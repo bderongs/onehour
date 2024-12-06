@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
 const openai = new OpenAI({
     apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -11,7 +12,6 @@ function ensureString(response: any): string {
     }
     if (typeof response === 'object') {
         try {
-            // For nested objects, extract values and join them
             const values = Object.values(response).filter(val => val !== undefined && val !== null);
             return values.join('. ');
         } catch {
@@ -23,9 +23,10 @@ function ensureString(response: any): string {
 
 export async function analyzeWithOpenAI(messages: { role: 'user' | 'assistant' | 'system', content: string }[], isForSummary: boolean = false) {
     try {
-        const systemMessage = isForSummary ? {
+        const systemMessage: ChatCompletionMessageParam = {
             role: 'system',
-            content: `You are a business analyst. Based on the conversation, create a structured summary of the problem. Extract only the facts mentioned and format them as complete sentences. Respond in JSON format with these fields:
+            content: isForSummary
+                ? `You are a business analyst. Based on the conversation, create a structured summary of the problem. Extract only the facts mentioned and format them as complete sentences. Respond in JSON format with these fields:
 - challenge (string): A clear statement of the main problem
 - currentSituation (string): A concise description of the current state
 - desiredOutcome (string): A clear statement of what success looks like
@@ -33,9 +34,7 @@ export async function analyzeWithOpenAI(messages: { role: 'user' | 'assistant' |
 - additionalInfo (string[]): List of other relevant details
 
 Important: All fields should contain complete, readable sentences, not structured data or key-value pairs.`
-        } : {
-            role: 'system',
-            content: `You are a business consultant analyzing problems. When a user presents their initial problem, analyze it immediately and ask specific follow-up questions about unclear aspects. Don't ask for a general description if one is already provided.
+                : `You are a business consultant analyzing problems. When a user presents their initial problem, analyze it immediately and ask specific follow-up questions about unclear aspects. Don't ask for a general description if one is already provided.
 
 Format your responses with clear structure:
 - Use line breaks between different points or questions
@@ -52,8 +51,16 @@ Focus on gathering missing details about:
 Be direct and concise in your analysis and questions. IMPORTANT: Always respond in plain text format only. Never return JSON or structured data in your response.`
         };
 
+        const formattedMessages: ChatCompletionMessageParam[] = [
+            systemMessage,
+            ...messages.map(msg => ({
+                role: msg.role,
+                content: msg.content
+            }))
+        ];
+
         const completion = await openai.chat.completions.create({
-            messages: [systemMessage, ...messages],
+            messages: formattedMessages,
             model: 'gpt-4',
             temperature: 0.7,
         });
@@ -62,7 +69,6 @@ Be direct and concise in your analysis and questions. IMPORTANT: Always respond 
 
         if (isForSummary) {
             try {
-                // For summary, validate the JSON and ensure all values are strings
                 const parsed = JSON.parse(response);
                 const formatted = {
                     challenge: ensureString(parsed.challenge),
@@ -87,7 +93,6 @@ Be direct and concise in your analysis and questions. IMPORTANT: Always respond 
                 });
             }
         } else {
-            // For chat responses, ensure we always return a string
             return ensureString(response);
         }
     } catch (error) {
