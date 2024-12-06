@@ -167,10 +167,11 @@ export function AIChatInterface({ initialProblem }: AIChatInterfaceProps) {
                             className={`flex ${message.isAi ? 'justify-start' : 'justify-end'}`}
                         >
                             <div
-                                className={`max-w-[80%] p-3 rounded-lg whitespace-pre-line ${message.isAi
-                                        ? 'bg-gray-100 text-gray-800'
-                                        : 'bg-blue-600 text-white'
+                                className={`max-w-[80%] p-3 rounded-lg ${message.isAi
+                                        ? 'bg-gray-100 text-gray-800 text-left'
+                                        : 'bg-blue-600 text-white text-left'
                                     }`}
+                                style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
                             >
                                 {formatMessage(message.content)}
                             </div>
@@ -201,8 +202,8 @@ export function AIChatInterface({ initialProblem }: AIChatInterfaceProps) {
                     <button
                         type="submit"
                         className={`p-2 rounded-lg ${isLoading
-                                ? 'bg-gray-400 cursor-not-allowed'
-                                : 'bg-blue-600 hover:bg-blue-700'
+                            ? 'bg-gray-400 cursor-not-allowed'
+                            : 'bg-blue-600 hover:bg-blue-700'
                             } text-white`}
                         disabled={isLoading}
                     >
