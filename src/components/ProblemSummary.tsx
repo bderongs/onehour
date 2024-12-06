@@ -25,35 +25,35 @@ export function ProblemSummary({ summary }: ProblemSummaryProps) {
     return (
         <div className="bg-white rounded-lg shadow-lg p-4 text-left">
             <div className="flex items-center gap-2 mb-4">
-                <FileText className="h-5 w-5 text-indigo-600" />
+                <FileText className="h-5 w-5 text-blue-600" />
                 <h2 className="text-lg font-semibold text-gray-900">Problem Summary</h2>
             </div>
 
             <div className="space-y-4 text-gray-800">
                 {summary.challenge && (
                     <div>
-                        <h3 className="font-medium text-indigo-600">Challenge</h3>
+                        <h3 className="font-medium text-blue-600">Challenge</h3>
                         <p className="mt-1 text-left">{ensureString(summary.challenge)}</p>
                     </div>
                 )}
 
                 {summary.currentSituation && (
                     <div>
-                        <h3 className="font-medium text-indigo-600">Current Situation</h3>
+                        <h3 className="font-medium text-blue-600">Current Situation</h3>
                         <p className="mt-1 text-left">{ensureString(summary.currentSituation)}</p>
                     </div>
                 )}
 
                 {summary.desiredOutcome && (
                     <div>
-                        <h3 className="font-medium text-indigo-600">Desired Outcome</h3>
+                        <h3 className="font-medium text-blue-600">Desired Outcome</h3>
                         <p className="mt-1 text-left">{ensureString(summary.desiredOutcome)}</p>
                     </div>
                 )}
 
                 {Array.isArray(summary.constraints) && summary.constraints.length > 0 && (
                     <div>
-                        <h3 className="font-medium text-indigo-600">Constraints</h3>
+                        <h3 className="font-medium text-blue-600">Constraints</h3>
                         <ul className="mt-1 list-disc list-inside text-left">
                             {summary.constraints.map((constraint, index) => (
                                 <li key={index}>{ensureString(constraint)}</li>
@@ -64,7 +64,7 @@ export function ProblemSummary({ summary }: ProblemSummaryProps) {
 
                 {Array.isArray(summary.additionalInfo) && summary.additionalInfo.length > 0 && (
                     <div>
-                        <h3 className="font-medium text-indigo-600">Additional Information</h3>
+                        <h3 className="font-medium text-blue-600">Additional Information</h3>
                         <ul className="mt-1 list-disc list-inside text-left">
                             {summary.additionalInfo.map((info, index) => (
                                 <li key={index}>{ensureString(info)}</li>
@@ -75,14 +75,14 @@ export function ProblemSummary({ summary }: ProblemSummaryProps) {
 
                 {hasSufficientInfo && (
                     <div className="mt-6 border-t pt-4">
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                            <p className="text-green-800 font-medium">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                            <p className="text-blue-800 font-medium">
                                 Your problem is well defined and ready for expert consultation
                             </p>
                         </div>
                         <button
                             onClick={() => window.location.href = '/find-consultant'}
-                            className="w-full bg-indigo-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 shadow-md"
+                            className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-md"
                         >
                             Connect with a Consultant
                             <ArrowRight className="h-5 w-5" />

@@ -168,8 +168,8 @@ export function AIChatInterface({ initialProblem }: AIChatInterfaceProps) {
                         >
                             <div
                                 className={`max-w-[80%] p-3 rounded-lg whitespace-pre-line ${message.isAi
-                                    ? 'bg-gray-100 text-gray-800 text-left'
-                                    : 'bg-indigo-600 text-white'
+                                        ? 'bg-gray-100 text-gray-800'
+                                        : 'bg-blue-600 text-white'
                                     }`}
                             >
                                 {formatMessage(message.content)}
@@ -194,15 +194,15 @@ export function AIChatInterface({ initialProblem }: AIChatInterfaceProps) {
                         type="text"
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        className="flex-grow p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900"
+                        className="flex-grow p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                         placeholder="Type your message..."
                         disabled={isLoading}
                     />
                     <button
                         type="submit"
                         className={`p-2 rounded-lg ${isLoading
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-indigo-600 hover:bg-indigo-700'
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-blue-600 hover:bg-blue-700'
                             } text-white`}
                         disabled={isLoading}
                     >

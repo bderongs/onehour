@@ -21,7 +21,7 @@ export function Hero() {
   };
 
   return (
-    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+    <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="text-center">
           {!showChat ? (
@@ -31,7 +31,7 @@ export function Hero() {
                 <br />
                 One Hour at a Time
               </h1>
-              <p className="text-xl md:text-2xl mb-8 text-indigo-100">
+              <p className="text-xl md:text-2xl mb-8 text-blue-50">
                 Describe your challenge below and we'll match you with the perfect expert
               </p>
 
@@ -46,7 +46,7 @@ export function Hero() {
                 />
                 <button
                   type="submit"
-                  className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-colors flex items-center mx-auto"
+                  className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center mx-auto"
                 >
                   Find an Expert
                   <ArrowRight className="ml-2 h-5 w-5" />
