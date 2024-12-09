@@ -2,18 +2,20 @@ import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { AIChatInterface } from './AIChatInterface';
 
-export function Hero() {
-  const [problem, setProblem] = useState('');
+interface HeroProps {
+  onConnect: () => void;
+}
+
+export function Hero({ onConnect }: HeroProps) {
   const [showChat, setShowChat] = useState(false);
+  const [problem, setProblem] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (problem.trim()) {
-      setShowChat(true);
-    }
+    setShowChat(true);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
@@ -64,7 +66,7 @@ export function Hero() {
             </>
           ) : (
             <div className="mb-8">
-              <AIChatInterface initialProblem={problem} />
+              <AIChatInterface initialProblem={problem} onConnect={onConnect} />
             </div>
           )}
         </div>

@@ -10,6 +10,7 @@ interface Message {
 
 interface AIChatInterfaceProps {
     initialProblem: string;
+    onConnect: () => void;
 }
 
 interface ProblemDetails {
@@ -20,7 +21,7 @@ interface ProblemDetails {
     additionalInfo?: string[];
 }
 
-export function AIChatInterface({ initialProblem }: AIChatInterfaceProps) {
+export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfaceProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -168,8 +169,8 @@ export function AIChatInterface({ initialProblem }: AIChatInterfaceProps) {
                         >
                             <div
                                 className={`max-w-[80%] p-3 rounded-lg ${message.isAi
-                                        ? 'bg-gray-100 text-gray-800 text-left'
-                                        : 'bg-blue-600 text-white text-left'
+                                    ? 'bg-gray-100 text-gray-800 text-left'
+                                    : 'bg-blue-600 text-white text-left'
                                     }`}
                                 style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
                             >
@@ -213,7 +214,7 @@ export function AIChatInterface({ initialProblem }: AIChatInterfaceProps) {
             </div>
 
             <div className="w-80">
-                <ProblemSummary summary={problemSummary} />
+                <ProblemSummary summary={problemSummary} onConnect={onConnect} />
             </div>
         </div>
     );

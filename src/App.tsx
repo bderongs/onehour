@@ -1,18 +1,17 @@
-import React from 'react';
-import { Header } from './components/Header';
+import React, { useState } from 'react';
 import { Hero } from './components/Hero';
-import { Features } from './components/Features';
-import { Footer } from './components/Footer';
+import { ConsultantConnect } from './components/ConsultantConnect';
 
 function App() {
+  const [currentPage, setCurrentPage] = useState<'home' | 'connect'>('home');
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-grow">
-        <Hero />
-        <Features />
-      </main>
-      <Footer />
+    <div className="min-h-screen bg-gray-50">
+      {currentPage === 'home' ? (
+        <Hero onConnect={() => setCurrentPage('connect')} />
+      ) : (
+        <ConsultantConnect onBack={() => setCurrentPage('home')} />
+      )}
     </div>
   );
 }

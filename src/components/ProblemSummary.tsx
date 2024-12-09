@@ -11,9 +11,10 @@ interface ProblemDetails {
 
 interface ProblemSummaryProps {
     summary: ProblemDetails;
+    onConnect: () => void;
 }
 
-export function ProblemSummary({ summary }: ProblemSummaryProps) {
+export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
     const ensureString = (value: any): string => {
         if (typeof value === 'string') return value;
         if (typeof value === 'object') return JSON.stringify(value);
@@ -21,6 +22,12 @@ export function ProblemSummary({ summary }: ProblemSummaryProps) {
     };
 
     const hasSufficientInfo = summary.challenge && summary.currentSituation && summary.desiredOutcome;
+
+    const handleConnectClick = () => {
+        localStorage.setItem('problemSummary', JSON.stringify(summary));
+        onConnect(); // Use the prop instead of window.location
+    };
+
 
     return (
         <div className="bg-white rounded-lg shadow-lg p-4 text-left">
@@ -81,7 +88,7 @@ export function ProblemSummary({ summary }: ProblemSummaryProps) {
                             </p>
                         </div>
                         <button
-                            onClick={() => window.location.href = '/find-consultant'}
+                            onClick={handleConnectClick}
                             className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-md"
                         >
                             Connect with a Consultant
