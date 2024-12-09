@@ -1,10 +1,17 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Header } from './components/Header';
+import { Footer } from './components/Footer';
+import { Hero } from './components/Hero';
+import { Features } from './components/Features';
 import './index.css';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
+ReactDOM.render(
+  <React.StrictMode>
+    <Header />
+    <Hero onConnect={() => {}} />
+    <Features />
+    <Footer />
+  </React.StrictMode>,
+  document.getElementById('root')
 );
