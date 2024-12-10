@@ -48,7 +48,7 @@ Focus on gathering missing details about:
 3) Previous attempts to solve
 4) Constraints (budget, timeline, etc)
 
-Keep responses short and focused. Don't ask more than 2 questions at a time. IMPORTANT: Always respond in plain text format only. Never return JSON or structured data in your response.`
+Keep responses short and focused. Don't ask more than 1 question at a time. IMPORTANT: Always respond in plain text format only. Never return JSON or structured data in your response.`
         };
 
         const formattedMessages: ChatCompletionMessageParam[] = [
@@ -61,7 +61,7 @@ Keep responses short and focused. Don't ask more than 2 questions at a time. IMP
 
         const completion = await openai.chat.completions.create({
             messages: formattedMessages,
-            model: 'gpt-4',
+            model: 'gpt-4o',
             temperature: isForSummary ? 0 : 0.7, // Use temperature 0 for more consistent JSON
         });
 
