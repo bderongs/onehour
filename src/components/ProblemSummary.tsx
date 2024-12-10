@@ -25,42 +25,41 @@ export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
 
     const handleConnectClick = () => {
         localStorage.setItem('problemSummary', JSON.stringify(summary));
-        onConnect(); // Use the prop instead of window.location
+        onConnect();
     };
-
 
     return (
         <div className="bg-white rounded-lg shadow-lg p-4 text-left">
             <div className="flex items-center gap-2 mb-4">
                 <FileText className="h-5 w-5 text-blue-600" />
-                <h2 className="text-lg font-semibold text-gray-900">Problem Summary</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Résumé du Problème</h2>
             </div>
 
             <div className="space-y-4 text-gray-800">
                 {summary.challenge && (
                     <div>
-                        <h3 className="font-medium text-blue-600">Challenge</h3>
+                        <h3 className="font-medium text-blue-600">Défi</h3>
                         <p className="mt-1 text-left">{ensureString(summary.challenge)}</p>
                     </div>
                 )}
 
                 {summary.currentSituation && (
                     <div>
-                        <h3 className="font-medium text-blue-600">Current Situation</h3>
+                        <h3 className="font-medium text-blue-600">Situation Actuelle</h3>
                         <p className="mt-1 text-left">{ensureString(summary.currentSituation)}</p>
                     </div>
                 )}
 
                 {summary.desiredOutcome && (
                     <div>
-                        <h3 className="font-medium text-blue-600">Desired Outcome</h3>
+                        <h3 className="font-medium text-blue-600">Résultat Souhaité</h3>
                         <p className="mt-1 text-left">{ensureString(summary.desiredOutcome)}</p>
                     </div>
                 )}
 
                 {Array.isArray(summary.constraints) && summary.constraints.length > 0 && (
                     <div>
-                        <h3 className="font-medium text-blue-600">Constraints</h3>
+                        <h3 className="font-medium text-blue-600">Contraintes</h3>
                         <ul className="mt-1 list-disc list-inside text-left">
                             {summary.constraints.map((constraint, index) => (
                                 <li key={index}>{ensureString(constraint)}</li>
@@ -71,7 +70,7 @@ export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
 
                 {Array.isArray(summary.additionalInfo) && summary.additionalInfo.length > 0 && (
                     <div>
-                        <h3 className="font-medium text-blue-600">Additional Information</h3>
+                        <h3 className="font-medium text-blue-600">Informations Supplémentaires</h3>
                         <ul className="mt-1 list-disc list-inside text-left">
                             {summary.additionalInfo.map((info, index) => (
                                 <li key={index}>{ensureString(info)}</li>
@@ -84,14 +83,14 @@ export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
                     <div className="mt-6 border-t pt-4">
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                             <p className="text-blue-800 font-medium">
-                                Your problem is well defined and ready for expert consultation
+                                Votre problème est bien défini et prêt pour une consultation d'expert
                             </p>
                         </div>
                         <button
                             onClick={handleConnectClick}
                             className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-md"
                         >
-                            Connect with a Consultant
+                            Se Connecter avec un Consultant
                             <ArrowRight className="h-5 w-5" />
                         </button>
                     </div>
@@ -99,7 +98,7 @@ export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
 
                 {Object.keys(summary).length === 0 && (
                     <p className="text-gray-500 italic text-left">
-                        The summary will be updated as you provide more information...
+                        Le résumé sera mis à jour au fur et à mesure que vous fournissez plus d'informations...
                     </p>
                 )}
             </div>

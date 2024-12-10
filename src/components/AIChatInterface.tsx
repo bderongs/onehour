@@ -28,6 +28,9 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
     const [problemSummary, setProblemSummary] = useState<ProblemDetails>({});
     const [isInitialized, setIsInitialized] = useState(false);
 
+    // Add ref for scrolling
+    const chatContainerRef = React.useRef<HTMLDivElement>(null);
+
     // Initial analysis of the problem
     useEffect(() => {
         const analyzeInitialProblem = async () => {
@@ -89,6 +92,13 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
 
         analyzeInitialProblem();
     }, [initialProblem, isInitialized]);
+
+    // Scroll to bottom when messages change
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -159,9 +169,12 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
     };
 
     return (
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto">
             <div className="flex-1 bg-white rounded-lg shadow-lg p-4">
-                <div className="h-96 overflow-y-auto mb-4 space-y-4">
+                <div
+                    ref={chatContainerRef}
+                    className="h-[calc(100vh-300px)] lg:h-96 overflow-y-auto mb-4 space-y-4"
+                >
                     {messages.map((message, index) => (
                         <div
                             key={index}
@@ -197,7 +210,7 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         className="flex-grow p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                        placeholder="Type your message..."
+                        placeholder="Tapez votre message..."
                         disabled={isLoading}
                     />
                     <button
@@ -213,7 +226,7 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
                 </form>
             </div>
 
-            <div className="w-80">
+            <div className="lg:w-80">
                 <ProblemSummary summary={problemSummary} onConnect={onConnect} />
             </div>
         </div>

@@ -48,21 +48,21 @@ export function ConsultantConnect({ onBack }: ConsultantConnectProps) {
                         <CheckCircle className="h-16 w-16 text-green-500" />
                     </div>
                     <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                        Thank You for Your Request!
+                        Merci pour Votre Demande !
                     </h1>
                     <p className="text-lg text-gray-600 mb-6">
-                        We've received your consultation request and will contact you within the next 24 hours
-                        via {form.preferredContact === 'email' ? 'email' : 'phone'}.
+                        Nous avons reçu votre demande de consultation et vous contacterons dans les prochaines 24 heures
+                        par {form.preferredContact === 'email' ? 'email' : 'téléphone'}.
                     </p>
                     <div className="bg-gray-50 p-4 rounded-lg mb-6">
                         <p className="text-gray-600">
-                            <span className="font-medium">Contact Details:</span><br />
+                            <span className="font-medium">Coordonnées :</span><br />
                             {form.name}<br />
                             {form.preferredContact === 'email' ? form.email : form.phone}
                         </p>
                     </div>
                     <p className="text-sm text-gray-500">
-                        Redirecting you back to home in a few seconds...
+                        Redirection vers l'accueil dans quelques secondes...
                     </p>
                 </div>
             </div>
@@ -76,29 +76,29 @@ export function ConsultantConnect({ onBack }: ConsultantConnectProps) {
                 className="flex items-center text-blue-600 mb-6 hover:text-blue-700"
             >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                Retour
             </button>
 
             <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">Confirm Your Consultation Request</h1>
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">Confirmez Votre Demande de Consultation</h1>
 
                 <div className="mb-6">
-                    <h2 className="text-lg font-semibold text-blue-600 mb-2">Problem Summary</h2>
+                    <h2 className="text-lg font-semibold text-blue-600 mb-2">Résumé du Problème</h2>
                     {problemSummary.challenge && (
                         <div className="mb-3">
-                            <h3 className="font-medium text-gray-700">Challenge</h3>
+                            <h3 className="font-medium text-gray-700">Défi</h3>
                             <p className="text-gray-600">{problemSummary.challenge}</p>
                         </div>
                     )}
                     {problemSummary.currentSituation && (
                         <div className="mb-3">
-                            <h3 className="font-medium text-gray-700">Current Situation</h3>
+                            <h3 className="font-medium text-gray-700">Situation Actuelle</h3>
                             <p className="text-gray-600">{problemSummary.currentSituation}</p>
                         </div>
                     )}
                     {problemSummary.desiredOutcome && (
                         <div className="mb-3">
-                            <h3 className="font-medium text-gray-700">Desired Outcome</h3>
+                            <h3 className="font-medium text-gray-700">Résultat Souhaité</h3>
                             <p className="text-gray-600">{problemSummary.desiredOutcome}</p>
                         </div>
                     )}
@@ -107,7 +107,7 @@ export function ConsultantConnect({ onBack }: ConsultantConnectProps) {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Full Name *
+                            Nom Complet *
                         </label>
                         <input
                             type="text"
@@ -120,7 +120,7 @@ export function ConsultantConnect({ onBack }: ConsultantConnectProps) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Email Address *
+                            Adresse Email *
                         </label>
                         <input
                             type="email"
@@ -133,7 +133,7 @@ export function ConsultantConnect({ onBack }: ConsultantConnectProps) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Phone Number (optional)
+                            Numéro de Téléphone (optionnel)
                         </label>
                         <input
                             type="tel"
@@ -145,7 +145,7 @@ export function ConsultantConnect({ onBack }: ConsultantConnectProps) {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Preferred Contact Method *
+                            Mode de Contact Préféré *
                         </label>
                         <div className="space-x-4">
                             <label className="inline-flex items-center">
@@ -168,14 +168,14 @@ export function ConsultantConnect({ onBack }: ConsultantConnectProps) {
                                     checked={form.preferredContact === 'phone'}
                                     onChange={() => setForm({ ...form, preferredContact: 'phone' })}
                                 />
-                                <span className="ml-2">Phone</span>
+                                <span className="ml-2">Téléphone</span>
                             </label>
                         </div>
                     </div>
 
                     <div className="bg-blue-50 p-4 rounded-lg">
                         <p className="text-blue-800">
-                            By submitting this form, you'll be contacted by one of our expert consultants within the next 24 hours.
+                            En soumettant ce formulaire, vous serez contacté par l'un de nos consultants experts dans les prochaines 24 heures.
                         </p>
                     </div>
 
@@ -183,7 +183,7 @@ export function ConsultantConnect({ onBack }: ConsultantConnectProps) {
                         type="submit"
                         className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
                     >
-                        Request Consultation
+                        Demander une Consultation
                     </button>
                 </form>
             </div>
