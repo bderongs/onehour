@@ -22,9 +22,7 @@ export function Footer() {
             <h3 className="text-lg font-semibold mb-4">Liens Rapides</h3>
             <ul className="space-y-2">
               <li><a href="/" className="text-gray-400 hover:text-white">Accueil</a></li>
-              <li><a href="/find-expert" className="text-gray-400 hover:text-white">Trouver un Expert</a></li>
-              <li><a href="/become-consultant" className="text-gray-400 hover:text-white">Devenir Consultant</a></li>
-              <li><a href="/how-it-works" className="text-gray-400 hover:text-white">Comment ça Marche</a></li>
+              <li><a href="#how-it-works" className="text-gray-400 hover:text-white">Comment ça Marche</a></li>
             </ul>
           </div>
 
