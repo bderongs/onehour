@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { getChatHistory } from '../services/chatStorage';
 
 interface ContactForm {
     name: string;
@@ -33,11 +34,50 @@ export function ConsultantConnect({ onBack }: ConsultantConnectProps) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Here you would typically send this to your backend
-        console.log('Form submitted:', form);
-        setIsSubmitted(true);
-        // Wait 3 seconds before going back
-        setTimeout(onBack, 3000);
+
+        // Get chat history from localStorage or state management
+        const chatHistory = getChatHistory();
+
+        // Prepare the data
+        const consultationData = {
+            // Contact Details
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+            preferredContact: form.preferredContact,
+
+            // Problem Summary
+            problemSummary: JSON.stringify(problemSummary),
+
+            // Chat History
+            chatHistory: JSON.stringify(chatHistory),
+
+            // Timestamp
+            submittedAt: new Date().toISOString()
+        };
+
+        try {
+            // Send to your endpoint
+            const response = await fetch('https://your-form-endpoint/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(consultationData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to submit consultation data');
+            }
+
+            // If successful, show success message and redirect
+            setIsSubmitted(true);
+            setTimeout(onBack, 3000);
+
+        } catch (error) {
+            console.error('Error submitting consultation:', error);
+            // You might want to show an error message to the user here
+        }
     };
 
     if (isSubmitted) {
