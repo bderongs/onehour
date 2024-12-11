@@ -1,17 +1,22 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import React, { Suspense } from 'react';
+import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
 
-const container = document.getElementById('root');
-if (!container) throw new Error('Failed to find the root element');
-const root = createRoot(container);
+// Configure future flags
+const router = {
+  future: {
+    v7_startTransition: true,
+  },
+};
 
-root.render(
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
+    <BrowserRouter future={router.future}>
+      <Suspense fallback={<div>Loading...</div>}>
+        <App />
+      </Suspense>
     </BrowserRouter>
   </React.StrictMode>
 );
