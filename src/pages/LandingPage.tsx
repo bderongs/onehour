@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { ArrowRight, Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap } from 'lucide-react';
+import { ArrowRight, Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Star, Quote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { AIChatInterface, Message } from '../components/AIChatInterface';
+import { ConsultantConnect } from '../components/ConsultantConnect';
+import { UseCaseForm } from '../components/UseCaseForm';
 
 interface UseCase {
     icon: React.ReactNode;
@@ -12,6 +15,10 @@ interface UseCase {
 export function LandingPage() {
     const navigate = useNavigate();
     const [problem, setProblem] = useState('');
+    const [showChat, setShowChat] = useState(false);
+    const [showConnect, setShowConnect] = useState(false);
+    const [showForm, setShowForm] = useState(true); // Ensure UseCaseForm is shown initially
+    const [messages, setMessages] = useState<Message[]>([]);
 
     const useCases: UseCase[] = [
         {
@@ -46,7 +53,8 @@ export function LandingPage() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        navigate('/chat', { state: { problem } });
+        setShowChat(true);
+        setShowForm(false); // Hide UseCaseForm when chat is shown
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -54,6 +62,20 @@ export function LandingPage() {
             e.preventDefault();
             handleSubmit(e);
         }
+    };
+
+    const handleConnect = () => {
+        setShowConnect(true);
+        setShowChat(false); // Hide AIChatInterface when ConsultantConnect is shown
+    };
+
+    const handleBack = () => {
+        setShowConnect(false);
+        setShowChat(true); // Show AIChatInterface when going back from ConsultantConnect
+    };
+
+    const handleMessagesUpdate = (newMessages: Message[]) => {
+        setMessages(newMessages);
     };
 
     const whyChoose = [
@@ -102,6 +124,33 @@ export function LandingPage() {
         }
     ];
 
+    const clientReviews = [
+        {
+            name: "Pascal Larue",
+            role: "CTO",
+            company: "TechCorp",
+            review: "Service exceptionnel ! J'ai pu résoudre mon problème en une heure seulement. L'expert était très compétent et a parfaitement compris nos besoins.",
+            rating: 5,
+            initials: "JD"
+        },
+        {
+            name: "Marie Curie",
+            role: "Directrice Innovation",
+            company: "ScienceLab",
+            review: "Les experts sont très professionnels et à l'écoute. Je recommande vivement. La qualité des conseils a dépassé mes attentes.",
+            rating: 4,
+            initials: "MC"
+        },
+        {
+            name: "Albert Einstein",
+            role: "CEO",
+            company: "FutureTech",
+            review: "Une solution rapide et efficace. Très satisfait du service. L'accompagnement était personnalisé et pertinent.",
+            rating: 5,
+            initials: "AE"
+        }
+    ];
+
     return (
         <div className="bg-gradient-to-b from-white to-gray-50">
             {/* Hero Section */}
@@ -127,43 +176,29 @@ export function LandingPage() {
                         </div>
 
                         <div className="max-w-5xl mx-auto">
-                            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                                {useCases.map((useCase, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => handleUseCaseClick(useCase.prefillText)}
-                                        className="p-6 rounded-xl text-left transition-all bg-white hover:bg-gray-50 border border-gray-200 hover:border-blue-200 shadow-sm hover:shadow-md"
-                                    >
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
-                                                {useCase.icon}
-                                            </div>
-                                            <h3 className="font-semibold text-gray-900">{useCase.title}</h3>
-                                        </div>
-                                        <p className="text-sm text-gray-600">{useCase.description}</p>
-                                    </button>
-                                ))}
-                            </div>
-
-                            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                                <textarea
-                                    value={problem}
-                                    onChange={(e) => setProblem(e.target.value)}
-                                    onKeyDown={handleKeyDown}
-                                    placeholder="Décrivez votre défi professionnel..."
-                                    className="flex-grow p-6 rounded-xl text-gray-900 h-48 text-left border border-gray-200 shadow-sm focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
-                                    required
+                            <div className={`${showForm ? 'block' : 'hidden'}`}>
+                                <UseCaseForm
+                                    useCases={useCases}
+                                    problem={problem}
+                                    setProblem={setProblem}
+                                    handleSubmit={handleSubmit}
+                                    handleUseCaseClick={handleUseCaseClick}
+                                    handleKeyDown={handleKeyDown}
                                 />
-                                <div className="flex items-center lg:justify-end">
-                                    <button
-                                        type="submit"
-                                        className="w-full lg:w-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
-                                    >
-                                        Trouver un Expert
-                                        <ArrowRight className="h-5 w-5" />
-                                    </button>
-                                </div>
-                            </form>
+                            </div>
+                            <div className={`${showChat ? 'block' : 'hidden'}`}>
+                                <AIChatInterface
+                                    initialProblem={problem}
+                                    onConnect={handleConnect}
+                                    messages={messages}
+                                    onMessagesUpdate={handleMessagesUpdate}
+                                />
+                            </div>
+                            <div className={`${showConnect ? 'block' : 'hidden'}`}>
+                                <ConsultantConnect
+                                    onBack={handleBack}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -198,7 +233,7 @@ export function LandingPage() {
             </div>
 
             {/* How it Works Section */}
-            <div className="py-24 bg-gray-50">
+            <div className="py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -208,22 +243,72 @@ export function LandingPage() {
                             Un processus simple en quatre étapes pour obtenir les conseils dont vous avez besoin
                         </p>
                     </div>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="flex flex-col md:flex-row justify-center items-center space-y-8 md:space-y-0 md:space-x-8">
                         {howItWorks.map((step, index) => (
+                            <React.Fragment key={index}>
+                                <div className="text-center">
+                                    <div className="p-3 bg-blue-50 rounded-lg w-fit mx-auto mb-4">
+                                        {React.cloneElement(step.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
+                                    </div>
+                                    <h3 className="text-xl font-semibold mb-2 text-gray-900">{step.title}</h3>
+                                    <p className="text-gray-600">{step.description}</p>
+                                </div>
+                                {index < howItWorks.length - 1 && (
+                                    <ArrowRightCircle className="h-8 w-8 text-blue-600 hidden md:block" />
+                                )}
+                            </React.Fragment>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Client Reviews Section - Temporarily hidden
+            <div className="py-24 bg-gradient-to-b from-gray-50 to-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            Ils Nous Font Confiance
+                        </h2>
+                        <p className="text-xl text-gray-600">
+                            Plus de 100 entreprises conseillées avec succès
+                        </p>
+                    </div>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {clientReviews.map((review, index) => (
                             <div
                                 key={index}
-                                className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all"
+                                className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-all relative"
                             >
-                                <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
-                                    {React.cloneElement(step.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
+                                <Quote className="absolute top-4 right-4 h-8 w-8 text-blue-100" />
+                                <div className="flex items-center mb-6">
+                                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-lg mr-4">
+                                        {review.initials}
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-gray-900">{review.name}</h3>
+                                        <p className="text-sm text-gray-600">{review.role}</p>
+                                        <p className="text-sm font-medium text-blue-600">{review.company}</p>
+                                    </div>
                                 </div>
-                                <h3 className="text-xl font-semibold mb-2 text-gray-900">{step.title}</h3>
-                                <p className="text-gray-600">{step.description}</p>
+                                <p className="text-gray-600 mb-6 italic">"{review.review}"</p>
+                                <div className="flex items-center">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Star
+                                            key={i}
+                                            className={`h-5 w-5 ${
+                                                i < review.rating
+                                                    ? 'text-yellow-400 fill-yellow-400'
+                                                    : 'text-gray-200'
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         ))}
                     </div>
                 </div>
             </div>
+            */}
         </div>
     );
 }

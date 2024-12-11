@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Send } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { analyzeWithOpenAI } from '../services/openai';
 import { ProblemSummary } from './ProblemSummary';
 
-interface Message {
+export interface Message {
+    role: 'user' | 'assistant';
     content: string;
-    isAi: boolean;
 }
 
 interface AIChatInterfaceProps {
     initialProblem: string;
     onConnect: () => void;
+    messages?: Message[];
+    onMessagesUpdate?: (messages: Message[]) => void;
 }
 
 interface ProblemDetails {
@@ -21,8 +23,8 @@ interface ProblemDetails {
     additionalInfo?: string[];
 }
 
-export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfaceProps) {
-    const [messages, setMessages] = useState<Message[]>([]);
+export function AIChatInterface({ initialProblem, onConnect, messages: externalMessages, onMessagesUpdate }: AIChatInterfaceProps) {
+    const [messages, setMessages] = useState<Message[]>(externalMessages || []);
     const [newMessage, setNewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [problemSummary, setProblemSummary] = useState<ProblemDetails>({});
@@ -30,6 +32,7 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
 
     // Add ref for scrolling
     const chatContainerRef = React.useRef<HTMLDivElement>(null);
+    const componentRef = React.useRef<HTMLDivElement>(null);
 
     // Initial analysis of the problem
     useEffect(() => {
@@ -41,7 +44,7 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
 
             try {
                 // Add the initial problem to messages
-                const initialMessages = [{ content: initialProblem, isAi: false }];
+                const initialMessages: Message[] = [{ role: 'user', content: initialProblem }];
                 setMessages(initialMessages);
 
                 const aiResponse = await analyzeWithOpenAI([
@@ -52,13 +55,13 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
                 ], false);
 
                 if (aiResponse) {
-                    const updatedMessages = [...initialMessages, { content: aiResponse, isAi: true }];
+                    const updatedMessages: Message[] = [...initialMessages, { role: 'assistant', content: aiResponse }];
                     setMessages(updatedMessages);
 
                     // Get initial summary
                     const summaryResponse = await analyzeWithOpenAI(
-                        updatedMessages.map(msg => ({
-                            role: msg.isAi ? 'assistant' : 'user',
+                        updatedMessages.map((msg): Message => ({
+                            role: msg.role,
                             content: msg.content
                         })),
                         true // Get summary response
@@ -83,8 +86,8 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
             } catch (error) {
                 console.error('Error analyzing initial problem:', error);
                 setMessages(prev => [...prev, {
-                    content: "I apologize, but I'm having trouble connecting. Please try again.",
-                    isAi: true
+                    role: 'assistant',
+                    content: "I apologize, but I'm having trouble connecting. Please try again."
                 }]);
             }
             setIsLoading(false);
@@ -100,33 +103,51 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
         }
     }, [messages]);
 
+    // Scroll to top when component changes
+    useEffect(() => {
+        if (componentRef.current) {
+            window.scrollTo({ top: componentRef.current.offsetTop, behavior: 'smooth' });
+        }
+    }, []);
+
+    useEffect(() => {
+        if (initialProblem && messages.length === 0) {
+            setMessages([{ role: 'user', content: initialProblem }]);
+        }
+    }, [initialProblem]);
+
+    const updateMessages = (newMessages: Message[]) => {
+        setMessages(newMessages);
+        onMessagesUpdate?.(newMessages);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newMessage.trim() || isLoading) return;
 
         const userMessage = newMessage.trim();
-        setMessages(prev => [...prev, { content: userMessage, isAi: false }]);
+        setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
         setNewMessage('');
         setIsLoading(true);
 
         try {
-            const updatedMessages = [...messages, { content: userMessage, isAi: false }];
+            const updatedMessages: Message[] = [...messages, { role: 'user', content: userMessage }];
             const aiResponse = await analyzeWithOpenAI(
-                updatedMessages.map(msg => ({
-                    role: msg.isAi ? 'assistant' : 'user',
+                updatedMessages.map((msg): Message => ({
+                    role: msg.role,
                     content: msg.content
                 })),
                 false // regular chat response
             );
 
             if (aiResponse) {
-                const newMessages = [...updatedMessages, { content: aiResponse, isAi: true }];
+                const newMessages: Message[] = [...updatedMessages, { role: 'assistant', content: aiResponse }];
                 setMessages(newMessages);
 
                 // Update summary after each interaction
                 const summaryResponse = await analyzeWithOpenAI(
-                    newMessages.map(msg => ({
-                        role: msg.isAi ? 'assistant' : 'user',
+                    newMessages.map((msg): Message => ({
+                        role: msg.role,
                         content: msg.content
                     })),
                     true // summary response
@@ -144,12 +165,25 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
         } catch (error) {
             console.error('Error getting AI response:', error);
             setMessages(prev => [...prev, {
-                content: "I apologize, but I'm having trouble connecting. Please try again.",
-                isAi: true
+                role: 'assistant',
+                content: "I apologize, but I'm having trouble connecting. Please try again."
             }]);
         }
 
         setIsLoading(false);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit(e as unknown as React.FormEvent);
+        }
+    };
+
+    const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setNewMessage(e.target.value);
+        e.target.style.height = 'auto';
+        e.target.style.height = `${e.target.scrollHeight}px`;
     };
 
     const formatMessage = (content: any): React.ReactNode => {
@@ -169,19 +203,19 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
     };
 
     return (
-        <div className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto">
-            <div className="flex-1 bg-white rounded-lg shadow-lg p-4">
+        <div ref={componentRef} className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto">
+            <div className="flex-1 bg-white rounded-lg shadow-lg p-4 flex flex-col">
                 <div
                     ref={chatContainerRef}
-                    className="h-[calc(100vh-300px)] lg:h-96 overflow-y-auto mb-4 space-y-4"
+                    className="flex-1 overflow-y-auto mb-4 space-y-4"
                 >
                     {messages.map((message, index) => (
                         <div
                             key={index}
-                            className={`flex ${message.isAi ? 'justify-start' : 'justify-end'}`}
+                            className={`flex ${message.role === 'assistant' ? 'justify-start' : 'justify-end'}`}
                         >
                             <div
-                                className={`max-w-[80%] p-3 rounded-lg ${message.isAi
+                                className={`max-w-[80%] p-3 rounded-lg ${message.role === 'assistant'
                                     ? 'bg-gray-100 text-gray-800 text-left'
                                     : 'bg-blue-600 text-white text-left'
                                     }`}
@@ -204,25 +238,29 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
                     )}
                 </div>
 
-                <form onSubmit={handleSubmit} className="flex gap-2">
-                    <input
-                        type="text"
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        className="flex-grow p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                        placeholder="Tapez votre message..."
-                        disabled={isLoading}
-                    />
-                    <button
-                        type="submit"
-                        className={`p-2 rounded-lg ${isLoading
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-blue-600 hover:bg-blue-700'
-                            } text-white`}
-                        disabled={isLoading}
-                    >
-                        <Send className="h-5 w-5" />
-                    </button>
+                <form onSubmit={handleSubmit} className="flex gap-2 items-center">
+                    <div className="relative flex-grow">
+                        <textarea
+                            value={newMessage}
+                            onChange={handleInput}
+                            onKeyDown={handleKeyDown}
+                            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 pr-10"
+                            placeholder="Tapez votre message..."
+                            disabled={isLoading}
+                            rows={2}
+                            style={{ overflow: 'hidden' }}
+                        />
+                        <button
+                            type="submit"
+                            className={`absolute right-2 bottom-4 p-2 rounded-full ${isLoading
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-blue-600 hover:bg-blue-700'
+                                } text-white`}
+                            disabled={isLoading}
+                        >
+                            <ArrowRight className="h-5 w-5" />
+                        </button>
+                    </div>
                 </form>
             </div>
 
@@ -231,4 +269,4 @@ export function AIChatInterface({ initialProblem, onConnect }: AIChatInterfacePr
             </div>
         </div>
     );
-} 
+}
