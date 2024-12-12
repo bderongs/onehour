@@ -151,6 +151,29 @@ export function LandingPage() {
         }
     ];
 
+    const expertiseHighlights = [
+        {
+            icon: <Shield className="h-6 w-6" />,
+            title: "Experts Sélectionnés",
+            description: "Nos consultants sont rigoureusement sélectionnés pour leur expertise pointue et leur expérience confirmée dans leur domaine."
+        },
+        {
+            icon: <Award className="h-6 w-6" />,
+            title: "Expertise Validée",
+            description: "Minimum 10 ans d'expérience professionnelle, certifications reconnues et track record vérifié."
+        },
+        {
+            icon: <Clock className="h-6 w-6" />,
+            title: "Engagement Temps",
+            description: "Nos experts s'engagent à fournir des conseils actionnables dans le temps imparti d'une heure."
+        },
+        {
+            icon: <Star className="h-6 w-6" />,
+            title: "Excellence Garantie",
+            description: "Satisfaction client suivie et maintien d'une note minimale de 4.8/5 pour nos consultants."
+        }
+    ];
+
     return (
         <div className="bg-gradient-to-b from-white to-gray-50">
             {/* Hero Section */}
@@ -162,7 +185,7 @@ export function LandingPage() {
                             Le concentré de conseil expert
                         </h1>
                         <p className="text-xl md:text-2xl mb-12 text-gray-600">
-                            Décrivez votre problème et programmez une session de micro-consulting pour le résoudre.
+                            Décrivez votre problème et programmez une session de micro-consulting avec l'un de nos experts.
                         </p>
 
                         {/* Pricing Section */}
@@ -228,6 +251,62 @@ export function LandingPage() {
                                 <p className="text-gray-600">{reason.description}</p>
                             </div>
                         ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Experts Section */}
+            <div className="py-24 bg-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            Des Experts de Confiance
+                        </h2>
+                        <p className="text-xl text-gray-600 mb-8">
+                            Une sélection rigoureuse des meilleurs consultants pour votre réussite
+                        </p>
+                        <div className="max-w-3xl mx-auto bg-blue-50 rounded-xl p-6 mb-12">
+                            <p className="text-blue-800 text-lg">
+                                "Nous sélectionnons moins de 5% des candidats consultants pour garantir
+                                une expertise exceptionnelle et des conseils de haute qualité."
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {expertiseHighlights.map((highlight, index) => (
+                            <div
+                                key={index}
+                                className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all"
+                            >
+                                <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
+                                    {React.cloneElement(highlight.icon as React.ReactElement, {
+                                        className: "h-6 w-6 text-blue-600"
+                                    })}
+                                </div>
+                                <h3 className="text-xl font-semibold mb-2 text-gray-900">
+                                    {highlight.title}
+                                </h3>
+                                <p className="text-gray-600">
+                                    {highlight.description}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-16 grid md:grid-cols-3 gap-8 text-center">
+                        <div className="p-6 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50">
+                            <div className="text-4xl font-bold text-blue-600 mb-2">10+</div>
+                            <div className="text-gray-700">Années d'expérience minimum</div>
+                        </div>
+                        <div className="p-6 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50">
+                            <div className="text-4xl font-bold text-blue-600 mb-2">4.8/5</div>
+                            <div className="text-gray-700">Note moyenne des consultants</div>
+                        </div>
+                        <div className="p-6 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50">
+                            <div className="text-4xl font-bold text-blue-600 mb-2">95%</div>
+                            <div className="text-gray-700">Taux de satisfaction client</div>
+                        </div>
                     </div>
                 </div>
             </div>

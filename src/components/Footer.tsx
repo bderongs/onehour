@@ -9,12 +9,10 @@ export function Footer() {
           <div>
             <div className="flex items-center mb-4">
               <Clock className="h-8 w-8 text-indigo-400" />
-              <span className="ml-2 text-xl font-bold">OneHourAdvice</span>
+              <span className="ml-2 text-xl font-bold">OneHourConsulting</span>
             </div>
             <p className="text-gray-400">
-              Solutions de conseil expert,
-              <br />
-              une heure à la fois.
+              Le concentré de conseil expert
             </p>
           </div>
 
@@ -38,14 +36,14 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <ul className="space-y-2">
-              <li className="text-gray-400">support@onehouradvice.com</li>
+              <li className="text-gray-400">contact@onehour.consulting</li>
               <li className="text-gray-400">01 23 45 67 89</li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} OneHourAdvice. Tous droits réservés.</p>
+          <p>&copy; {new Date().getFullYear()} OneHourConsulting. Tous droits réservés.</p>
         </div>
       </div>
     </footer>
