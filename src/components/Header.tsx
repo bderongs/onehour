@@ -38,6 +38,10 @@ export function Header() {
               className="text-gray-700 hover:text-indigo-600">
               Comment ça Marche
             </button>
+            <button onClick={() => scrollToSection('pricing')}
+              className="text-gray-700 hover:text-indigo-600">
+              Pricing
+            </button>
           </div>
 
           {/* Mobile menu button */}
@@ -66,6 +70,10 @@ export function Header() {
               <button onClick={() => scrollToSection('how-it-works')}
                 className="block w-full text-left px-3 py-2 text-gray-700 hover:text-indigo-600">
                 Comment ça Marche
+              </button>
+              <button onClick={() => scrollToSection('pricing')}
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-indigo-600">
+                Pricing
               </button>
             </div>
           </div>

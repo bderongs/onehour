@@ -182,29 +182,18 @@ export function LandingPage() {
     };
 
     return (
-        <div className="bg-gradient-to-b from-white to-gray-50">
+        <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10">
             {/* Hero Section */}
-            <div className="relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10" />
+            <div className="hero-section relative overflow-hidden bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+                <div className="absolute inset-0" />
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
                     <div className="text-center relative z-10">
-                        <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <h1 className="mt-20 text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                             Le concentré de conseil expert
                         </h1>
                         <p className="text-xl md:text-2xl mb-12 text-gray-600">
                             Décrivez votre problème et programmez une session de micro-consulting avec l'un de nos experts.
                         </p>
-
-                        {/* Pricing Section */}
-                        <div className="text-center mb-16">
-                            <h2 className="text-3xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                Tarification Transparente
-                            </h2>
-                            <p className="text-2xl text-gray-700">
-                                Une session de conseil = <span className="font-semibold text-blue-600">150€</span>
-                            </p>
-                        </div>
-
                         <div className="max-w-5xl mx-auto">
                             <div className={`${showForm ? 'block' : 'hidden'}`}>
                                 <UseCaseForm
@@ -235,7 +224,7 @@ export function LandingPage() {
             </div>
 
             {/* Why Choose Section */}
-            <div id="why-choose" className="py-24">
+            <div id="why-choose" className="why-choose-section py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -263,7 +252,7 @@ export function LandingPage() {
             </div>
 
             {/* Experts Section */}
-            <div id="experts" className="py-24 bg-white">
+            <div id="experts" className="experts-section py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -272,8 +261,9 @@ export function LandingPage() {
                         <p className="text-xl text-gray-600 mb-8">
                             Une sélection rigoureuse des meilleurs consultants pour votre réussite
                         </p>
-                        <div className="max-w-3xl mx-auto bg-blue-50 rounded-xl p-6 mb-12">
-                            <p className="text-blue-800 text-lg">
+                        <div className="max-w-3xl mx-auto bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8 mb-12 border border-blue-100">
+                            <Quote className="h-8 w-8 text-blue-500 mb-4 mx-auto opacity-50" />
+                            <p className="text-blue-900 text-lg font-medium">
                                 "Nous sélectionnons moins de 5% des candidats consultants pour garantir
                                 une expertise exceptionnelle et des conseils de haute qualité."
                             </p>
@@ -284,17 +274,17 @@ export function LandingPage() {
                         {expertiseHighlights.map((highlight, index) => (
                             <div
                                 key={index}
-                                className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all"
+                                className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all"
                             >
                                 <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
                                     {React.cloneElement(highlight.icon as React.ReactElement, {
                                         className: "h-6 w-6 text-blue-600"
                                     })}
                                 </div>
-                                <h3 className="text-xl font-semibold mb-2 text-gray-900">
+                                <h3 className="text-xl font-semibold mb-3 text-blue-900">
                                     {highlight.title}
                                 </h3>
-                                <p className="text-gray-600">
+                                <p className="text-gray-700">
                                     {highlight.description}
                                 </p>
                             </div>
@@ -302,24 +292,24 @@ export function LandingPage() {
                     </div>
 
                     <div className="mt-16 grid md:grid-cols-3 gap-8 text-center">
-                        <div className="p-6 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50">
-                            <div className="text-4xl font-bold text-blue-600 mb-2">10+</div>
-                            <div className="text-gray-700">Années d'expérience minimum</div>
+                        <div className="p-8 rounded-xl bg-gradient-to-br from-blue-10/50 to-purple-10/50 border border-blue-100 backdrop-blur-sm">
+                            <div className="text-4xl font-bold text-blue-700 mb-2">10+</div>
+                            <div className="text-blue-900 font-medium">Années d'expérience minimum</div>
                         </div>
-                        <div className="p-6 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50">
-                            <div className="text-4xl font-bold text-blue-600 mb-2">4.8/5</div>
-                            <div className="text-gray-700">Note moyenne des consultants</div>
+                        <div className="p-8 rounded-xl bg-gradient-to-br from-blue-10/50 to-purple-10/50 border border-blue-100 backdrop-blur-sm">
+                            <div className="text-4xl font-bold text-blue-700 mb-2">4.8/5</div>
+                            <div className="text-blue-900 font-medium">Note moyenne des consultants</div>
                         </div>
-                        <div className="p-6 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50">
-                            <div className="text-4xl font-bold text-blue-600 mb-2">95%</div>
-                            <div className="text-gray-700">Taux de satisfaction client</div>
+                        <div className="p-8 rounded-xl bg-gradient-to-br from-blue-10/50 to-purple-10/50 border border-blue-100 backdrop-blur-sm">
+                            <div className="text-4xl font-bold text-blue-700 mb-2">95%</div>
+                            <div className="text-blue-900 font-medium">Taux de satisfaction client</div>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* How it Works Section */}
-            <div id="how-it-works" className="py-24">
+            <div id="how-it-works" className="how-it-works-section py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -329,21 +319,51 @@ export function LandingPage() {
                             Un processus simple en quatre étapes pour obtenir les conseils dont vous avez besoin
                         </p>
                     </div>
-                    <div className="flex flex-col md:flex-row justify-center items-center space-y-8 md:space-y-0 md:space-x-8">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {howItWorks.map((step, index) => (
-                            <React.Fragment key={index}>
-                                <div className="text-center">
-                                    <div className="p-3 bg-blue-50 rounded-lg w-fit mx-auto mb-4">
-                                        {React.cloneElement(step.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
-                                    </div>
-                                    <h3 className="text-xl font-semibold mb-2 text-gray-900">{step.title}</h3>
-                                    <p className="text-gray-600">{step.description}</p>
+                            <div
+                                key={index}
+                                className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all text-center"
+                            >
+                                <div className="p-3 bg-blue-50 rounded-lg w-fit mx-auto mb-4">
+                                    {React.cloneElement(step.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
                                 </div>
-                                {index < howItWorks.length - 1 && (
-                                    <ArrowRightCircle className="h-8 w-8 text-blue-600 hidden md:block" />
-                                )}
-                            </React.Fragment>
+                                <h3 className="text-xl font-semibold mb-2 text-gray-900">{step.title}</h3>
+                                <p className="text-gray-600">{step.description}</p>
+                            </div>
                         ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Pricing Section */}
+            <div id="pricing" className="pricing-section py-24">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            Nos Tarifs
+                        </h2>
+                        <p className="text-xl text-gray-600">
+                            Choisissez la formule qui vous convient le mieux. Nos prix sont fixes pour éviter les maux de tête et nous sélectionnons les meilleurs consultants pour vous.
+                        </p>
+                    </div>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                            <h3 className="text-xl font-semibold mb-2 text-gray-900">30 minutes</h3>
+                            <p className="text-2xl font-bold text-blue-600">150€</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                            <h3 className="text-xl font-semibold mb-2 text-gray-900">1 heure</h3>
+                            <p className="text-2xl font-bold text-blue-600">250€</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                            <h3 className="text-xl font-semibold mb-2 text-gray-900">2 heures</h3>
+                            <p className="text-2xl font-bold text-blue-600">400€</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                            <h3 className="text-xl font-semibold mb-2 text-gray-900">Missions longues</h3>
+                            <p className="text-2xl font-bold text-blue-600">Sur devis</p>
+                        </div>
                     </div>
                 </div>
             </div>

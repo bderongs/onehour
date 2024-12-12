@@ -4,6 +4,7 @@ import { ChatPage } from './pages/ChatPage';
 import { ConsultantConnect } from './components/ConsultantConnect';
 import { Layout } from './components/Layout';
 import { FAQ } from './pages/FAQ';
+import { PricingPage } from './pages/PricingPage';
 
 function App() {
   try {
