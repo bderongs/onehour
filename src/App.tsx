@@ -3,6 +3,7 @@ import { LandingPage } from './pages/LandingPage';
 import { ChatPage } from './pages/ChatPage';
 import { ConsultantConnect } from './components/ConsultantConnect';
 import { Layout } from './components/Layout';
+import { FAQ } from './pages/FAQ';
 
 function App() {
   try {
@@ -16,6 +17,11 @@ function App() {
         <Route path="/chat" element={
           <Layout>
             <ChatPage />
+          </Layout>
+        } />
+        <Route path="/faq" element={
+          <Layout>
+            <FAQ />
           </Layout>
         } />
         <Route path="/connect" element={

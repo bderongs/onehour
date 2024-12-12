@@ -174,6 +174,13 @@ export function LandingPage() {
         }
     ];
 
+    const scrollToSection = (sectionId: string) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
     return (
         <div className="bg-gradient-to-b from-white to-gray-50">
             {/* Hero Section */}
@@ -228,7 +235,7 @@ export function LandingPage() {
             </div>
 
             {/* Why Choose Section */}
-            <div className="py-24">
+            <div id="why-choose" className="py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -256,7 +263,7 @@ export function LandingPage() {
             </div>
 
             {/* Experts Section */}
-            <div className="py-24 bg-white">
+            <div id="experts" className="py-24 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -312,7 +319,7 @@ export function LandingPage() {
             </div>
 
             {/* How it Works Section */}
-            <div className="py-24">
+            <div id="how-it-works" className="py-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -340,54 +347,6 @@ export function LandingPage() {
                     </div>
                 </div>
             </div>
-
-            {/* Client Reviews Section - Temporarily hidden
-            <div className="py-24 bg-gradient-to-b from-gray-50 to-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            Ils Nous Font Confiance
-                        </h2>
-                        <p className="text-xl text-gray-600">
-                            Plus de 100 entreprises conseillées avec succès
-                        </p>
-                    </div>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {clientReviews.map((review, index) => (
-                            <div
-                                key={index}
-                                className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-all relative"
-                            >
-                                <Quote className="absolute top-4 right-4 h-8 w-8 text-blue-100" />
-                                <div className="flex items-center mb-6">
-                                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-lg mr-4">
-                                        {review.initials}
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-900">{review.name}</h3>
-                                        <p className="text-sm text-gray-600">{review.role}</p>
-                                        <p className="text-sm font-medium text-blue-600">{review.company}</p>
-                                    </div>
-                                </div>
-                                <p className="text-gray-600 mb-6 italic">"{review.review}"</p>
-                                <div className="flex items-center">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star
-                                            key={i}
-                                            className={`h-5 w-5 ${
-                                                i < review.rating
-                                                    ? 'text-yellow-400 fill-yellow-400'
-                                                    : 'text-gray-200'
-                                            }`}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-            */}
         </div>
     );
 }
