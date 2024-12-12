@@ -261,7 +261,7 @@ export function LandingPage() {
                         <p className="text-xl text-gray-600 mb-8">
                             Une sélection rigoureuse des meilleurs consultants pour votre réussite
                         </p>
-                        <div className="max-w-3xl mx-auto bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8 mb-12 border border-blue-100">
+                        <div className="max-w-3xl mx-auto bg-gradient-to-b from-blue-50 to-purple-50 rounded-xl p-8 mb-12 border border-blue-100 ">
                             <Quote className="h-8 w-8 text-blue-500 mb-4 mx-auto opacity-50" />
                             <p className="text-blue-900 text-lg font-medium">
                                 "Nous sélectionnons moins de 5% des candidats consultants pour garantir
