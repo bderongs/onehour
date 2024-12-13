@@ -28,8 +28,8 @@ export async function analyzeWithOpenAI(messages: { role: 'user' | 'assistant' |
     "challenge": "Brief description of main problem",
     "currentSituation": "Current state description",
     "desiredOutcome": "Goal description",
-    "constraints": "List of constraints",
-    "additionalInfo": "list of relevant additional information"
+    "constraints": "Constraints",
+    "additionalInfo": "Additional information"
 }
 IMPORTANT: Response must be valid JSON only, no additional text. Only include fields where information is known.`
         } : {
@@ -79,15 +79,12 @@ IMPORTANT: Always respond in plain text format only. Never return JSON, markdown
 
                 // Only include fields that have content
                 const formatted: any = {};
-                if (parsed.challenge) formatted.challenge = ensureString(parsed.challenge);
-                if (parsed.currentSituation) formatted.currentSituation = ensureString(parsed.currentSituation);
-                if (parsed.desiredOutcome) formatted.desiredOutcome = ensureString(parsed.desiredOutcome);
-                if (Array.isArray(parsed.constraints) && parsed.constraints.length > 0) {
-                    formatted.constraints = parsed.constraints.map(ensureString);
-                }
-                if (Array.isArray(parsed.additionalInfo) && parsed.additionalInfo.length > 0) {
-                    formatted.additionalInfo = parsed.additionalInfo.map(ensureString);
-                }
+                const keys = ['challenge', 'currentSituation', 'desiredOutcome', 'constraints', 'additionalInfo'];
+                keys.forEach(key => {
+                    if (parsed[key]) {
+                        formatted[key] = ensureString(parsed[key]);
+                    }
+                });
 
                 return JSON.stringify(formatted);
             } catch (e) {
@@ -104,4 +101,4 @@ IMPORTANT: Always respond in plain text format only. Never return JSON, markdown
         }
         return "I apologize, but I'm having trouble connecting. Please try again.";
     }
-} 
+}

@@ -19,8 +19,8 @@ interface ProblemDetails {
     challenge?: string;
     currentSituation?: string;
     desiredOutcome?: string;
-    constraints?: string[];
-    additionalInfo?: string[];
+    constraints?: string;
+    additionalInfo?: string;
 }
 
 export function AIChatInterface({ initialProblem, onConnect, messages: externalMessages, onMessagesUpdate }: AIChatInterfaceProps) {
@@ -32,6 +32,7 @@ export function AIChatInterface({ initialProblem, onConnect, messages: externalM
 
     // Add ref for scrolling
     const chatContainerRef = React.useRef<HTMLDivElement>(null);
+    const summaryContainerRef = React.useRef<HTMLDivElement>(null);
     const componentRef = React.useRef<HTMLDivElement>(null);
 
     // Initial analysis of the problem
@@ -77,8 +78,8 @@ export function AIChatInterface({ initialProblem, onConnect, messages: externalM
                                 challenge: initialProblem,
                                 currentSituation: "",
                                 desiredOutcome: "",
-                                constraints: [],
-                                additionalInfo: []
+                                constraints: "",
+                                additionalInfo: ""
                             });
                         }
                     }
@@ -208,6 +209,7 @@ export function AIChatInterface({ initialProblem, onConnect, messages: externalM
                 <div
                     ref={chatContainerRef}
                     className="flex-1 overflow-y-auto mb-4 space-y-4"
+                    style={{ maxHeight: '600px' }}
                 >
                     {messages.map((message, index) => (
                         <div
@@ -264,7 +266,7 @@ export function AIChatInterface({ initialProblem, onConnect, messages: externalM
                 </form>
             </div>
 
-            <div className="lg:w-80">
+            <div ref={summaryContainerRef} className="lg:w-80">
                 <ProblemSummary summary={problemSummary} onConnect={onConnect} />
             </div>
         </div>

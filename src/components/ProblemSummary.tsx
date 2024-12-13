@@ -5,8 +5,8 @@ interface ProblemDetails {
     challenge?: string;
     currentSituation?: string;
     desiredOutcome?: string;
-    constraints?: string[];
-    additionalInfo?: string[];
+    constraints?: string;
+    additionalInfo?: string;
 }
 
 interface ProblemSummaryProps {
@@ -57,25 +57,17 @@ export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
                     </div>
                 )}
 
-                {Array.isArray(summary.constraints) && summary.constraints.length > 0 && (
+                {summary.constraints && (
                     <div>
                         <h3 className="font-medium text-blue-600">Contraintes</h3>
-                        <ul className="mt-1 list-disc list-inside text-left">
-                            {summary.constraints.map((constraint, index) => (
-                                <li key={index}>{ensureString(constraint)}</li>
-                            ))}
-                        </ul>
+                        <p className="mt-1 text-left">{ensureString(summary.constraints)}</p>
                     </div>
                 )}
 
-                {Array.isArray(summary.additionalInfo) && summary.additionalInfo.length > 0 && (
+                {summary.additionalInfo && (
                     <div>
                         <h3 className="font-medium text-blue-600">Informations Supplémentaires</h3>
-                        <ul className="mt-1 list-disc list-inside text-left">
-                            {summary.additionalInfo.map((info, index) => (
-                                <li key={index}>{ensureString(info)}</li>
-                            ))}
-                        </ul>
+                        <p className="mt-1 text-left">{ensureString(summary.additionalInfo)}</p>
                     </div>
                 )}
 
@@ -104,4 +96,4 @@ export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
             </div>
         </div>
     );
-} 
+}
