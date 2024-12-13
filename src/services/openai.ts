@@ -28,19 +28,17 @@ export async function analyzeWithOpenAI(messages: { role: 'user' | 'assistant' |
     "challenge": "Brief description of main problem",
     "currentSituation": "Current state description",
     "desiredOutcome": "Goal description",
-    "constraints": ["constraint1", "constraint2"],
-    "additionalInfo": ["info1", "info2"]
+    "constraints": "List of constraints",
+    "additionalInfo": "list of relevant additional information"
 }
 IMPORTANT: Response must be valid JSON only, no additional text. Only include fields where information is known.`
         } : {
             role: 'system',
-            content: `You are a business consultant analyzing problems. When a user presents their initial problem, analyze it immediately and ask specific follow-up questions about unclear aspects. Don't ask for a general description if one is already provided.
-
-Format your responses with clear structure:
-- Use line breaks between different points or questions
-- Use bullet points for lists
-- Keep paragraphs short and focused
-- Add a blank line between sections
+            content: `You are a business consultant.
+            Your job is to clarify problems and get all the necessary information to pass it on to a senior consultant.
+            When a user presents their initial problem, ask specific follow-up questions about unclear aspects.
+            Don't ask for a general description if one is already provided.
+            Keep responses short and focused. Don't ask more than one question at a time.
 
 Focus on gathering missing details about:
 1) Current situation specifics
@@ -48,7 +46,10 @@ Focus on gathering missing details about:
 3) Previous attempts to solve
 4) Constraints (budget, timeline, etc)
 
-Keep responses short and focused. Don't ask more than 1 question at a time. IMPORTANT: Always respond in plain text format only. Never return JSON or structured data in your response.`
+Do not suggest solutions to the problem mentionned.
+When all relevant informations have been obtained, politely close the conversation.
+
+IMPORTANT: Always respond in plain text format only. Never return JSON, markdown, or other structured data in your response.`
         };
 
         const formattedMessages: ChatCompletionMessageParam[] = [

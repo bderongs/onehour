@@ -259,15 +259,9 @@ export function LandingPage() {
                             Des Experts de Confiance
                         </h2>
                         <p className="text-xl text-gray-600 mb-8">
-                            Une sélection rigoureuse des meilleurs consultants pour votre réussite
-                        </p>
-                        <div className="max-w-3xl mx-auto bg-gradient-to-b from-blue-50 to-purple-50 rounded-xl p-8 mb-12 border border-blue-100 ">
-                            <Quote className="h-8 w-8 text-blue-500 mb-4 mx-auto opacity-50" />
-                            <p className="text-blue-900 text-lg font-medium">
-                                "Nous sélectionnons moins de 5% des candidats consultants pour garantir
-                                une expertise exceptionnelle et des conseils de haute qualité."
-                            </p>
-                        </div>
+                        Nous sélectionnons moins de 5% des candidats consultants pour garantir
+                        une expertise exceptionnelle et des conseils de haute qualité.
+                        </p>                        
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -348,19 +342,19 @@ export function LandingPage() {
                         </p>
                     </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
                             <h3 className="text-xl font-semibold mb-2 text-gray-900">30 minutes</h3>
                             <p className="text-2xl font-bold text-blue-600">150€</p>
                         </div>
-                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
                             <h3 className="text-xl font-semibold mb-2 text-gray-900">1 heure</h3>
                             <p className="text-2xl font-bold text-blue-600">250€</p>
                         </div>
-                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
                             <h3 className="text-xl font-semibold mb-2 text-gray-900">2 heures</h3>
                             <p className="text-2xl font-bold text-blue-600">400€</p>
                         </div>
-                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
                             <h3 className="text-xl font-semibold mb-2 text-gray-900">Missions longues</h3>
                             <p className="text-2xl font-bold text-blue-600">Sur devis</p>
                         </div>

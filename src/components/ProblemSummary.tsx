@@ -98,7 +98,7 @@ export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
 
                 {Object.keys(summary).length === 0 && (
                     <p className="text-gray-500 italic text-left">
-                        Le résumé sera mis à jour au fur et à mesure que vous fournissez plus d'informations...
+                        Le résumé sera mis à jour à mesure que vous fournissez plus d'informations...
                     </p>
                 )}
             </div>
