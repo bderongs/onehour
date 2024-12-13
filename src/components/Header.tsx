@@ -40,7 +40,7 @@ export function Header() {
             </button>
             <button onClick={() => scrollToSection('pricing')}
               className="text-gray-700 hover:text-indigo-600">
-              Pricing
+              Tarifs
             </button>
           </div>
 
@@ -73,7 +73,7 @@ export function Header() {
               </button>
               <button onClick={() => scrollToSection('pricing')}
                 className="block w-full text-left px-3 py-2 text-gray-700 hover:text-indigo-600">
-                Pricing
+                Tarifs
               </button>
             </div>
           </div>
