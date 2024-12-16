@@ -5,6 +5,17 @@ import { useState } from 'react';
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const isConsultantPage = window.location.pathname === '/consultants';
+
+  const mainNavigation = [
+    { name: 'Pourquoi Nous Choisir', id: 'why-choose' },
+    { name: 'Nos Experts', id: 'experts' },
+    { name: 'Comment ça Marche', id: 'how-it-works' },
+    { name: 'Tarifs', id: 'pricing' },
+  ];
+
+  const consultantLink = { name: 'Devenir consultant', href: '/consultants' };
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -26,22 +37,23 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <button onClick={() => scrollToSection('why-choose')}
-              className="text-gray-700 hover:text-indigo-600">
-              Pourquoi Nous Choisir
-            </button>
-            <button onClick={() => scrollToSection('experts')}
-              className="text-gray-700 hover:text-indigo-600">
-              Nos Experts
-            </button>
-            <button onClick={() => scrollToSection('how-it-works')}
-              className="text-gray-700 hover:text-indigo-600">
-              Comment ça Marche
-            </button>
-            <button onClick={() => scrollToSection('pricing')}
-              className="text-gray-700 hover:text-indigo-600">
-              Tarifs
-            </button>
+            {mainNavigation.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className="text-gray-700 hover:text-indigo-600"
+              >
+                {item.name}
+              </button>
+            ))}
+            {!isConsultantPage && (
+              <a
+                href={consultantLink.href}
+                className="text-indigo-600 hover:text-indigo-800 font-medium"
+              >
+                {consultantLink.name}
+              </a>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -59,22 +71,23 @@ export function Header() {
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="pt-2 pb-3 space-y-1">
-              <button onClick={() => scrollToSection('why-choose')}
-                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-indigo-600">
-                Pourquoi Nous Choisir
-              </button>
-              <button onClick={() => scrollToSection('experts')}
-                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-indigo-600">
-                Nos Experts
-              </button>
-              <button onClick={() => scrollToSection('how-it-works')}
-                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-indigo-600">
-                Comment ça Marche
-              </button>
-              <button onClick={() => scrollToSection('pricing')}
-                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-indigo-600">
-                Tarifs
-              </button>
+              {mainNavigation.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className="block w-full text-left px-3 py-2 text-gray-700 hover:text-indigo-600"
+                >
+                  {item.name}
+                </button>
+              ))}
+              {!isConsultantPage && (
+                <a
+                  href={consultantLink.href}
+                  className="block w-full text-left px-3 py-2 text-indigo-600 hover:text-indigo-800 font-medium"
+                >
+                  {consultantLink.name}
+                </a>
+              )}
             </div>
           </div>
         )}

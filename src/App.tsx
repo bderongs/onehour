@@ -4,6 +4,7 @@ import { ChatPage } from './pages/ChatPage';
 import { ConsultantConnect } from './components/ConsultantConnect';
 import { Layout } from './components/Layout';
 import { FAQ } from './pages/FAQ';
+import ConsultantPage from './pages/ConsultantPage';
 
 
 function App() {
@@ -25,9 +26,9 @@ function App() {
             <FAQ />
           </Layout>
         } />
-        <Route path="/connect" element={
+        <Route path="/consultants" element={
           <Layout>
-            <ConsultantConnect onBack={() => window.history.back()} />
+            <ConsultantPage />
           </Layout>
         } />
         <Route path="*" element={
