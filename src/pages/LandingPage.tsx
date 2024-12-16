@@ -231,7 +231,7 @@ export function LandingPage() {
                             Pourquoi OneHourAdvice ?
                         </h2>
                         <p className="text-xl text-gray-600">
-                            Obtenez les conseils dont vous avez besoin, quand vous en avez besoin
+                            Obtenez les conseils dont vous avez besoin, quand vous en avez besoin.
                         </p>
                     </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -310,7 +310,7 @@ export function LandingPage() {
                             Comment ça Marche ?
                         </h2>
                         <p className="text-xl text-gray-600">
-                            Un processus simple en quatre étapes pour obtenir les conseils dont vous avez besoin
+                            Un processus simple en quatre étapes pour obtenir les conseils dont vous avez besoin.
                         </p>
                     </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
