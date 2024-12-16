@@ -36,13 +36,13 @@ export function LandingPage() {
         {
             icon: <Users className="h-6 w-6" />,
             title: "Recrutement",
-            description: "Évaluer des candidats",
+            description: "Évaluer des candidats.",
             prefillText: "Je dois recruter des profils techniques et j'ai besoin d'un expert pour m'aider à évaluer les compétences des candidats lors des entretiens."
         },
         {
             icon: <Plus className="h-6 w-6" />,
             title: "Autre Sujet",
-            description: "J'ai une autre problématique",
+            description: "J'ai une autre problématique.",
             prefillText: ""
         }
     ];
@@ -97,7 +97,7 @@ export function LandingPage() {
         {
             icon: <CheckCircle className="h-6 w-6" />,
             title: "Innovant",
-            description: "Concentrez-vous sur l'échange, notre IA prend les notes"
+            description: "Concentrez-vous sur l'échange, notre IA prend les notes."
         }
     ];
 

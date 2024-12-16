@@ -37,7 +37,7 @@ const ConsultantPage = () => {
                             Développez votre activité de conseil
                         </h1>
                         <p className="text-xl text-indigo-600">
-                            Rejoignez notre plateforme et connectez-vous avec des clients qualifiés
+                            Rejoignez notre plateforme et connectez-vous avec des clients qualifiés.
                         </p>
                     </div>
 
@@ -45,19 +45,19 @@ const ConsultantPage = () => {
                         <div className="bg-white p-6 rounded-lg shadow-md">
                             <h3 className="text-xl font-semibold mb-4">Visibilité accrue</h3>
                             <p className="text-gray-600">
-                                Créez votre profil professionnel et présentez votre expertise à une clientèle ciblée
+                                Créez votre profil professionnel et présentez votre expertise à une clientèle ciblée.
                             </p>
                         </div>
                         <div className="bg-white p-6 rounded-lg shadow-md">
                             <h3 className="text-xl font-semibold mb-4">Gestion simplifiée</h3>
                             <p className="text-gray-600">
-                                Synchronisez votre calendrier et laissez vos clients réserver directement leurs créneaux
+                                Synchronisez votre calendrier et laissez vos clients réserver directement leurs créneaux.
                             </p>
                         </div>
                         <div className="bg-white p-6 rounded-lg shadow-md">
                             <h3 className="text-xl font-semibold mb-4">Revenus additionnels</h3>
                             <p className="text-gray-600">
-                                Proposez des consultations ponctuelles et développez une nouvelle source de revenus
+                                Proposez des consultations ponctuelles et développez une nouvelle source de revenus.
                             </p>
                         </div>
                     </div>
@@ -70,22 +70,22 @@ const ConsultantPage = () => {
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-blue-600 mb-2">1</div>
                                 <h4 className="font-semibold mb-2">Inscription</h4>
-                                <p className="text-gray-600">Créez votre compte gratuitement</p>
+                                <p className="text-gray-600">Créez votre compte gratuitement.</p>
                             </div>
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-blue-600 mb-2">2</div>
                                 <h4 className="font-semibold mb-2">Compétences</h4>
-                                <p className="text-gray-600">Validez vos expertises</p>
+                                <p className="text-gray-600">Validez vos expertises.</p>
                             </div>
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-blue-600 mb-2">3</div>
                                 <h4 className="font-semibold mb-2">Calendrier</h4>
-                                <p className="text-gray-600">Configurez vos disponibilités</p>
+                                <p className="text-gray-600">Configurez vos disponibilités.</p>
                             </div>
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-blue-600 mb-2">4</div>
                                 <h4 className="font-semibold mb-2">Consultations</h4>
-                                <p className="text-gray-600">Commencez à conseiller vos clients</p>
+                                <p className="text-gray-600">Commencez à conseiller vos clients.</p>
                             </div>
                         </div>
                     </div>
@@ -96,7 +96,7 @@ const ConsultantPage = () => {
                         </h2>
                         {isSubmitted ? (
                             <div className="text-green-600 text-xl mb-6">
-                                Merci, nous reviendrons très vite vers vous
+                                Merci, nous reviendrons très vite vers vous.
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} className="max-w-md mx-auto mb-8">
@@ -161,4 +161,4 @@ const ConsultantPage = () => {
     );
 };
 
-export default ConsultantPage; 
+export default ConsultantPage;
