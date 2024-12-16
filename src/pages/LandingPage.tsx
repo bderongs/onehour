@@ -194,7 +194,7 @@ export function LandingPage() {
                         <p className="text-xl md:text-2xl mb-12 text-gray-600">
                             Décrivez votre problème et programmez une session de micro-consulting avec l'un de nos experts.
                         </p>
-                        <div className="max-w-5xl mx-auto">
+                        <div className="max-w-7xl mx-auto">
                             <div className={`${showForm ? 'block' : 'hidden'}`}>
                                 <UseCaseForm
                                     useCases={useCases}
