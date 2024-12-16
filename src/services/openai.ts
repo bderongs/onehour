@@ -29,7 +29,8 @@ export async function analyzeWithOpenAI(messages: { role: 'user' | 'assistant' |
     "currentSituation": "Current state description",
     "desiredOutcome": "Goal description",
     "constraints": "Constraints",
-    "additionalInfo": "Additional information"
+    "additionalInfo": "Additional information",
+    "hasSufficientInfo": Boolean: if there is enough information to select a relevant expert and send the query, return true, else return false. The query must at least include a challenge, current situation and desired outcome, as well as some budget and time constraint information.
 }
 IMPORTANT: Response must be valid JSON only, no additional text. Only include fields where information is known.`
         } : {
@@ -68,6 +69,9 @@ IMPORTANT: Always respond in plain text format only. Never return JSON, markdown
 
         let response = completion.choices[0].message.content || '';
 
+        // Log the AI response to the console
+        console.log('AI Response:', response);
+
         if (isForSummary) {
             try {
                 // Try to extract JSON if it's wrapped in other text
@@ -79,7 +83,7 @@ IMPORTANT: Always respond in plain text format only. Never return JSON, markdown
 
                 // Only include fields that have content
                 const formatted: any = {};
-                const keys = ['challenge', 'currentSituation', 'desiredOutcome', 'constraints', 'additionalInfo'];
+                const keys = ['challenge', 'currentSituation', 'desiredOutcome', 'constraints', 'additionalInfo', 'hasSufficientInfo'];
                 keys.forEach(key => {
                     if (parsed[key]) {
                         formatted[key] = ensureString(parsed[key]);

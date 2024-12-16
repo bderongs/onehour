@@ -7,6 +7,7 @@ interface ProblemDetails {
     desiredOutcome?: string;
     constraints?: string;
     additionalInfo?: string;
+    hasSufficientInfo?: boolean;
 }
 
 interface ProblemSummaryProps {
@@ -20,8 +21,6 @@ export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
         if (typeof value === 'object') return JSON.stringify(value);
         return String(value || '');
     };
-
-    const hasSufficientInfo = summary.challenge && summary.currentSituation && summary.desiredOutcome;
 
     const handleConnectClick = () => {
         localStorage.setItem('problemSummary', JSON.stringify(summary));
@@ -71,18 +70,19 @@ export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
                     </div>
                 )}
 
-                {hasSufficientInfo && (
+                {summary.hasSufficientInfo && (
                     <div className="mt-6 border-t pt-4">
+                        {console.log('hasSufficientInfo:', summary.hasSufficientInfo)}
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                             <p className="text-blue-800 font-medium">
-                                Votre problème est bien défini et prêt pour une consultation d'expert
+                                Votre problème est bien défini et prêt pour une consultation d'expert.
                             </p>
                         </div>
                         <button
                             onClick={handleConnectClick}
                             className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-md"
                         >
-                            Se Connecter avec un Consultant
+                            Se connecter avec un consultant
                             <ArrowRight className="h-5 w-5" />
                         </button>
                     </div>
