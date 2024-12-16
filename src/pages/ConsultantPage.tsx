@@ -74,8 +74,8 @@ const ConsultantPage = () => {
                             </div>
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-blue-600 mb-2">2</div>
-                                <h4 className="font-semibold mb-2">Profil</h4>
-                                <p className="text-gray-600">Complétez votre profil professionnel</p>
+                                <h4 className="font-semibold mb-2">Compétences</h4>
+                                <p className="text-gray-600">Validez vos expertises</p>
                             </div>
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-blue-600 mb-2">3</div>
