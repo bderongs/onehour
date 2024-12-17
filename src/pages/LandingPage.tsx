@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote } from 'lucide-react';
+import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
@@ -184,7 +184,7 @@ export function LandingPage() {
     return (
         <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10">
             {/* Hero Section */}
-            <div className="hero-section relative overflow-hidden bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+            <div className="hero-section relative overflow-hidden">
                 <div className="absolute inset-0" />
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
                     <div className="text-center relative z-10">
@@ -221,6 +221,7 @@ export function LandingPage() {
                         </div>
                     </div>
                 </div>
+              
             </div>
 
             {/* Why Choose Section */}
@@ -238,7 +239,7 @@ export function LandingPage() {
                         {whyChoose.map((reason, index) => (
                             <div
                                 key={index}
-                                className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all"
+                                className="bg-white p-6 rounded-xl border border-gray-200 shadow-lg"
                             >
                                 <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
                                     {React.cloneElement(reason.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
@@ -268,7 +269,7 @@ export function LandingPage() {
                         {expertiseHighlights.map((highlight, index) => (
                             <div
                                 key={index}
-                                className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all"
+                                className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-lg"
                             >
                                 <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
                                     {React.cloneElement(highlight.icon as React.ReactElement, {
@@ -317,7 +318,7 @@ export function LandingPage() {
                         {howItWorks.map((step, index) => (
                             <div
                                 key={index}
-                                className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all text-center"
+                                className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-lg text-center"
                             >
                                 <div className="p-3 bg-blue-50 rounded-lg w-fit mx-auto mb-4">
                                     {React.cloneElement(step.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
@@ -330,37 +331,6 @@ export function LandingPage() {
                 </div>
             </div>
 
-            {/* Pricing Section */}
-            <div id="pricing" className="pricing-section py-24">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            Nos Tarifs
-                        </h2>
-                        <p className="text-xl text-gray-600">
-                            Choisissez la formule qui vous convient le mieux. Nos prix sont fixes pour éviter les maux de tête et nous sélectionnons les meilleurs consultants pour vous.
-                        </p>
-                    </div>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
-                            <h3 className="text-xl font-semibold mb-2 text-gray-900">30 minutes</h3>
-                            <p className="text-2xl font-bold text-blue-600">150€</p>
-                        </div>
-                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
-                            <h3 className="text-xl font-semibold mb-2 text-gray-900">1 heure</h3>
-                            <p className="text-2xl font-bold text-blue-600">250€</p>
-                        </div>
-                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
-                            <h3 className="text-xl font-semibold mb-2 text-gray-900">2 heures</h3>
-                            <p className="text-2xl font-bold text-blue-600">400€</p>
-                        </div>
-                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
-                            <h3 className="text-xl font-semibold mb-2 text-gray-900">Missions longues</h3>
-                            <p className="text-2xl font-bold text-blue-600">Sur devis</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 }
