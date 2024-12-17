@@ -1,11 +1,10 @@
 import { Routes, Route } from 'react-router-dom';
 import { LandingPage } from './pages/LandingPage';
 import { ChatPage } from './pages/ChatPage';
-import { ConsultantConnect } from './components/ConsultantConnect';
 import { Layout } from './components/Layout';
 import { FAQ } from './pages/FAQ';
 import ConsultantPage from './pages/ConsultantPage';
-
+import { AutomationLandingPage } from './pages/AutomationLandingPage'; // Import the new page
 
 function App() {
   try {
@@ -29,6 +28,11 @@ function App() {
         <Route path="/consultants" element={
           <Layout>
             <ConsultantPage />
+          </Layout>
+        } />
+        <Route path="/automation" element={
+          <Layout>
+            <AutomationLandingPage />
           </Layout>
         } />
         <Route path="*" element={

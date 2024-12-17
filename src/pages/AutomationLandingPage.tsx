@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ArrowRight, Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +13,7 @@ interface UseCase {
     prefillText: string;
 }
 
-export function LandingPage() {
+export function AutomationLandingPage() {
     const navigate = useNavigate();
     const [problem, setProblem] = useState('');
     const [showChat, setShowChat] = useState(false);
@@ -22,22 +23,22 @@ export function LandingPage() {
 
     const useCases: UseCase[] = [
         {
-            icon: <Package2 className="h-6 w-6" />,
-            title: "Choisir un logiciel",
-            description: "Sélectionnez les meilleurs logiciels pour votre activité.",
-            prefillText: "Je cherche à choisir un logiciel pour mon entreprise. J'ai besoin d'aide pour comparer les solutions du marché et identifier celle qui correspond le mieux à mes besoins spécifiques."
+            icon: <Bot className="h-6 w-6" />,
+            title: "Automatisation des processus",
+            description: "Optimisez vos processus métiers avec des solutions d'automatisation.",
+            prefillText: "Je souhaite automatiser certains processus dans mon entreprise pour gagner en efficacité et réduire les coûts. J'ai besoin d'aide pour identifier les processus à automatiser et les solutions adaptées."
         },
         {
-            icon: <Bot className="h-6 w-6" />,
-            title: "IA & Entreprise",
-            description: "Automatisez vos processus avec l'IA et économisez des heures de travail manuel.",
-            prefillText: "Je souhaite comprendre comment l'intelligence artificielle pourrait être utile dans mon entreprise. J'aimerais identifier les opportunités concrètes d'application et les bénéfices potentiels."
+            icon: <Package2 className="h-6 w-6" />,
+            title: "Intégration de systèmes",
+            description: "Connectez vos systèmes et applications pour une meilleure synergie.",
+            prefillText: "Je cherche à intégrer différents systèmes et applications utilisés dans mon entreprise pour améliorer la communication et la productivité. J'ai besoin d'un expert pour m'aider à choisir et implémenter les meilleures solutions d'intégration."
         },
         {
             icon: <Users className="h-6 w-6" />,
-            title: "Recrutement",
-            description: "Sélectionnez les meilleurs candidats avec un expert du domaine.",
-            prefillText: "Je dois recruter dans un domaine que je ne maîtrise pas et j'ai besoin d'un expert pour m'aider à évaluer les compétences des candidats lors des entretiens."
+            title: "Automatisation des tâches répétitives",
+            description: "Libérez du temps en automatisant les tâches répétitives.",
+            prefillText: "Je souhaite automatiser des tâches répétitives dans mon entreprise pour permettre à mes employés de se concentrer sur des tâches à plus forte valeur ajoutée. J'ai besoin d'aide pour identifier et mettre en place les outils d'automatisation."
         },
         {
             icon: <Plus className="h-6 w-6" />,
@@ -131,7 +132,7 @@ export function LandingPage() {
             company: "TechCorp",
             review: "Service exceptionnel ! J'ai pu résoudre mon problème en une heure seulement. L'expert était très compétent et a parfaitement compris nos besoins.",
             rating: 5,
-            initials: "PL"
+            initials: "JD"
         },
         {
             name: "Marie Curie",
@@ -189,10 +190,10 @@ export function LandingPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
                     <div className="text-center relative z-10">
                         <h1 className="mt-20 text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            Le concentré de conseil expert
+                            Automatisation des Processus
                         </h1>
                         <p className="text-xl md:text-2xl mb-12 text-gray-600">
-                            Décrivez votre problème et programmez une session de micro-consulting avec l'un de nos experts.
+                            Décrivez votre problème et programmez une session de micro-consulting avec l'un de nos experts en automatisation.
                         </p>
                         <div className="max-w-7xl mx-auto">
                             <div className={`${showForm ? 'block' : 'hidden'}`}>
