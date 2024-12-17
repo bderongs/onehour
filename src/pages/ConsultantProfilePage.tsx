@@ -1,60 +1,19 @@
 import React, { useState } from 'react';
-import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote } from 'lucide-react';
+import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, Shield, Award, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
-import { UseCaseForm } from '../components/UseCaseForm';
 
-interface UseCase {
-    icon: React.ReactNode;
-    title: string;
-    description: string;
-    prefillText: string;
-}
-
-export function LandingPage() {
+export function ConsultantProfilePage() {
     const navigate = useNavigate();
     const [problem, setProblem] = useState('');
-    const [showChat, setShowChat] = useState(false);
+    const [showChat, setShowChat] = useState(true); // Ensure AIChatInterface is shown initially
     const [showConnect, setShowConnect] = useState(false);
-    const [showForm, setShowForm] = useState(true); // Ensure UseCaseForm is shown initially
     const [messages, setMessages] = useState<Message[]>([]);
-
-    const useCases: UseCase[] = [
-        {
-            icon: <Package2 className="h-6 w-6" />,
-            title: "Choisir un logiciel",
-            description: "Sélectionnez les meilleurs logiciels pour votre activité.",
-            prefillText: "Je cherche à choisir un logiciel pour mon entreprise. J'ai besoin d'aide pour comparer les solutions du marché et identifier celle qui correspond le mieux à mes besoins spécifiques."
-        },
-        {
-            icon: <Bot className="h-6 w-6" />,
-            title: "IA & Entreprise",
-            description: "Automatisez vos processus avec l'IA et économisez des heures de travail manuel.",
-            prefillText: "Je souhaite comprendre comment l'intelligence artificielle pourrait être utile dans mon entreprise. J'aimerais identifier les opportunités concrètes d'application et les bénéfices potentiels."
-        },
-        {
-            icon: <Users className="h-6 w-6" />,
-            title: "Recrutement",
-            description: "Sélectionnez les meilleurs candidats avec un expert du domaine.",
-            prefillText: "Je dois recruter dans un domaine que je ne maîtrise pas et j'ai besoin d'un expert pour m'aider à évaluer les compétences des candidats lors des entretiens."
-        },
-        {
-            icon: <Plus className="h-6 w-6" />,
-            title: "Autre sujet",
-            description: "J'ai une autre problématique.",
-            prefillText: ""
-        }
-    ];
-
-    const handleUseCaseClick = (prefillText: string) => {
-        setProblem(prefillText);
-    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setShowChat(true);
-        setShowForm(false); // Hide UseCaseForm when chat is shown
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -195,16 +154,6 @@ export function LandingPage() {
                             Décrivez votre problème et programmez une session de micro-consulting avec l'un de nos experts.
                         </p>
                         <div className="max-w-7xl mx-auto">
-                            <div className={`${showForm ? 'block' : 'hidden'}`}>
-                                <UseCaseForm
-                                    useCases={useCases}
-                                    problem={problem}
-                                    setProblem={setProblem}
-                                    handleSubmit={handleSubmit}
-                                    handleUseCaseClick={handleUseCaseClick}
-                                    handleKeyDown={handleKeyDown}
-                                />
-                            </div>
                             <div className={`${showChat ? 'block' : 'hidden'}`}>
                                 <AIChatInterface
                                     initialProblem={problem}
@@ -221,7 +170,6 @@ export function LandingPage() {
                         </div>
                     </div>
                 </div>
-              
             </div>
 
             {/* Why Choose Section */}

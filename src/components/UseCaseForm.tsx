@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 
@@ -58,7 +57,7 @@ export function UseCaseForm({
                 <div className="flex items-center lg:justify-end">
                     <button
                         type="submit"
-                        className="w-full lg:w-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
+                        className="w-full lg:w-auto bg-indigo-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-indigo-700 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
                     >
                         Trouver un Expert
                         <ArrowRight className="h-5 w-5" />

@@ -4,7 +4,8 @@ import { ChatPage } from './pages/ChatPage';
 import { Layout } from './components/Layout';
 import { FAQ } from './pages/FAQ';
 import ConsultantPage from './pages/ConsultantPage';
-import { AutomationLandingPage } from './pages/AutomationLandingPage'; // Import the new page
+import { AutomationLandingPage } from './pages/AutomationLandingPage';
+import { ConsultantProfilePage } from './pages/ConsultantProfilePage';
 
 function App() {
   try {
@@ -33,6 +34,11 @@ function App() {
         <Route path="/automation" element={
           <Layout>
             <AutomationLandingPage />
+          </Layout>
+        } />
+        <Route path="/profile" element={
+          <Layout>
+            <ConsultantProfilePage />
           </Layout>
         } />
         <Route path="*" element={

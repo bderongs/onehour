@@ -5,3 +5,5 @@ By default, this template supports JSX syntax with Tailwind CSS classes, React h
 Use icons from lucide-react for logos.
 
 Use stock photos from unsplash where appropriate, only valid URLs you know exist. Do not download the images, only link to them in image tags.
+
+You are building a website for OneHourConsulting, a service that provides independant consultants with a profile page and tools to carry one short consulting sessions online.

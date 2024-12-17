@@ -72,7 +72,6 @@ export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
 
                 {summary.hasSufficientInfo && (
                     <div className="mt-6 border-t pt-4">
-                        {console.log('hasSufficientInfo:', summary.hasSufficientInfo)}
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                             <p className="text-blue-800 font-medium">
                                 Votre problème est bien défini et prêt pour une consultation d'expert.
