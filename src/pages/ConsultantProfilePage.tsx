@@ -12,6 +12,13 @@ export function ConsultantProfilePage() {
     const [showConnect, setShowConnect] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
 
+    React.useEffect(() => {
+        window.scrollTo(0, 0);
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+    }, []);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setShowChat(true);
@@ -113,11 +120,21 @@ export function ConsultantProfilePage() {
 
 
     const scrollToSection = (sectionId: string) => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
+        // Only scroll if explicitly triggered by a user action, not on page load
+        if (window.location.hash !== `#${sectionId}`) {  // Add this check
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
         }
     };
+
+    // Remove any hash from URL on page load
+    React.useEffect(() => {
+        if (window.location.hash) {
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    }, []);
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
@@ -130,7 +147,7 @@ export function ConsultantProfilePage() {
                         {/* Wrapped existing grid content */}
                         <div className="grid md:grid-cols-3 gap-12 items-start">
                             <div className="md:col-span-1 mt-4 space-y-6">
-                                <img 
+                                <img
                                     src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
                                     alt="Arnaud Lacaze"
                                     className="rounded-full w-full max-w-[300px] mx-auto aspect-square object-cover object-top"
@@ -155,9 +172,9 @@ export function ConsultantProfilePage() {
                                 </p>
                                 <div className="prose prose-lg text-gray-600 mb-6">
                                     <p>
-                                        Avec plus de 15 ans d'expérience dans la transformation digitale et l'innovation, 
-                                        Arnaud accompagne les entreprises dans leur évolution technologique et organisationnelle. 
-                                        Ancien directeur de l'innovation chez Bouygues Telecom et consultant senior chez Accenture, 
+                                        Avec plus de 15 ans d'expérience dans la transformation digitale et l'innovation,
+                                        Arnaud accompagne les entreprises dans leur évolution technologique et organisationnelle.
+                                        Ancien directeur de l'innovation chez Bouygues Telecom et consultant senior chez Accenture,
                                         il a piloté de nombreux projets de transformation à grande échelle.
                                     </p>
                                     <p className="mt-4 font-semibold">
