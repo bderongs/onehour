@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import { getChatHistory } from '../services/chatStorage';
 import { submitToGoogleForm } from '../services/formSubmission';
@@ -207,4 +207,4 @@ export function ConsultantConnect({ onBack }: ConsultantConnectProps) {
             </div>
         </div>
     );
-} 
+}

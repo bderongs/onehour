@@ -205,7 +205,7 @@ export function AIChatInterface({ initialProblem, onConnect, messages: externalM
 
     return (
         <div ref={componentRef} className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto">
-            <div className="flex-1 bg-white rounded-lg shadow-lg p-4 flex flex-col">
+            <div className="flex-1 rounded-lg p-4 flex flex-col">
                 <div
                     ref={chatContainerRef}
                     className="flex-1 overflow-y-auto mb-4 space-y-4"
@@ -218,7 +218,7 @@ export function AIChatInterface({ initialProblem, onConnect, messages: externalM
                         >
                             <div
                                 className={`max-w-[80%] p-3 rounded-lg ${message.role === 'assistant'
-                                    ? 'bg-gray-100 text-gray-800 text-left'
+                                    ? 'bg-indigo-100 text-gray-800 text-left'
                                     : 'bg-blue-600 text-white text-left'
                                     }`}
                                 style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
@@ -19,6 +19,7 @@ export function LandingPage() {
     const [showConnect, setShowConnect] = useState(false);
     const [showForm, setShowForm] = useState(true); // Ensure UseCaseForm is shown initially
     const [messages, setMessages] = useState<Message[]>([]);
+
 
     const useCases: UseCase[] = [
         {
