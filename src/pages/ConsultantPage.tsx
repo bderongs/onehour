@@ -59,6 +59,31 @@ const ConsultantPage = () => {
                             Proposez des consultations ponctuelles et développez une nouvelle source de revenus.
                         </p>
                     </div>
+                    {/* New Benefits */}
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-xl font-semibold mb-4 text-gray-900">Profil personnel</h3>
+                        <p className="text-gray-600">
+                            Construisez un profil personnel avec vos compétences, un formulaire de demande intelligent et vos disponibilités.
+                        </p>
+                    </div>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-xl font-semibold mb-4 text-gray-900">Pipeline de conversion</h3>
+                        <p className="text-gray-600">
+                            Canalisez toutes les demandes que vous recevez dans un pipeline de conversion, avec des rappels intelligents et automatiques.
+                        </p>
+                    </div>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-xl font-semibold mb-4 text-gray-900">Opportunités de missions</h3>
+                        <p className="text-gray-600">
+                            Découvrez des opportunités pour des missions plus longues à partir de vos activités de micro-conseil.
+                        </p>
+                    </div>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-xl font-semibold mb-4 text-gray-900">Leads qualifiés</h3>
+                        <p className="text-gray-600">
+                            Obtenez des leads qualifiés directement depuis la plateforme.
+                        </p>
+                    </div>
                 </div>
 
                 <div id="how-it-works" className="bg-white rounded-xl p-8 mb-16">

@@ -187,7 +187,7 @@ export function LandingPage() {
             {/* Hero Section */}
             <div className="hero-section relative overflow-hidden">
                 <div className="absolute inset-0" />
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
                     <div className="text-center relative z-10">
                         <h1 className="mt-20 text-4xl md:text-6xl font-bold mb-6 text-gray-900">
                             Le concentré de conseil expert
