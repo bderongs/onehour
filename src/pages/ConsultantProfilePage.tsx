@@ -38,6 +38,29 @@ export function ConsultantProfilePage() {
         setMessages(newMessages);
     };
 
+    const getNextWorkingDay = (date: Date) => {
+        const day = date.getDay();
+        const diff = day === 5 ? 3 : day === 6 ? 2 : 1; // If Friday, add 3 days; if Saturday, add 2 days; otherwise, add 1 day
+        date.setDate(date.getDate() + diff);
+        return date;
+    };
+
+    const formatDate = (date: Date) => {
+        return date.toLocaleDateString('fr-FR', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            hour: 'numeric',
+            minute: 'numeric'
+        });
+    };
+
+    const availabilities = [
+        getNextWorkingDay(new Date()),
+        getNextWorkingDay(new Date(new Date().setDate(new Date().getDate() + 1))),
+        getNextWorkingDay(new Date(new Date().setDate(new Date().getDate() + 2)))
+    ];
+
     const howItWorks = [
         {
             icon: <MessageSquare className="h-6 w-6" />,
@@ -151,6 +174,20 @@ export function ConsultantProfilePage() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    {/* Section for Arnaud's next 3 availabilities */}
+                    <div className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-lg mt-12">
+                        <h3 className="text-2xl font-semibold mb-6 text-gray-900">
+                            Prochaines Disponibilités
+                        </h3>
+                        <ul className="flex space-x-4">
+                            {availabilities.map((date, index) => (
+                                <li key={index} className="flex items-center p-4 bg-blue-50 rounded-lg">
+                                    <Calendar className="h-6 w-6 text-blue-600 mr-2" />
+                                    <span className="text-gray-900 font-medium">{formatDate(date)}</span>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                     {/* Separate white box for request bloc */}
                     <div id="request-bloc" className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-lg mt-12">
