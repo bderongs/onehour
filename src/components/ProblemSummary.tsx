@@ -81,7 +81,7 @@ export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
                             onClick={handleConnectClick}
                             className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-md"
                         >
-                            Se connecter avec un consultant
+                            Se connecter
                             <ArrowRight className="h-5 w-5" />
                         </button>
                     </div>
