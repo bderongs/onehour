@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, Shield, Award, Star } from 'lucide-react';
+import { Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, Shield, Award, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
+import { HeaderSimple } from '../components/HeaderSimple';
 
 export function ConsultantProfilePage() {
     const navigate = useNavigate();
@@ -141,7 +142,50 @@ export function ConsultantProfilePage() {
     };
 
     return (
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-5">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+            <HeaderSimple />
+            {/* Consultant Summary Section */}
+            <div className="consultant-summary-section py-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-lg grid md:grid-cols-3 gap-12 items-start">
+                        <div className="md:col-span-1">
+                            <img 
+                                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e" 
+                                alt="Arnaud Lacaze"
+                                className="rounded-full w-full max-w-[300px] mx-auto aspect-square object-cover"
+                            />
+                        </div>
+                        <div className="md:col-span-2">
+                            <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                                Arnaud Lacaze
+                            </h2>
+                            <p className="text-xl text-blue-600 mb-4">
+                                Expert en Transformation Digitale & Innovation
+                            </p>
+                            <div className="prose prose-lg text-gray-600 mb-6">
+                                <p>
+                                    Avec plus de 15 ans d'expérience dans la transformation digitale et l'innovation, 
+                                    Arnaud accompagne les entreprises dans leur évolution technologique et organisationnelle. 
+                                    Ancien directeur de l'innovation chez Bouygues Telecom et consultant senior chez Accenture, 
+                                    il a piloté de nombreux projets de transformation à grande échelle.
+                                </p>
+                                <p className="mt-4 font-semibold">
+                                    Spécialisé dans :
+                                </p>
+                                <ul className="grid md:grid-cols-2 gap-2 mt-2">
+                                    <li>Stratégie digitale</li>
+                                    <li>Innovation produit</li>
+                                    <li>Transformation organisationnelle</li>
+                                    <li>Management de l'innovation</li>
+                                    <li>Conduite du changement</li>
+                                    <li>Agilité à l'échelle</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Hero Section */}
             <div className="hero-section relative overflow-hidden">
                 <div className="absolute inset-0" />
