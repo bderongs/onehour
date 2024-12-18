@@ -50,11 +50,6 @@ export function ConsultantProfilePage() {
             description: "Des experts qualifiés à votre service."
         },
         {
-            icon: <Target className="h-6 w-6" />,
-            title: "Simple",
-            description: "Un tarif unique, sans surprise."
-        },
-        {
             icon: <CheckCircle className="h-6 w-6" />,
             title: "Innovant",
             description: "Concentrez-vous sur l'échange, notre IA prend les notes."
@@ -148,14 +143,24 @@ export function ConsultantProfilePage() {
             <div className="consultant-summary-section py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-lg grid md:grid-cols-3 gap-12 items-start">
-                        <div className="md:col-span-1">
+                        <div className="md:col-span-1 mt-4 space-y-6">
                             <img 
-                                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e" 
+                                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
                                 alt="Arnaud Lacaze"
-                                className="rounded-full w-full max-w-[300px] mx-auto aspect-square object-cover"
+                                className="rounded-full w-full max-w-[300px] mx-auto aspect-square object-cover object-top"
                             />
+                            <div className="grid grid-cols-2 gap-4 max-w-[300px] mx-auto">
+                                <div className="text-center p-3 bg-white/80 rounded-lg">
+                                    <div className="font-bold text-blue-600">15+</div>
+                                    <div className="text-sm text-gray-600">Années d'exp.</div>
+                                </div>
+                                <div className="text-center p-3 bg-white/80 rounded-lg">
+                                    <div className="font-bold text-blue-600">200+</div>
+                                    <div className="text-sm text-gray-600">Clients</div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="md:col-span-2">
+                        <div className="md:col-span-2 mt-10">
                             <h2 className="text-3xl font-bold mb-4 text-gray-900">
                                 Arnaud Lacaze
                             </h2>
@@ -221,13 +226,13 @@ export function ConsultantProfilePage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                            Pourquoi OneHourAdvice ?
+                            Pourquoi OneHour ?
                         </h2>
                         <p className="text-xl text-gray-600">
                             Obtenez les conseils dont vous avez besoin, quand vous en avez besoin.
                         </p>
                     </div>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {whyChoose.map((reason, index) => (
                             <div
                                 key={index}
