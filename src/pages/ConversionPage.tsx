@@ -137,14 +137,28 @@ export function ConversionPage() {
                         </div>
                     </div>
 
-                    {/* About Section */}
+                    {/* Recent Missions Section */}
                     <div className="bg-white p-6 rounded-lg shadow-md">
-                        <h3 className="text-xl font-semibold mb-4">A propos</h3>
-                        <p className="text-gray-600">
-                            Expert passionné par l'innovation et la transformation digitale, je mets mon expertise au service des entreprises 
-                            pour les aider à relever leurs défis technologiques et organisationnels. Mon approche combine vision stratégique 
-                            et pragmatisme opérationnel pour des résultats concrets et durables.
-                        </p>
+                        <h3 className="text-xl font-semibold mb-4">Mes dernières missions</h3>
+                        <div className="space-y-6">
+                            <div className="border-l-4 border-blue-600 pl-4">
+                                <h4 className="font-semibold text-lg text-gray-900">Transformation Agile chez TotalEnergies</h4>
+                                <p className="text-gray-600 mt-1">Accompagnement de la transformation agile à l'échelle pour une business unit de 400 personnes. Mise en place du framework SAFe, formation des équipes et du management, et création d'un centre d'excellence agile.</p>
+                                <div className="text-sm text-gray-500 mt-2">2023 - 6 mois</div>
+                            </div>
+                            
+                            <div className="border-l-4 border-blue-600 pl-4">
+                                <h4 className="font-semibold text-lg text-gray-900">Innovation Produit chez Decathlon</h4>
+                                <p className="text-gray-600 mt-1">Refonte du processus d'innovation produit et mise en place d'une approche design thinking. Animation d'ateliers d'idéation et accompagnement des équipes dans le développement de nouveaux produits connectés.</p>
+                                <div className="text-sm text-gray-500 mt-2">2022 - 8 mois</div>
+                            </div>
+                            
+                            <div className="border-l-4 border-blue-600 pl-4">
+                                <h4 className="font-semibold text-lg text-gray-900">Stratégie Digitale pour La Poste</h4>
+                                <p className="text-gray-600 mt-1">Définition et déploiement de la stratégie de transformation digitale. Création d'une feuille de route sur 3 ans et accompagnement dans la mise en place des premiers projets structurants.</p>
+                                <div className="text-sm text-gray-500 mt-2">2022 - 4 mois</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
