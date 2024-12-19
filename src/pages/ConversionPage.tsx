@@ -40,34 +40,39 @@ export function ConversionPage() {
                     {/* Combined Banner and Consultant Info Section */}
                     <div className="bg-white rounded-lg shadow-md mb-8 overflow-hidden">
                         <div className="relative">
-                            <div className="w-40 h-40 bg-gray-400 rounded-full z-10 absolute left-6 top-1/2 transform translate-y-[-25%] border-4 border-white">
+                            <div className="w-28 h-28 md:w-40 md:h-40 bg-gray-400 rounded-full z-10 absolute left-4 md:left-6 top-1/2 transform translate-y-[-25%] border-4 border-white">
                                 <img
                                     src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
                                     alt="Arnaud Lacaze"
                                     className="w-full h-full rounded-full object-cover object-top"
                                 />
                             </div>
-                            <div className="h-40 bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-end px-12">
+                            <div className="h-32 md:h-40 bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-end px-4 md:px-12">
                                 <div className="text-right">
-                                    <div className="text-3xl font-bold text-blue-200">OneHour</div>
-                                    <div className="text-2xl font-semibold text-white">Consulting</div>
+                                    <div className="text-2xl md:text-3xl font-bold text-blue-200">ShowMeTheWay</div>
+                                    <div className="text-xl md:text-2xl font-semibold text-white">Consulting</div>
                                 </div>
                             </div>
                         </div>
-                        <div className="p-6 pt-12">
-                            <div className="flex justify-between items-center">
+                        <div className="p-4 md:p-6 pt-8 md:pt-12">
+                            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 md:gap-0">
                                 <div>
-                                    <h2 className="text-2xl font-bold">Arnaud Lacaze</h2>
-                                    <p className="text-gray-600">Expert en Transformation Digitale & Innovation</p>
+                                    <h2 className="text-xl md:text-2xl font-bold">Arnaud Lacaze</h2>
+                                    <p className="text-gray-600 text-sm md:text-base">Expert en Transformation Digitale & Innovation</p>
+                                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-1 text-sm text-gray-500">
+                                        <span>📍 Paris, France</span>
+                                        <span className="hidden md:inline">•</span>
+                                        <span>🗣️ Français, English, Español</span>
+                                    </div>
                                 </div>
-                                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg">Me contacter</button>
+                                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg w-full md:w-auto">Me contacter</button>
                             </div>
-                            <div className="flex space-x-4 mt-4">
-                                <span className="bg-gray-200 px-3 py-1 rounded-full">75€ / 30 min</span>
-                                <span className="bg-gray-200 px-3 py-1 rounded-full">15 ans d'xp</span>
-                                <span className="bg-gray-200 px-3 py-1 rounded-full">20+ clients</span>
+                            <div className="flex flex-wrap gap-2 mt-4">
+                                <span className="bg-gray-200 px-3 py-1 rounded-full text-sm">75€ / 30 min</span>
+                                <span className="bg-gray-200 px-3 py-1 rounded-full text-sm">15 ans d'xp</span>
+                                <span className="bg-gray-200 px-3 py-1 rounded-full text-sm">20+ clients</span>
                             </div>
-                            <div className="mt-6 prose prose-lg text-gray-600">
+                            <div className="mt-6 prose prose-sm md:prose-lg text-gray-600">
                                 <p>
                                     Avec plus de 15 ans d'expérience dans la transformation digitale et l'innovation,
                                     j'accompagne les entreprises dans leur évolution technologique et organisationnelle.
