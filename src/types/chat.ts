@@ -23,7 +23,7 @@ export const CHAT_CONFIGS: Record<ChatUseCase, ChatConfig> = {
             
             When a user presents their initial problem:
             1) Acknowledge their need
-            2) Ask specific follow-up questions about unclear aspects
+            2) Ask specific follow-up questions about unclear aspects. Only one question at a time.
             3) Keep responses short and focused
             4) Ask one question at a time
 
@@ -36,7 +36,7 @@ export const CHAT_CONFIGS: Record<ChatUseCase, ChatConfig> = {
             6) Decision-making process
 
             Do not suggest solutions - that's Arnaud's role.
-            When you have gathered sufficient information, explain that you'll pass this detailed brief to Arnaud and suggest scheduling a meeting.`,
+            When you have gathered sufficient information, explain that you'll pass this detailed brief to Arnaud. No need to suggest a meeting as this is taken care of in the next step.`,
         title: "Assistant virtuel d'Arnaud",
         subtitle: "Je vous aide à préparer votre brief pour Arnaud",
         onConnect: () => {
@@ -44,6 +44,8 @@ export const CHAT_CONFIGS: Record<ChatUseCase, ChatConfig> = {
         },
         summaryInstructions: `Analyze the conversation and create a JSON summary with the following structure.
         IMPORTANT: The summary must be in the same language as the conversation (French if the conversation is in French).
+        IMPORTANT: Do not return any other output than the JSON with all fields filled.
+        IMPORTANT: The readyForAssessment field must be a boolean (true/false), not a string.
         
         {
             "challenge": "Brief description of the main challenge or project",
@@ -52,12 +54,11 @@ export const CHAT_CONFIGS: Record<ChatUseCase, ChatConfig> = {
             "constraints": "Budget, timeline, and technical constraints",
             "stakeholders": "Key stakeholders involved",
             "previousAttempts": "Previous solutions or attempts",
-            "readyForAssessment": Boolean indicating if we have enough information for Arnaud to help effectively.
-            Set to true when we have at least:
-            - Clear challenge description
-            - Current situation
-            - Desired outcome
-            - Some constraints (budget/timeline)
+            "readyForAssessment": true or false (boolean, not string). Set to true only when we have:
+                - Clear challenge description
+                - Current situation details
+                - Desired outcome
+                - Some constraints (budget/timeline)
         }
 
         Example in French:
@@ -69,7 +70,9 @@ export const CHAT_CONFIGS: Record<ChatUseCase, ChatConfig> = {
             "stakeholders": "Équipe support client, DSI",
             "previousAttempts": "Test d'un chatbot basique en 2022",
             "readyForAssessment": true
-        }`
+        }
+        
+        IMPORTANT: Make sure readyForAssessment is a boolean value (true/false), not a string ("true"/"false").`
     },
     automation_assessment: {
         initialMessage: {

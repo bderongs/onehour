@@ -26,6 +26,7 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
     const chatContainerRef = React.useRef<HTMLDivElement>(null);
     const summaryContainerRef = React.useRef<HTMLDivElement>(null);
     const componentRef = React.useRef<HTMLDivElement>(null);
+    const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
     // Initial analysis of the problem
     useEffect(() => {
@@ -37,23 +38,66 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
         analyzeInitialMessage();
     }, [config.initialMessage, isInitialized]);
 
+    // Keep focus on textarea after sending message
+    useEffect(() => {
+        if (!isLoading && textareaRef.current) {
+            textareaRef.current.focus();
+        }
+    }, [isLoading]);
+
     // Function to get summary if needed
     const updateSummaryIfNeeded = async (messagesForSummary: Message[]) => {
         if (!config.summaryInstructions || !messagesForSummary.some(m => m.role === 'user')) return;
 
         try {
             const summaryResponse = await analyzeWithOpenAI(
-                messagesForSummary.map((msg): Message => ({
-                    role: msg.role,
-                    content: msg.content
-                })),
-                config.summaryInstructions
+                [
+                    { role: 'system', content: config.summaryInstructions },
+                    ...messagesForSummary.map((msg): Message => ({
+                        role: msg.role,
+                        content: msg.content
+                    })),
+                    { 
+                        role: 'user', 
+                        content: 'Please analyze the conversation above and provide a JSON summary following the specified format.' 
+                    }
+                ],
+                true // Use summary mode
             );
 
             if (summaryResponse) {
                 try {
-                    const parsedSummary = JSON.parse(summaryResponse);
-                    setProblemSummary(parsedSummary);
+                    // Try to extract JSON if it's wrapped in other text
+                    const jsonMatch = summaryResponse.match(/\{[\s\S]*\}/);
+                    const jsonStr = jsonMatch ? jsonMatch[0] : summaryResponse;
+                    
+                    const parsedSummary = JSON.parse(jsonStr);
+                    
+                    // Validate content fields and readyForAssessment
+                    const requiredFields = ['challenge', 'currentSituation', 'desiredOutcome', 'constraints', 'readyForAssessment'];
+                    const hasAllFields = requiredFields.every(field => {
+                        if (field === 'readyForAssessment') {
+                            return typeof parsedSummary[field] === 'boolean';
+                        }
+                        return field in parsedSummary && 
+                               typeof parsedSummary[field] === 'string' && 
+                               parsedSummary[field].trim() !== '';
+                    });
+                    
+                    if (hasAllFields) {
+                        setProblemSummary(parsedSummary);
+                    } else {
+                        console.error('Summary missing required fields or has invalid values:', 
+                            requiredFields.filter(field => {
+                                if (field === 'readyForAssessment') {
+                                    return typeof parsedSummary[field] !== 'boolean';
+                                }
+                                return !(field in parsedSummary && 
+                                       typeof parsedSummary[field] === 'string' && 
+                                       parsedSummary[field].trim() !== '');
+                            })
+                        );
+                    }
                 } catch (e) {
                     console.error('Failed to parse summary JSON:', e);
                 }
@@ -190,6 +234,7 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
                 <form onSubmit={handleSubmit} className="flex gap-2 items-center">
                     <div className="relative flex-grow">
                         <textarea
+                            ref={textareaRef}
                             value={newMessage}
                             onChange={handleInput}
                             onKeyDown={handleKeyDown}
