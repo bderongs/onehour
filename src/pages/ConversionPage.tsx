@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { CheckCircle, Star, ArrowRight, Linkedin, Twitter, Globe, X } from 'lucide-react';
+import { CheckCircle, Star, ArrowRight, Linkedin, Twitter, Globe, X, BadgeCheck } from 'lucide-react';
 import { LightFooter } from '../components/LightFooter';
 
 interface ServicePackage {
@@ -452,7 +452,18 @@ export function ConversionPage() {
                 <div className="max-w-4xl mx-auto px-4">
                     {/* Client References Section */}
                     <div className="scroll-animation bg-white p-6 rounded-lg shadow-md mb-8">
-                        <h3 className="text-xl font-semibold mb-4">Références clients</h3>
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-xl font-semibold">Références clients</h3>
+                            <a 
+                                href="https://www.trustboard.eu" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="flex items-center gap-1 text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                            >
+                                <BadgeCheck className="h-4 w-4 text-blue-600" />
+                                Vérifiées par Trustboard
+                            </a>
+                        </div>
                         <div className="space-y-4">
                             {clientReviews.map((review, index) => (
                                 <div key={index} className="flex items-start p-4 bg-gray-50 rounded-lg">
