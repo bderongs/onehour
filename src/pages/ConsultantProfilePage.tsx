@@ -96,6 +96,24 @@ export default function ConsultantProfilePage() {
     const [modal, setModal] = useState<ModalState>({ isOpen: false, package: null, type: 'info' });
     useScrollAnimation();
 
+    // Enhanced scroll reset effect
+    useEffect(() => {
+        // Reset scroll on mount
+        window.scrollTo(0, 0);
+        
+        // Handle refresh/reload cases
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        
+        // Cleanup
+        return () => {
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'auto';
+            }
+        };
+    }, []);
+
     // Add function to handle modal
     const openModal = (pkg: ServicePackage, index: number) => {
         setModal({ 
