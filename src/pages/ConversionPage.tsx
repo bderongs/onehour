@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { CheckCircle, Star, ArrowRight, Linkedin, Twitter, Globe } from 'lucide-react';
+import { CheckCircle, Star, ArrowRight, Linkedin, Twitter, Globe, X } from 'lucide-react';
 import { LightFooter } from '../components/LightFooter';
 
 interface ServicePackage {
@@ -53,19 +53,70 @@ function useScrollAnimation() {
     }, []);
 }
 
+// Add new interface for modal state
+interface ModalState {
+    isOpen: boolean;
+    package: ServicePackage | null;
+}
+
+function getAvailabilityForDuration(duration: string): string {
+    const now = new Date();
+    let daysToAdd = 1;
+    
+    // Add more days based on duration
+    if (duration.includes("minutes")) {
+        daysToAdd = 1; // Next day for discovery calls
+    } else if (duration.includes("mois")) {
+        daysToAdd = 30; // One month for monthly services
+    } else {
+        daysToAdd = 7; // One week for all other services
+    }
+    
+    const availabilityDate = new Date(now);
+    availabilityDate.setDate(availabilityDate.getDate() + daysToAdd);
+    
+    // Keep adding days until we find a weekday (1-5, Monday-Friday)
+    while (availabilityDate.getDay() === 0 || availabilityDate.getDay() === 6) {
+        availabilityDate.setDate(availabilityDate.getDate() + 1);
+    }
+    
+    // Format the date in French
+    const options: Intl.DateTimeFormatOptions = { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'long' 
+    };
+    return availabilityDate.toLocaleDateString('fr-FR', options);
+}
+
 export function ConversionPage() {
     const [scrollY, setScrollY] = useState(0);
     const [nextAvailability] = useState(getNextWorkingDay());
+    const [modal, setModal] = useState<ModalState>({ isOpen: false, package: null });
     useScrollAnimation();
 
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrollY(window.scrollY);
-        };
+    // Add function to handle modal
+    const openModal = (pkg: ServicePackage) => {
+        setModal({ isOpen: true, package: pkg });
+        document.body.style.overflow = 'hidden'; // Prevent background scroll
+    };
 
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    const closeModal = () => {
+        setModal({ isOpen: false, package: null });
+        document.body.style.overflow = 'unset'; // Restore scroll
+    };
+
+    // Add function to get time based on package duration
+    const getTimeForDuration = (duration: string): string => {
+        if (duration.includes("mois")) {
+            return "10h";
+        } else if (duration.includes("semaine")) {
+            return "11h";
+        } else if (duration.includes("jours") || duration.includes("journée")) {
+            return "14h30";
+        }
+        return "14h"; // Default time for short calls
+    };
 
     const clientReviews = [
         {
@@ -185,44 +236,11 @@ export function ConversionPage() {
                 "Présentation exécutive"
             ],
             highlight: "Popular"
-        },
-        {
-            title: "Product Strategy",
-            duration: "1 mois",
-            price: "8\u00A0000\u00A0€",
-            description: "Définition de votre stratégie produit et de sa roadmap de développement sur 12 mois.",
-            deliverables: [
-                "Analyse de marché",
-                "Définition du MVP",
-                "Roadmap produit",
-                "Plan de mise en œuvre"
-            ]
-        },
-        {
-            title: "Tech Due Diligence",
-            duration: "1 semaine",
-            price: "6\u00A0000\u00A0€",
-            description: "Évaluation approfondie de votre stack technique et de vos pratiques de développement.",
-            deliverables: [
-                "Audit technique",
-                "Analyse des risques",
-                "Recommandations d'architecture",
-                "Rapport détaillé"
-            ]
-        },
-        {
-            title: "Leadership Coaching",
-            duration: "3 mois",
-            price: "1\u00A0500\u00A0€/mois",
-            description: "Coaching personnalisé pour les leaders techniques et product managers en transition.",
-            deliverables: [
-                "Sessions bi-mensuelles",
-                "Outils de leadership",
-                "Plan de développement",
-                "Support par email"
-            ]
         }
     ];
+
+    // Calculate average rating
+    const averageRating = clientReviews.reduce((acc, review) => acc + review.rating, 0) / clientReviews.length;
 
     return (
         <div className="min-h-screen flex flex-col relative">
@@ -285,8 +303,8 @@ export function ConversionPage() {
                 {/* Cover Section - Full Width */}
                 <div className="scroll-animation w-full bg-white shadow-md mb-8">
                     <div className="max-w-4xl mx-auto">
-                        <div className="relative p-4 md:p-6 flex items-start justify-between">
-                            <div className="w-48 h-64 md:w-72 md:h-96 bg-gray-400 rounded-2xl border-4 border-white overflow-hidden">
+                        <div className="relative p-4 md:p-6 flex items-start gap-6">
+                            <div className="w-48 h-64 md:w-72 md:h-96 flex-shrink-0 bg-gray-400 rounded-2xl border-4 border-white overflow-hidden">
                                 <img
                                     src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
                                     alt="Arnaud Lacaze"
@@ -294,18 +312,14 @@ export function ConversionPage() {
                                     style={{ objectPosition: '50% 10%' }}
                                 />
                             </div>
-                            <div className="text-right flex flex-col gap-8 max-w-sm">
-                                <div>
-                                    <div className="text-2xl md:text-3xl font-bold text-blue-600">ShowMeTheWay</div>
-                                    <div className="text-xl md:text-2xl font-semibold text-gray-700">Consulting</div>
+                            <div className="flex-grow flex flex-col gap-4">
+                                <div className="flex justify-end">
+                                    <div className="text-right">
+                                        <div className="text-2xl md:text-3xl font-bold text-blue-600">ShowMeTheWay</div>
+                                        <div className="text-xl md:text-2xl font-semibold text-gray-700">Consulting</div>
+                                    </div>
                                 </div>
-                                <p className="text-gray-600 text-right text-sm md:text-base leading-relaxed">
-                                    Passionné par l'innovation et la transformation digitale, j'accompagne les entreprises dans leur évolution technologique depuis plus de 15 ans. Mon approche combine expertise technique et vision stratégique pour des résultats concrets et durables.
-                                </p>
-                            </div>
-                        </div>
-                        <div className="p-4 md:p-6 -mt-4">
-                            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 md:gap-0">
+                                
                                 <div>
                                     <div className="flex items-center gap-4 mb-1">
                                         <h2 className="text-xl md:text-2xl font-bold">Arnaud Lacaze</h2>
@@ -322,18 +336,39 @@ export function ConversionPage() {
                                         </div>
                                     </div>
                                     <p className="text-gray-600 text-sm md:text-base">Expert en Transformation Digitale & Innovation</p>
-                                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-1 text-sm text-gray-500">
+                                </div>
+
+                                <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+                                    Passionné par l'innovation et la transformation digitale, j'accompagne les entreprises dans leur évolution technologique depuis plus de 15 ans. Mon approche combine expertise technique et vision stratégique pour des résultats concrets et durables.
+                                </p>
+
+                                <div className="flex flex-col gap-2">
+                                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-sm text-gray-500">
                                         <span>📍 Paris, France</span>
                                         <span className="hidden md:inline">•</span>
                                         <span>🗣️ Français, English, Español</span>
                                     </div>
-                                </div>
-                                <div className="bg-gray-50 p-4 rounded-lg">
-                                    <div className="text-sm text-gray-500">Prochaine disponibilité</div>
-                                    <div className="text-xl font-bold text-gray-900">
-                                        {nextAvailability}, 14h
+                                    <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4">
+                                        <div className="flex items-center gap-1">
+                                            <div className="flex">
+                                                {[...Array(5)].map((_, i) => (
+                                                    <Star 
+                                                        key={i} 
+                                                        className={`h-4 w-4 ${i < Math.round(averageRating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                                                    />
+                                                ))}
+                                            </div>
+                                            <span className="text-sm text-gray-600 ml-1">
+                                                {averageRating.toFixed(1)}/5 ({clientReviews.length} avis)
+                                            </span>
+                                        </div>
+                                        <span className="hidden md:inline text-gray-300">•</span>
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-sm text-gray-600">
+                                                ⚡️ Répond en général sous 6h
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="text-sm text-gray-500 mt-1">Pour un appel découverte</div>
                                 </div>
                             </div>
                         </div>
@@ -378,7 +413,16 @@ export function ConversionPage() {
                                         </div>
                                     </div>
                                     <div className="p-6 pt-0">
-                                        <button className="w-full bg-gray-50 hover:bg-gray-100 text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors">
+                                        <div className="text-center mb-3">
+                                            <div className="text-sm text-gray-500">Prochaine disponibilité</div>
+                                            <div className="text-sm font-medium text-gray-900">
+                                                {getAvailabilityForDuration(pkg.duration)}, {getTimeForDuration(pkg.duration)}
+                                            </div>
+                                        </div>
+                                        <button 
+                                            onClick={() => openModal(pkg)}
+                                            className="w-full bg-gray-50 hover:bg-gray-100 text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors"
+                                        >
                                             En savoir plus
                                         </button>
                                     </div>
@@ -530,6 +574,59 @@ export function ConversionPage() {
                     </div>
                 </div>
             </main>
+
+            {/* Add Modal */}
+            {modal.isOpen && modal.package && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                    <div 
+                        className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative
+                        transform transition-all duration-300 scale-100"
+                    >
+                        <button 
+                            onClick={closeModal}
+                            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                        >
+                            <X className="h-6 w-6" />
+                        </button>
+                        
+                        <div className="p-6">
+                            <div className="flex justify-between items-start mb-6">
+                                <div>
+                                    <h2 className="text-2xl font-bold text-gray-900">{modal.package.title}</h2>
+                                    <p className="text-gray-500">{modal.package.duration}</p>
+                                    <div className="text-lg font-bold text-gray-900 mt-1">{modal.package.price}</div>
+                                </div>
+                                {modal.package.highlight && (
+                                    <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                                        {modal.package.highlight}
+                                    </span>
+                                )}
+                            </div>
+
+                            <div className="prose prose-blue max-w-none">
+                                <h3 className="text-lg font-semibold mb-2">Description détaillée</h3>
+                                <p className="text-gray-600">{modal.package.description}</p>
+                                
+                                <h3 className="text-lg font-semibold mt-6 mb-2">Livrables</h3>
+                                <ul className="space-y-3">
+                                    {modal.package.deliverables.map((item, i) => (
+                                        <li key={i} className="flex items-start gap-3">
+                                            <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                                            <span className="text-gray-600">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <div className="mt-8">
+                                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors">
+                                        Réserver un créneau
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
