@@ -308,70 +308,77 @@ export function ConversionPage() {
                 {/* Cover Section - Full Width */}
                 <div className="scroll-animation w-full bg-white shadow-md mb-8">
                     <div className="max-w-4xl mx-auto">
-                        <div className="relative p-4 md:p-6 flex items-start gap-6">
-                            <div className="w-48 h-64 md:w-72 md:h-96 flex-shrink-0 bg-gray-400 rounded-2xl border-4 border-white overflow-hidden">
-                                <img
-                                    src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
-                                    alt="Arnaud Lacaze"
-                                    className="w-full h-full object-cover"
-                                    style={{ objectPosition: '50% 10%' }}
-                                />
+                        <div className="relative p-4 md:p-6 flex flex-col gap-6">
+                            {/* Logo Section - Mobile only */}
+                            <div className="block md:hidden text-center">
+                                <div className="text-xl md:text-3xl font-bold text-blue-600">ShowMeTheWay</div>
+                                <div className="text-lg md:text-2xl font-semibold text-gray-700">Consulting</div>
                             </div>
-                            <div className="flex-grow flex flex-col gap-4">
-                                <div className="flex justify-end">
-                                    <div className="text-right">
-                                        <div className="text-2xl md:text-3xl font-bold text-blue-600">ShowMeTheWay</div>
-                                        <div className="text-xl md:text-2xl font-semibold text-gray-700">Consulting</div>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <div className="flex items-center gap-4 mb-1">
-                                        <h2 className="text-xl md:text-2xl font-bold">Arnaud Lacaze</h2>
-                                        <div className="flex gap-3">
-                                            <a href="https://linkedin.com/in/arnaud-lacaze" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600 transition-colors">
-                                                <Linkedin className="h-5 w-5" />
-                                            </a>
-                                            <a href="https://twitter.com/arnaudlacaze" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors">
-                                                <Twitter className="h-5 w-5" />
-                                            </a>
-                                            <a href="https://arnaudlacaze.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-600 transition-colors">
-                                                <Globe className="h-5 w-5" />
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <p className="text-gray-600 text-sm md:text-base">Expert en Transformation Digitale & Innovation</p>
-                                </div>
 
-                                <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-                                    Passionné par l'innovation et la transformation digitale, j'accompagne les entreprises dans leur évolution technologique depuis plus de 15 ans. Mon approche combine expertise technique et vision stratégique pour des résultats concrets et durables.
-                                </p>
-
-                                <div className="flex flex-col gap-2">
-                                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-sm text-gray-500">
-                                        <span>📍 Paris, France</span>
-                                        <span className="hidden md:inline">•</span>
-                                        <span>🗣️ Français, English, Español</span>
+                            <div className="flex flex-col md:flex-row md:items-start gap-6">
+                                <div className="w-40 h-40 md:w-72 md:h-96 mx-auto md:mx-0 flex-shrink-0 bg-gray-400 rounded-2xl border-4 border-white overflow-hidden">
+                                    <img
+                                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
+                                        alt="Arnaud Lacaze"
+                                        className="w-full h-full object-cover"
+                                        style={{ objectPosition: '50% 10%' }}
+                                    />
+                                </div>
+                                <div className="flex-grow flex flex-col gap-4">
+                                    {/* Logo Section - Desktop only */}
+                                    <div className="hidden md:block text-right">
+                                        <div className="text-xl md:text-3xl font-bold text-blue-600">ShowMeTheWay</div>
+                                        <div className="text-lg md:text-2xl font-semibold text-gray-700">Consulting</div>
                                     </div>
-                                    <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-4">
-                                        <div className="flex items-center gap-1">
-                                            <div className="flex">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Star 
-                                                        key={i} 
-                                                        className={`h-4 w-4 ${i < Math.round(averageRating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                                                    />
-                                                ))}
+                                    
+                                    <div className="text-center md:text-left">
+                                        <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-1">
+                                            <h2 className="text-xl md:text-2xl font-bold">Arnaud Lacaze</h2>
+                                            <div className="flex gap-3 justify-center md:justify-start">
+                                                <a href="https://linkedin.com/in/arnaud-lacaze" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600 transition-colors">
+                                                    <Linkedin className="h-5 w-5" />
+                                                </a>
+                                                <a href="https://twitter.com/arnaudlacaze" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors">
+                                                    <Twitter className="h-5 w-5" />
+                                                </a>
+                                                <a href="https://arnaudlacaze.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-600 transition-colors">
+                                                    <Globe className="h-5 w-5" />
+                                                </a>
                                             </div>
-                                            <span className="text-sm text-gray-600 ml-1">
-                                                {averageRating.toFixed(1)}/5 ({clientReviews.length} avis)
-                                            </span>
                                         </div>
-                                        <span className="hidden md:inline text-gray-300">•</span>
-                                        <div className="flex items-center gap-1">
-                                            <span className="text-sm text-gray-600">
-                                                ⚡️ Répond en général sous 6h
-                                            </span>
+                                        <p className="text-gray-600 text-sm md:text-base">Expert en Transformation Digitale & Innovation</p>
+                                    </div>
+
+                                    <p className="text-gray-600 text-sm md:text-base leading-relaxed text-center md:text-left">
+                                        Passionné par l'innovation et la transformation digitale, j'accompagne les entreprises dans leur évolution technologique depuis plus de 15 ans. Mon approche combine expertise technique et vision stratégique pour des résultats concrets et durables.
+                                    </p>
+
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-sm text-gray-500 text-center md:text-left">
+                                            <span>📍 Paris, France</span>
+                                            <span className="hidden md:inline">•</span>
+                                            <span>🗣️ Français, English, Español</span>
+                                        </div>
+                                        <div className="flex flex-col md:flex-row items-center md:items-center gap-2 md:gap-4">
+                                            <div className="flex items-center gap-1">
+                                                <div className="flex">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <Star 
+                                                            key={i} 
+                                                            className={`h-4 w-4 ${i < Math.round(averageRating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                <span className="text-sm text-gray-600 ml-1">
+                                                    {averageRating.toFixed(1)}/5 ({clientReviews.length} avis)
+                                                </span>
+                                            </div>
+                                            <span className="hidden md:inline text-gray-300">•</span>
+                                            <div className="flex items-center gap-1">
+                                                <span className="text-sm text-gray-600">
+                                                    ⚡️ Répond en général sous 6h
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
