@@ -1,8 +1,72 @@
-import React from 'react';
-import { CheckCircle, Star } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
+import { CheckCircle, Star, ArrowRight, Linkedin, Twitter, Globe } from 'lucide-react';
 import { LightFooter } from '../components/LightFooter';
 
+interface ServicePackage {
+    title: string;
+    duration: string;
+    price: string;
+    description: string;
+    deliverables: string[];
+    highlight?: string;
+}
+
+function getNextWorkingDay(): string {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    // Keep adding days until we find a weekday (1-5, Monday-Friday)
+    while (tomorrow.getDay() === 0 || tomorrow.getDay() === 6) {
+        tomorrow.setDate(tomorrow.getDate() + 1);
+    }
+    
+    // Format the date in French
+    const options: Intl.DateTimeFormatOptions = { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'long' 
+    };
+    return tomorrow.toLocaleDateString('fr-FR', options);
+}
+
+function useScrollAnimation() {
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            },
+            {
+                threshold: 0.1,
+                rootMargin: '-50px 0px'
+            }
+        );
+
+        const elements = document.querySelectorAll('.scroll-animation');
+        elements.forEach(el => observer.observe(el));
+
+        return () => elements.forEach(el => observer.unobserve(el));
+    }, []);
+}
+
 export function ConversionPage() {
+    const [scrollY, setScrollY] = useState(0);
+    const [nextAvailability] = useState(getNextWorkingDay());
+    useScrollAnimation();
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrollY(window.scrollY);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     const clientReviews = [
         {
             name: "Pascal Dubois",
@@ -33,31 +97,230 @@ export function ConversionPage() {
         }
     ];
 
+    const servicePackages: ServicePackage[] = [
+        {
+            title: "Appel Découverte",
+            duration: "15 minutes",
+            price: "Gratuit",
+            description: "Un premier échange pour comprendre vos enjeux et voir comment je peux vous aider dans votre transformation.",
+            deliverables: [
+                "Présentation de votre contexte",
+                "Identification des challenges",
+                "Discussion des solutions possibles",
+                "Recommandations initiales"
+            ],
+            highlight: "Sans engagement"
+        },
+        {
+            title: "Diagnostic Flash",
+            duration: "1 journée",
+            price: "1\u00A0200\u00A0€",
+            description: "Évaluation rapide de votre transformation digitale et identification des axes d'amélioration prioritaires.",
+            deliverables: [
+                "Audit express de maturité digitale",
+                "Identification des quick wins",
+                "Recommandations prioritaires",
+                "Compte rendu détaillé"
+            ],
+            highlight: "Idéal pour démarrer"
+        },
+        {
+            title: "Sprint Innovation",
+            duration: "5 jours",
+            price: "5\u00A0000\u00A0€",
+            description: "Accompagnement intensif pour accélérer un projet d'innovation ou résoudre un défi stratégique.",
+            deliverables: [
+                "Animation d'ateliers design thinking",
+                "Prototype conceptuel",
+                "Feuille de route détaillée",
+                "Présentation des résultats"
+            ],
+            highlight: "Best-seller"
+        },
+        {
+            title: "Transformation Agile",
+            duration: "3 mois",
+            price: "Sur mesure",
+            description: "Programme complet de transformation agile adapté à votre contexte et vos objectifs.",
+            deliverables: [
+                "Diagnostic organisationnel",
+                "Formation des équipes",
+                "Mise en place du framework",
+                "Coaching des managers"
+            ]
+        },
+        {
+            title: "Mentorat Direction",
+            duration: "6 mois",
+            price: "2\u00A0500€/mois",
+            description: "Accompagnement personnalisé des dirigeants dans leur vision et execution stratégique.",
+            deliverables: [
+                "Sessions mensuelles one-to-one",
+                "Support continu à distance",
+                "Revues stratégiques trimestrielles",
+                "Accès à mon réseau"
+            ]
+        },
+        {
+            title: "Innovation Workshop",
+            duration: "2 jours",
+            price: "2\u00A0400€",
+            description: "Workshop intensif pour générer des idées innovantes et construire une vision produit partagée avec vos équipes.",
+            deliverables: [
+                "Facilitation d'ateliers créatifs",
+                "Cartographie d'opportunités",
+                "Priorisation des initiatives",
+                "Synthèse et plan d'action"
+            ]
+        },
+        {
+            title: "Digital Assessment",
+            duration: "2 semaines",
+            price: "4\u00A0800\u00A0€",
+            description: "Audit complet de votre maturité digitale et de vos processus avec recommandations détaillées.",
+            deliverables: [
+                "Analyse des processus actuels",
+                "Benchmark sectoriel",
+                "Plan de transformation",
+                "Présentation exécutive"
+            ],
+            highlight: "Popular"
+        },
+        {
+            title: "Product Strategy",
+            duration: "1 mois",
+            price: "8\u00A0000\u00A0€",
+            description: "Définition de votre stratégie produit et de sa roadmap de développement sur 12 mois.",
+            deliverables: [
+                "Analyse de marché",
+                "Définition du MVP",
+                "Roadmap produit",
+                "Plan de mise en œuvre"
+            ]
+        },
+        {
+            title: "Tech Due Diligence",
+            duration: "1 semaine",
+            price: "6\u00A0000\u00A0€",
+            description: "Évaluation approfondie de votre stack technique et de vos pratiques de développement.",
+            deliverables: [
+                "Audit technique",
+                "Analyse des risques",
+                "Recommandations d'architecture",
+                "Rapport détaillé"
+            ]
+        },
+        {
+            title: "Leadership Coaching",
+            duration: "3 mois",
+            price: "1\u00A0500\u00A0€/mois",
+            description: "Coaching personnalisé pour les leaders techniques et product managers en transition.",
+            deliverables: [
+                "Sessions bi-mensuelles",
+                "Outils de leadership",
+                "Plan de développement",
+                "Support par email"
+            ]
+        }
+    ];
+
     return (
-        <div className="bg-gray-100 min-h-screen flex flex-col">
-            <main className="flex-grow">
-                <div className="max-w-4xl mx-auto px-4 py-8">
-                    {/* Combined Banner and Consultant Info Section */}
-                    <div className="bg-white rounded-lg shadow-md mb-8 overflow-hidden">
-                        <div className="relative">
-                            <div className="w-28 h-28 md:w-40 md:h-40 bg-gray-400 rounded-full z-10 absolute left-4 md:left-6 top-1/2 transform translate-y-[-25%] border-4 border-white">
+        <div className="min-h-screen flex flex-col relative">
+            <style>
+                {`
+                    .scroll-animation {
+                        opacity: 0;
+                        transform: translateY(30px);
+                        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+                        will-change: transform, opacity;
+                    }
+                    .animate-in {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                    @media (prefers-reduced-motion: reduce) {
+                        .scroll-animation {
+                            transition: none;
+                            opacity: 1;
+                            transform: none;
+                        }
+                    }
+                    .scrollbar-hide {
+                        -ms-overflow-style: none;
+                        scrollbar-width: none;
+                    }
+                    .scrollbar-hide::-webkit-scrollbar {
+                        display: none;
+                    }
+                `}
+            </style>
+
+            {/* Animated Background */}
+            <div className="fixed inset-0 -z-10 overflow-hidden">
+                <div 
+                    className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50"
+                    style={{
+                        backgroundImage: `
+                            radial-gradient(circle at 20% 35%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
+                            radial-gradient(circle at 75% 44%, rgba(165, 180, 252, 0.15) 0%, transparent 50%),
+                            radial-gradient(circle at 5% 75%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
+                            radial-gradient(circle at 80% 95%, rgba(165, 180, 252, 0.15) 0%, transparent 50%)
+                        `
+                    }}
+                />
+                <div 
+                    className="absolute inset-0 opacity-30"
+                    style={{
+                        transform: `translateY(${scrollY * 0.2}px)`,
+                        backgroundImage: `
+                            radial-gradient(circle at 50% ${30 + (scrollY * 0.02)}%, rgba(147, 197, 253, 0.2) 0%, transparent 40%),
+                            radial-gradient(circle at ${70 - (scrollY * 0.01)}% ${60 + (scrollY * 0.01)}%, rgba(165, 180, 252, 0.2) 0%, transparent 40%)
+                        `,
+                        transition: 'transform 0.1s ease-out'
+                    }}
+                />
+            </div>
+
+            <main className="flex-grow relative">
+                {/* Cover Section - Full Width */}
+                <div className="scroll-animation w-full bg-white shadow-md mb-8">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="relative p-4 md:p-6 flex items-start justify-between">
+                            <div className="w-48 h-64 md:w-72 md:h-96 bg-gray-400 rounded-2xl border-4 border-white overflow-hidden">
                                 <img
                                     src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
                                     alt="Arnaud Lacaze"
-                                    className="w-full h-full rounded-full object-cover object-top"
+                                    className="w-full h-full object-cover"
+                                    style={{ objectPosition: '50% 10%' }}
                                 />
                             </div>
-                            <div className="h-32 md:h-40 bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-end px-4 md:px-12">
-                                <div className="text-right">
-                                    <div className="text-2xl md:text-3xl font-bold text-blue-200">ShowMeTheWay</div>
-                                    <div className="text-xl md:text-2xl font-semibold text-white">Consulting</div>
+                            <div className="text-right flex flex-col gap-8 max-w-sm">
+                                <div>
+                                    <div className="text-2xl md:text-3xl font-bold text-blue-600">ShowMeTheWay</div>
+                                    <div className="text-xl md:text-2xl font-semibold text-gray-700">Consulting</div>
                                 </div>
+                                <p className="text-gray-600 text-right text-sm md:text-base leading-relaxed">
+                                    Passionné par l'innovation et la transformation digitale, j'accompagne les entreprises dans leur évolution technologique depuis plus de 15 ans. Mon approche combine expertise technique et vision stratégique pour des résultats concrets et durables.
+                                </p>
                             </div>
                         </div>
-                        <div className="p-4 md:p-6 pt-8 md:pt-12">
-                            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 md:gap-0">
+                        <div className="p-4 md:p-6 -mt-4">
+                            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 md:gap-0">
                                 <div>
-                                    <h2 className="text-xl md:text-2xl font-bold">Arnaud Lacaze</h2>
+                                    <div className="flex items-center gap-4 mb-1">
+                                        <h2 className="text-xl md:text-2xl font-bold">Arnaud Lacaze</h2>
+                                        <div className="flex gap-3">
+                                            <a href="https://linkedin.com/in/arnaud-lacaze" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600 transition-colors">
+                                                <Linkedin className="h-5 w-5" />
+                                            </a>
+                                            <a href="https://twitter.com/arnaudlacaze" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors">
+                                                <Twitter className="h-5 w-5" />
+                                            </a>
+                                            <a href="https://arnaudlacaze.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-600 transition-colors">
+                                                <Globe className="h-5 w-5" />
+                                            </a>
+                                        </div>
+                                    </div>
                                     <p className="text-gray-600 text-sm md:text-base">Expert en Transformation Digitale & Innovation</p>
                                     <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-1 text-sm text-gray-500">
                                         <span>📍 Paris, France</span>
@@ -65,26 +328,110 @@ export function ConversionPage() {
                                         <span>🗣️ Français, English, Español</span>
                                     </div>
                                 </div>
-                                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg w-full md:w-auto">Me contacter</button>
+                                <div className="bg-gray-50 p-4 rounded-lg">
+                                    <div className="text-sm text-gray-500">Prochaine disponibilité</div>
+                                    <div className="text-xl font-bold text-gray-900">
+                                        {nextAvailability}, 14h
+                                    </div>
+                                    <div className="text-sm text-gray-500 mt-1">Pour un appel découverte</div>
+                                </div>
                             </div>
-                            <div className="flex flex-wrap gap-2 mt-4">
-                                <span className="bg-gray-200 px-3 py-1 rounded-full text-sm">75€ / 30 min</span>
-                                <span className="bg-gray-200 px-3 py-1 rounded-full text-sm">15 ans d'xp</span>
-                                <span className="bg-gray-200 px-3 py-1 rounded-full text-sm">20+ clients</span>
-                            </div>
-                            <div className="mt-6 prose prose-sm md:prose-lg text-gray-600">
-                                <p>
-                                    Avec plus de 15 ans d'expérience dans la transformation digitale et l'innovation,
-                                    j'accompagne les entreprises dans leur évolution technologique et organisationnelle.
-                                    Ancien directeur de l'innovation chez Bouygues Telecom et consultant senior chez Accenture,
-                                    j'ai piloté de nombreux projets de transformation à grande échelle.
-                                </p>
-                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Service Packages Section */}
+                <div className="scroll-animation overflow-hidden mb-8">
+                    <div className="flex overflow-x-auto pb-6 scrollbar-hide">
+                        <div className="flex gap-4 mx-auto px-4 py-2">
+                            {servicePackages.map((pkg, index) => (
+                                <div 
+                                    key={index}
+                                    className="flex flex-col bg-white rounded-xl shadow-md w-80 flex-shrink-0 
+                                    hover:shadow-lg transition-all duration-200 ease-out hover:scale-[1.02]
+                                    transform-gpu"
+                                >
+                                    <div className="p-6 flex flex-col h-full">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h4 className="text-lg font-semibold text-gray-900">{pkg.title}</h4>
+                                                <p className="text-sm text-gray-500">{pkg.duration}</p>
+                                                <div className="text-sm font-bold text-gray-900 mt-1">{pkg.price}</div>
+                                            </div>
+                                            {pkg.highlight && (
+                                                <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                                                    {pkg.highlight}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
+                                        <div className="mt-auto">
+                                            <div className="text-sm font-medium text-gray-900 mb-2">Ce qui est inclus :</div>
+                                            <ul className="space-y-2">
+                                                {pkg.deliverables.map((item, i) => (
+                                                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                                                        <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                                                        <span>{item}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div className="p-6 pt-0">
+                                        <button className="w-full bg-gray-50 hover:bg-gray-100 text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors">
+                                            En savoir plus
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Container for the rest of the content */}
+                <div className="max-w-4xl mx-auto px-4">
+                    {/* Client References Section */}
+                    <div className="scroll-animation bg-white p-6 rounded-lg shadow-md mb-8">
+                        <h3 className="text-xl font-semibold mb-4">Références clients</h3>
+                        <div className="space-y-4">
+                            {clientReviews.map((review, index) => (
+                                <div key={index} className="flex items-start p-4 bg-gray-50 rounded-lg">
+                                    <div className="flex-shrink-0">
+                                        <img
+                                            src={review.image}
+                                            alt={review.name}
+                                            className="h-10 w-10 rounded-full object-cover object-top"
+                                        />
+                                    </div>
+                                    <div className="ml-4">
+                                        <div className="text-lg font-medium text-gray-900">{review.name}</div>
+                                        <div className="text-sm text-gray-600">{review.role} chez {review.company}</div>
+                                        <div className="mt-2 text-gray-700">{review.review}</div>
+                                        <div className="mt-2 flex">
+                                            {Array.from({ length: review.rating }).map((_, i) => (
+                                                <Star key={i} className="h-5 w-5 text-yellow-500 fill-current" />
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Bio Section */}
+                    <div className="scroll-animation bg-white p-6 rounded-lg shadow-md mb-8">
+                        <div className="prose prose-sm md:prose-lg text-gray-600">
+                            <p>
+                                Avec plus de 15 ans d'expérience dans la transformation digitale et l'innovation,
+                                j'accompagne les entreprises dans leur évolution technologique et organisationnelle.
+                                Ancien directeur de l'innovation chez Bouygues Telecom et consultant senior chez Accenture,
+                                j'ai piloté de nombreux projets de transformation à grande échelle.
+                            </p>
                         </div>
                     </div>
 
                     {/* Key Competencies Section */}
-                    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <div className="scroll-animation bg-white p-6 rounded-lg shadow-md mb-8">
                         <h3 className="text-xl font-semibold mb-4">Compétences clés</h3>
                         <ul className="grid md:grid-cols-2 gap-2">
                             <li className="flex items-center gap-2">
@@ -114,36 +461,52 @@ export function ConversionPage() {
                         </ul>
                     </div>
 
-                    {/* Client References Section */}
-                    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-                        <h3 className="text-xl font-semibold mb-4">Références clients</h3>
+                    {/* Toolkit Section */}
+                    <div className="scroll-animation bg-white p-6 rounded-lg shadow-md mb-8">
+                        <h3 className="text-xl font-semibold mb-4">Toolkit</h3>
                         <div className="space-y-4">
-                            {clientReviews.map((review, index) => (
-                                <div key={index} className="flex items-start p-4 bg-gray-50 rounded-lg">
-                                    <div className="flex-shrink-0">
-                                        <img
-                                            src={review.image}
-                                            alt={review.name}
-                                            className="h-10 w-10 rounded-full object-cover object-top"
-                                        />
-                                    </div>
-                                    <div className="ml-4">
-                                        <div className="text-lg font-medium text-gray-900">{review.name}</div>
-                                        <div className="text-sm text-gray-600">{review.role} chez {review.company}</div>
-                                        <div className="mt-2 text-gray-700">{review.review}</div>
-                                        <div className="mt-2 flex">
-                                            {Array.from({ length: review.rating }).map((_, i) => (
-                                                <Star key={i} className="h-5 w-5 text-yellow-500 fill-current" />
-                                            ))}
-                                        </div>
-                                    </div>
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-500 mb-2">Gestion de Projet & Agilité</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Jira</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Confluence</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Trello</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Azure DevOps</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Miro</span>
                                 </div>
-                            ))}
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-500 mb-2">Design & Prototypage</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Figma</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Adobe XD</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">InVision</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Sketch</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-500 mb-2">Analyse & Reporting</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Tableau</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Power BI</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Google Analytics</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Looker</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-500 mb-2">Collaboration & Communication</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Slack</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Microsoft Teams</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Notion</span>
+                                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">Google Workspace</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Recent Missions Section */}
-                    <div className="bg-white p-6 rounded-lg shadow-md">
+                    <div className="scroll-animation bg-white p-6 rounded-lg shadow-md">
                         <h3 className="text-xl font-semibold mb-4">Mes dernières missions</h3>
                         <div className="space-y-6">
                             <div className="border-l-4 border-blue-600 pl-4">
