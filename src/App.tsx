@@ -27,11 +27,10 @@ function App() {
           } />
           <Route path="/chat" element={
             <>
-              <Header />
-              <main className="flex-grow pt-16">
+              <main className="flex-grow">
                 <ChatPage />
               </main>
-              <Footer />
+              <LightFooter />
             </>
           } />
           <Route path="/faq" element={

@@ -101,7 +101,7 @@ export function ConsultantConnect({ onBack }: ConsultantConnectProps) {
                 <h1 className="text-2xl font-bold text-gray-900 mb-4">Confirmez Votre Demande de Consultation</h1>
 
                 <div className="mb-6">
-                    <h2 className="text-lg font-semibold text-blue-600 mb-2">Résumé du Problème</h2>
+                    <h2 className="text-lg font-semibold text-blue-600 mb-2">Résumé du problème</h2>
                     {problemSummary.challenge && (
                         <div className="mb-3">
                             <h3 className="font-medium text-gray-700">Défi</h3>

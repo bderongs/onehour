@@ -1,96 +1,85 @@
 import React from 'react';
-import { FileText, ArrowRight } from 'lucide-react';
-
-interface ProblemDetails {
-    challenge?: string;
-    currentSituation?: string;
-    desiredOutcome?: string;
-    constraints?: string;
-    additionalInfo?: string;
-    hasSufficientInfo?: boolean;
-}
+import { CheckCircle, AlertCircle, MessageSquare } from 'lucide-react';
 
 interface ProblemSummaryProps {
-    summary: ProblemDetails;
+    summary: {
+        challenge?: string;
+        currentSituation?: string;
+        desiredOutcome?: string;
+        constraints?: string;
+        stakeholders?: string;
+        previousAttempts?: string;
+        readyForAssessment?: boolean;
+    };
     onConnect: () => void;
+    hasUserMessage: boolean;
 }
 
-export function ProblemSummary({ summary, onConnect }: ProblemSummaryProps) {
-    const ensureString = (value: any): string => {
-        if (typeof value === 'string') return value;
-        if (typeof value === 'object') return JSON.stringify(value);
-        return String(value || '');
-    };
+export function ProblemSummary({ summary, onConnect, hasUserMessage }: ProblemSummaryProps) {
+    const sections = [
+        { key: 'challenge', label: 'Challenge', value: summary.challenge },
+        { key: 'currentSituation', label: 'Situation actuelle', value: summary.currentSituation },
+        { key: 'desiredOutcome', label: 'Objectifs', value: summary.desiredOutcome },
+        { key: 'constraints', label: 'Contraintes', value: summary.constraints },
+        { key: 'stakeholders', label: 'Parties prenantes', value: summary.stakeholders },
+        { key: 'previousAttempts', label: 'Solutions tentées', value: summary.previousAttempts },
+    ];
 
-    const handleConnectClick = () => {
-        localStorage.setItem('problemSummary', JSON.stringify(summary));
-        onConnect();
-    };
+    const filledSections = sections.filter(section => section.value);
+
+    if (!hasUserMessage) {
+        return (
+            <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex flex-col items-center justify-center text-center py-6">
+                    <MessageSquare className="h-8 w-8 text-gray-400 mb-3" />
+                    <p className="text-gray-500 text-sm">
+                        Expliquez votre projet à l'assistant pour voir apparaître un résumé de votre besoin ici.
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="bg-white rounded-lg shadow-lg p-4 text-left">
-            <div className="flex items-center gap-2 mb-4">
-                <FileText className="h-5 w-5 text-blue-600" />
-                <h2 className="text-lg font-semibold text-gray-900">Résumé du Problème</h2>
-            </div>
+        <div className="bg-gray-50 rounded-lg p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Résumé de votre besoin</h3>
+            
+            {filledSections.length === 0 ? (
+                <p className="text-gray-500 text-sm">
+                    Le résumé de votre besoin apparaîtra ici au fur et à mesure de notre conversation.
+                </p>
+            ) : (
+                <div className="space-y-4">
+                    {filledSections.map(section => (
+                        <div key={section.key}>
+                            <h4 className="text-sm font-medium text-gray-700">{section.label}</h4>
+                            <p className="text-sm text-gray-600 mt-1">{section.value}</p>
+                        </div>
+                    ))}
+                </div>
+            )}
 
-            <div className="space-y-4 text-gray-800">
-                {summary.challenge && (
-                    <div>
-                        <h3 className="font-medium text-blue-600">Défi</h3>
-                        <p className="mt-1 text-left">{ensureString(summary.challenge)}</p>
-                    </div>
-                )}
-
-                {summary.currentSituation && (
-                    <div>
-                        <h3 className="font-medium text-blue-600">Situation Actuelle</h3>
-                        <p className="mt-1 text-left">{ensureString(summary.currentSituation)}</p>
-                    </div>
-                )}
-
-                {summary.desiredOutcome && (
-                    <div>
-                        <h3 className="font-medium text-blue-600">Résultat Souhaité</h3>
-                        <p className="mt-1 text-left">{ensureString(summary.desiredOutcome)}</p>
-                    </div>
-                )}
-
-                {summary.constraints && (
-                    <div>
-                        <h3 className="font-medium text-blue-600">Contraintes</h3>
-                        <p className="mt-1 text-left">{ensureString(summary.constraints)}</p>
-                    </div>
-                )}
-
-                {summary.additionalInfo && (
-                    <div>
-                        <h3 className="font-medium text-blue-600">Informations Supplémentaires</h3>
-                        <p className="mt-1 text-left">{ensureString(summary.additionalInfo)}</p>
-                    </div>
-                )}
-
-                {summary.hasSufficientInfo && (
-                    <div className="mt-6 border-t pt-4">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                            <p className="text-blue-800 font-medium">
-                                Votre problème est bien défini et prêt pour une consultation d'expert.
-                            </p>
+            <div className="mt-6">
+                {summary.readyForAssessment ? (
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg">
+                            <CheckCircle className="h-5 w-5" />
+                            <span className="text-sm">Votre brief est complet</span>
                         </div>
                         <button
-                            onClick={handleConnectClick}
-                            className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-md"
+                            onClick={onConnect}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors"
                         >
-                            Se connecter
-                            <ArrowRight className="h-5 w-5" />
+                            Planifier un rendez-vous avec Arnaud
                         </button>
                     </div>
-                )}
-
-                {Object.keys(summary).length === 0 && (
-                    <p className="text-gray-500 italic text-left">
-                        Le résumé sera mis à jour à mesure que vous fournissez plus d'informations...
-                    </p>
+                ) : filledSections.length > 0 && (
+                    <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-lg">
+                        <AlertCircle className="h-5 w-5" />
+                        <span className="text-sm">
+                            Continuez la discussion pour compléter votre brief
+                        </span>
+                    </div>
                 )}
             </div>
         </div>

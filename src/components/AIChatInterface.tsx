@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { analyzeWithOpenAI } from '../services/openai';
 import { ProblemSummary } from './ProblemSummary';
+import { ChatConfig } from '../types/chat';
 
 export interface Message {
     role: 'user' | 'assistant';
@@ -9,25 +10,16 @@ export interface Message {
 }
 
 interface AIChatInterfaceProps {
-    initialProblem: string;
-    onConnect: () => void;
+    config: ChatConfig;
     messages?: Message[];
     onMessagesUpdate?: (messages: Message[]) => void;
 }
 
-interface ProblemDetails {
-    challenge?: string;
-    currentSituation?: string;
-    desiredOutcome?: string;
-    constraints?: string;
-    additionalInfo?: string;
-}
-
-export function AIChatInterface({ initialProblem, onConnect, messages: externalMessages, onMessagesUpdate }: AIChatInterfaceProps) {
-    const [messages, setMessages] = useState<Message[]>(externalMessages || []);
+export function AIChatInterface({ config, messages: externalMessages, onMessagesUpdate }: AIChatInterfaceProps) {
+    const [messages, setMessages] = useState<Message[]>(externalMessages || [config.initialMessage]);
     const [newMessage, setNewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [problemSummary, setProblemSummary] = useState<ProblemDetails>({});
+    const [problemSummary, setProblemSummary] = useState<any>({});
     const [isInitialized, setIsInitialized] = useState(false);
 
     // Add ref for scrolling
@@ -37,65 +29,39 @@ export function AIChatInterface({ initialProblem, onConnect, messages: externalM
 
     // Initial analysis of the problem
     useEffect(() => {
-        const analyzeInitialProblem = async () => {
-            if (isInitialized || !initialProblem) return;
-
-            setIsLoading(true);
+        const analyzeInitialMessage = async () => {
+            if (isInitialized || !config.initialMessage) return;
             setIsInitialized(true);
-
-            try {
-                // Add the initial problem to messages
-                const initialMessages: Message[] = [{ role: 'user', content: initialProblem }];
-                setMessages(initialMessages);
-
-                const aiResponse = await analyzeWithOpenAI([
-                    {
-                        role: 'user',
-                        content: initialProblem
-                    }
-                ], false);
-
-                if (aiResponse) {
-                    const updatedMessages: Message[] = [...initialMessages, { role: 'assistant', content: aiResponse }];
-                    setMessages(updatedMessages);
-
-                    // Get initial summary
-                    const summaryResponse = await analyzeWithOpenAI(
-                        updatedMessages.map((msg): Message => ({
-                            role: msg.role,
-                            content: msg.content
-                        })),
-                        true // Get summary response
-                    );
-
-                    if (summaryResponse) {
-                        try {
-                            const parsedSummary = JSON.parse(summaryResponse);
-                            setProblemSummary(parsedSummary);
-                        } catch (e) {
-                            console.error('Failed to parse summary JSON:', e);
-                            setProblemSummary({
-                                challenge: initialProblem,
-                                currentSituation: "",
-                                desiredOutcome: "",
-                                constraints: "",
-                                additionalInfo: ""
-                            });
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error('Error analyzing initial problem:', error);
-                setMessages(prev => [...prev, {
-                    role: 'assistant',
-                    content: "I apologize, but I'm having trouble connecting. Please try again."
-                }]);
-            }
-            setIsLoading(false);
         };
 
-        analyzeInitialProblem();
-    }, [initialProblem, isInitialized]);
+        analyzeInitialMessage();
+    }, [config.initialMessage, isInitialized]);
+
+    // Function to get summary if needed
+    const updateSummaryIfNeeded = async (messagesForSummary: Message[]) => {
+        if (!config.summaryInstructions || !messagesForSummary.some(m => m.role === 'user')) return;
+
+        try {
+            const summaryResponse = await analyzeWithOpenAI(
+                messagesForSummary.map((msg): Message => ({
+                    role: msg.role,
+                    content: msg.content
+                })),
+                config.summaryInstructions
+            );
+
+            if (summaryResponse) {
+                try {
+                    const parsedSummary = JSON.parse(summaryResponse);
+                    setProblemSummary(parsedSummary);
+                } catch (e) {
+                    console.error('Failed to parse summary JSON:', e);
+                }
+            }
+        } catch (error) {
+            console.error('Error getting summary:', error);
+        }
+    };
 
     // Scroll to bottom when messages change
     useEffect(() => {
@@ -110,12 +76,6 @@ export function AIChatInterface({ initialProblem, onConnect, messages: externalM
             window.scrollTo({ top: componentRef.current.offsetTop, behavior: 'smooth' });
         }
     }, []);
-
-    useEffect(() => {
-        if (initialProblem && messages.length === 0) {
-            setMessages([{ role: 'user', content: initialProblem }]);
-        }
-    }, [initialProblem]);
 
     const updateMessages = (newMessages: Message[]) => {
         setMessages(newMessages);
@@ -134,34 +94,22 @@ export function AIChatInterface({ initialProblem, onConnect, messages: externalM
         try {
             const updatedMessages: Message[] = [...messages, { role: 'user', content: userMessage }];
             const aiResponse = await analyzeWithOpenAI(
-                updatedMessages.map((msg): Message => ({
-                    role: msg.role,
-                    content: msg.content
-                })),
+                [
+                    { role: 'system', content: config.systemPrompt },
+                    ...updatedMessages.map((msg): Message => ({
+                        role: msg.role,
+                        content: msg.content
+                    }))
+                ],
                 false // regular chat response
             );
 
             if (aiResponse) {
                 const newMessages: Message[] = [...updatedMessages, { role: 'assistant', content: aiResponse }];
-                setMessages(newMessages);
+                updateMessages(newMessages);
 
-                // Update summary after each interaction
-                const summaryResponse = await analyzeWithOpenAI(
-                    newMessages.map((msg): Message => ({
-                        role: msg.role,
-                        content: msg.content
-                    })),
-                    true // summary response
-                );
-
-                if (summaryResponse) {
-                    try {
-                        const parsedSummary = JSON.parse(summaryResponse);
-                        setProblemSummary(parsedSummary);
-                    } catch (e) {
-                        console.error('Failed to parse summary JSON:', e);
-                    }
-                }
+                // Update summary after the response
+                await updateSummaryIfNeeded(newMessages);
             }
         } catch (error) {
             console.error('Error getting AI response:', error);
@@ -170,7 +118,6 @@ export function AIChatInterface({ initialProblem, onConnect, messages: externalM
                 content: "I apologize, but I'm having trouble connecting. Please try again."
             }]);
         }
-
         setIsLoading(false);
     };
 
@@ -267,7 +214,11 @@ export function AIChatInterface({ initialProblem, onConnect, messages: externalM
             </div>
 
             <div ref={summaryContainerRef} className="lg:w-80">
-                <ProblemSummary summary={problemSummary} onConnect={onConnect} />
+                <ProblemSummary 
+                    summary={problemSummary} 
+                    onConnect={config.onConnect}
+                    hasUserMessage={messages.some(m => m.role === 'user')}
+                />
             </div>
         </div>
     );

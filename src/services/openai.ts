@@ -19,9 +19,15 @@ function ensureString(response: any): string {
     return String(response);
 }
 
-export async function analyzeWithOpenAI(messages: { role: 'user' | 'assistant' | 'system', content: string }[], isForSummary: boolean = false) {
+export async function analyzeWithOpenAI(
+    messages: { role: 'user' | 'assistant' | 'system', content: string }[], 
+    summaryInstructions?: string | boolean
+) {
     try {
-        const systemMessage: ChatCompletionMessageParam = isForSummary ? {
+        const systemMessage: ChatCompletionMessageParam = typeof summaryInstructions === 'string' ? {
+            role: 'system',
+            content: summaryInstructions
+        } : summaryInstructions ? {
             role: 'system',
             content: `Analyze the conversation and create a JSON summary with the following structure:
 {
@@ -64,7 +70,7 @@ IMPORTANT: Always respond in plain text format only. Never return JSON, markdown
         const completion = await openai.chat.completions.create({
             messages: formattedMessages,
             model: 'gpt-4o',
-            temperature: isForSummary ? 0 : 0.7, // Use temperature 0 for more consistent JSON
+            temperature: typeof summaryInstructions === 'string' ? 0 : 0.7, // Use temperature 0 for more consistent JSON
         });
 
         let response = completion.choices[0].message.content || '';
@@ -72,7 +78,7 @@ IMPORTANT: Always respond in plain text format only. Never return JSON, markdown
         // Log the AI response to the console
         console.log('AI Response:', response);
 
-        if (isForSummary) {
+        if (typeof summaryInstructions === 'string') {
             try {
                 // Try to extract JSON if it's wrapped in other text
                 const jsonMatch = response.match(/\{[\s\S]*\}/);
@@ -100,7 +106,7 @@ IMPORTANT: Always respond in plain text format only. Never return JSON, markdown
         }
     } catch (error) {
         console.error('OpenAI API Error:', error);
-        if (isForSummary) {
+        if (typeof summaryInstructions === 'string') {
             return JSON.stringify({});
         }
         return "I apologize, but I'm having trouble connecting. Please try again.";
