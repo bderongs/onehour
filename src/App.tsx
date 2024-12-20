@@ -4,8 +4,7 @@ import { ChatPage } from './pages/ChatPage';
 import { FAQ } from './pages/FAQ';
 import ConsultantPage from './pages/ConsultantPage';
 import { AutomationLandingPage } from './pages/AutomationLandingPage';
-import { ConsultantProfilePage } from './pages/ConsultantProfilePage';
-import { ConversionPage } from './pages/ConversionPage';
+import ConsultantProfilePage from './pages/ConsultantProfilePage';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Terms } from './pages/Terms';
@@ -85,14 +84,6 @@ function App() {
                 <Privacy />
               </main>
               <Footer />
-            </>
-          } />
-          <Route path="/profile-new" element={
-            <>
-              <main className="flex-grow">
-                <ConversionPage />
-              </main>
-              <LightFooter />
             </>
           } />
           <Route path="*" element={
