@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { ArrowRight, Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
 import { UseCaseForm } from '../components/UseCaseForm';
+import { CHAT_CONFIGS } from '../types/chat';
 
 interface UseCase {
     icon: React.ReactNode;
@@ -77,6 +77,16 @@ export function AutomationLandingPage() {
 
     const handleMessagesUpdate = (newMessages: Message[]) => {
         setMessages(newMessages);
+    };
+
+    // Create a custom chat config based on the automation assessment config
+    const chatConfig = {
+        ...CHAT_CONFIGS.automation_assessment,
+        initialMessage: {
+            role: 'assistant' as const,
+            content: problem || CHAT_CONFIGS.automation_assessment.initialMessage.content
+        },
+        onConnect: handleConnect
     };
 
     const whyChoose = [
@@ -183,7 +193,7 @@ export function AutomationLandingPage() {
     };
 
     return (
-        <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
             {/* Hero Section */}
             <div className="hero-section relative overflow-hidden bg-gradient-to-r from-blue-500/10 to-purple-500/10">
                 <div className="absolute inset-0" />
@@ -206,19 +216,20 @@ export function AutomationLandingPage() {
                                     handleKeyDown={handleKeyDown}
                                 />
                             </div>
-                            <div className={`${showChat ? 'block' : 'hidden'}`}>
-                                <AIChatInterface
-                                    initialProblem={problem}
-                                    onConnect={handleConnect}
-                                    messages={messages}
-                                    onMessagesUpdate={handleMessagesUpdate}
-                                />
-                            </div>
-                            <div className={`${showConnect ? 'block' : 'hidden'}`}>
-                                <ConsultantConnect
-                                    onBack={handleBack}
-                                />
-                            </div>
+                            {showChat && !showConnect && (
+                                <div className="max-w-4xl mx-auto px-4 py-8">
+                                    <AIChatInterface
+                                        config={chatConfig}
+                                        messages={messages}
+                                        onMessagesUpdate={handleMessagesUpdate}
+                                    />
+                                </div>
+                            )}
+                            {showConnect && (
+                                <div className="max-w-4xl mx-auto px-4 py-8">
+                                    <ConsultantConnect onBack={handleBack} />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

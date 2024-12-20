@@ -25,7 +25,7 @@ export function LandingPage() {
         {
             icon: <Package2 className="h-6 w-6" />,
             title: "Choisir un logiciel",
-            description: "Sélectionnez les meilleurs logiciels pour votre activité.",
+            description: "S��lectionnez les meilleurs logiciels pour votre activité.",
             prefillText: "Je cherche à choisir un logiciel pour mon entreprise. J'ai besoin d'aide pour comparer les solutions du marché et identifier celle qui correspond le mieux à mes besoins spécifiques."
         },
         {
@@ -77,6 +77,20 @@ export function LandingPage() {
 
     const handleMessagesUpdate = (newMessages: Message[]) => {
         setMessages(newMessages);
+    };
+
+    // Create chat config
+    const chatConfig = {
+        initialMessage: {
+            role: 'assistant' as const,
+            content: problem || "Bonjour ! Comment puis-je vous aider ?"
+        },
+        systemPrompt: `You are a helpful assistant.
+            Guide the conversation to understand the user's needs.
+            Keep responses focused and clear.`,
+        title: "Assistant",
+        subtitle: "Je suis là pour vous aider",
+        onConnect: handleConnect
     };
 
     const whyChoose = [
@@ -208,8 +222,7 @@ export function LandingPage() {
                             </div>
                             <div className={`${showChat ? 'block' : 'hidden'}`}>
                                 <AIChatInterface
-                                    initialProblem={problem}
-                                    onConnect={handleConnect}
+                                    config={chatConfig}
                                     messages={messages}
                                     onMessagesUpdate={handleMessagesUpdate}
                                 />
