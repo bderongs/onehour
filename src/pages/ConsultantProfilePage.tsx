@@ -445,12 +445,6 @@ export default function ConsultantProfilePage() {
                                                     {averageRating.toFixed(1)}/5 ({clientReviews.length} avis)
                                                 </span>
                                             </div>
-                                            <span className="hidden md:inline text-gray-300">•</span>
-                                            <div className="flex items-center gap-1">
-                                                <span className="text-sm text-gray-600">
-                                                    ⚡️ Répond en général sous 6h
-                                                </span>
-                                            </div>
                                         </div>
                                         <div className="mt-2 md:mt-4 flex justify-center md:justify-start">
                                             <button 
