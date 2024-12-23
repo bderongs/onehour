@@ -63,8 +63,8 @@ export function ProblemSummary({ summary, onConnect, hasUserMessage }: ProblemSu
                 {summary.readyForAssessment ? (
                     <div className="space-y-3">
                         <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg">
-                            <CheckCircle className="h-5 w-5" />
-                            <span className="text-sm">Votre brief est complet</span>
+                            <CheckCircle className="h-4 w-4 flex-shrink-0" />
+                            <span className="text-sm">Votre brief est complet ! Vous pouvez prendre rendez-vous ou continuer à ajouter des détails.</span>
                         </div>
                         <button
                             onClick={onConnect}
