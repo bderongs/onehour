@@ -271,6 +271,17 @@ export default function ConsultantProfilePage() {
 
     const handleChatOpen = () => {
         setShowChat(true);
+        // Coordinate the scroll timing with the animation
+        setTimeout(() => {
+            const chatElement = document.querySelector('.slide-down-enter-active');
+            if (chatElement) {
+                const elementPosition = chatElement.getBoundingClientRect().top + window.pageYOffset;
+                window.scrollTo({
+                    top: elementPosition - 100, // Offset to leave some space at the top
+                    behavior: 'smooth'
+                });
+            }
+        }, 50); // Reduced delay to start scroll earlier in the animation
     };
 
     const handleChatClose = () => {
@@ -320,7 +331,7 @@ export default function ConsultantProfilePage() {
                         opacity: 1;
                         max-height: 2000px;
                         transform: translateY(0);
-                        transition: all 0.3s ease-out;
+                        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
                         overflow: hidden;
                     }
                     .slide-down-exit {
@@ -333,7 +344,7 @@ export default function ConsultantProfilePage() {
                         opacity: 0;
                         max-height: 0;
                         transform: translateY(-20px);
-                        transition: all 0.3s ease-out;
+                        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
                         overflow: hidden;
                     }
                 `}
