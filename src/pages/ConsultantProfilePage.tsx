@@ -271,22 +271,10 @@ export default function ConsultantProfilePage() {
 
     const handleChatOpen = () => {
         setShowChat(true);
-        document.body.style.overflow = 'hidden';
-        // Save current scroll position
-        document.body.style.position = 'fixed';
-        document.body.style.width = '100%';
-        document.body.style.top = `-${window.scrollY}px`;
     };
 
     const handleChatClose = () => {
         setShowChat(false);
-        // Restore scroll position
-        const scrollY = document.body.style.top;
-        document.body.style.position = '';
-        document.body.style.width = '';
-        document.body.style.top = '';
-        document.body.style.overflow = 'unset';
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
     };
 
     const handleConnect = () => {
@@ -322,55 +310,31 @@ export default function ConsultantProfilePage() {
                     .scrollbar-hide::-webkit-scrollbar {
                         display: none;
                     }
-                    .chat-overlay {
-                        position: fixed;
-                        inset: 0;
-                        background-color: rgba(0, 0, 0, 0.5);
-                        z-index: 100;
-                        display: flex;
-                        justify-content: center;
-                        align-items: flex-end;
-                        padding: 0;
-                    }
-                    .chat-container {
-                        background-color: white;
-                        width: 100%;
-                        height: 100%;
-                        position: relative;
+                    .slide-down-enter {
+                        opacity: 0;
+                        max-height: 0;
+                        transform: translateY(-20px);
                         overflow: hidden;
-                        transition: transform 0.3s ease-out;
-                        transform: translateY(100%);
-                        box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
-                        display: flex;
-                        flex-direction: column;
                     }
-                    .chat-container.active {
+                    .slide-down-enter-active {
+                        opacity: 1;
+                        max-height: 2000px;
                         transform: translateY(0);
+                        transition: all 0.3s ease-out;
+                        overflow: hidden;
                     }
-                    .chat-header {
-                        padding: 1.5rem;
-                        border-bottom: 1px solid #e5e7eb;
-                        position: relative;
+                    .slide-down-exit {
+                        opacity: 1;
+                        max-height: 2000px;
+                        transform: translateY(0);
+                        overflow: hidden;
                     }
-                    .chat-content {
-                        flex: 1;
-                        overflow: auto;
-                    }
-                    @media (min-width: 768px) {
-                        .chat-overlay {
-                            align-items: flex-start;
-                        }
-                        .chat-container {
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            right: 0;
-                            height: calc(100vh - 28rem);
-                            transform: translateY(100vh);
-                        }
-                        .chat-container.active {
-                            transform: translateY(28rem);
-                        }
+                    .slide-down-exit-active {
+                        opacity: 0;
+                        max-height: 0;
+                        transform: translateY(-20px);
+                        transition: all 0.3s ease-out;
+                        overflow: hidden;
                     }
                 `}
             </style>
@@ -400,36 +364,6 @@ export default function ConsultantProfilePage() {
                     }}
                 />
             </div>
-
-            {/* Chat Overlay */}
-            {showChat && (
-                <div className="chat-overlay">
-                    <div className={`chat-container ${showChat ? 'active' : ''}`}>
-                        <div className="chat-header">
-                            <button 
-                                onClick={handleChatClose}
-                                className="absolute top-6 right-6 text-gray-500 hover:text-gray-700 z-10"
-                            >
-                                <X className="h-6 w-6" />
-                            </button>
-                            <div className="flex items-center gap-2">
-                                <Sparkles className="h-5 w-5 text-blue-600" />
-                                <h2 className="text-xl font-semibold text-gray-900">{CHAT_CONFIGS.consultant_qualification.title}</h2>
-                            </div>
-                            <p className="text-sm text-gray-600 mt-1">{CHAT_CONFIGS.consultant_qualification.subtitle}</p>
-                        </div>
-                        <div className="chat-content">
-                            <div className="p-6">
-                                <AIChatInterface
-                                    config={CHAT_CONFIGS.consultant_qualification}
-                                    messages={messages}
-                                    onMessagesUpdate={setMessages}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             <main className="flex-grow relative">
                 {/* Cover Section - Full Width */}
@@ -522,6 +456,36 @@ export default function ConsultantProfilePage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Chat Section - Only shown when showChat is true */}
+                {showChat && (
+                    <div className={`max-w-4xl mx-auto px-4 mb-8 slide-down-enter slide-down-enter-active`}>
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden my-2 mx-1">
+                            <div className="p-4 border-b border-gray-200">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Sparkles className="h-5 w-5 text-blue-600" />
+                                        <h2 className="text-xl font-semibold text-gray-900">{CHAT_CONFIGS.consultant_qualification.title}</h2>
+                                    </div>
+                                    <button 
+                                        onClick={handleChatClose}
+                                        className="text-gray-500 hover:text-gray-700"
+                                    >
+                                        <X className="h-6 w-6" />
+                                    </button>
+                                </div>
+                                <p className="text-sm text-gray-600 mt-1">{CHAT_CONFIGS.consultant_qualification.subtitle}</p>
+                            </div>
+                            <div className="p-4">
+                                <AIChatInterface
+                                    config={CHAT_CONFIGS.consultant_qualification}
+                                    messages={messages}
+                                    onMessagesUpdate={setMessages}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Service Packages Section */}
                 <div className="scroll-animation overflow-hidden mb-8">
