@@ -194,6 +194,53 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
         ));
     };
 
+    // Handle initial AI response when external messages are provided
+    useEffect(() => {
+        const getInitialResponse = async () => {
+            if (!externalMessages || externalMessages.length === 0 || isInitialized) return;
+            
+            // Don't respond if the last message is from the assistant
+            if (externalMessages[externalMessages.length - 1].role === 'assistant') {
+                setIsInitialized(true);
+                return;
+            }
+            
+            setIsLoading(true);
+            try {
+                const aiResponse = await analyzeWithOpenAI(
+                    [
+                        { role: 'system' as const, content: config.systemPrompt },
+                        ...externalMessages.map(msg => ({
+                            role: msg.role,
+                            content: msg.content
+                        }))
+                    ],
+                    false
+                );
+
+                if (aiResponse) {
+                    const updatedMessages: Message[] = [
+                        ...externalMessages,
+                        { role: 'assistant', content: aiResponse }
+                    ];
+                    updateMessages(updatedMessages);
+                    await updateSummaryIfNeeded(updatedMessages);
+                }
+            } catch (error) {
+                console.error('Error getting initial AI response:', error);
+                const errorMessages: Message[] = [
+                    ...externalMessages,
+                    { role: 'assistant', content: "Je suis désolé, mais j'ai des difficultés à me connecter. Veuillez réessayer." }
+                ];
+                updateMessages(errorMessages);
+            }
+            setIsLoading(false);
+            setIsInitialized(true);
+        };
+
+        getInitialResponse();
+    }, [externalMessages, config.systemPrompt, isInitialized]);
+
     return (
         <div ref={componentRef} className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto">
             <div className="flex-1 rounded-lg p-4 flex flex-col">

@@ -70,7 +70,7 @@ export function ProblemSummary({ summary, onConnect, hasUserMessage }: ProblemSu
                             onClick={onConnect}
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors"
                         >
-                            Planifier un rendez-vous avec Arnaud
+                            Planifier un rendez-vous
                         </button>
                     </div>
                 ) : filledSections.length > 0 && (

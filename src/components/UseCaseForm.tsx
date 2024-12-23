@@ -12,7 +12,7 @@ interface UseCaseFormProps {
     useCases: UseCase[];
     problem: string;
     setProblem: (problem: string) => void;
-    handleSubmit: (e: React.FormEvent) => void;
+    handleSubmit: (e: React.FormEvent, message: string) => void;
     handleUseCaseClick: (prefillText: string) => void;
     handleKeyDown: (e: React.KeyboardEvent) => void;
 }
@@ -25,6 +25,13 @@ export function UseCaseForm({
     handleUseCaseClick,
     handleKeyDown
 }: UseCaseFormProps) {
+    const onSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (problem.trim()) {
+            handleSubmit(e, problem);
+        }
+    };
+
     return (
         <>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -45,7 +52,7 @@ export function UseCaseForm({
                 ))}
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <form onSubmit={onSubmit} className="flex flex-col gap-4">
                 <textarea
                     value={problem}
                     onChange={(e) => setProblem(e.target.value)}
