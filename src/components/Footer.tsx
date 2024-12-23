@@ -1,5 +1,6 @@
 import React from 'react';
 import { Clock } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const scrollToSection = (sectionId: string) => {
   const element = document.getElementById(sectionId);
@@ -9,6 +10,9 @@ const scrollToSection = (sectionId: string) => {
 };
 
 export function Footer() {
+  const location = useLocation();
+  const isSimplifiedFooter = location.pathname === '/consultants' || location.pathname === '/pricing';
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -23,35 +27,39 @@ export function Footer() {
             </p>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Liens Rapides</h3>
-            <ul className="space-y-2">
-              <li>
-                <button onClick={() => scrollToSection('why-choose')} className="text-gray-400 hover:text-white">
-                  Pourquoi Nous Choisir
-                </button>
-              </li>
-              <li>
-                <button onClick={() => scrollToSection('experts')} className="text-gray-400 hover:text-white">
-                  Nos Experts
-                </button>
-              </li>
-              <li>
-                <button onClick={() => scrollToSection('how-it-works')} className="text-gray-400 hover:text-white">
-                  Comment ça Marche
-                </button>
-              </li>
-            </ul>
-          </div>
+          {!isSimplifiedFooter && (
+            <>
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Liens Rapides</h3>
+                <ul className="space-y-2">
+                  <li>
+                    <button onClick={() => scrollToSection('why-choose')} className="text-gray-400 hover:text-white">
+                      Pourquoi Nous Choisir
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => scrollToSection('experts')} className="text-gray-400 hover:text-white">
+                      Nos Experts
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => scrollToSection('how-it-works')} className="text-gray-400 hover:text-white">
+                      Comment ça Marche
+                    </button>
+                  </li>
+                </ul>
+              </div>
 
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Ressources</h3>
-            <ul className="space-y-2">
-              <li><a href="/faq" className="text-gray-400 hover:text-white">FAQ</a></li>
-            </ul>
-          </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Ressources</h3>
+                <ul className="space-y-2">
+                  <li><a href="/faq" className="text-gray-400 hover:text-white">FAQ</a></li>
+                </ul>
+              </div>
+            </>
+          )}
 
-          <div>
+          <div className={isSimplifiedFooter ? 'md:col-start-4' : ''}>
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <ul className="space-y-2">
               <li className="text-gray-400">contact@onehour.consulting</li>

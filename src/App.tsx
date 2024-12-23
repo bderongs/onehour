@@ -10,6 +10,7 @@ import { Footer } from './components/Footer';
 import { Terms } from './pages/Terms';
 import { Privacy } from './pages/Privacy';
 import { LightFooter } from './components/LightFooter';
+import { PricingPage } from './pages/PricingPage';
 
 function App() {
   try {
@@ -47,6 +48,15 @@ function App() {
               <Header />
               <main className="flex-grow pt-16">
                 <ConsultantPage />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/pricing" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <PricingPage />
               </main>
               <Footer />
             </>

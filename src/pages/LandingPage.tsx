@@ -25,7 +25,7 @@ export function LandingPage() {
         {
             icon: <Package2 className="h-6 w-6" />,
             title: "Choisir un logiciel",
-            description: "S��lectionnez les meilleurs logiciels pour votre activité.",
+            description: "Sélectionnez les meilleurs logiciels pour votre activité.",
             prefillText: "Je cherche à choisir un logiciel pour mon entreprise. J'ai besoin d'aide pour comparer les solutions du marché et identifier celle qui correspond le mieux à mes besoins spécifiques."
         },
         {
