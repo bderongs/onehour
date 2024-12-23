@@ -2,6 +2,21 @@ import React, { useState } from 'react';
 import { submitConsultantForm } from '../services/consultantFormSubmission';
 import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5 }
+};
+
+const stagger = {
+    animate: {
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+};
 
 const ConsultantPage = () => {
     const [formData, setFormData] = useState({
@@ -78,60 +93,88 @@ const ConsultantPage = () => {
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Hero Section */}
-                <div className="text-center mb-16">
+                <motion.div 
+                    className="text-center mb-16"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
                     <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
                         Développez votre activité de consultant<br />avec l'aide de l'IA
                     </h1>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
                         Un assistant IA intelligent qui qualifie vos prospects 24/7 et une page de profil qui convertit. Créez des offres packagées et laissez l'IA matcher les bonnes solutions à vos clients.
                     </p>
-                    <div className="flex flex-col sm:flex-row justify-center gap-4">
-                        <button 
+                    <motion.div 
+                        className="flex flex-col sm:flex-row justify-center gap-4"
+                        variants={stagger}
+                        initial="initial"
+                        animate="animate"
+                    >
+                        <motion.button 
+                            variants={fadeInUp}
                             onClick={() => document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' })} 
                             className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2 group"
                         >
                             Créer mon profil gratuitement
                             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                        </button>
-                        <button 
+                        </motion.button>
+                        <motion.button 
+                            variants={fadeInUp}
                             onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} 
                             className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors border border-blue-600"
                         >
                             Découvrir les fonctionnalités
-                        </button>
-                    </div>
-                </div>
+                        </motion.button>
+                    </motion.div>
+                </motion.div>
 
                 {/* Success Metrics */}
-                <div className="bg-white rounded-xl p-8 shadow-md mb-16">
+                <motion.div 
+                    className="bg-white rounded-xl p-8 shadow-md mb-16"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                >
                     <div className="grid md:grid-cols-3 gap-8 text-center">
-                        <div>
-                            <div className="text-3xl font-bold text-blue-600 mb-2">+50%</div>
-                            <div className="text-gray-600">de revenus en moyenne<br />après 6 mois</div>
-                        </div>
-                        <div>
-                            <div className="text-3xl font-bold text-blue-600 mb-2">300+</div>
-                            <div className="text-gray-600">consultants utilisent<br />notre plateforme</div>
-                        </div>
-                        <div>
-                            <div className="text-3xl font-bold text-blue-600 mb-2">98%</div>
-                            <div className="text-gray-600">de taux de satisfaction<br />client</div>
-                        </div>
+                        {[
+                            { value: '+50%', label: 'de revenus en moyenne\naprès 6 mois' },
+                            { value: '300+', label: 'consultants utilisent\nnotre plateforme' },
+                            { value: '98%', label: 'de taux de satisfaction\nclient' }
+                        ].map((metric, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: index * 0.1 }}
+                            >
+                                <div className="text-3xl font-bold text-blue-600 mb-2">{metric.value}</div>
+                                <div className="text-gray-600">{metric.label}</div>
+                            </motion.div>
+                        ))}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* AI Assistant Demo Section */}
-                <div className="mb-16 bg-white rounded-xl p-8 shadow-md">
+                <motion.div 
+                    className="mb-16 bg-white rounded-xl p-8 shadow-md"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                >
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div>
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
                                 <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
                                     <Sparkles className="h-4 w-4" />
                                     Fonctionnalité phare #1
                                 </div>
                                 <Link 
                                     to="/profile" 
-                                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium sm:ml-auto"
                                 >
                                     Voir un exemple <ArrowRight className="h-4 w-4" />
                                 </Link>
@@ -191,10 +234,16 @@ const ConsultantPage = () => {
                             <p className="text-sm text-gray-500 text-center">Exemple d'interaction avec l'assistant IA</p>
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Package Creation Demo Section */}
-                <div className="mb-16 bg-white rounded-xl p-8 shadow-md">
+                <motion.div 
+                    className="mb-16 bg-white rounded-xl p-8 shadow-md"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                >
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="bg-gray-50 rounded-xl p-6">
                             <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
@@ -226,14 +275,14 @@ const ConsultantPage = () => {
                             <p className="text-sm text-gray-500 text-center">Exemple d'offre packagée avec matching IA</p>
                         </div>
                         <div>
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
                                 <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
                                     <Sparkles className="h-4 w-4" />
                                     Fonctionnalité phare #2
                                 </div>
                                 <Link 
                                     to="/profile" 
-                                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium sm:ml-auto"
                                 >
                                     Voir un exemple <ArrowRight className="h-4 w-4" />
                                 </Link>
@@ -270,28 +319,60 @@ const ConsultantPage = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Features Grid */}
-                <div id="features" className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                <motion.div 
+                    id="features" 
+                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+                    variants={stagger}
+                    initial="initial"
+                    whileInView="animate"
+                    viewport={{ once: true }}
+                >
                     {features.map((feature, index) => (
-                        <div key={index} className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                        <motion.div
+                            key={index}
+                            variants={fadeInUp}
+                            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+                        >
                             <h3 className="text-xl font-semibold mb-3 text-gray-900">{feature.title}</h3>
                             <p className="text-gray-600 mb-4">{feature.description}</p>
                             <div className="flex items-center gap-2 text-blue-600">
                                 <BadgeCheck className="h-5 w-5" />
                                 <span className="text-sm font-medium">{feature.metrics}</span>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
 
                 {/* Success Stories */}
-                <div className="mb-16">
-                    <h2 className="text-3xl font-bold text-center mb-12">Ils ont réussi avec nous</h2>
-                    <div className="grid md:grid-cols-3 gap-8">
+                <motion.div 
+                    className="mb-16"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <motion.h2 
+                        className="text-3xl font-bold text-center mb-12"
+                        variants={fadeInUp}
+                    >
+                        Ils ont réussi avec nous
+                    </motion.h2>
+                    <motion.div 
+                        className="grid md:grid-cols-3 gap-8"
+                        variants={stagger}
+                        initial="initial"
+                        whileInView="animate"
+                        viewport={{ once: true }}
+                    >
                         {successStories.map((story, index) => (
-                            <div key={index} className="bg-white p-6 rounded-xl shadow-md">
+                            <motion.div
+                                key={index}
+                                variants={fadeInUp}
+                                className="bg-white p-6 rounded-xl shadow-md"
+                            >
                                 <div className="flex items-center gap-4 mb-4">
                                     <img 
                                         src={story.image} 
@@ -305,13 +386,20 @@ const ConsultantPage = () => {
                                     </div>
                                 </div>
                                 <p className="text-gray-600">"{story.quote}"</p>
-                            </div>
+                            </motion.div>
                         ))}
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
 
                 {/* Sign Up Form */}
-                <div id="signup-form" className="max-w-2xl mx-auto">
+                <motion.div 
+                    id="signup-form" 
+                    className="max-w-2xl mx-auto"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                >
                     <div className="text-center mb-8">
                         <h2 className="text-3xl font-bold text-gray-900 mb-4">
                             Créez votre profil maintenant
@@ -436,7 +524,7 @@ const ConsultantPage = () => {
                             </p>
                         </form>
                     )}
-                </div>
+                </motion.div>
             </div>
         </div>
     );
