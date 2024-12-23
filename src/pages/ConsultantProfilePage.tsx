@@ -371,7 +371,7 @@ export default function ConsultantProfilePage() {
                     <div className="max-w-4xl mx-auto">
                         <div className="relative p-4 md:p-6 flex flex-col gap-6">
                             {/* Logo Section - Mobile only */}
-                            <div className="block md:hidden text-center">
+                            <div className="block md:hidden text-right">
                                 <div className="text-xl md:text-3xl font-bold text-blue-600">ShowMeTheWay</div>
                                 <div className="text-lg md:text-2xl font-semibold text-gray-700">Consulting</div>
                             </div>
@@ -407,7 +407,7 @@ export default function ConsultantProfilePage() {
                                                 </a>
                                             </div>
                                         </div>
-                                        <p className="text-gray-600 text-sm md:text-base">Expert en Transformation Digitale & Innovation</p>
+                                        <p className="text-gray-600 text-base md:text-lg font-semibold tracking-wide">Expert en Transformation Digitale & Innovation</p>
                                     </div>
 
                                     <p className="text-gray-600 text-sm md:text-base leading-relaxed text-center md:text-left mt-4 md:mt-6">
@@ -444,10 +444,10 @@ export default function ConsultantProfilePage() {
                                         <div className="mt-2 md:mt-4 flex justify-center md:justify-start">
                                             <button 
                                                 onClick={handleChatOpen}
-                                                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 group"
                                             >
-                                                Expliquez moi votre projet
-                                                <ArrowRight className="h-4 w-4" />
+                                                <Sparkles className="h-5 w-5 transition-transform group-hover:scale-110" />
+                                                Discutons de votre projet
                                             </button>
                                         </div>
                                     </div>
