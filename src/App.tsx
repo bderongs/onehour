@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
 import { LandingPage } from './pages/LandingPage';
-import { ChatPage } from './pages/ChatPage';
 import { FAQ } from './pages/FAQ';
 import ConsultantPage from './pages/ConsultantPage';
 import { AutomationLandingPage } from './pages/AutomationLandingPage';
@@ -24,14 +23,6 @@ function App() {
                 <LandingPage />
               </main>
               <Footer />
-            </>
-          } />
-          <Route path="/chat" element={
-            <>
-              <main className="flex-grow">
-                <ChatPage />
-              </main>
-              <LightFooter />
             </>
           } />
           <Route path="/faq" element={
