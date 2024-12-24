@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, X } from 'lucide-react';
 import { submitToGoogleForm } from '../services/formSubmission';
 import { ChatConfig } from '../types/chat';
 
@@ -56,15 +56,31 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
             });
 
             setIsSubmitted(true);
-            setTimeout(onBack, 3000);
         } catch (error) {
             console.error('Error submitting consultation:', error);
         }
     };
 
+    const handleClose = () => {
+        setIsSubmitted(false);
+        setForm({
+            name: '',
+            email: '',
+            phone: '',
+            preferredContact: 'email'
+        });
+        onBack();
+    };
+
     if (isSubmitted) {
         return (
-            <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+            <div className="bg-white rounded-lg shadow-lg p-8 text-center relative">
+                <button 
+                    onClick={handleClose}
+                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                >
+                    <X className="h-6 w-6" />
+                </button>
                 <div className="flex justify-center mb-6">
                     <CheckCircle className="h-16 w-16 text-green-500" />
                 </div>
@@ -72,19 +88,23 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
                     Merci pour Votre Demande !
                 </h1>
                 <p className="text-lg text-gray-600 mb-6">
-                    Nous avons reçu votre demande de consultation et vous contacterons dans les prochaines 24 heures
-                    par {form.preferredContact === 'email' ? 'email' : 'téléphone'}.
+                    {config.confirmationMessage}
                 </p>
-                <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <div className="bg-gray-50 p-4 rounded-lg">
                     <p className="text-gray-600">
-                        <span className="font-medium">Coordonnées :</span><br />
-                        {form.name}<br />
-                        {form.preferredContact === 'email' ? form.email : form.phone}
+                        <span className="font-medium">Vos coordonnées :</span><br />
+                        <span className="font-medium">Nom :</span> {form.name}<br />
+                        <span className="font-medium">Email :</span> {form.email}
+                        {form.phone && (
+                            <>
+                                <br />
+                                <span className="font-medium">Téléphone :</span> {form.phone}
+                            </>
+                        )}
+                        <br />
+                        <span className="font-medium">Mode de contact préféré :</span> {form.preferredContact === 'email' ? 'Email' : 'Téléphone'}
                     </p>
                 </div>
-                <p className="text-sm text-gray-500">
-                    Redirection vers l'accueil dans quelques secondes...
-                </p>
             </div>
         );
     }

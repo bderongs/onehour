@@ -10,6 +10,7 @@ export interface ChatConfig {
     onConnect: () => void;
     summaryInstructions?: string;
     submitMessage: string;
+    confirmationMessage: string;
 }
 export const CHAT_CONFIGS: Record<ChatUseCase, ChatConfig> = {
     consultant_qualification: {
@@ -18,6 +19,7 @@ export const CHAT_CONFIGS: Record<ChatUseCase, ChatConfig> = {
             content: "Bonjour ! Je suis l'assistant virtuel d'Arnaud. Mon rôle est de vous aider à clarifier votre brief avant votre échange avec lui. Plus je comprends précisément votre besoin, plus Arnaud pourra préparer des solutions pertinentes. Pouvez-vous me parler de votre projet ?"
         },
         submitMessage: "Envoyer",
+        confirmationMessage: "Je vous recontacterai personnellement dans les 24 heures pour approfondir notre discussion et voir comment je peux vous aider au mieux dans votre projet.",
         systemPrompt: `You are Arnaud's AI assistant.
             Your primary role is to help clarify the client's brief before their interaction with Arnaud.
             Guide the conversation to gather comprehensive information that will help Arnaud prepare relevant solutions.
@@ -81,6 +83,7 @@ export const CHAT_CONFIGS: Record<ChatUseCase, ChatConfig> = {
             content: "Bonjour ! Je suis là pour vous aider à évaluer vos besoins en automatisation. Pouvez-vous me parler des processus que vous souhaitez optimiser ?"
         },
         submitMessage: "Envoyer",
+        confirmationMessage: "Nous avons bien reçu votre demande d'évaluation d'automatisation. Notre expert en automatisation vous contactera dans les prochaines 24 heures pour planifier votre assessment technique.",
         systemPrompt: `You are an automation expert.
             Your job is to understand the user's automation needs and assess the complexity and feasibility.
             Ask specific questions about:

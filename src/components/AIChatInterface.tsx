@@ -14,9 +14,10 @@ interface AIChatInterfaceProps {
     config: ChatConfig;
     messages?: Message[];
     onMessagesUpdate?: (messages: Message[]) => void;
+    shouldReset?: boolean;
 }
 
-export function AIChatInterface({ config, messages: externalMessages, onMessagesUpdate }: AIChatInterfaceProps) {
+export function AIChatInterface({ config, messages: externalMessages, onMessagesUpdate, shouldReset = false }: AIChatInterfaceProps) {
     const [messages, setMessages] = useState<Message[]>(externalMessages || []);
     const [newMessage, setNewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +30,16 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
     const summaryContainerRef = React.useRef<HTMLDivElement>(null);
     const componentRef = React.useRef<HTMLDivElement>(null);
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+    // Reset state when shouldReset changes
+    useEffect(() => {
+        if (shouldReset) {
+            setMessages(externalMessages || []);
+            setNewMessage('');
+            setProblemSummary({});
+            setIsInitialized(false);
+        }
+    }, [shouldReset, externalMessages]);
 
     // Initialize messages when component mounts
     useEffect(() => {

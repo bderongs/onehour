@@ -35,6 +35,7 @@ export function LandingPage() {
     const [showForm, setShowForm] = useState(true);
     const [messages, setMessages] = useState<Message[]>([]);
     const [scrollY, setScrollY] = useState(0);
+    const [shouldReset, setShouldReset] = useState(false);
     const [problemSummary, setProblemSummary] = useState({
         challenge: '',
         currentSituation: '',
@@ -53,6 +54,12 @@ export function LandingPage() {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    useEffect(() => {
+        if (shouldReset) {
+            setShouldReset(false);
+        }
+    }, [shouldReset]);
 
     const useCases: UseCase[] = [
         {
@@ -113,7 +120,20 @@ export function LandingPage() {
 
     const handleBack = () => {
         setShowConnect(false);
-        setShowChat(true);
+        setShowChat(false);
+        setShowForm(true);
+        setMessages([]);
+        setShouldReset(true);
+        setProblemSummary({
+            challenge: '',
+            currentSituation: '',
+            desiredOutcome: '',
+            constraints: '',
+            stakeholders: '',
+            previousAttempts: '',
+            readyForAssessment: false
+        });
+        setProblem('');
     };
 
     const handleMessagesUpdate = (newMessages: Message[]) => {
@@ -157,6 +177,7 @@ export function LandingPage() {
         subtitle: "Je vous aide à trouver l'expert idéal",
         onConnect: handleConnect,
         submitMessage: "En soumettant ce formulaire, vous serez contacté par l'un de nos consultants experts dans les prochaines 24 heures.",
+        confirmationMessage: "Nous avons bien reçu votre demande. L'un de nos consultants experts vous contactera dans les prochaines 24 heures pour approfondir votre projet et vous proposer les solutions les plus adaptées.",
         summaryInstructions: `Analyze the conversation and create a JSON summary with the following structure.
         IMPORTANT: The summary must be in the same language as the conversation (French if the conversation is in French).
         IMPORTANT: Do not return any other output than the JSON with all fields filled.
@@ -351,6 +372,7 @@ export function LandingPage() {
                                                 ...chatConfig,
                                                 initialMessage: messages.length > 0 ? messages[0] : chatConfig.initialMessage
                                             }}
+                                            shouldReset={shouldReset}
                                         />
                                     </div>
                                 </div>

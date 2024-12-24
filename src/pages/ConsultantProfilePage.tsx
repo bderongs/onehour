@@ -110,6 +110,7 @@ export default function ConsultantProfilePage() {
     const [showChat, setShowChat] = useState(false);
     const [showConnect, setShowConnect] = useState(false);
     const [messages, setMessages] = useState<Message[]>([CHAT_CONFIGS.consultant_qualification.initialMessage]);
+    const [shouldReset, setShouldReset] = useState(false);
     const [problemSummary, setProblemSummary] = useState<ProblemSummary>({
         challenge: '',
         currentSituation: '',
@@ -120,6 +121,13 @@ export default function ConsultantProfilePage() {
         readyForAssessment: false
     });
     useScrollAnimation();
+
+    // Reset shouldReset after it's been consumed
+    useEffect(() => {
+        if (shouldReset) {
+            setShouldReset(false);
+        }
+    }, [shouldReset]);
 
     // Enhanced scroll reset effect
     useEffect(() => {
@@ -318,7 +326,18 @@ export default function ConsultantProfilePage() {
     const handleBack = () => {
         console.log('ConsultantProfilePage - handleBack called');
         setShowConnect(false);
-        setShowChat(true);
+        setShowChat(false);
+        setShouldReset(true);
+        setMessages([CHAT_CONFIGS.consultant_qualification.initialMessage]);
+        setProblemSummary({
+            challenge: '',
+            currentSituation: '',
+            desiredOutcome: '',
+            constraints: '',
+            stakeholders: '',
+            previousAttempts: '',
+            readyForAssessment: false
+        });
     };
 
     // Add handler for messages update to extract summary
@@ -527,10 +546,11 @@ export default function ConsultantProfilePage() {
                                 config={{
                                     ...CHAT_CONFIGS.consultant_qualification,
                                     onConnect: handleConnect,
-                                    submitMessage: "En soumettant ce formulaire, vous serez contacté par Arnaud Lacaze dans les prochaines 24 heures."
+                                    submitMessage: "Je vous recontacterai personnellement dans les 24 heures pour approfondir notre discussion et voir comment je peux vous aider au mieux dans votre projet."
                                 }}
                                 messages={messages}
                                 onMessagesUpdate={handleMessagesUpdate}
+                                shouldReset={shouldReset}
                             />
                         </div>
                     </div>
@@ -545,7 +565,7 @@ export default function ConsultantProfilePage() {
                             config={{
                                 ...CHAT_CONFIGS.consultant_qualification,
                                 onConnect: handleConnect,
-                                submitMessage: "En soumettant ce formulaire, vous serez contacté par Arnaud Lacaze dans les prochaines 24 heures."
+                                submitMessage: "Je vous recontacterai personnellement dans les 24 heures pour approfondir notre discussion et voir comment je peux vous aider au mieux dans votre projet."
                             }}
                         />
                     </div>
