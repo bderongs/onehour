@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote, Sparkles } from 'lucide-react';
+import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote, Sparkles, ArrowRight, BadgeCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
 import { UseCaseForm } from '../components/UseCaseForm';
+import { motion } from 'framer-motion';
 
 interface UseCase {
     icon: React.ReactNode;
@@ -12,6 +13,20 @@ interface UseCase {
     prefillText: string;
 }
 
+const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5 }
+};
+
+const stagger = {
+    animate: {
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+};
+
 export function LandingPage() {
     const navigate = useNavigate();
     const [problem, setProblem] = useState('');
@@ -19,6 +34,7 @@ export function LandingPage() {
     const [showConnect, setShowConnect] = useState(false);
     const [showForm, setShowForm] = useState(true);
     const [messages, setMessages] = useState<Message[]>([]);
+    const [scrollY, setScrollY] = useState(0);
     const [problemSummary, setProblemSummary] = useState({
         challenge: '',
         currentSituation: '',
@@ -28,6 +44,15 @@ export function LandingPage() {
         previousAttempts: '',
         readyForAssessment: false
     });
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrollY(window.scrollY);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const useCases: UseCase[] = [
         {
@@ -93,7 +118,6 @@ export function LandingPage() {
 
     const handleMessagesUpdate = (newMessages: Message[]) => {
         setMessages(newMessages);
-        // Extract the latest summary from the messages
         for (let i = newMessages.length - 1; i >= 0; i--) {
             const msg = newMessages[i];
             if (msg.role === 'assistant' && msg.summary) {
@@ -104,7 +128,6 @@ export function LandingPage() {
         }
     };
 
-    // Update chat config
     const chatConfig = {
         initialMessage: {
             role: 'assistant' as const,
@@ -148,307 +171,410 @@ export function LandingPage() {
             "stakeholders": "Key stakeholders involved",
             "previousAttempts": "Previous solutions or attempts",
             "readyForAssessment": false
-        }
-
-        Example in French:
-        {
-            "challenge": "Transformation digitale du service client",
-            "currentSituation": "Processus manuel, temps de réponse long",
-            "desiredOutcome": "Automatisation partielle, réduction des délais",
-            "constraints": "Budget 50k€, déploiement sous 3 mois",
-            "stakeholders": "Équipe support client, DSI",
-            "previousAttempts": "Aucune tentative précédente",
-            "readyForAssessment": true
-        }
-
-        Rules for readyForAssessment:
-        - Set to true only when we have gathered sufficient information about:
-          * Challenge (clear description)
-          * Current situation
-          * Desired outcome
-          * At least some constraints
-        - Set to false if any of these key elements are missing
-        - Must be a boolean value, not a string
-
-        If information is not available for a field, use a default value:
-        - For previousAttempts: "Aucune tentative précédente"
-        - For stakeholders: "À déterminer"
-        - For constraints: "À définir"
-        But continue gathering this information in the conversation.`
+        }`
     };
 
     const whyChoose = [
         {
             icon: <Clock className="h-6 w-6" />,
             title: "Efficace",
-            description: "Une heure de conseil, une solution."
+            description: "Des solutions concrètes et actionnables, de 30 minutes à plusieurs jours selon vos besoins.",
+            metrics: "95% de satisfaction client"
         },
         {
             icon: <Briefcase className="h-6 w-6" />,
             title: "Professionnel",
-            description: "Des experts qualifiés à votre service."
+            description: "Des experts sélectionnés avec plus de 10 ans d'expérience.",
+            metrics: "Top 5% des consultants"
         },
         {
             icon: <Target className="h-6 w-6" />,
             title: "Simple",
-            description: "Un tarif unique, sans surprise."
+            description: "Des missions packagées avec un prix affiché, sans devis ni négociation.",
+            metrics: "Prix transparent"
         },
         {
             icon: <CheckCircle className="h-6 w-6" />,
             title: "Innovant",
-            description: "Concentrez-vous sur l'échange, notre IA prend les notes."
+            description: "IA de qualification et matching expert automatisé.",
+            metrics: "Réponse en 24h"
         }
     ];
 
     const howItWorks = [
         {
             icon: <MessageSquare className="h-6 w-6" />,
-            title: "Décrivez",
-            description: "Expliquez votre problème en détail."
+            title: "Décrivez votre besoin",
+            description: "Notre IA qualifie votre demande et identifie vos enjeux clés."
         },
         {
             icon: <Calendar className="h-6 w-6" />,
-            title: "Planifiez",
-            description: "Choisissez un créneau pour votre session."
+            title: "Matching expert",
+            description: "Nous vous mettons en relation avec l'expert le plus pertinent."
         },
         {
             icon: <Zap className="h-6 w-6" />,
-            title: "Connectez",
-            description: "Discutez avec un expert en direct."
+            title: "Session de conseil",
+            description: "Une session de conseil adaptée à vos besoins pour des solutions concrètes."
         },
         {
             icon: <CheckCircle className="h-6 w-6" />,
-            title: "Résolvez",
-            description: "Obtenez des solutions concrètes."
+            title: "Suivi & Support",
+            description: "Accompagnement dans la mise en œuvre des recommandations."
+        }
+    ];
+
+    const expertiseAreas = [
+        {
+            title: "Transformation Digitale",
+            description: "Stratégie digitale, innovation produit, conduite du changement",
+            icon: <Zap className="h-6 w-6" />
+        },
+        {
+            title: "Management & Organisation",
+            description: "Agilité, leadership, excellence opérationnelle",
+            icon: <Users className="h-6 w-6" />
+        },
+        {
+            title: "Technologie & Data",
+            description: "Architecture IT, data science, cybersécurité",
+            icon: <Bot className="h-6 w-6" />
+        },
+        {
+            title: "Innovation & Stratégie",
+            description: "Business model, R&D, go-to-market",
+            icon: <Target className="h-6 w-6" />
         }
     ];
 
     const clientReviews = [
         {
-            name: "Pascal Larue",
+            name: "Pascal Dubois",
             role: "CTO",
             company: "TechCorp",
             review: "Service exceptionnel ! J'ai pu résoudre mon problème en une heure seulement. L'expert était très compétent et a parfaitement compris nos besoins.",
             rating: 5,
-            initials: "PL"
+            image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5"
         },
         {
-            name: "Marie Curie",
+            name: "Marie Jarry",
             role: "Directrice Innovation",
             company: "ScienceLab",
             review: "Les experts sont très professionnels et à l'écoute. Je recommande vivement. La qualité des conseils a dépassé mes attentes.",
-            rating: 4,
-            initials: "MC"
+            rating: 5,
+            image: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe"
         },
         {
-            name: "Albert Einstein",
+            name: "Albert Dapas",
             role: "CEO",
             company: "FutureTech",
             review: "Une solution rapide et efficace. Très satisfait du service. L'accompagnement était personnalisé et pertinent.",
             rating: 5,
-            initials: "AE"
+            image: "https://images.unsplash.com/photo-1560250097-0b93528c311a"
         }
     ];
-
-    const expertiseHighlights = [
-        {
-            icon: <Shield className="h-6 w-6" />,
-            title: "Experts Sélectionnés",
-            description: "Nos consultants sont rigoureusement sélectionnés pour leur expertise pointue et leur expérience confirmée dans leur domaine."
-        },
-        {
-            icon: <Award className="h-6 w-6" />,
-            title: "Expertise Validée",
-            description: "Minimum 10 ans d'expérience professionnelle, certifications reconnues et track record vérifié."
-        },
-        {
-            icon: <Clock className="h-6 w-6" />,
-            title: "Engagement Temps",
-            description: "Nos experts s'engagent à fournir des conseils actionnables dans le temps imparti d'une heure."
-        },
-        {
-            icon: <Star className="h-6 w-6" />,
-            title: "Excellence Garantie",
-            description: "Satisfaction client suivie et maintien d'une note minimale de 4.8/5 pour nos consultants."
-        }
-    ];
-
-    const scrollToSection = (sectionId: string) => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-        }
-    };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                {/* Hero Section */}
-                <div className="hero-section relative overflow-hidden">
-                    <div className="absolute inset-0" />
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
-                        <div className="text-center relative z-10">
-                            <h1 className="mt-20 text-4xl md:text-6xl font-bold mb-6 text-gray-900">
-                                Le concentré de conseil expert
-                            </h1>
-                            <p className="text-xl md:text-2xl mb-12 text-gray-600">
-                                Décrivez votre problème et programmez une session de micro-consulting avec l'un de nos experts.
-                            </p>
-                            <div className="max-w-7xl mx-auto">
-                                <div className={`max-w-4xl mx-auto ${showForm ? 'block' : 'hidden'}`}>
-                                    <UseCaseForm
-                                        useCases={useCases}
-                                        problem={problem}
-                                        setProblem={setProblem}
-                                        handleSubmit={handleSubmit}
-                                        handleUseCaseClick={handleUseCaseClick}
-                                        handleKeyDown={handleKeyDown}
-                                    />
-                                </div>
-                                <div className={`max-w-4xl mx-auto px-4 mb-8 slide-down-enter slide-down-enter-active ${showChat && !showConnect ? 'block' : 'hidden'}`}>
-                                    <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                                        <div className="p-4 border-b border-gray-200">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-2">
-                                                    <Sparkles className="h-5 w-5 text-blue-600" />
-                                                    <h2 className="text-xl font-semibold text-gray-900">{chatConfig.title}</h2>
-                                                </div>
+        <div className="min-h-screen">
+            {/* Animated Background */}
+            <div className="fixed inset-0 -z-10 overflow-hidden">
+                <div 
+                    className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50"
+                    style={{
+                        backgroundImage: `
+                            radial-gradient(circle at 20% 35%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
+                            radial-gradient(circle at 75% 44%, rgba(165, 180, 252, 0.15) 0%, transparent 50%),
+                            radial-gradient(circle at 5% 75%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
+                            radial-gradient(circle at 80% 95%, rgba(165, 180, 252, 0.15) 0%, transparent 50%)
+                        `
+                    }}
+                />
+                <div 
+                    className="absolute inset-0 opacity-30"
+                    style={{
+                        transform: `translateY(${scrollY * 0.2}px)`,
+                        backgroundImage: `
+                            radial-gradient(circle at 50% ${30 + (scrollY * 0.02)}%, rgba(147, 197, 253, 0.2) 0%, transparent 40%),
+                            radial-gradient(circle at ${70 - (scrollY * 0.01)}% ${60 + (scrollY * 0.01)}%, rgba(165, 180, 252, 0.2) 0%, transparent 40%)
+                        `,
+                        transition: 'transform 0.1s ease-out'
+                    }}
+                />
+            </div>
+
+            <div className="relative">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    {/* Hero Section */}
+                    <motion.div 
+                        className="text-center mb-16"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
+                            Le concentré de conseil expert
+                        </h1>
+                        <p className="text-xl md:text-2xl mb-12 text-gray-600 max-w-3xl mx-auto">
+                            Décrivez votre problème et programmez une session de micro-consulting avec l'un de nos experts.
+                        </p>
+
+                        {/* Use Case Form Section */}
+                        <div className="max-w-4xl mx-auto">
+                            <div className={`${showForm ? 'block' : 'hidden'}`}>
+                                <UseCaseForm
+                                    useCases={useCases}
+                                    problem={problem}
+                                    setProblem={setProblem}
+                                    handleSubmit={handleSubmit}
+                                    handleUseCaseClick={handleUseCaseClick}
+                                    handleKeyDown={handleKeyDown}
+                                />
+                            </div>
+
+                            {/* Chat Interface */}
+                            <div className={`slide-down-enter slide-down-enter-active ${showChat && !showConnect ? 'block' : 'hidden'}`}>
+                                <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                                    <div className="p-4 border-b border-gray-200">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <Sparkles className="h-5 w-5 text-blue-600" />
+                                                <h2 className="text-xl font-semibold text-gray-900">{chatConfig.title}</h2>
                                             </div>
-                                            <p className="text-sm text-gray-600 mt-1 text-left">{chatConfig.subtitle}</p>
                                         </div>
-                                        <div className="p-4">
-                                            <AIChatInterface
-                                                messages={messages}
-                                                onMessagesUpdate={handleMessagesUpdate}
-                                                config={{
-                                                    ...chatConfig,
-                                                    initialMessage: messages.length > 0 ? messages[0] : chatConfig.initialMessage
-                                                }}
-                                            />
-                                        </div>
+                                        <p className="text-sm text-gray-600 mt-1 text-left">{chatConfig.subtitle}</p>
                                     </div>
-                                </div>
-                                <div className={`max-w-4xl mx-auto px-4 mb-8 slide-down-enter slide-down-enter-active ${showConnect ? 'block' : 'hidden'}`}>
-                                    <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                                        <ConsultantConnect
-                                            onBack={handleBack}
-                                            problemSummary={problemSummary}
-                                            config={chatConfig}
+                                    <div className="p-4">
+                                        <AIChatInterface
+                                            messages={messages}
+                                            onMessagesUpdate={handleMessagesUpdate}
+                                            config={{
+                                                ...chatConfig,
+                                                initialMessage: messages.length > 0 ? messages[0] : chatConfig.initialMessage
+                                            }}
                                         />
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                {/* Why Choose Section */}
-                <div id="why-choose" className="why-choose-section py-24">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            {/* Connect Form */}
+                            <div className={`slide-down-enter slide-down-enter-active ${showConnect ? 'block' : 'hidden'}`}>
+                                <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                                    <ConsultantConnect
+                                        onBack={handleBack}
+                                        problemSummary={problemSummary}
+                                        config={chatConfig}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    {/* Why Choose Section */}
+                    <motion.div 
+                        className="mb-24"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                    >
                         <div className="text-center mb-16">
                             <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Pourquoi OneHourAdvice ?
+                                Pourquoi OneHour ?
                             </h2>
                             <p className="text-xl text-gray-600">
-                                Obtenez les conseils dont vous avez besoin, quand vous en avez besoin.
+                                Une nouvelle approche du conseil, simple et efficace
                             </p>
                         </div>
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {whyChoose.map((reason, index) => (
-                                <div
+                                <motion.div
                                     key={index}
-                                    className="bg-white p-6 rounded-xl border border-gray-200 shadow-lg"
+                                    variants={fadeInUp}
+                                    className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]"
                                 >
                                     <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
                                         {React.cloneElement(reason.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
                                     </div>
                                     <h3 className="text-xl font-semibold mb-2 text-gray-900">{reason.title}</h3>
-                                    <p className="text-gray-600">{reason.description}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Experts Section */}
-                <div id="experts" className="experts-section py-24">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-16">
-                            <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Des Experts de Confiance
-                            </h2>
-                            <p className="text-xl text-gray-600 mb-8">
-                            Nous sélectionnons moins de 5% des candidats consultants pour garantir
-                            une expertise exceptionnelle et des conseils de haute qualité.
-                            </p>                        
-                        </div>
-
-                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {expertiseHighlights.map((highlight, index) => (
-                                <div
-                                    key={index}
-                                    className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-lg"
-                                >
-                                    <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
-                                        {React.cloneElement(highlight.icon as React.ReactElement, {
-                                            className: "h-6 w-6 text-blue-600"
-                                        })}
+                                    <p className="text-gray-600 mb-4">{reason.description}</p>
+                                    <div className="flex items-center gap-2 text-blue-600">
+                                        <BadgeCheck className="h-5 w-5" />
+                                        <span className="text-sm font-medium">{reason.metrics}</span>
                                     </div>
-                                    <h3 className="text-xl font-semibold mb-3 text-blue-900">
-                                        {highlight.title}
-                                    </h3>
-                                    <p className="text-gray-700">
-                                        {highlight.description}
-                                    </p>
-                                </div>
+                                </motion.div>
                             ))}
                         </div>
+                    </motion.div>
 
-                        <div className="mt-16 grid md:grid-cols-3 gap-8 text-center">
-                            <div className="p-8 rounded-xl bg-gradient-to-br from-blue-10/50 to-purple-10/50 border border-blue-100 backdrop-blur-sm">
-                                <div className="text-4xl font-bold text-blue-700 mb-2">10+</div>
-                                <div className="text-blue-900 font-medium">Années d'expérience minimum</div>
-                            </div>
-                            <div className="p-8 rounded-xl bg-gradient-to-br from-blue-10/50 to-purple-10/50 border border-blue-100 backdrop-blur-sm">
-                                <div className="text-4xl font-bold text-blue-700 mb-2">4.8/5</div>
-                                <div className="text-blue-900 font-medium">Note moyenne des consultants</div>
-                            </div>
-                            <div className="p-8 rounded-xl bg-gradient-to-br from-blue-10/50 to-purple-10/50 border border-blue-100 backdrop-blur-sm">
-                                <div className="text-4xl font-bold text-blue-700 mb-2">95%</div>
-                                <div className="text-blue-900 font-medium">Taux de satisfaction client</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* How it Works Section */}
-                <div id="how-it-works" className="how-it-works-section py-24">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* How it Works Section */}
+                    <motion.div 
+                        className="mb-24"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                    >
                         <div className="text-center mb-16">
                             <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Comment ça Marche ?
+                                Comment ça marche ?
                             </h2>
                             <p className="text-xl text-gray-600">
-                                Un processus simple en quatre étapes pour obtenir les conseils dont vous avez besoin.
+                                Un processus simple en quatre étapes
                             </p>
                         </div>
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {howItWorks.map((step, index) => (
-                                <div
+                                <motion.div
                                     key={index}
-                                    className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-lg text-center"
+                                    variants={fadeInUp}
+                                    className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-md text-center"
                                 >
                                     <div className="p-3 bg-blue-50 rounded-lg w-fit mx-auto mb-4">
                                         {React.cloneElement(step.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
                                     </div>
                                     <h3 className="text-xl font-semibold mb-2 text-gray-900">{step.title}</h3>
                                     <p className="text-gray-600">{step.description}</p>
-                                </div>
+                                </motion.div>
                             ))}
                         </div>
-                    </div>
+                    </motion.div>
+
+                    {/* Expertise Areas Section */}
+                    <motion.div 
+                        className="mb-24"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <div className="text-center mb-16">
+                            <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                                Nos domaines d'expertise
+                            </h2>
+                            <p className="text-xl text-gray-600">
+                                Des experts spécialisés pour chaque problématique
+                            </p>
+                        </div>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                            {expertiseAreas.map((area, index) => (
+                                <motion.div
+                                    key={index}
+                                    variants={fadeInUp}
+                                    className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-md"
+                                >
+                                    <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
+                                        {React.cloneElement(area.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
+                                    </div>
+                                    <h3 className="text-xl font-semibold mb-2 text-gray-900">{area.title}</h3>
+                                    <p className="text-gray-600">{area.description}</p>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </motion.div>
+
+                    {/* Client Reviews Section */}
+                    <motion.div 
+                        className="mb-24"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <div className="text-center mb-16">
+                            <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                                Ce qu'en disent nos clients
+                            </h2>
+                            <p className="text-xl text-gray-600">
+                                Des résultats concrets et mesurables
+                            </p>
+                        </div>
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {clientReviews.map((review, index) => (
+                                <motion.div
+                                    key={index}
+                                    variants={fadeInUp}
+                                    className="bg-white p-6 rounded-xl shadow-md"
+                                >
+                                    <div className="flex items-start gap-4 mb-4">
+                                        <img 
+                                            src={review.image} 
+                                            alt={review.name} 
+                                            className="w-16 h-16 rounded-full object-cover"
+                                        />
+                                        <div>
+                                            <h4 className="font-semibold text-gray-900">{review.name}</h4>
+                                            <p className="text-sm text-gray-600">{review.role}</p>
+                                            <p className="text-sm text-gray-600">{review.company}</p>
+                                        </div>
+                                    </div>
+                                    <p className="text-gray-600 mb-4">"{review.review}"</p>
+                                    <div className="flex">
+                                        {[...Array(review.rating)].map((_, i) => (
+                                            <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </motion.div>
+
+                    {/* CTA Section */}
+                    <motion.div 
+                        className="text-center"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <h2 className="text-3xl font-bold mb-6 text-gray-900">
+                            Prêt à commencer ?
+                        </h2>
+                        <p className="text-xl text-gray-600 mb-8">
+                            Décrivez votre problématique et trouvez l'expert qu'il vous faut
+                        </p>
+                        <button 
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                            className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2 group"
+                        >
+                            Commencer maintenant
+                            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                        </button>
+                    </motion.div>
                 </div>
             </div>
+
+            <style>{`
+                .scroll-animation {
+                    opacity: 0;
+                    transform: translateY(30px);
+                    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+                    will-change: transform, opacity;
+                }
+                .animate-in {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .scroll-animation {
+                        transition: none;
+                        opacity: 1;
+                        transform: none;
+                    }
+                }
+                .slide-down-enter {
+                    opacity: 0;
+                    max-height: 0;
+                    transform: translateY(-20px);
+                    overflow: hidden;
+                }
+                .slide-down-enter-active {
+                    opacity: 1;
+                    max-height: 2000px;
+                    transform: translateY(0);
+                    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+                    overflow: hidden;
+                }
+            `}</style>
         </div>
     );
 }

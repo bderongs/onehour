@@ -64,7 +64,7 @@ export function UseCaseForm({
                 <div className="flex items-center lg:justify-end">
                     <button
                         type="submit"
-                        className="w-full lg:w-auto bg-indigo-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-indigo-700 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
+                        className="w-full lg:w-auto bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
                     >
                         Trouver un Expert
                         <ArrowRight className="h-5 w-5" />
