@@ -20,6 +20,15 @@ export function AutomationLandingPage() {
     const [showConnect, setShowConnect] = useState(false);
     const [showForm, setShowForm] = useState(true); // Ensure UseCaseForm is shown initially
     const [messages, setMessages] = useState<Message[]>([]);
+    const [summary, setSummary] = useState({
+        challenge: "",
+        currentSituation: "",
+        desiredOutcome: "",
+        constraints: "",
+        stakeholders: "",
+        previousAttempts: "",
+        readyForAssessment: false
+    });
 
     const useCases: UseCase[] = [
         {
@@ -77,6 +86,19 @@ export function AutomationLandingPage() {
 
     const handleMessagesUpdate = (newMessages: Message[]) => {
         setMessages(newMessages);
+        // Create a basic summary from the last user message
+        const lastUserMessage = newMessages.filter(m => m.role === 'user').pop();
+        if (lastUserMessage) {
+            setSummary({
+                challenge: lastUserMessage.content,
+                currentSituation: "",
+                desiredOutcome: "",
+                constraints: "",
+                stakeholders: "",
+                previousAttempts: "",
+                readyForAssessment: true
+            });
+        }
     };
 
     // Create a custom chat config based on the automation assessment config
@@ -227,7 +249,11 @@ export function AutomationLandingPage() {
                             )}
                             {showConnect && (
                                 <div className="max-w-4xl mx-auto px-4 py-8">
-                                    <ConsultantConnect onBack={handleBack} />
+                                    <ConsultantConnect 
+                                        onBack={handleBack}
+                                        problemSummary={summary}
+                                        config={chatConfig}
+                                    />
                                 </div>
                             )}
                         </div>

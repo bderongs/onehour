@@ -20,6 +20,7 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
     const [messages, setMessages] = useState<Message[]>(externalMessages || []);
     const [newMessage, setNewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isSummaryLoading, setIsSummaryLoading] = useState(false);
     const [problemSummary, setProblemSummary] = useState<any>({});
     const [isInitialized, setIsInitialized] = useState(false);
 
@@ -97,6 +98,7 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
         if (!config.summaryInstructions || !messagesForSummary.some(m => m.role === 'user')) return;
 
         console.log('AIChatInterface - Updating summary, messages:', messagesForSummary);
+        setIsSummaryLoading(true);
 
         try {
             const summaryResponse = await analyzeWithOpenAI(
@@ -177,6 +179,8 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
             }
         } catch (error) {
             console.error('Error getting summary:', error);
+        } finally {
+            setIsSummaryLoading(false);
         }
     };
 
@@ -224,6 +228,7 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
             if (aiResponse) {
                 const newMessages: Message[] = [...updatedMessages, { role: 'assistant', content: aiResponse }];
                 updateMessages(newMessages);
+                setIsLoading(false); // Set loading to false before updating summary
 
                 // Update summary after the response
                 await updateSummaryIfNeeded(newMessages);
@@ -234,8 +239,8 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
                 role: 'assistant',
                 content: "I apologize, but I'm having trouble connecting. Please try again."
             }]);
+            setIsLoading(false);
         }
-        setIsLoading(false);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -336,6 +341,7 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
                     summary={problemSummary} 
                     onConnect={config.onConnect}
                     hasUserMessage={messages.some(m => m.role === 'user')}
+                    isLoading={isSummaryLoading}
                 />
             </div>
         </div>

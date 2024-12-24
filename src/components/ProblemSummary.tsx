@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, AlertCircle, MessageSquare } from 'lucide-react';
+import { CheckCircle, AlertCircle, MessageSquare, RefreshCw } from 'lucide-react';
 
 interface ProblemSummaryProps {
     summary: {
@@ -13,9 +13,10 @@ interface ProblemSummaryProps {
     };
     onConnect: () => void;
     hasUserMessage: boolean;
+    isLoading?: boolean;
 }
 
-export function ProblemSummary({ summary, onConnect, hasUserMessage }: ProblemSummaryProps) {
+export function ProblemSummary({ summary, onConnect, hasUserMessage, isLoading = false }: ProblemSummaryProps) {
     const sections = [
         { key: 'challenge', label: 'Challenge', value: summary.challenge },
         { key: 'currentSituation', label: 'Situation actuelle', value: summary.currentSituation },
@@ -42,14 +43,19 @@ export function ProblemSummary({ summary, onConnect, hasUserMessage }: ProblemSu
 
     return (
         <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Résumé de votre besoin</h3>
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Résumé de votre besoin</h3>
+                {isLoading && (
+                    <RefreshCw className="h-4 w-4 text-blue-600 animate-spin" />
+                )}
+            </div>
             
             {filledSections.length === 0 ? (
                 <p className="text-gray-500 text-sm">
                     Le résumé de votre besoin apparaîtra ici au fur et à mesure de notre conversation.
                 </p>
             ) : (
-                <div className="space-y-4">
+                <div className={`space-y-4 transition-opacity duration-200 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
                     {filledSections.map(section => (
                         <div key={section.key}>
                             <h4 className="text-sm font-medium text-gray-700">{section.label}</h4>
@@ -69,6 +75,7 @@ export function ProblemSummary({ summary, onConnect, hasUserMessage }: ProblemSu
                         <button
                             onClick={onConnect}
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors"
+                            disabled={isLoading}
                         >
                             Planifier un rendez-vous
                         </button>

@@ -11,13 +11,13 @@ export interface ChatConfig {
     summaryInstructions?: string;
     submitMessage: string;
 }
-
 export const CHAT_CONFIGS: Record<ChatUseCase, ChatConfig> = {
     consultant_qualification: {
         initialMessage: {
             role: 'assistant',
             content: "Bonjour ! Je suis l'assistant virtuel d'Arnaud. Mon rôle est de vous aider à clarifier votre brief avant votre échange avec lui. Plus je comprends précisément votre besoin, plus Arnaud pourra préparer des solutions pertinentes. Pouvez-vous me parler de votre projet ?"
         },
+        submitMessage: "Envoyer",
         systemPrompt: `You are Arnaud's AI assistant.
             Your primary role is to help clarify the client's brief before their interaction with Arnaud.
             Guide the conversation to gather comprehensive information that will help Arnaud prepare relevant solutions.
@@ -80,6 +80,7 @@ export const CHAT_CONFIGS: Record<ChatUseCase, ChatConfig> = {
             role: 'assistant',
             content: "Bonjour ! Je suis là pour vous aider à évaluer vos besoins en automatisation. Pouvez-vous me parler des processus que vous souhaitez optimiser ?"
         },
+        submitMessage: "Envoyer",
         systemPrompt: `You are an automation expert.
             Your job is to understand the user's automation needs and assess the complexity and feasibility.
             Ask specific questions about:
