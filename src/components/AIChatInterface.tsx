@@ -17,7 +17,7 @@ interface AIChatInterfaceProps {
 }
 
 export function AIChatInterface({ config, messages: externalMessages, onMessagesUpdate }: AIChatInterfaceProps) {
-    const [messages, setMessages] = useState<Message[]>(externalMessages || [config.initialMessage]);
+    const [messages, setMessages] = useState<Message[]>(externalMessages || []);
     const [newMessage, setNewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [problemSummary, setProblemSummary] = useState<any>({});
@@ -29,15 +29,61 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
     const componentRef = React.useRef<HTMLDivElement>(null);
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
-    // Initial analysis of the problem
+    // Initialize messages when component mounts
     useEffect(() => {
-        const analyzeInitialMessage = async () => {
-            if (isInitialized || !config.initialMessage) return;
+        if (externalMessages && externalMessages.length > 0) {
+            setMessages(externalMessages);
+        } else if (messages.length === 0) {
+            setMessages([config.initialMessage]);
+        }
+    }, [externalMessages, config.initialMessage]);
+
+    // Handle initial AI response when external messages are provided
+    useEffect(() => {
+        const getInitialResponse = async () => {
+            if (!externalMessages || externalMessages.length === 0 || isInitialized) return;
+            
+            // Don't respond if the last message is from the assistant
+            if (externalMessages[externalMessages.length - 1].role === 'assistant') {
+                setIsInitialized(true);
+                return;
+            }
+            
+            setIsLoading(true);
+            try {
+                const aiResponse = await analyzeWithOpenAI(
+                    [
+                        { role: 'system' as const, content: config.systemPrompt },
+                        ...externalMessages.map(msg => ({
+                            role: msg.role,
+                            content: msg.content
+                        }))
+                    ],
+                    false
+                );
+
+                if (aiResponse) {
+                    const updatedMessages: Message[] = [
+                        ...externalMessages,
+                        { role: 'assistant', content: aiResponse }
+                    ];
+                    updateMessages(updatedMessages);
+                    await updateSummaryIfNeeded(updatedMessages);
+                }
+            } catch (error) {
+                console.error('Error getting initial AI response:', error);
+                const errorMessages: Message[] = [
+                    ...externalMessages,
+                    { role: 'assistant', content: "Je suis désolé, mais j'ai des difficultés à me connecter. Veuillez réessayer." }
+                ];
+                updateMessages(errorMessages);
+            }
+            setIsLoading(false);
             setIsInitialized(true);
         };
 
-        analyzeInitialMessage();
-    }, [config.initialMessage, isInitialized]);
+        getInitialResponse();
+    }, [externalMessages, config.systemPrompt, isInitialized]);
 
     // Keep focus on textarea after sending message
     useEffect(() => {
@@ -220,53 +266,6 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
             </React.Fragment>
         ));
     };
-
-    // Handle initial AI response when external messages are provided
-    useEffect(() => {
-        const getInitialResponse = async () => {
-            if (!externalMessages || externalMessages.length === 0 || isInitialized) return;
-            
-            // Don't respond if the last message is from the assistant
-            if (externalMessages[externalMessages.length - 1].role === 'assistant') {
-                setIsInitialized(true);
-                return;
-            }
-            
-            setIsLoading(true);
-            try {
-                const aiResponse = await analyzeWithOpenAI(
-                    [
-                        { role: 'system' as const, content: config.systemPrompt },
-                        ...externalMessages.map(msg => ({
-                            role: msg.role,
-                            content: msg.content
-                        }))
-                    ],
-                    false
-                );
-
-                if (aiResponse) {
-                    const updatedMessages: Message[] = [
-                        ...externalMessages,
-                        { role: 'assistant', content: aiResponse }
-                    ];
-                    updateMessages(updatedMessages);
-                    await updateSummaryIfNeeded(updatedMessages);
-                }
-            } catch (error) {
-                console.error('Error getting initial AI response:', error);
-                const errorMessages: Message[] = [
-                    ...externalMessages,
-                    { role: 'assistant', content: "Je suis désolé, mais j'ai des difficultés à me connecter. Veuillez réessayer." }
-                ];
-                updateMessages(errorMessages);
-            }
-            setIsLoading(false);
-            setIsInitialized(true);
-        };
-
-        getInitialResponse();
-    }, [externalMessages, config.systemPrompt, isInitialized]);
 
     return (
         <div ref={componentRef} className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto">

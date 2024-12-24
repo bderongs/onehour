@@ -309,7 +309,10 @@ export function LandingPage() {
                                     <AIChatInterface
                                         messages={messages}
                                         onMessagesUpdate={handleMessagesUpdate}
-                                        config={chatConfig}
+                                        config={{
+                                            ...chatConfig,
+                                            initialMessage: messages.length > 0 ? messages[0] : chatConfig.initialMessage
+                                        }}
                                     />
                                 </div>
                                 <div className={`${showConnect ? 'block' : 'hidden'}`}>
