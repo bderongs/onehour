@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote } from 'lucide-react';
+import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
@@ -305,22 +305,37 @@ export function LandingPage() {
                                         handleKeyDown={handleKeyDown}
                                     />
                                 </div>
-                                <div className={`${showChat && !showConnect ? 'block' : 'hidden'}`}>
-                                    <AIChatInterface
-                                        messages={messages}
-                                        onMessagesUpdate={handleMessagesUpdate}
-                                        config={{
-                                            ...chatConfig,
-                                            initialMessage: messages.length > 0 ? messages[0] : chatConfig.initialMessage
-                                        }}
-                                    />
+                                <div className={`max-w-4xl mx-auto px-4 mb-8 slide-down-enter slide-down-enter-active ${showChat && !showConnect ? 'block' : 'hidden'}`}>
+                                    <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                                        <div className="p-4 border-b border-gray-200">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <Sparkles className="h-5 w-5 text-blue-600" />
+                                                    <h2 className="text-xl font-semibold text-gray-900">{chatConfig.title}</h2>
+                                                </div>
+                                            </div>
+                                            <p className="text-sm text-gray-600 mt-1 text-left">{chatConfig.subtitle}</p>
+                                        </div>
+                                        <div className="p-4">
+                                            <AIChatInterface
+                                                messages={messages}
+                                                onMessagesUpdate={handleMessagesUpdate}
+                                                config={{
+                                                    ...chatConfig,
+                                                    initialMessage: messages.length > 0 ? messages[0] : chatConfig.initialMessage
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className={`${showConnect ? 'block' : 'hidden'}`}>
-                                    <ConsultantConnect
-                                        onBack={handleBack}
-                                        problemSummary={problemSummary}
-                                        config={chatConfig}
-                                    />
+                                <div className={`max-w-4xl mx-auto px-4 mb-8 slide-down-enter slide-down-enter-active ${showConnect ? 'block' : 'hidden'}`}>
+                                    <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                                        <ConsultantConnect
+                                            onBack={handleBack}
+                                            problemSummary={problemSummary}
+                                            config={chatConfig}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
