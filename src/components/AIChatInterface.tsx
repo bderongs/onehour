@@ -7,6 +7,7 @@ import { ChatConfig } from '../types/chat';
 export interface Message {
     role: 'user' | 'assistant';
     content: string;
+    summary?: any;
 }
 
 interface AIChatInterfaceProps {
@@ -49,6 +50,8 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
     const updateSummaryIfNeeded = async (messagesForSummary: Message[]) => {
         if (!config.summaryInstructions || !messagesForSummary.some(m => m.role === 'user')) return;
 
+        console.log('AIChatInterface - Updating summary, messages:', messagesForSummary);
+
         try {
             const summaryResponse = await analyzeWithOpenAI(
                 [
@@ -71,10 +74,22 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
                     const jsonMatch = summaryResponse.match(/\{[\s\S]*\}/);
                     const jsonStr = jsonMatch ? jsonMatch[0] : summaryResponse;
                     
+                    console.log('AIChatInterface - Raw summary response:', summaryResponse);
+                    console.log('AIChatInterface - Extracted JSON:', jsonStr);
+                    
                     const parsedSummary = JSON.parse(jsonStr);
+                    console.log('AIChatInterface - Parsed summary:', parsedSummary);
                     
                     // Validate content fields and readyForAssessment
-                    const requiredFields = ['challenge', 'currentSituation', 'desiredOutcome', 'constraints', 'readyForAssessment'];
+                    const requiredFields = [
+                        'challenge',
+                        'currentSituation',
+                        'desiredOutcome',
+                        'constraints',
+                        'stakeholders',
+                        'previousAttempts',
+                        'readyForAssessment'
+                    ];
                     const hasAllFields = requiredFields.every(field => {
                         if (field === 'readyForAssessment') {
                             return typeof parsedSummary[field] === 'boolean';
@@ -85,9 +100,21 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
                     });
                     
                     if (hasAllFields) {
+                        console.log('AIChatInterface - Setting valid summary:', parsedSummary);
                         setProblemSummary(parsedSummary);
+                        if (onMessagesUpdate) {
+                            // Create a new message that includes the summary
+                            const messagesWithSummary = [...messagesForSummary];
+                            const lastMessage = messagesWithSummary[messagesWithSummary.length - 1];
+                            if (lastMessage && lastMessage.role === 'assistant') {
+                                // Append the summary to the last assistant message
+                                lastMessage.summary = parsedSummary;
+                            }
+                            console.log('AIChatInterface - Calling onMessagesUpdate with messages and summary');
+                            onMessagesUpdate(messagesWithSummary);
+                        }
                     } else {
-                        console.error('Summary missing required fields or has invalid values:', 
+                        console.error('AIChatInterface - Summary missing required fields or has invalid values:', 
                             requiredFields.filter(field => {
                                 if (field === 'readyForAssessment') {
                                     return typeof parsedSummary[field] !== 'boolean';

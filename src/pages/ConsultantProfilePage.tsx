@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { CheckCircle, Star, ArrowRight, Linkedin, Twitter, Globe, X, BadgeCheck, Sparkles } from 'lucide-react';
+import { CheckCircle, Star, ArrowRight, Linkedin, Twitter, Globe, X, BadgeCheck, Sparkles, AlertCircle, MessageSquare } from 'lucide-react';
 import { LightFooter } from '../components/LightFooter';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
+import { ConsultantConnect } from '../components/ConsultantConnect';
 import { CHAT_CONFIGS } from '../types/chat';
 
 interface ServicePackage {
@@ -92,12 +93,32 @@ function getAvailabilityForDuration(duration: string): string {
     return availabilityDate.toLocaleDateString('fr-FR', options);
 }
 
+interface ProblemSummary {
+    challenge: string;
+    currentSituation: string;
+    desiredOutcome: string;
+    constraints: string;
+    stakeholders: string;
+    previousAttempts: string;
+    readyForAssessment: boolean;
+}
+
 export default function ConsultantProfilePage() {
     const [scrollY, setScrollY] = useState(0);
     const [nextAvailability] = useState(getNextWorkingDay());
     const [modal, setModal] = useState<ModalState>({ isOpen: false, package: null, type: 'info' });
     const [showChat, setShowChat] = useState(false);
+    const [showConnect, setShowConnect] = useState(false);
     const [messages, setMessages] = useState<Message[]>([CHAT_CONFIGS.consultant_qualification.initialMessage]);
+    const [problemSummary, setProblemSummary] = useState<ProblemSummary>({
+        challenge: '',
+        currentSituation: '',
+        desiredOutcome: '',
+        constraints: '',
+        stakeholders: '',
+        previousAttempts: '',
+        readyForAssessment: false
+    });
     useScrollAnimation();
 
     // Enhanced scroll reset effect
@@ -289,8 +310,29 @@ export default function ConsultantProfilePage() {
     };
 
     const handleConnect = () => {
-        // Handle connection logic here
-        console.log('Connecting...');
+        console.log('ConsultantProfilePage - handleConnect called, current summary:', problemSummary);
+        setShowConnect(true);
+        setShowChat(false);
+    };
+
+    const handleBack = () => {
+        console.log('ConsultantProfilePage - handleBack called');
+        setShowConnect(false);
+        setShowChat(true);
+    };
+
+    // Add handler for messages update to extract summary
+    const handleMessagesUpdate = (newMessages: Message[]) => {
+        setMessages(newMessages);
+        // Look for the latest summary in the messages
+        for (let i = newMessages.length - 1; i >= 0; i--) {
+            const msg = newMessages[i];
+            if (msg.role === 'assistant' && msg.summary) {
+                console.log('ConsultantProfilePage - Found summary in message:', msg.summary);
+                setProblemSummary(msg.summary);
+                break;
+            }
+        }
     };
 
     return (
@@ -462,35 +504,52 @@ export default function ConsultantProfilePage() {
                     </div>
                 </div>
 
-                {/* Chat Section - Only shown when showChat is true */}
-                {showChat && (
-                    <div className={`max-w-4xl mx-auto px-4 mb-8 slide-down-enter slide-down-enter-active`}>
-                        <div className="bg-white rounded-xl shadow-md overflow-hidden my-2 mx-1">
-                            <div className="p-4 border-b border-gray-200">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <Sparkles className="h-5 w-5 text-blue-600" />
-                                        <h2 className="text-xl font-semibold text-gray-900">{CHAT_CONFIGS.consultant_qualification.title}</h2>
-                                    </div>
-                                    <button 
-                                        onClick={handleChatClose}
-                                        className="text-gray-500 hover:text-gray-700"
-                                    >
-                                        <X className="h-6 w-6" />
-                                    </button>
+                {/* Chat Section - Always mounted but conditionally visible */}
+                <div className={`max-w-4xl mx-auto px-4 mb-8 slide-down-enter slide-down-enter-active ${showChat && !showConnect ? 'block' : 'hidden'}`}>
+                    <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div className="p-4 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Sparkles className="h-5 w-5 text-blue-600" />
+                                    <h2 className="text-xl font-semibold text-gray-900">{CHAT_CONFIGS.consultant_qualification.title}</h2>
                                 </div>
-                                <p className="text-sm text-gray-600 mt-1">{CHAT_CONFIGS.consultant_qualification.subtitle}</p>
+                                <button 
+                                    onClick={() => setShowChat(false)}
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                    <X className="h-6 w-6" />
+                                </button>
                             </div>
-                            <div className="p-4">
-                                <AIChatInterface
-                                    config={CHAT_CONFIGS.consultant_qualification}
-                                    messages={messages}
-                                    onMessagesUpdate={setMessages}
-                                />
-                            </div>
+                            <p className="text-sm text-gray-600 mt-1">{CHAT_CONFIGS.consultant_qualification.subtitle}</p>
+                        </div>
+                        <div className="p-4">
+                            <AIChatInterface
+                                config={{
+                                    ...CHAT_CONFIGS.consultant_qualification,
+                                    onConnect: handleConnect,
+                                    submitMessage: "En soumettant ce formulaire, vous serez contacté par Arnaud Lacaze dans les prochaines 24 heures."
+                                }}
+                                messages={messages}
+                                onMessagesUpdate={handleMessagesUpdate}
+                            />
                         </div>
                     </div>
-                )}
+                </div>
+
+                {/* Connect Form - Always mounted but conditionally visible */}
+                <div className={`max-w-4xl mx-auto px-4 mb-8 slide-down-enter slide-down-enter-active ${showConnect ? 'block' : 'hidden'}`}>
+                    <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                        <ConsultantConnect 
+                            onBack={handleBack}
+                            problemSummary={problemSummary}
+                            config={{
+                                ...CHAT_CONFIGS.consultant_qualification,
+                                onConnect: handleConnect,
+                                submitMessage: "En soumettant ce formulaire, vous serez contacté par Arnaud Lacaze dans les prochaines 24 heures."
+                            }}
+                        />
+                    </div>
+                </div>
 
                 {/* Service Packages Section */}
                 <div className="scroll-animation overflow-hidden mb-8">

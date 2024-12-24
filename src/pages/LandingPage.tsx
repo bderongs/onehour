@@ -19,6 +19,15 @@ export function LandingPage() {
     const [showConnect, setShowConnect] = useState(false);
     const [showForm, setShowForm] = useState(true);
     const [messages, setMessages] = useState<Message[]>([]);
+    const [problemSummary, setProblemSummary] = useState({
+        challenge: '',
+        currentSituation: '',
+        desiredOutcome: '',
+        constraints: '',
+        stakeholders: '',
+        previousAttempts: '',
+        readyForAssessment: false
+    });
 
     const useCases: UseCase[] = [
         {
@@ -72,6 +81,7 @@ export function LandingPage() {
     };
 
     const handleConnect = () => {
+        console.log('LandingPage - handleConnect called, current summary:', problemSummary);
         setShowConnect(true);
         setShowChat(false);
     };
@@ -83,6 +93,15 @@ export function LandingPage() {
 
     const handleMessagesUpdate = (newMessages: Message[]) => {
         setMessages(newMessages);
+        // Extract the latest summary from the messages
+        for (let i = newMessages.length - 1; i >= 0; i--) {
+            const msg = newMessages[i];
+            if (msg.role === 'assistant' && msg.summary) {
+                console.log('LandingPage - Found summary in message:', msg.summary);
+                setProblemSummary(msg.summary);
+                break;
+            }
+        }
     };
 
     // Update chat config
@@ -114,6 +133,7 @@ export function LandingPage() {
         title: "Assistant OneHour",
         subtitle: "Je vous aide à trouver l'expert idéal",
         onConnect: handleConnect,
+        submitMessage: "En soumettant ce formulaire, vous serez contacté par l'un de nos consultants experts dans les prochaines 24 heures.",
         summaryInstructions: `Analyze the conversation and create a JSON summary with the following structure.
         IMPORTANT: The summary must be in the same language as the conversation (French if the conversation is in French).
         IMPORTANT: Do not return any other output than the JSON with all fields filled.
@@ -275,28 +295,28 @@ export function LandingPage() {
                                 Décrivez votre problème et programmez une session de micro-consulting avec l'un de nos experts.
                             </p>
                             <div className="max-w-7xl mx-auto">
-                                {showForm && (
-                                    <div className="max-w-4xl mx-auto">
-                                        <UseCaseForm
-                                            useCases={useCases}
-                                            problem={problem}
-                                            setProblem={setProblem}
-                                            handleSubmit={handleSubmit}
-                                            handleUseCaseClick={handleUseCaseClick}
-                                            handleKeyDown={handleKeyDown}
-                                        />
-                                    </div>
-                                )}
-                                {showChat && !showConnect && (
+                                <div className={`max-w-4xl mx-auto ${showForm ? 'block' : 'hidden'}`}>
+                                    <UseCaseForm
+                                        useCases={useCases}
+                                        problem={problem}
+                                        setProblem={setProblem}
+                                        handleSubmit={handleSubmit}
+                                        handleUseCaseClick={handleUseCaseClick}
+                                        handleKeyDown={handleKeyDown}
+                                    />
+                                </div>
+                                <div className={`${showChat && !showConnect ? 'block' : 'hidden'}`}>
                                     <AIChatInterface
                                         messages={messages}
                                         onMessagesUpdate={handleMessagesUpdate}
                                         config={chatConfig}
                                     />
-                                )}
+                                </div>
                                 <div className={`${showConnect ? 'block' : 'hidden'}`}>
                                     <ConsultantConnect
                                         onBack={handleBack}
+                                        problemSummary={problemSummary}
+                                        config={chatConfig}
                                     />
                                 </div>
                             </div>

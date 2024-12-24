@@ -9,6 +9,7 @@ export interface ChatConfig {
     subtitle: string;
     onConnect: () => void;
     summaryInstructions?: string;
+    submitMessage: string;
 }
 
 export const CHAT_CONFIGS: Record<ChatUseCase, ChatConfig> = {
