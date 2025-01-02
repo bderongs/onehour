@@ -333,10 +333,10 @@ export function LandingPage() {
                         transition={{ duration: 0.6 }}
                     >
                         <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
-                            Le concentré de conseil expert
+                            La boutique du consulting
                         </h1>
                         <p className="text-xl md:text-2xl mb-12 text-gray-600 max-w-3xl mx-auto">
-                            Décrivez votre problème et programmez une session de micro-consulting avec l'un de nos experts.
+                            Décrivez votre problème et trouvez le service et l'expert qu'il vous faut. On garantit la qualité du service.
                         </p>
 
                         {/* Use Case Form Section */}
@@ -389,6 +389,305 @@ export function LandingPage() {
                                 </div>
                             </div>
                         </div>
+                    </motion.div>
+
+                    {/* Service Packages Carousel */}
+                    <motion.div 
+                        className="mb-24"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                                Nos services
+                            </h2>
+                            <p className="text-xl text-gray-600 mb-2">
+                                Des solutions packagées pour tous vos besoins
+                            </p>
+                        </div>
+                        <div className="max-w-7xl mx-auto select-none">
+                            {/* First Row: Software & AI */}
+                            <div className="overflow-hidden">
+                                <div className="relative px-2 py-2">
+                                    <div className="animate-scroll-right flex gap-6">
+                                        {/* Duplicate the cards for seamless scrolling */}
+                                        {[...Array(2)].map((_, arrayIndex) => (
+                                            <div key={arrayIndex} className="flex gap-6 animate-scroll">
+                                                {[
+                                                    // Software Selection Services
+                                                    {
+                                                        title: "Sélection Logiciel Express",
+                                                        duration: "1 journée",
+                                                        price: "1\u00A0200\u00A0€",
+                                                        description: "Analyse rapide de vos besoins et recommandation des meilleures solutions logicielles adaptées à votre contexte.",
+                                                        deliverables: [
+                                                            "Analyse des besoins métier",
+                                                            "Benchmark des solutions",
+                                                            "Matrice de comparaison",
+                                                            "Recommandations détaillées"
+                                                        ]
+                                                    },
+                                                    {
+                                                        title: "Accompagnement Logiciel",
+                                                        duration: "2 semaines",
+                                                        price: "4\u00A0800\u00A0€",
+                                                        description: "Accompagnement complet dans la sélection et la mise en place de votre nouvelle solution logicielle.",
+                                                        deliverables: [
+                                                            "Cahier des charges détaillé",
+                                                            "Shortlist fournisseurs",
+                                                            "Assistance aux démonstrations",
+                                                            "Plan d'implémentation"
+                                                        ]
+                                                    },
+                                                    {
+                                                        title: "Migration Logicielle",
+                                                        duration: "3 semaines",
+                                                        price: "6\u00A0500\u00A0€",
+                                                        description: "Accompagnement dans la migration de vos données et processus vers une nouvelle solution logicielle.",
+                                                        deliverables: [
+                                                            "Plan de migration détaillé",
+                                                            "Mapping des données",
+                                                            "Tests de migration",
+                                                            "Formation des utilisateurs"
+                                                        ]
+                                                    },
+                                                    {
+                                                        title: "Optimisation Logicielle",
+                                                        duration: "1 semaine",
+                                                        price: "2\u00A0800\u00A0€",
+                                                        description: "Audit et optimisation de vos solutions logicielles existantes pour maximiser leur valeur.",
+                                                        deliverables: [
+                                                            "Audit d'utilisation",
+                                                            "Identification des gains",
+                                                            "Plan d'optimisation",
+                                                            "Recommandations techniques"
+                                                        ]
+                                                    },
+                                                    // AI Services
+                                                    {
+                                                        title: "Diagnostic IA",
+                                                        duration: "2 jours",
+                                                        price: "2\u00A0400\u00A0€",
+                                                        description: "Évaluation des opportunités d'automatisation et d'intelligence artificielle dans votre organisation.",
+                                                        deliverables: [
+                                                            "Cartographie des processus",
+                                                            "Identification des use-cases",
+                                                            "Estimation des gains",
+                                                            "Recommandations priorisées"
+                                                        ]
+                                                    },
+                                                    {
+                                                        title: "Projet IA Pilot",
+                                                        duration: "3 semaines",
+                                                        price: "7\u00A0500\u00A0€",
+                                                        description: "Mise en place d'un premier projet d'IA pour démontrer la valeur et initier votre transformation.",
+                                                        deliverables: [
+                                                            "Proof of Concept",
+                                                            "Architecture technique",
+                                                            "Formation des équipes",
+                                                            "Plan de déploiement"
+                                                        ]
+                                                    },
+                                                    {
+                                                        title: "IA Générative",
+                                                        duration: "2 semaines",
+                                                        price: "5\u00A0200\u00A0€",
+                                                        description: "Intégration de solutions d'IA générative (LLM) dans vos processus métier existants.",
+                                                        deliverables: [
+                                                            "Sélection du modèle",
+                                                            "Développement des prompts",
+                                                            "Intégration technique",
+                                                            "Tests et validation"
+                                                        ]
+                                                    },
+                                                    {
+                                                        title: "Automatisation IA",
+                                                        duration: "4 semaines",
+                                                        price: "8\u00A0900\u00A0€",
+                                                        description: "Automatisation complète d'un processus métier avec des solutions d'intelligence artificielle.",
+                                                        deliverables: [
+                                                            "Analyse du workflow",
+                                                            "Développement de la solution",
+                                                            "Tests et optimisation",
+                                                            "Documentation technique"
+                                                        ]
+                                                    }
+                                                ].map((pkg, index) => (
+                                                    <div 
+                                                        key={index}
+                                                        className="flex flex-col bg-white/80 backdrop-blur-sm rounded-xl shadow-md w-80 flex-shrink-0 
+                                                        border border-gray-100
+                                                        transform-gpu relative
+                                                        before:absolute before:inset-0 before:z-[-1] before:bg-gradient-to-br before:from-blue-50/50 before:to-indigo-50/50 before:rounded-xl"
+                                                    >
+                                                        <div className="p-6 flex flex-col h-full">
+                                                            <div className="flex justify-between items-start mb-4">
+                                                                <div>
+                                                                    <h4 className="text-lg font-semibold text-gray-900">{pkg.title}</h4>
+                                                                    <p className="text-sm text-gray-500">{pkg.duration}</p>
+                                                                    <div className="text-sm font-bold text-gray-900 mt-1">{pkg.price}</div>
+                                                                </div>
+                                                            </div>
+                                                            <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
+                                                            <div className="mt-auto">
+                                                                <ul className="space-y-2">
+                                                                    {pkg.deliverables.map((item, i) => (
+                                                                        <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                                                                            <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                                                                            <span>{item}</span>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {/* Add gradient overlays */}
+                                    <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#f8fafc] to-transparent pointer-events-none z-10"></div>
+                                    <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#f8fafc] to-transparent pointer-events-none z-10"></div>
+                                </div>
+                            </div>
+
+                            {/* Second Row: Recruitment */}
+                            <div className="overflow-hidden">
+                                <div className="relative px-4 py-4">
+                                    <div className="animate-scroll-left flex gap-6">
+                                        {/* Duplicate the cards for seamless scrolling */}
+                                        {[...Array(2)].map((_, arrayIndex) => (
+                                            <div key={arrayIndex} className="flex gap-6 animate-scroll">
+                                                {[
+                                                    // Recruitment Services
+                                                    {
+                                                        title: "Recrutement Tech Express",
+                                                        duration: "1 semaine",
+                                                        price: "2\u00A0900\u00A0€",
+                                                        description: "Assistance au recrutement de profils techniques avec évaluation experte des compétences.",
+                                                        deliverables: [
+                                                            "Grille d'évaluation technique",
+                                                            "Tests techniques personnalisés",
+                                                            "Conduite des entretiens",
+                                                            "Rapport d'évaluation"
+                                                        ]
+                                                    },
+                                                    {
+                                                        title: "Recrutement Tech Complet",
+                                                        duration: "1 mois",
+                                                        price: "5\u00A0000\u00A0€",
+                                                        description: "Service complet de recrutement technique, de la définition du poste à l'intégration du candidat.",
+                                                        deliverables: [
+                                                            "Définition du profil idéal",
+                                                            "Sourcing et présélection",
+                                                            "Évaluation technique approfondie",
+                                                            "Accompagnement à l'intégration"
+                                                        ]
+                                                    },
+                                                    {
+                                                        title: "Assessment Technique",
+                                                        duration: "3 jours",
+                                                        price: "3\u00A0200\u00A0€",
+                                                        description: "Évaluation approfondie des compétences techniques d'une équipe ou d'un candidat senior.",
+                                                        deliverables: [
+                                                            "Tests techniques avancés",
+                                                            "Entretiens approfondis",
+                                                            "Évaluation pratique",
+                                                            "Rapport détaillé"
+                                                        ]
+                                                    },
+                                                    {
+                                                        title: "Onboarding Tech",
+                                                        duration: "2 semaines",
+                                                        price: "4\u00A0500\u00A0€",
+                                                        description: "Programme d'intégration personnalisé pour les nouveaux talents techniques.",
+                                                        deliverables: [
+                                                            "Plan d'intégration",
+                                                            "Formation technique",
+                                                            "Mentorat personnalisé",
+                                                            "Suivi de progression"
+                                                        ]
+                                                    }
+                                                ].map((pkg, index) => (
+                                                    <div 
+                                                        key={index}
+                                                        className="flex flex-col bg-white/80 backdrop-blur-sm rounded-xl shadow-md w-80 flex-shrink-0 
+                                                        border border-gray-100
+                                                        transform-gpu relative
+                                                        before:absolute before:inset-0 before:z-[-1] before:bg-gradient-to-br before:from-blue-50/50 before:to-indigo-50/50 before:rounded-xl"
+                                                    >
+                                                        <div className="p-6 flex flex-col h-full">
+                                                            <div className="flex justify-between items-start mb-4">
+                                                                <div>
+                                                                    <h4 className="text-lg font-semibold text-gray-900">{pkg.title}</h4>
+                                                                    <p className="text-sm text-gray-500">{pkg.duration}</p>
+                                                                    <div className="text-sm font-bold text-gray-900 mt-1">{pkg.price}</div>
+                                                                </div>
+                                                            </div>
+                                                            <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
+                                                            <div className="mt-auto">
+                                                                <ul className="space-y-2">
+                                                                    {pkg.deliverables.map((item, i) => (
+                                                                        <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                                                                            <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                                                                            <span>{item}</span>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {/* Add gradient overlays */}
+                                    <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#f8fafc] to-transparent pointer-events-none z-10"></div>
+                                    <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#f8fafc] to-transparent pointer-events-none z-10"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <style>{`
+                            @keyframes scroll-right {
+                                0% {
+                                    transform: translateX(0);
+                                }
+                                50% {
+                                    transform: translateX(-25%);
+                                }
+                                100% {
+                                    transform: translateX(0);
+                                }
+                            }
+
+                            @keyframes scroll-left {
+                                0% {
+                                    transform: translateX(-25%);
+                                }
+                                50% {
+                                    transform: translateX(0);
+                                }
+                                100% {
+                                    transform: translateX(-25%);
+                                }
+                            }
+
+                            .animate-scroll-right {
+                                animation: scroll-right 80s linear infinite;
+                            }
+
+                            .animate-scroll-left {
+                                animation: scroll-left 80s linear infinite;
+                            }
+
+                            .animate-scroll-right:hover,
+                            .animate-scroll-left:hover {
+                                animation-play-state: paused;
+                            }
+                        `}</style>
                     </motion.div>
 
                     {/* Why Choose Section */}
