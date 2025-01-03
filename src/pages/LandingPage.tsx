@@ -336,7 +336,9 @@ export function LandingPage() {
                             La boutique du consulting
                         </h1>
                         <p className="text-xl md:text-2xl mb-12 text-gray-600 max-w-3xl mx-auto">
-                            Décrivez votre problème et trouvez le service et l'expert qu'il vous faut. On garantit la qualité du service.
+                            Décrivez votre problème et trouvez le service et l'expert qu'il vous faut.
+                            <br/>
+                            On garantit la qualité de la prestation.
                         </p>
 
                         {/* Use Case Form Section */}
@@ -418,101 +420,53 @@ export function LandingPage() {
                                                 {[
                                                     // Software Selection Services
                                                     {
-                                                        title: "Sélection Logiciel Express",
+                                                        title: "Sélection CRM",
                                                         duration: "1 journée",
                                                         price: "1\u00A0200\u00A0€",
-                                                        description: "Analyse rapide de vos besoins et recommandation des meilleures solutions logicielles adaptées à votre contexte.",
-                                                        deliverables: [
-                                                            "Analyse des besoins métier",
-                                                            "Benchmark des solutions",
-                                                            "Matrice de comparaison",
-                                                            "Recommandations détaillées"
-                                                        ]
+                                                        description: "Choix d'un CRM adapté à votre équipe commerciale de 5-20 personnes. Comparaison Salesforce, HubSpot, Pipedrive.",
                                                     },
                                                     {
-                                                        title: "Accompagnement Logiciel",
+                                                        title: "Choix ERP PME",
                                                         duration: "2 semaines",
                                                         price: "4\u00A0800\u00A0€",
-                                                        description: "Accompagnement complet dans la sélection et la mise en place de votre nouvelle solution logicielle.",
-                                                        deliverables: [
-                                                            "Cahier des charges détaillé",
-                                                            "Shortlist fournisseurs",
-                                                            "Assistance aux démonstrations",
-                                                            "Plan d'implémentation"
-                                                        ]
+                                                        description: "Sélection d'un ERP pour PME de 50-200 employés. Analyse Sage, SAP Business One, Microsoft Dynamics.",
                                                     },
                                                     {
-                                                        title: "Migration Logicielle",
+                                                        title: "Migration Cloud",
                                                         duration: "3 semaines",
                                                         price: "6\u00A0500\u00A0€",
-                                                        description: "Accompagnement dans la migration de vos données et processus vers une nouvelle solution logicielle.",
-                                                        deliverables: [
-                                                            "Plan de migration détaillé",
-                                                            "Mapping des données",
-                                                            "Tests de migration",
-                                                            "Formation des utilisateurs"
-                                                        ]
+                                                        description: "Migration de vos serveurs vers le cloud. Choix entre AWS, Azure, GCP selon vos contraintes techniques et budgétaires.",
                                                     },
                                                     {
-                                                        title: "Optimisation Logicielle",
+                                                        title: "Outils Collaboratifs",
                                                         duration: "1 semaine",
                                                         price: "2\u00A0800\u00A0€",
-                                                        description: "Audit et optimisation de vos solutions logicielles existantes pour maximiser leur valeur.",
-                                                        deliverables: [
-                                                            "Audit d'utilisation",
-                                                            "Identification des gains",
-                                                            "Plan d'optimisation",
-                                                            "Recommandations techniques"
-                                                        ]
+                                                        description: "Mise en place d'outils collaboratifs pour équipe hybride. Microsoft 365 vs Google Workspace vs alternatives.",
                                                     },
                                                     // AI Services
                                                     {
-                                                        title: "Diagnostic IA",
+                                                        title: "Automatisation RH",
                                                         duration: "2 jours",
                                                         price: "2\u00A0400\u00A0€",
-                                                        description: "Évaluation des opportunités d'automatisation et d'intelligence artificielle dans votre organisation.",
-                                                        deliverables: [
-                                                            "Cartographie des processus",
-                                                            "Identification des use-cases",
-                                                            "Estimation des gains",
-                                                            "Recommandations priorisées"
-                                                        ]
+                                                        description: "Automatisation du tri de CV et présélection des candidats avec l'IA. Réduction de 70% du temps de recrutement.",
                                                     },
                                                     {
-                                                        title: "Projet IA Pilot",
+                                                        title: "IA Service Client",
                                                         duration: "3 semaines",
                                                         price: "7\u00A0500\u00A0€",
-                                                        description: "Mise en place d'un premier projet d'IA pour démontrer la valeur et initier votre transformation.",
-                                                        deliverables: [
-                                                            "Proof of Concept",
-                                                            "Architecture technique",
-                                                            "Formation des équipes",
-                                                            "Plan de déploiement"
-                                                        ]
+                                                        description: "Chatbot IA pour votre service client. Traitement automatique de 40% des demandes clients 24/7.",
                                                     },
                                                     {
-                                                        title: "IA Générative",
+                                                        title: "GPT sur mesure",
                                                         duration: "2 semaines",
                                                         price: "5\u00A0200\u00A0€",
-                                                        description: "Intégration de solutions d'IA générative (LLM) dans vos processus métier existants.",
-                                                        deliverables: [
-                                                            "Sélection du modèle",
-                                                            "Développement des prompts",
-                                                            "Intégration technique",
-                                                            "Tests et validation"
-                                                        ]
+                                                        description: "Création d'un assistant GPT personnalisé pour votre métier. Formation sur vos données et documents internes.",
                                                     },
                                                     {
-                                                        title: "Automatisation IA",
+                                                        title: "IA Analyse Data",
                                                         duration: "4 semaines",
                                                         price: "8\u00A0900\u00A0€",
-                                                        description: "Automatisation complète d'un processus métier avec des solutions d'intelligence artificielle.",
-                                                        deliverables: [
-                                                            "Analyse du workflow",
-                                                            "Développement de la solution",
-                                                            "Tests et optimisation",
-                                                            "Documentation technique"
-                                                        ]
+                                                        description: "Analyse prédictive de vos données clients. Prévision des ventes et détection des opportunités commerciales.",
                                                     }
                                                 ].map((pkg, index) => (
                                                     <div 
@@ -531,16 +485,6 @@ export function LandingPage() {
                                                                 </div>
                                                             </div>
                                                             <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
-                                                            <div className="mt-auto">
-                                                                <ul className="space-y-2">
-                                                                    {pkg.deliverables.map((item, i) => (
-                                                                        <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                                                                            <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                                            <span>{item}</span>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -563,52 +507,28 @@ export function LandingPage() {
                                                 {[
                                                     // Recruitment Services
                                                     {
-                                                        title: "Recrutement Tech Express",
+                                                        title: "Dev Full-Stack",
                                                         duration: "1 semaine",
                                                         price: "2\u00A0900\u00A0€",
-                                                        description: "Assistance au recrutement de profils techniques avec évaluation experte des compétences.",
-                                                        deliverables: [
-                                                            "Grille d'évaluation technique",
-                                                            "Tests techniques personnalisés",
-                                                            "Conduite des entretiens",
-                                                            "Rapport d'évaluation"
-                                                        ]
+                                                        description: "Recrutement développeur Full-Stack (React, Node.js). Tests techniques et entretiens structurés inclus.",
                                                     },
                                                     {
-                                                        title: "Recrutement Tech Complet",
+                                                        title: "Équipe Data",
                                                         duration: "1 mois",
                                                         price: "5\u00A0000\u00A0€",
-                                                        description: "Service complet de recrutement technique, de la définition du poste à l'intégration du candidat.",
-                                                        deliverables: [
-                                                            "Définition du profil idéal",
-                                                            "Sourcing et présélection",
-                                                            "Évaluation technique approfondie",
-                                                            "Accompagnement à l'intégration"
-                                                        ]
+                                                        description: "Constitution d'une équipe Data de 3-4 personnes. Data Scientists et Data Engineers avec 3-5 ans d'expérience.",
                                                     },
                                                     {
-                                                        title: "Assessment Technique",
+                                                        title: "CTO Startup",
                                                         duration: "3 jours",
                                                         price: "3\u00A0200\u00A0€",
-                                                        description: "Évaluation approfondie des compétences techniques d'une équipe ou d'un candidat senior.",
-                                                        deliverables: [
-                                                            "Tests techniques avancés",
-                                                            "Entretiens approfondis",
-                                                            "Évaluation pratique",
-                                                            "Rapport détaillé"
-                                                        ]
+                                                        description: "Évaluation et recrutement de votre CTO. Idéal pour startup en Seed/Série A cherchant un profil expérimenté.",
                                                     },
                                                     {
-                                                        title: "Onboarding Tech",
+                                                        title: "Tech Lead",
                                                         duration: "2 semaines",
                                                         price: "4\u00A0500\u00A0€",
-                                                        description: "Programme d'intégration personnalisé pour les nouveaux talents techniques.",
-                                                        deliverables: [
-                                                            "Plan d'intégration",
-                                                            "Formation technique",
-                                                            "Mentorat personnalisé",
-                                                            "Suivi de progression"
-                                                        ]
+                                                        description: "Recrutement Tech Lead pour équipe de 5-8 développeurs. Focus architecture logicielle et leadership technique.",
                                                     }
                                                 ].map((pkg, index) => (
                                                     <div 
@@ -627,16 +547,6 @@ export function LandingPage() {
                                                                 </div>
                                                             </div>
                                                             <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
-                                                            <div className="mt-auto">
-                                                                <ul className="space-y-2">
-                                                                    {pkg.deliverables.map((item, i) => (
-                                                                        <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                                                                            <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                                            <span>{item}</span>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 ))}
