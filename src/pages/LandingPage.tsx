@@ -13,6 +13,16 @@ interface UseCase {
     prefillText: string;
 }
 
+interface ExpertCall {
+    icon: React.ReactNode;
+    title: string;
+    duration: string;
+    prefillText: string;
+    price?: string;
+    description?: string;
+    benefits?: string[];
+}
+
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
@@ -25,6 +35,12 @@ const stagger = {
             staggerChildren: 0.1
         }
     }
+};
+
+const springTransition = {
+    type: "spring",
+    stiffness: 350,
+    damping: 30
 };
 
 export function LandingPage() {
@@ -45,6 +61,8 @@ export function LandingPage() {
         previousAttempts: '',
         readyForAssessment: false
     });
+    const [searchQuery, setSearchQuery] = useState('');
+    const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -85,6 +103,139 @@ export function LandingPage() {
             title: "Autre sujet",
             description: "J'ai une autre problématique.",
             prefillText: ""
+        }
+    ];
+
+    const expertCalls: ExpertCall[] = [
+        {
+            icon: <Package2 className="h-6 w-6" />,
+            title: "Choisir un CRM",
+            duration: "1h",
+            price: "290€ HT",
+            description: "Un expert en solutions CRM vous aide à comparer et sélectionner la meilleure solution pour votre entreprise.",
+            benefits: [
+                "Analyse de vos besoins spécifiques",
+                "Comparaison des solutions du marché",
+                "Recommandations personnalisées"
+            ],
+            prefillText: "J'ai besoin d'aide pour choisir un CRM adapté à mon entreprise de 50 personnes."
+        },
+        {
+            icon: <Bot className="h-6 w-6" />,
+            title: "Automatiser le support client",
+            duration: "1h30",
+            price: "390€ HT",
+            description: "Optimisez votre service client grâce à l'IA. Un expert vous guide dans l'automatisation intelligente de vos processus.",
+            benefits: [
+                "Audit de vos processus actuels",
+                "Identification des opportunités d'automatisation",
+                "Plan d'implémentation détaillé"
+            ],
+            prefillText: "Je souhaite automatiser notre support client avec l'IA pour réduire le temps de réponse."
+        },
+        {
+            icon: <Users className="h-6 w-6" />,
+            title: "Recruter un CTO",
+            duration: "2h",
+            price: "490€ HT",
+            description: "Un expert en recrutement tech vous accompagne dans la définition du profil et la stratégie de recrutement de votre futur CTO.",
+            benefits: [
+                "Définition du profil idéal",
+                "Stratégie de sourcing",
+                "Grille d'évaluation technique"
+            ],
+            prefillText: "J'ai besoin d'aide pour recruter un CTO pour ma startup en série A."
+        },
+        {
+            icon: <Target className="h-6 w-6" />,
+            title: "Définir ma stratégie marketing",
+            duration: "1h30",
+            price: "390€ HT",
+            description: "Construisez une stratégie marketing efficace avec l'aide d'un expert qui analyse votre marché et vos objectifs.",
+            benefits: [
+                "Analyse de votre positionnement",
+                "Identification des canaux prioritaires",
+                "Plan d'action concret"
+            ],
+            prefillText: "Je cherche à définir ma stratégie marketing digital pour 2024."
+        },
+        {
+            icon: <Zap className="h-6 w-6" />,
+            title: "Optimiser mes process",
+            duration: "1h",
+            price: "290€ HT",
+            description: "Identifiez et éliminez les inefficacités dans vos processus avec l'aide d'un expert en optimisation opérationnelle.",
+            benefits: [
+                "Cartographie des processus",
+                "Identification des points de friction",
+                "Recommandations d'amélioration"
+            ],
+            prefillText: "Je veux optimiser les processus internes de mon entreprise."
+        },
+        {
+            icon: <Shield className="h-6 w-6" />,
+            title: "Audit sécurité",
+            duration: "2h",
+            price: "490€ HT",
+            description: "Évaluez la sécurité de votre infrastructure IT et identifiez les points d'amélioration avec un expert en cybersécurité.",
+            benefits: [
+                "Analyse des vulnérabilités",
+                "Évaluation des risques",
+                "Plan d'action prioritaire"
+            ],
+            prefillText: "J'aimerais faire un audit de sécurité de mon infrastructure IT."
+        },
+        {
+            icon: <Calendar className="h-6 w-6" />,
+            title: "Planifier ma levée de fonds",
+            duration: "1h30",
+            price: "390€ HT",
+            description: "Préparez votre levée de fonds avec un expert qui vous aide à structurer votre approche et maximiser vos chances de succès.",
+            benefits: [
+                "Évaluation de votre maturité",
+                "Stratégie de pitch",
+                "Planning détaillé"
+            ],
+            prefillText: "Je prépare une levée de fonds et j'ai besoin de conseils stratégiques."
+        },
+        {
+            icon: <MessageSquare className="h-6 w-6" />,
+            title: "Améliorer mes ventes",
+            duration: "1h",
+            price: "290€ HT",
+            description: "Boostez vos performances commerciales avec un expert qui analyse votre processus de vente et identifie les leviers de croissance.",
+            benefits: [
+                "Audit du tunnel de vente",
+                "Optimisation du closing",
+                "Techniques d'acquisition"
+            ],
+            prefillText: "Je cherche à améliorer la performance de mon équipe commerciale."
+        },
+        {
+            icon: <FileText className="h-6 w-6" />,
+            title: "Rédiger mon business plan",
+            duration: "2h",
+            price: "490€ HT",
+            description: "Structurez votre business plan avec l'aide d'un expert qui vous guide dans la construction d'un document convaincant.",
+            benefits: [
+                "Structure personnalisée",
+                "Analyse financière",
+                "Storytelling impactant"
+            ],
+            prefillText: "J'ai besoin d'aide pour structurer mon business plan."
+        },
+        {
+            icon: <Briefcase className="h-6 w-6" />,
+            title: "Développer à l'international",
+            duration: "1h30",
+            price: "390€ HT",
+            description: "Planifiez votre expansion internationale avec un expert qui vous aide à identifier les opportunités et éviter les pièges.",
+            benefits: [
+                "Analyse des marchés cibles",
+                "Stratégie d'entrée",
+                "Plan de déploiement"
+            ],
+            prefillText: "Je souhaite développer mon entreprise à l'international."
         }
     ];
 
@@ -195,33 +346,6 @@ export function LandingPage() {
         }`
     };
 
-    const whyChoose = [
-        {
-            icon: <Clock className="h-6 w-6" />,
-            title: "Rapide",
-            description: "Des sessions de conseil de 30 min à 2h pour répondre à vos questions spécifiques.",
-            metrics: "Réponses immédiates"
-        },
-        {
-            icon: <Briefcase className="h-6 w-6" />,
-            title: "Expert",
-            description: "Des consultants qui sont passés par là avant vous et peuvent partager leur expérience.",
-            metrics: "Expertise vérifiée"
-        },
-        {
-            icon: <Target className="h-6 w-6" />,
-            title: "Structuré",
-            description: "Un format Spark concentré sur une problématique précise, sans engagement.",
-            metrics: "Format optimisé"
-        },
-        {
-            icon: <CheckCircle className="h-6 w-6" />,
-            title: "Encadré",
-            description: "BrainSparks structure et garantit la qualité de chaque prestation.",
-            metrics: "Qualité garantie"
-        }
-    ];
-
     const howItWorks = [
         {
             icon: <MessageSquare className="h-6 w-6" />,
@@ -247,14 +371,14 @@ export function LandingPage() {
 
     const features = [
         {
-            title: "Les avantages du conseil externe",
-            description: "Profitez de l'expertise de consultants expérimentés sans les inconvénients habituels du conseil traditionnel.",
-            icon: <Briefcase className="h-6 w-6" />
-        },
-        {
-            title: "Format Spark optimisé",
+            title: "Format structuré ",
             description: "Un concentré de conseil pour répondre à une problématique précise, sans engagement et sans perte de temps.",
             icon: <Zap className="h-6 w-6" />
+        },
+        {
+            title: "Tarif défini",
+            description: "Pas de surprise, le tarif est annoncé avant le début de la session.",
+            icon: <Briefcase className="h-6 w-6" />
         },
         {
             title: "Qualité garantie",
@@ -268,38 +392,11 @@ export function LandingPage() {
         }
     ];
 
-    const clientReviews = [
-        {
-            name: "Thomas Martin",
-            role: "Directeur Commercial",
-            company: "TechVenture",
-            review: "Le format Spark est exactement ce dont j'avais besoin. En 1h, j'ai obtenu des réponses claires à mes questions sur notre stratégie commerciale.",
-            rating: 5,
-            image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5"
-        },
-        {
-            name: "Sophie Dubois",
-            role: "CEO",
-            company: "StartupFlow",
-            review: "L'accompagnement IA pour préparer la session était très utile. Le consultant était parfaitement préparé et le rapport post-session très détaillé.",
-            rating: 5,
-            image: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe"
-        },
-        {
-            name: "Marc Leroy",
-            role: "DRH",
-            company: "InnovCorp",
-            review: "Excellent rapport qualité-prix. J'apprécie particulièrement la transparence et la simplicité du processus.",
-            rating: 5,
-            image: "https://images.unsplash.com/photo-1560250097-0b93528c311a"
-        }
-    ];
-
     return (
         <div className="min-h-screen">
             {/* Animated Background */}
             <div className="fixed inset-0 -z-10 overflow-hidden">
-                <div 
+                <div
                     className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50"
                     style={{
                         backgroundImage: `
@@ -310,7 +407,7 @@ export function LandingPage() {
                         `
                     }}
                 />
-                <div 
+                <div
                     className="absolute inset-0 opacity-30"
                     style={{
                         transform: `translateY(${scrollY * 0.2}px)`,
@@ -326,30 +423,157 @@ export function LandingPage() {
             <div className="relative">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     {/* Hero Section */}
-                    <motion.div 
+                    <motion.div
                         className="text-center mb-16"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
                     >
                         <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
-                            Le conseil en un éclair
+                            Découvrez le Spark
                         </h1>
                         <p className="text-xl md:text-2xl mb-12 text-gray-600 max-w-3xl mx-auto">
-                            Les avantages du conseil externe, sans les inconvénients
+                            Un concentré de conseil : 30 min à 2h avec un expert.
                         </p>
 
                         {/* Use Case Form Section */}
                         <div className="max-w-4xl mx-auto">
                             <div className={`${showForm ? 'block' : 'hidden'}`}>
-                                <UseCaseForm
-                                    useCases={useCases}
-                                    problem={problem}
-                                    setProblem={setProblem}
-                                    handleSubmit={handleSubmit}
-                                    handleUseCaseClick={handleUseCaseClick}
-                                    handleKeyDown={handleKeyDown}
-                                />
+                                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-6xl mx-auto">
+                                    {expertCalls.map((call, index) => (
+                                        <motion.div
+                                            key={index}
+                                            layout
+                                            layoutTransition={springTransition}
+                                            variants={fadeInUp}
+                                            className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer
+                                                ${expandedCallIndex === index ? 'md:col-span-2 md:row-span-2' : ''}`}
+                                            onClick={() => {
+                                                if (expandedCallIndex === index) {
+                                                    return;
+                                                }
+                                                setExpandedCallIndex(expandedCallIndex === index ? null : index);
+                                            }}
+                                        >
+                                            <div className="p-6 h-full flex flex-col">
+                                                <div className="flex justify-between items-start w-full">
+                                                    <div className="p-2 bg-blue-50 rounded-lg w-fit mb-3">
+                                                        {React.cloneElement(call.icon as React.ReactElement, {
+                                                            className: "h-5 w-5 text-blue-600"
+                                                        })}
+                                                    </div>
+                                                    {expandedCallIndex !== index && (
+                                                        <div className="flex items-center gap-1 text-blue-600 text-sm text-left">
+                                                            <Clock className="h-4 w-4" />
+                                                            <span>{call.duration}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <h3 className="text-sm font-semibold text-gray-900 mb-2 text-left">
+                                                    {call.title}
+                                                </h3>
+
+                                                {expandedCallIndex === index ? (
+                                                    <motion.div
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        transition={{ duration: 0.2 }}
+                                                        className="flex flex-col flex-grow"
+                                                    >
+                                                        <p className="text-gray-600 text-sm mb-4 text-left">
+                                                            {call.description}
+                                                        </p>
+
+                                                        <div className="space-y-4 mb-4">
+                                                            <div className="flex items-center gap-2 text-gray-900 text-left">
+                                                                <Clock className="h-4 w-4 text-blue-600" />
+                                                                <span className="text-sm">{call.duration}</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 text-gray-900 text-left">
+                                                                <BadgeCheck className="h-4 w-4 text-blue-600" />
+                                                                <span className="text-sm">{call.price}</span>
+                                                            </div>
+                                                        </div>
+
+                                                        {call.benefits && (
+                                                            <div className="space-y-2 mb-6">
+                                                                {call.benefits.map((benefit, i) => (
+                                                                    <div key={i} className="flex items-start gap-2 text-left">
+                                                                        <CheckCircle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                                                                        <span className="text-sm text-gray-600">{benefit}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleUseCaseClick(call.prefillText);
+                                                                setExpandedCallIndex(null);
+                                                            }}
+                                                            className="mt-auto w-full bg-blue-600 text-white px-4 py-2 rounded-lg 
+                                                                     font-semibold hover:bg-blue-700 transition-colors flex items-center 
+                                                                     justify-center gap-2"
+                                                        >
+                                                            Choisir ce Spark
+                                                            <ArrowRight className="h-4 w-4" />
+                                                        </button>
+                                                    </motion.div>
+                                                ) : (
+                                                    <div className="mt-auto" />
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </div>
+
+                                <div className="mt-6 text-center flex flex-col items-center gap-4">
+                                    <div className="inline-flex items-center gap-2 text-gray-600 bg-gray-50 px-4 py-2 rounded-full">
+                                        <Plus className="h-4 w-4" />
+                                        <span className="text-sm">Et bien d'autres possibilités selon vos besoins</span>
+                                    </div>
+
+                                    <div className="relative w-full max-w-md flex gap-2">
+                                        <div className="relative flex-1">
+                                            <input
+                                                type="text"
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                placeholder="Décrivez votre problématique..."
+                                                className="w-full px-4 py-3 pl-10 bg-white rounded-lg border border-gray-200 
+                                                         focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+                                                         transition-all shadow-sm"
+                                            />
+                                            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                                                <svg
+                                                    className="h-5 w-5 text-gray-400"
+                                                    fill="none"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                </svg>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                                                       transition-colors duration-200 flex items-center justify-center
+                                                       shadow-sm"
+                                            onClick={() => {
+                                                // Add search functionality here
+                                                console.log('Search query:', searchQuery);
+                                            }}
+                                        >
+                                            Rechercher
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Chat Interface */}
@@ -392,7 +616,7 @@ export function LandingPage() {
                     </motion.div>
 
                     {/* Service Packages Section - Replace with Features Section */}
-                    <motion.div 
+                    <motion.div
                         className="mb-24"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
@@ -404,7 +628,7 @@ export function LandingPage() {
                                 Le Spark: un concentré de conseil
                             </h2>
                             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                                Une décision importante à prendre ? Un problème à régler ? Besoin de visibilité sur un sujet complexe ? 
+                                Une décision importante à prendre ? Un problème à régler ? Besoin de visibilité sur un sujet complexe ?
                                 Chaque module Spark vous permet de répondre à une problématique précise.
                             </p>
                         </div>
@@ -425,45 +649,8 @@ export function LandingPage() {
                         </div>
                     </motion.div>
 
-                    {/* Why Choose Section */}
-                    <motion.div 
-                        className="mb-24"
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <div className="text-center mb-16">
-                            <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Les avantages du conseil externe, sans les inconvénients
-                            </h2>
-                            <p className="text-xl text-gray-600">
-                                Obtenez les réponses que vous cherchez en une session de 30 min à 2h auprès d'un expert validé.
-                            </p>
-                        </div>
-                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {whyChoose.map((reason, index) => (
-                                <motion.div
-                                    key={index}
-                                    variants={fadeInUp}
-                                    className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02]"
-                                >
-                                    <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
-                                        {React.cloneElement(reason.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
-                                    </div>
-                                    <h3 className="text-xl font-semibold mb-2 text-gray-900">{reason.title}</h3>
-                                    <p className="text-gray-600 mb-4">{reason.description}</p>
-                                    <div className="flex items-center gap-2 text-blue-600">
-                                        <BadgeCheck className="h-5 w-5" />
-                                        <span className="text-sm font-medium">{reason.metrics}</span>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </motion.div>
-
                     {/* How it Works Section */}
-                    <motion.div 
+                    <motion.div
                         className="mb-24"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
@@ -496,7 +683,7 @@ export function LandingPage() {
                     </motion.div>
 
                     {/* Expertise Areas Section */}
-                    <motion.div 
+                    <motion.div
                         className="mb-24"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
@@ -528,54 +715,8 @@ export function LandingPage() {
                         </div>
                     </motion.div>
 
-                    {/* Client Reviews Section */}
-                    <motion.div 
-                        className="mb-24"
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <div className="text-center mb-16">
-                            <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Ce qu'en disent nos clients
-                            </h2>
-                            <p className="text-xl text-gray-600">
-                                Des résultats concrets et mesurables
-                            </p>
-                        </div>
-                        <div className="grid md:grid-cols-3 gap-8">
-                            {clientReviews.map((review, index) => (
-                                <motion.div
-                                    key={index}
-                                    variants={fadeInUp}
-                                    className="bg-white p-6 rounded-xl shadow-md"
-                                >
-                                    <div className="flex items-start gap-4 mb-4">
-                                        <img 
-                                            src={review.image} 
-                                            alt={review.name} 
-                                            className="w-16 h-16 rounded-full object-cover"
-                                        />
-                                        <div>
-                                            <h4 className="font-semibold text-gray-900">{review.name}</h4>
-                                            <p className="text-sm text-gray-600">{review.role}</p>
-                                            <p className="text-sm text-gray-600">{review.company}</p>
-                                        </div>
-                                    </div>
-                                    <p className="text-gray-600 mb-4">"{review.review}"</p>
-                                    <div className="flex">
-                                        {[...Array(review.rating)].map((_, i) => (
-                                            <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                                        ))}
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </motion.div>
-
                     {/* CTA Section */}
-                    <motion.div 
+                    <motion.div
                         className="text-center"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
@@ -588,7 +729,7 @@ export function LandingPage() {
                         <p className="text-xl text-gray-600 mb-8">
                             Décrivez votre problématique et trouvez l'expert qu'il vous faut
                         </p>
-                        <button 
+                        <button
                             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                             className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2 group"
                         >
@@ -631,6 +772,24 @@ export function LandingPage() {
                     overflow: hidden;
                 }
             `}</style>
+
+            <div className="hidden">
+                <textarea
+                    value={problem}
+                    onChange={(e) => setProblem(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Décrivez votre problématique..."
+                    className="w-full p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                    rows={4}
+                />
+                <button
+                    onClick={(e) => handleSubmit(e, problem)}
+                    className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2"
+                >
+                    Commencer
+                    <ArrowRight className="h-5 w-5" />
+                </button>
+            </div>
         </div>
     );
 }
