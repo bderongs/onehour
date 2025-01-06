@@ -6,13 +6,13 @@ export function Terms() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h1 className="text-3xl font-bold mb-8 text-gray-900">Termes et Conditions</h1>
                 <div className="prose prose-lg text-gray-600">
-                    <p>Bienvenue chez OneHour. Ces termes et conditions décrivent les règles et règlements pour l'utilisation de notre site web.</p>
+                    <p>Bienvenue chez BrainSparks. Ces termes et conditions décrivent les règles et règlements pour l'utilisation de notre site web.</p>
                     <h2>1. Introduction</h2>
-                    <p>En accédant à ce site web, nous supposons que vous acceptez ces termes et conditions. Ne continuez pas à utiliser OneHour si vous n'acceptez pas tous les termes et conditions énoncés sur cette page.</p>
+                    <p>En accédant à ce site web, nous supposons que vous acceptez ces termes et conditions. Ne continuez pas à utiliser BrainSparks si vous n'acceptez pas tous les termes et conditions énoncés sur cette page.</p>
                     <h2>2. Droits de Propriété Intellectuelle</h2>
-                    <p>Sauf indication contraire, OneHour et/ou ses concédants détiennent les droits de propriété intellectuelle pour tout le matériel sur OneHour. Tous les droits de propriété intellectuelle sont réservés. Vous pouvez accéder à cela depuis OneHour pour votre usage personnel soumis aux restrictions définies dans ces termes et conditions.</p>
+                    <p>Sauf indication contraire, BrainSparks et/ou ses concédants détiennent les droits de propriété intellectuelle pour tout le matériel sur BrainSparks. Tous les droits de propriété intellectuelle sont réservés. Vous pouvez accéder à cela depuis BrainSparks pour votre usage personnel soumis aux restrictions définies dans ces termes et conditions.</p>
                     <h2>3. Commentaires des Utilisateurs</h2>
-                    <p>Certaines parties de ce site web offrent aux utilisateurs la possibilité de publier et d'échanger des opinions et des informations dans certaines zones du site web. OneHour ne filtre pas, n'édite pas, ne publie pas et ne révise pas les Commentaires avant leur présence sur le site web. Les Commentaires ne reflètent pas les vues et opinions de OneHour, ses agents et/ou affiliés. Les Commentaires reflètent les vues et opinions de la personne qui publie ses vues et opinions.</p>
+                    <p>Certaines parties de ce site web offrent aux utilisateurs la possibilité de publier et d'échanger des opinions et des informations dans certaines zones du site web. BrainSparks ne filtre pas, n'édite pas, ne publie pas et ne révise pas les Commentaires avant leur présence sur le site web. Les Commentaires ne reflètent pas les vues et opinions de BrainSparks, ses agents et/ou affiliés. Les Commentaires reflètent les vues et opinions de la personne qui publie ses vues et opinions.</p>
                     <h2>4. Hyperliens vers notre Contenu</h2>
                     <p>Les organisations suivantes peuvent créer des liens vers notre site web sans approbation écrite préalable : agences gouvernementales, moteurs de recherche, organisations de presse, distributeurs d'annuaires en ligne, et entreprises accréditées à l'échelle du système.</p>
                     <h2>5. iFrames</h2>

@@ -88,7 +88,7 @@ export function PricingPage() {
             ],
             cta: 'Contacter les ventes',
             highlight: false,
-            action: () => { window.location.href = 'mailto:contact@onehour.consulting'; }
+            action: () => { window.location.href = 'mailto:contact@BrainSparks.io'; }
         }
     ];
 

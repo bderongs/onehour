@@ -65,7 +65,7 @@ export function Footer() {
           <div className={isSimplifiedFooter ? 'md:col-start-4' : ''}>
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <ul className="space-y-2">
-              <li className="text-gray-400">contact@onehour.consulting</li>
+              <li className="text-gray-400">contact@brainsparks.io</li>
               <li className="text-gray-400">01 23 45 67 89</li>
             </ul>
           </div>

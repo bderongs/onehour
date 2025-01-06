@@ -151,9 +151,9 @@ export function LandingPage() {
     const chatConfig = {
         initialMessage: {
             role: 'assistant' as const,
-            content: "Bonjour ! Je suis l'assistant virtuel de OneHour Consulting. Mon rôle est de vous aider à clarifier votre besoin avant de vous mettre en relation avec l'expert le plus pertinent. Plus je comprends précisément votre situation, plus nous pourrons vous proposer des solutions adaptées. Pouvez-vous me parler de votre projet ?"
+            content: "Bonjour ! Je suis l'assistant virtuel de BrainSparks. Mon rôle est de vous aider à clarifier votre besoin avant de vous mettre en relation avec l'expert le plus pertinent. Plus je comprends précisément votre situation, plus nous pourrons vous proposer des solutions adaptées. Pouvez-vous me parler de votre projet ?"
         },
-        systemPrompt: `You are OneHour Consulting's AI assistant.
+        systemPrompt: `You are BrainSparks Consulting's AI assistant.
             Your primary role is to help clarify the client's needs before matching them with the most relevant expert.
             Guide the conversation to gather comprehensive information that will help identify the best consultant.
             
@@ -173,7 +173,7 @@ export function LandingPage() {
 
             Do not suggest specific solutions - that's the expert's role.
             When you have gathered sufficient information, explain that you'll help match them with the most relevant expert. No need to suggest a meeting as this is taken care of in the next step.`,
-        title: "Assistant OneHour",
+        title: "Assistant BrainSparks",
         subtitle: "Je vous aide à trouver l'expert idéal",
         onConnect: handleConnect,
         submitMessage: "En soumettant ce formulaire, vous serez contacté par l'un de nos consultants experts dans les prochaines 24 heures.",
@@ -217,7 +217,7 @@ export function LandingPage() {
         {
             icon: <CheckCircle className="h-6 w-6" />,
             title: "Encadré",
-            description: "Brainsparks structure et garantit la qualité de chaque prestation.",
+            description: "BrainSparks structure et garantit la qualité de chaque prestation.",
             metrics: "Qualité garantie"
         }
     ];
@@ -505,7 +505,7 @@ export function LandingPage() {
                     >
                         <div className="text-center mb-16">
                             <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Pourquoi Brainsparks ?
+                                Pourquoi BrainSparks ?
                             </h2>
                             <p className="text-xl text-gray-600">
                                 Une nouvelle approche du conseil, simple et efficace
