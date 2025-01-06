@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Clock } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 export function Header() {
   const location = useLocation();
@@ -26,8 +26,11 @@ export function Header() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <Clock className="h-8 w-8 text-gray-900" />
-              <span className="ml-2 text-xl font-bold text-gray-900">OneHourConsulting</span>
+              <Sparkles className="h-8 w-8 text-blue-600" />
+              <div className="ml-2 text-xl font-bold">
+                <span className="text-gray-900">Brain</span>
+                <span className="text-blue-600">Sparks</span>
+              </div>
             </Link>
           </div>
 

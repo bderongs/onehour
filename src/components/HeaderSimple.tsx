@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Clock } from 'lucide-react';
+import { Flame } from 'lucide-react';
 
 export function HeaderSimple() {
   return (
@@ -9,8 +8,11 @@ export function HeaderSimple() {
         <div className="flex h-16">
           <div className="flex items-center">
             <a href="/" className="flex items-center">
-              <Clock className="h-8 w-8 text-indigo-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">OneHourConsulting</span>
+              <Flame className="h-8 w-8 text-blue-600" />
+              <div className="ml-2 text-xl font-bold">
+                <span className="text-gray-900">Brain</span>
+                <span className="text-blue-600">Sparks</span>
+              </div>
             </a>
           </div>
         </div>
