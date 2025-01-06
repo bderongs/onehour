@@ -37,12 +37,6 @@ const stagger = {
     }
 };
 
-const springTransition = {
-    type: "spring",
-    stiffness: 350,
-    damping: 30
-};
-
 export function LandingPage() {
     const navigate = useNavigate();
     const [problem, setProblem] = useState('');
@@ -371,23 +365,13 @@ export function LandingPage() {
 
     const features = [
         {
-            title: "Format structuré ",
-            description: "Un concentré de conseil pour répondre à une problématique précise, sans engagement et sans perte de temps.",
-            icon: <Zap className="h-6 w-6" />
-        },
-        {
-            title: "Tarif défini",
-            description: "Pas de surprise, le tarif est annoncé avant le début de la session.",
-            icon: <Briefcase className="h-6 w-6" />
-        },
-        {
-            title: "Qualité garantie",
-            description: "Chaque consultant est limité à 10 Sparks maximum, assurant une expertise pointue sur chaque sujet proposé.",
+            title: "BrainSparks encadre la prestation",
+            description: "BrainSparks va au-delà de la mise en relation, et structure les prestations proposées par nos consultants pour en garantir la pertinence et la qualité. Nos experts ne peuvent proposer que 10 Spark chacun au maximum, ce qui les force à ne proposer des prestations sur lesquelles ils sont réellement experts.",
             icon: <Shield className="h-6 w-6" />
         },
         {
-            title: "Gestion simplifiée",
-            description: "Pas de temps masqué ni de gestion commerciale complexe. Réservez votre session et commencez immédiatement.",
+            title: "BrainSparks s'occupe de la relation commerciale",
+            description: "Sélectionnez un Spark, détaillez votre contexte et réservez la session. La mission commence et s'arrête avec votre rendez-vous.",
             icon: <Calendar className="h-6 w-6" />
         }
     ];
@@ -444,7 +428,6 @@ export function LandingPage() {
                                         <motion.div
                                             key={index}
                                             layout
-                                            layoutTransition={springTransition}
                                             variants={fadeInUp}
                                             className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer
                                                 ${expandedCallIndex === index ? 'md:col-span-2 md:row-span-2' : ''}`}
@@ -698,7 +681,7 @@ export function LandingPage() {
                                 Une nouvelle approche du conseil, simple et efficace
                             </p>
                         </div>
-                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="grid md:grid-cols-2 gap-8">
                             {features.map((feature, index) => (
                                 <motion.div
                                     key={index}
@@ -706,10 +689,16 @@ export function LandingPage() {
                                     className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-md"
                                 >
                                     <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
-                                        {React.cloneElement(feature.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
+                                        {React.cloneElement(feature.icon as React.ReactElement, {
+                                            className: "h-6 w-6 text-blue-600"
+                                        })}
                                     </div>
-                                    <h3 className="text-xl font-semibold mb-2 text-gray-900">{feature.title}</h3>
-                                    <p className="text-gray-600">{feature.description}</p>
+                                    <h3 className="text-xl font-semibold mb-4 text-gray-900">
+                                        {feature.title}
+                                    </h3>
+                                    <p className="text-gray-600 leading-relaxed">
+                                        {feature.description}
+                                    </p>
                                 </motion.div>
                             ))}
                         </div>
