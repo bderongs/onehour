@@ -8,10 +8,10 @@ export function HeaderSimple() {
         <div className="flex h-16">
           <div className="flex items-center">
             <a href="/" className="flex items-center">
-              <Flame className="h-8 w-8 text-blue-600" />
+              <Flame className="h-8 w-8 text-indigo-400" />
               <div className="ml-2 text-xl font-bold">
                 <span className="text-gray-900">Brain</span>
-                <span className="text-blue-600">Sparks</span>
+                <span className="text-indigo-400">Sparks</span>
               </div>
             </a>
           </div>

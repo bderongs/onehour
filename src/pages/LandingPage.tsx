@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote, Sparkles, ArrowRight, BadgeCheck } from 'lucide-react';
+import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote, Sparkles, ArrowRight, BadgeCheck, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
@@ -198,98 +198,98 @@ export function LandingPage() {
     const whyChoose = [
         {
             icon: <Clock className="h-6 w-6" />,
-            title: "Efficace",
-            description: "Des solutions concrètes et actionnables, de 30 minutes à plusieurs jours selon vos besoins.",
-            metrics: "95% de satisfaction client"
+            title: "Rapide",
+            description: "Des sessions de conseil de 30 min à 2h pour répondre à vos questions spécifiques.",
+            metrics: "Réponses immédiates"
         },
         {
             icon: <Briefcase className="h-6 w-6" />,
-            title: "Professionnel",
-            description: "Des experts sélectionnés avec plus de 10 ans d'expérience.",
-            metrics: "Top 5% des consultants"
+            title: "Expert",
+            description: "Des consultants qui sont passés par là avant vous et peuvent partager leur expérience.",
+            metrics: "Expertise vérifiée"
         },
         {
             icon: <Target className="h-6 w-6" />,
-            title: "Simple",
-            description: "Des missions packagées avec un prix affiché, sans devis ni négociation.",
-            metrics: "Prix transparent"
+            title: "Structuré",
+            description: "Un format Spark concentré sur une problématique précise, sans engagement.",
+            metrics: "Format optimisé"
         },
         {
             icon: <CheckCircle className="h-6 w-6" />,
-            title: "Innovant",
-            description: "IA de qualification et matching expert automatisé.",
-            metrics: "Réponse en 24h"
+            title: "Encadré",
+            description: "Brainsparks structure et garantit la qualité de chaque prestation.",
+            metrics: "Qualité garantie"
         }
     ];
 
     const howItWorks = [
         {
             icon: <MessageSquare className="h-6 w-6" />,
-            title: "Décrivez votre besoin",
-            description: "Notre IA qualifie votre demande et identifie vos enjeux clés."
+            title: "Choisissez votre Spark",
+            description: "Sélectionnez le module qui correspond à votre problématique."
         },
         {
-            icon: <Calendar className="h-6 w-6" />,
-            title: "Matching expert",
-            description: "Nous vous mettons en relation avec l'expert le plus pertinent."
+            icon: <Bot className="h-6 w-6" />,
+            title: "Brief IA",
+            description: "Notre IA vous aide à structurer votre brief pour optimiser la session."
         },
         {
-            icon: <Zap className="h-6 w-6" />,
-            title: "Session de conseil",
-            description: "Une session de conseil adaptée à vos besoins pour des solutions concrètes."
+            icon: <Users className="h-6 w-6" />,
+            title: "Session Expert",
+            description: "Échangez en direct avec le consultant pour obtenir des réponses concrètes."
         },
         {
-            icon: <CheckCircle className="h-6 w-6" />,
-            title: "Suivi & Support",
-            description: "Accompagnement dans la mise en œuvre des recommandations."
+            icon: <FileText className="h-6 w-6" />,
+            title: "Rapport",
+            description: "Recevez un rapport détaillé prêt à partager avec vos équipes."
         }
     ];
 
-    const expertiseAreas = [
+    const features = [
         {
-            title: "Transformation Digitale",
-            description: "Stratégie digitale, innovation produit, conduite du changement",
+            title: "Les avantages du conseil externe",
+            description: "Profitez de l'expertise de consultants expérimentés sans les inconvénients habituels du conseil traditionnel.",
+            icon: <Briefcase className="h-6 w-6" />
+        },
+        {
+            title: "Format Spark optimisé",
+            description: "Un concentré de conseil pour répondre à une problématique précise, sans engagement et sans perte de temps.",
             icon: <Zap className="h-6 w-6" />
         },
         {
-            title: "Management & Organisation",
-            description: "Agilité, leadership, excellence opérationnelle",
-            icon: <Users className="h-6 w-6" />
+            title: "Qualité garantie",
+            description: "Chaque consultant est limité à 10 Sparks maximum, assurant une expertise pointue sur chaque sujet proposé.",
+            icon: <Shield className="h-6 w-6" />
         },
         {
-            title: "Technologie & Data",
-            description: "Architecture IT, data science, cybersécurité",
-            icon: <Bot className="h-6 w-6" />
-        },
-        {
-            title: "Innovation & Stratégie",
-            description: "Business model, R&D, go-to-market",
-            icon: <Target className="h-6 w-6" />
+            title: "Gestion simplifiée",
+            description: "Pas de temps masqué ni de gestion commerciale complexe. Réservez votre session et commencez immédiatement.",
+            icon: <Calendar className="h-6 w-6" />
         }
     ];
 
     const clientReviews = [
         {
-            name: "Pascal Dubois",
-            role: "CTO",
-            company: "TechCorp",
-            review: "Service exceptionnel ! J'ai pu résoudre mon problème en une heure seulement. L'expert était très compétent et a parfaitement compris nos besoins.",
+            name: "Thomas Martin",
+            role: "Directeur Commercial",
+            company: "TechVenture",
+            review: "Le format Spark est exactement ce dont j'avais besoin. En 1h, j'ai obtenu des réponses claires à mes questions sur notre stratégie commerciale.",
             rating: 5,
             image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5"
         },
         {
-            name: "Marie Jarry",
-            role: "Directrice Innovation",
-            company: "ScienceLab",
-            review: "Les experts sont très professionnels et à l'écoute. Je recommande vivement. La qualité des conseils a dépassé mes attentes.",
+            name: "Sophie Dubois",
+            role: "CEO",
+            company: "StartupFlow",
+            review: "L'accompagnement IA pour préparer la session était très utile. Le consultant était parfaitement préparé et le rapport post-session très détaillé.",
             rating: 5,
             image: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe"
         },
         {
-            name: "Albert Dapas",
-            role: "CEO",
-            company: "FutureTech",
-            review: "Une solution rapide et efficace. Très satisfait du service. L'accompagnement était personnalisé et pertinent.",
+            name: "Marc Leroy",
+            role: "DRH",
+            company: "InnovCorp",
+            review: "Excellent rapport qualité-prix. J'apprécie particulièrement la transparence et la simplicité du processus.",
             rating: 5,
             image: "https://images.unsplash.com/photo-1560250097-0b93528c311a"
         }
@@ -333,12 +333,10 @@ export function LandingPage() {
                         transition={{ duration: 0.6 }}
                     >
                         <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
-                            La boutique du consulting
+                            Le conseil en un éclair
                         </h1>
                         <p className="text-xl md:text-2xl mb-12 text-gray-600 max-w-3xl mx-auto">
-                            Décrivez votre problème et trouvez le service et l'expert qu'il vous faut.
-                            <br/>
-                            On garantit la qualité de la prestation.
+                            Les avantages du conseil externe, sans les inconvénients
                         </p>
 
                         {/* Use Case Form Section */}
@@ -393,7 +391,7 @@ export function LandingPage() {
                         </div>
                     </motion.div>
 
-                    {/* Service Packages Carousel */}
+                    {/* Service Packages Section - Replace with Features Section */}
                     <motion.div 
                         className="mb-24"
                         initial={{ opacity: 0 }}
@@ -401,203 +399,30 @@ export function LandingPage() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.5 }}
                     >
-                        <div className="text-center mb-8">
+                        <div className="text-center mb-16">
                             <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Nos services
+                                Le Spark: un concentré de conseil
                             </h2>
-                            <p className="text-xl text-gray-600 mb-2">
-                                Des solutions packagées pour tous vos besoins
+                            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                                Une décision importante à prendre ? Un problème à régler ? Besoin de visibilité sur un sujet complexe ? 
+                                Chaque module Spark vous permet de répondre à une problématique précise.
                             </p>
                         </div>
-                        <div className="max-w-7xl mx-auto select-none">
-                            {/* First Row: Software & AI */}
-                            <div className="overflow-hidden">
-                                <div className="relative px-2 py-2">
-                                    <div className="animate-scroll-right flex gap-6">
-                                        {/* Duplicate the cards for seamless scrolling */}
-                                        {[...Array(2)].map((_, arrayIndex) => (
-                                            <div key={arrayIndex} className="flex gap-6 animate-scroll">
-                                                {[
-                                                    // Software Selection Services
-                                                    {
-                                                        title: "Sélection CRM",
-                                                        duration: "1 journée",
-                                                        price: "1\u00A0200\u00A0€",
-                                                        description: "Choix d'un CRM adapté à votre équipe commerciale de 5-20 personnes. Comparaison Salesforce, HubSpot, Pipedrive.",
-                                                    },
-                                                    {
-                                                        title: "Choix ERP PME",
-                                                        duration: "2 semaines",
-                                                        price: "4\u00A0800\u00A0€",
-                                                        description: "Sélection d'un ERP pour PME de 50-200 employés. Analyse Sage, SAP Business One, Microsoft Dynamics.",
-                                                    },
-                                                    {
-                                                        title: "Migration Cloud",
-                                                        duration: "3 semaines",
-                                                        price: "6\u00A0500\u00A0€",
-                                                        description: "Migration de vos serveurs vers le cloud. Choix entre AWS, Azure, GCP selon vos contraintes techniques et budgétaires.",
-                                                    },
-                                                    {
-                                                        title: "Outils Collaboratifs",
-                                                        duration: "1 semaine",
-                                                        price: "2\u00A0800\u00A0€",
-                                                        description: "Mise en place d'outils collaboratifs pour équipe hybride. Microsoft 365 vs Google Workspace vs alternatives.",
-                                                    },
-                                                    // AI Services
-                                                    {
-                                                        title: "Automatisation RH",
-                                                        duration: "2 jours",
-                                                        price: "2\u00A0400\u00A0€",
-                                                        description: "Automatisation du tri de CV et présélection des candidats avec l'IA. Réduction de 70% du temps de recrutement.",
-                                                    },
-                                                    {
-                                                        title: "IA Service Client",
-                                                        duration: "3 semaines",
-                                                        price: "7\u00A0500\u00A0€",
-                                                        description: "Chatbot IA pour votre service client. Traitement automatique de 40% des demandes clients 24/7.",
-                                                    },
-                                                    {
-                                                        title: "GPT sur mesure",
-                                                        duration: "2 semaines",
-                                                        price: "5\u00A0200\u00A0€",
-                                                        description: "Création d'un assistant GPT personnalisé pour votre métier. Formation sur vos données et documents internes.",
-                                                    },
-                                                    {
-                                                        title: "IA Analyse Data",
-                                                        duration: "4 semaines",
-                                                        price: "8\u00A0900\u00A0€",
-                                                        description: "Analyse prédictive de vos données clients. Prévision des ventes et détection des opportunités commerciales.",
-                                                    }
-                                                ].map((pkg, index) => (
-                                                    <div 
-                                                        key={index}
-                                                        className="flex flex-col bg-white/80 backdrop-blur-sm rounded-xl shadow-md w-80 flex-shrink-0 
-                                                        border border-gray-100
-                                                        transform-gpu relative
-                                                        before:absolute before:inset-0 before:z-[-1] before:bg-gradient-to-br before:from-blue-50/50 before:to-indigo-50/50 before:rounded-xl"
-                                                    >
-                                                        <div className="p-6 flex flex-col h-full">
-                                                            <div className="flex justify-between items-start mb-4">
-                                                                <div>
-                                                                    <h4 className="text-lg font-semibold text-gray-900">{pkg.title}</h4>
-                                                                    <p className="text-sm text-gray-500">{pkg.duration}</p>
-                                                                    <div className="text-sm font-bold text-gray-900 mt-1">{pkg.price}</div>
-                                                                </div>
-                                                            </div>
-                                                            <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ))}
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                            {features.map((feature, index) => (
+                                <motion.div
+                                    key={index}
+                                    variants={fadeInUp}
+                                    className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-md"
+                                >
+                                    <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
+                                        {React.cloneElement(feature.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
                                     </div>
-                                    {/* Add gradient overlays */}
-                                    <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#f8fafc] to-transparent pointer-events-none z-10"></div>
-                                    <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#f8fafc] to-transparent pointer-events-none z-10"></div>
-                                </div>
-                            </div>
-
-                            {/* Second Row: Recruitment */}
-                            <div className="overflow-hidden">
-                                <div className="relative px-4 py-4">
-                                    <div className="animate-scroll-left flex gap-6">
-                                        {/* Duplicate the cards for seamless scrolling */}
-                                        {[...Array(2)].map((_, arrayIndex) => (
-                                            <div key={arrayIndex} className="flex gap-6 animate-scroll">
-                                                {[
-                                                    // Recruitment Services
-                                                    {
-                                                        title: "Dev Full-Stack",
-                                                        duration: "1 semaine",
-                                                        price: "2\u00A0900\u00A0€",
-                                                        description: "Recrutement développeur Full-Stack (React, Node.js). Tests techniques et entretiens structurés inclus.",
-                                                    },
-                                                    {
-                                                        title: "Équipe Data",
-                                                        duration: "1 mois",
-                                                        price: "5\u00A0000\u00A0€",
-                                                        description: "Constitution d'une équipe Data de 3-4 personnes. Data Scientists et Data Engineers avec 3-5 ans d'expérience.",
-                                                    },
-                                                    {
-                                                        title: "CTO Startup",
-                                                        duration: "3 jours",
-                                                        price: "3\u00A0200\u00A0€",
-                                                        description: "Évaluation et recrutement de votre CTO. Idéal pour startup en Seed/Série A cherchant un profil expérimenté.",
-                                                    },
-                                                    {
-                                                        title: "Tech Lead",
-                                                        duration: "2 semaines",
-                                                        price: "4\u00A0500\u00A0€",
-                                                        description: "Recrutement Tech Lead pour équipe de 5-8 développeurs. Focus architecture logicielle et leadership technique.",
-                                                    }
-                                                ].map((pkg, index) => (
-                                                    <div 
-                                                        key={index}
-                                                        className="flex flex-col bg-white/80 backdrop-blur-sm rounded-xl shadow-md w-80 flex-shrink-0 
-                                                        border border-gray-100
-                                                        transform-gpu relative
-                                                        before:absolute before:inset-0 before:z-[-1] before:bg-gradient-to-br before:from-blue-50/50 before:to-indigo-50/50 before:rounded-xl"
-                                                    >
-                                                        <div className="p-6 flex flex-col h-full">
-                                                            <div className="flex justify-between items-start mb-4">
-                                                                <div>
-                                                                    <h4 className="text-lg font-semibold text-gray-900">{pkg.title}</h4>
-                                                                    <p className="text-sm text-gray-500">{pkg.duration}</p>
-                                                                    <div className="text-sm font-bold text-gray-900 mt-1">{pkg.price}</div>
-                                                                </div>
-                                                            </div>
-                                                            <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {/* Add gradient overlays */}
-                                    <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#f8fafc] to-transparent pointer-events-none z-10"></div>
-                                    <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#f8fafc] to-transparent pointer-events-none z-10"></div>
-                                </div>
-                            </div>
+                                    <h3 className="text-xl font-semibold mb-2 text-gray-900">{feature.title}</h3>
+                                    <p className="text-gray-600">{feature.description}</p>
+                                </motion.div>
+                            ))}
                         </div>
-
-                        <style>{`
-                            @keyframes scroll-right {
-                                0% {
-                                    transform: translateX(0);
-                                }
-                                50% {
-                                    transform: translateX(-25%);
-                                }
-                                100% {
-                                    transform: translateX(0);
-                                }
-                            }
-
-                            @keyframes scroll-left {
-                                0% {
-                                    transform: translateX(-25%);
-                                }
-                                50% {
-                                    transform: translateX(0);
-                                }
-                                100% {
-                                    transform: translateX(-25%);
-                                }
-                            }
-
-                            .animate-scroll-right {
-                                animation: scroll-right 80s linear infinite;
-                            }
-
-                            .animate-scroll-left {
-                                animation: scroll-left 80s linear infinite;
-                            }
-
-                            .animate-scroll-right:hover,
-                            .animate-scroll-left:hover {
-                                animation-play-state: paused;
-                            }
-                        `}</style>
                     </motion.div>
 
                     {/* Why Choose Section */}
@@ -610,10 +435,10 @@ export function LandingPage() {
                     >
                         <div className="text-center mb-16">
                             <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Pourquoi OneHour ?
+                                Les avantages du conseil externe, sans les inconvénients
                             </h2>
                             <p className="text-xl text-gray-600">
-                                Une nouvelle approche du conseil, simple et efficace
+                                Obtenez les réponses que vous cherchez en une session de 30 min à 2h auprès d'un expert validé.
                             </p>
                         </div>
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -680,24 +505,24 @@ export function LandingPage() {
                     >
                         <div className="text-center mb-16">
                             <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Nos domaines d'expertise
+                                Pourquoi Brainsparks ?
                             </h2>
                             <p className="text-xl text-gray-600">
-                                Des experts spécialisés pour chaque problématique
+                                Une nouvelle approche du conseil, simple et efficace
                             </p>
                         </div>
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {expertiseAreas.map((area, index) => (
+                            {features.map((feature, index) => (
                                 <motion.div
                                     key={index}
                                     variants={fadeInUp}
                                     className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-md"
                                 >
                                     <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
-                                        {React.cloneElement(area.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
+                                        {React.cloneElement(feature.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
                                     </div>
-                                    <h3 className="text-xl font-semibold mb-2 text-gray-900">{area.title}</h3>
-                                    <p className="text-gray-600">{area.description}</p>
+                                    <h3 className="text-xl font-semibold mb-2 text-gray-900">{feature.title}</h3>
+                                    <p className="text-gray-600">{feature.description}</p>
                                 </motion.div>
                             ))}
                         </div>

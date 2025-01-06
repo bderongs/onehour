@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 const scrollToSection = (sectionId: string) => {
@@ -19,8 +19,11 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center mb-4">
-              <Clock className="h-8 w-8 text-indigo-400" />
-              <span className="ml-2 text-xl font-bold">OneHourConsulting</span>
+              <Sparkles className="h-8 w-8 text-indigo-400" />
+              <span className="ml-2 text-xl font-bold">
+                <span className="text-white">Brain</span>
+                <span className="text-indigo-400">Sparks</span>
+              </span>
             </div>
             <p className="text-gray-400">
               Le concentré de conseil expertise
@@ -69,7 +72,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} OneHourConsulting. Tous droits réservés.</p>
+          <p>&copy; {new Date().getFullYear()} BrainSparks. Tous droits réservés.</p>
         </div>
       </div>
     </footer>
