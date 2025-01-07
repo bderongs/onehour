@@ -42,7 +42,7 @@ export function BrandName({ className = '', color = 'indigo-900', size = 'md' }:
 
   return (
     <div className={`flex items-center justify-center gap-2 ${className}`}>
-      <Logo className={`${logoSizes[size]} ${colorClass}`} />
+      <Logo className={`${logoSizes[size]}`} color={color} />
       <span className={`font-semibold ${sizes[size]} ${colorClass} leading-none`}>
         Sparkier
       </span>

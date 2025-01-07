@@ -26,13 +26,13 @@ export function BrandPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Logo</h2>
             <div className="space-y-8">
               <div>
-                <h3 className="text-lg font-semibold mb-6">Version Standard</h3>
+                <h3 className="text-lg font-semibold mb-6">Version standard</h3>
                 <div className="bg-white border border-gray-200 rounded-lg p-12 flex items-center justify-center">
                   <BrandName size="lg" color="indigo-900" />
                 </div>
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-6">Symbol Seul</h3>
+                <h3 className="text-lg font-semibold mb-6">Symbole seul</h3>
                 <div className="bg-white border border-gray-200 rounded-lg p-12 flex items-center justify-center">
                   <Logo className="h-48 w-48" color="#3730A3" />
                 </div>
