@@ -34,10 +34,16 @@ export function BrandName({ className = '', color = 'indigo-900', size = 'md' }:
     lg: 'h-16 w-16'
   };
 
+  const getColorClass = (color: TailwindColor) => {
+    return `text-${color}`;
+  };
+
+  const colorClass = getColorClass(color);
+
   return (
     <div className={`flex items-center justify-center gap-2 ${className}`}>
-      <Logo className={`${logoSizes[size]} text-${color}`} />
-      <span className={`font-semibold ${sizes[size]} text-${color} leading-none`}>
+      <Logo className={`${logoSizes[size]} ${colorClass}`} />
+      <span className={`font-semibold ${sizes[size]} ${colorClass} leading-none`}>
         Sparkier
       </span>
     </div>
