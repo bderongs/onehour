@@ -10,8 +10,8 @@ export function LightFooter() {
                     <div className="flex items-center">
                         <Sparkles className="h-8 w-8 text-blue-600" />
                         <span className="ml-2 text-xl font-bold">
-                            <span className="text-gray-900">Brain</span>
-                            <span className="text-blue-600">Sparks</span>
+                            <span className="text-gray-900">Spark</span>
+                            <span className="text-blue-600">ier</span>
                         </span>
                     </div>
                     <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">

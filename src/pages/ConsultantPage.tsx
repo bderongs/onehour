@@ -50,12 +50,12 @@ const ConsultantPage = () => {
     const features = [
         {
             title: "Dédié au conseil en stratégie",
-            description: "Contrairement aux plateformes de freelancing low cost, BrainSparks vous permet de renvoyer une image professionnelle, structurée autour de votre offre de conseil en stratégie.",
+            description: "Contrairement aux plateformes de freelancing low cost, Sparkier vous permet de renvoyer une image professionnelle, structurée autour de votre offre de conseil en stratégie.",
             icon: <Target className="h-6 w-6" />
         },
         {
             title: "Des clients qualifiés",
-            description: "BrainSparks vous assure des clients qualifiés, qui viennent uniquement chercher des prestations de conseil en stratégie. Le tarif minimum d'un Spark est de 500€ pour 30 minutes.",
+            description: "Sparkier vous assure des clients qualifiés, qui viennent uniquement chercher des prestations de conseil en stratégie. Le tarif minimum d'un Spark est de 500€ pour 30 minutes.",
             icon: <Users className="h-6 w-6" />
         },
         {
@@ -88,7 +88,7 @@ const ConsultantPage = () => {
         },
         {
             title: "Restez à l'écoute du marché",
-            description: "Les fins de mission peuvent arriver soudainement et vous couter très cher, si vous n'avez pas pris le temps de garder une base commerciale active. Brainsparks vous permet de cumuler vos missions longues avec des sessions de conseil très courtes, sans perdre de temps à faire du commerce, ce qui vous permet de flux continu d'opportunitées pour des missions plus longues.",
+            description: "Les fins de mission peuvent arriver soudainement et vous couter très cher, si vous n'avez pas pris le temps de garder une base commerciale active. Sparkier vous permet de cumuler vos missions longues avec des sessions de conseil très courtes, sans perdre de temps à faire du commerce, ce qui vous permet de flux continu d'opportunitées pour des missions plus longues.",
             icon: <BarChart className="h-6 w-6" />
         }
     ];
@@ -202,7 +202,7 @@ const ConsultantPage = () => {
                 <div className="mb-16">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                            Pourquoi BrainSparks ?
+                            Pourquoi Sparkier ?
                         </h2>
                     </div>
 

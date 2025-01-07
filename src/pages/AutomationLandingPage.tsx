@@ -266,7 +266,7 @@ export function AutomationLandingPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                            Pourquoi BrainSparks ?
+                            Pourquoi Sparkier ?
                         </h2>
                         <p className="text-xl text-gray-600">
                             Obtenez les conseils dont vous avez besoin, quand vous en avez besoin.

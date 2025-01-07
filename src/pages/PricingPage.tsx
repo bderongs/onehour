@@ -40,7 +40,7 @@ export function PricingPage() {
             name: 'Starter',
             price: '0€',
             period: '/mois',
-            description: 'Parfait pour démarrer et tester la plateforme',
+            description: 'Idéal pour découvrir Sparkier et lancer votre activité',
             features: [
                 'Page de profil basique',
                 'Assistant IA de qualification (100 messages/mois)',
@@ -56,7 +56,7 @@ export function PricingPage() {
             name: 'Pro',
             price: '49€',
             period: '/mois',
-            description: 'Pour les consultants qui veulent développer leur activité',
+            description: 'Pour les consultants qui veulent accélérer leur croissance',
             features: [
                 'Page de profil personnalisée',
                 'Assistant IA illimité',
@@ -75,7 +75,7 @@ export function PricingPage() {
             name: 'Enterprise',
             price: '199€',
             period: '/mois',
-            description: 'Pour les cabinets de conseil et les équipes',
+            description: 'Solution complète pour les cabinets de conseil',
             features: [
                 'Tout ce qui est inclus dans Pro',
                 'Pages de profil pour 5 consultants',
@@ -88,7 +88,7 @@ export function PricingPage() {
             ],
             cta: 'Contacter les ventes',
             highlight: false,
-            action: () => { window.location.href = 'mailto:contact@BrainSparks.io'; }
+            action: () => { window.location.href = 'mailto:contact@sparkier.io'; }
         }
     ];
 
@@ -98,10 +98,10 @@ export function PricingPage() {
                 {/* Header */}
                 <div className="text-center mb-16">
                     <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                        Des prix simples et transparents
+                        Développez votre activité avec Sparkier
                     </h1>
                     <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                        Choisissez le plan qui correspond à vos besoins. Commencez gratuitement et évoluez à votre rythme.
+                        Des tarifs transparents pour vous accompagner à chaque étape de votre croissance.
                     </p>
                 </div>
 
@@ -179,18 +179,18 @@ export function PricingPage() {
                 <div id="signup-form" className="max-w-2xl mx-auto mt-24">
                     <div className="text-center mb-8">
                         <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                            Créez votre profil maintenant
+                            Rejoignez Sparkier
                         </h2>
                         <p className="text-gray-600">
-                            Commencez gratuitement et développez votre activité de conseil
+                            Créez votre profil et commencez à développer votre activité
                         </p>
                     </div>
 
                     {isSubmitted ? (
                         <div className="bg-green-50 text-green-800 p-6 rounded-xl text-center">
                             <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-600" />
-                            <h3 className="text-xl font-semibold mb-2">Merci pour votre inscription !</h3>
-                            <p>Notre équipe va vous contacter dans les 24h pour finaliser la création de votre profil et vous accompagner dans la prise en main de la plateforme.</p>
+                            <h3 className="text-xl font-semibold mb-2">Bienvenue chez Sparkier !</h3>
+                            <p>Notre équipe vous contactera dans les 24h pour finaliser votre profil et vous accompagner dans la prise en main de la plateforme.</p>
                         </div>
                     ) : (
                         <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-md">

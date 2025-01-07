@@ -10,7 +10,7 @@ export function Header() {
   const navigation = [
     { name: 'Le Spark', href: '#spark' },
     { name: 'Comment ça Marche', href: '#how-it-works' },
-    { name: 'Pourquoi Brainsparks', href: '#why-brainsparks' },
+    { name: 'Pourquoi Sparkier', href: '#why-sparkier' },
 
   ];
 
@@ -29,8 +29,8 @@ export function Header() {
             <Link to="/" className="flex items-center">
               <Sparkles className="h-8 w-8 text-indigo-600" />
               <div className="ml-2 text-xl font-bold">
-                <span className="text-gray-900">Brain</span>
-                <span className="text-indigo-600">Sparks</span>
+                <span className="text-gray-900">Spark</span>
+                <span className="text-indigo-600">ier</span>
               </div>
             </Link>
           </div>

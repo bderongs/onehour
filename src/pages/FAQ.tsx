@@ -12,8 +12,8 @@ export function FAQ() {
 
     const faqs: FAQItem[] = [
         {
-            question: "Qu'est-ce que BrainSparks ?",
-            answer: "BrainSparks est un service de micro-consulting qui vous met en relation avec des experts qualifiés pour des sessions de conseil d'une heure. Notre plateforme permet de résoudre rapidement vos problématiques professionnelles avec l'aide d'experts triés sur le volet."
+            question: "Qu'est-ce que Sparkier ?",
+            answer: "Sparkier est un service de micro-consulting qui vous met en relation avec des experts qualifiés pour des sessions de conseil d'une heure. Notre plateforme permet de résoudre rapidement vos problématiques professionnelles avec l'aide d'experts triés sur le volet."
         },
         {
             question: "Comment fonctionne le service ?",
@@ -87,7 +87,7 @@ export function FAQ() {
                         Questions Fréquentes
                     </h1>
                     <p className="text-xl text-gray-600">
-                        Tout ce que vous devez savoir sur BrainSparks
+                        Tout ce que vous devez savoir sur Sparkier
                     </p>
                 </div>
 
@@ -115,7 +115,7 @@ export function FAQ() {
                     </p>
                     <p className="mt-2">
                         <a
-                            href="mailto:contact@BrainSparks.io"
+                            href="mailto:contact@sparkier.io"
                             className="text-indigo-600 hover:text-indigo-700 font-semibold"
                         >
                             Contactez-nous

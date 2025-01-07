@@ -21,8 +21,8 @@ export function Footer() {
             <div className="flex items-center mb-4">
               <Sparkles className="h-8 w-8 text-indigo-400" />
               <span className="ml-2 text-xl font-bold">
-                <span className="text-white">Brain</span>
-                <span className="text-indigo-400">Sparks</span>
+                <span className="text-white">Spark</span>
+                <span className="text-indigo-400">ier</span>
               </span>
             </div>
             <p className="text-gray-400">
@@ -65,14 +65,14 @@ export function Footer() {
           <div className={isSimplifiedFooter ? 'md:col-start-4' : ''}>
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <ul className="space-y-2">
-              <li className="text-gray-400">contact@brainsparks.io</li>
+              <li className="text-gray-400">contact@sparkier.io</li>
               <li className="text-gray-400">01 23 45 67 89</li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} BrainSparks. Tous droits réservés.</p>
+          <p>&copy; {new Date().getFullYear()} Sparkier. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

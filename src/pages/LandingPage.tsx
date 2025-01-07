@@ -302,9 +302,9 @@ export function LandingPage() {
     const chatConfig = {
         initialMessage: {
             role: 'assistant' as const,
-            content: "Bonjour ! Je suis l'assistant virtuel de BrainSparks. Mon rôle est de vous aider à clarifier votre besoin avant de vous mettre en relation avec l'expert le plus pertinent. Plus je comprends précisément votre situation, plus nous pourrons vous proposer des solutions adaptées. Pouvez-vous me parler de votre projet ?"
+            content: "Bonjour ! Je suis l'assistant virtuel de Sparkier. Mon rôle est de vous aider à clarifier votre besoin avant de vous mettre en relation avec l'expert le plus pertinent. Plus je comprends précisément votre situation, plus nous pourrons vous proposer des solutions adaptées. Pouvez-vous me parler de votre projet ?"
         },
-        systemPrompt: `You are BrainSparks Consulting's AI assistant.
+        systemPrompt: `You are Sparkier Consulting's AI assistant.
             Your primary role is to help clarify the client's needs before matching them with the most relevant expert.
             Guide the conversation to gather comprehensive information that will help identify the best consultant.
             
@@ -324,7 +324,7 @@ export function LandingPage() {
 
             Do not suggest specific solutions - that's the expert's role.
             When you have gathered sufficient information, explain that you'll help match them with the most relevant expert. No need to suggest a meeting as this is taken care of in the next step.`,
-        title: "Assistant BrainSparks",
+        title: "Assistant Sparkier",
         subtitle: "Je vous aide à trouver l'expert idéal",
         onConnect: handleConnect,
         submitMessage: "En soumettant ce formulaire, vous serez contacté par l'un de nos consultants experts dans les prochaines 24 heures.",
@@ -394,12 +394,12 @@ export function LandingPage() {
 
     const about_content = [
         {
-            title: "BrainSparks encadre la prestation",
-            description: "BrainSparks va au-delà de la mise en relation, et structure les prestations proposées par nos consultants pour en garantir la pertinence et la qualité. Nos experts ne peuvent proposer que 10 Spark chacun au maximum, ce qui les force à ne proposer des prestations sur lesquelles ils sont réellement experts.",
+            title: "Sparkier encadre la prestation",
+            description: "Sparkier va au-delà de la mise en relation, et structure les prestations proposées par nos consultants pour en garantir la pertinence et la qualité. Nos experts ne peuvent proposer que 10 Spark chacun au maximum, ce qui les force à ne proposer des prestations sur lesquelles ils sont réellement experts.",
             icon: <Shield className="h-6 w-6" />
         },
         {
-            title: "BrainSparks vous épargne la gestion de la relation commerciale",
+            title: "Sparkier vous épargne la gestion de la relation commerciale",
             description: "Pas de temps masqué. Sélectionnez un Spark, détaillez votre contexte et réservez la session. La mission commence et s'arrête avec votre rendez-vous.",
             icon: <Calendar className="h-6 w-6" />
         }
@@ -696,7 +696,7 @@ export function LandingPage() {
 
                     {/* Expertise Areas Section */}
                     <motion.div
-                        id="why-brainsparks"
+                        id="why-sparkier"
                         className="mb-24"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
@@ -705,7 +705,7 @@ export function LandingPage() {
                     >
                         <div className="text-center mb-16">
                             <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Pourquoi BrainSparks ?
+                                Pourquoi Sparkier ?
                             </h2>
                             <p className="text-xl text-gray-600">
                                 Une nouvelle approche du conseil, simple et efficace
