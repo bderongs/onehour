@@ -107,7 +107,7 @@ const ConsultantPage = () => {
                         Pour les consultants
                     </h1>
                     <h2 className="text-2xl md:text-4xl font-semibold mb-4 text-gray-800">
-                        Vendez votre expertise en stratégie
+                        Packagez votre expertise en stratégie
                     </h2>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
                         À des clients qualifiés sous la forme de sessions de 30 minutes à 2h
