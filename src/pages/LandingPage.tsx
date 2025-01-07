@@ -57,6 +57,7 @@ export function LandingPage() {
     });
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
+    const [isChatExpanded, setIsChatExpanded] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -541,48 +542,71 @@ export function LandingPage() {
                                 </div>
 
                                 <div className="mt-6 text-center flex flex-col items-center gap-4">
-                                    <div className="inline-flex items-center gap-2 text-gray-600 bg-gray-50 px-4 py-2 rounded-full">
-                                        <Plus className="h-4 w-4" />
-                                        <span className="text-sm">Et bien d'autres possibilités selon vos besoins</span>
-                                    </div>
-
-                                    <div className="relative w-full max-w-md flex gap-2">
-                                        <div className="relative flex-1">
-                                            <input
-                                                type="text"
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                                placeholder="Décrivez votre problématique..."
-                                                className="w-full px-4 py-3 pl-10 bg-white rounded-lg border border-gray-200 
-                                                         focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                                                         transition-all shadow-sm"
-                                            />
-                                            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                                                <svg
-                                                    className="h-5 w-5 text-gray-400"
-                                                    fill="none"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth="2"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                                </svg>
-                                            </div>
-                                        </div>
-
-                                        <button
-                                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
-                                                       transition-colors duration-200 flex items-center justify-center
-                                                       shadow-sm"
-                                            onClick={() => {
-                                                // Add search functionality here
-                                                console.log('Search query:', searchQuery);
-                                            }}
+                                    <div className="w-full max-w-6xl">
+                                        <motion.div
+                                            className="bg-white rounded-xl shadow-md overflow-hidden text-sm"
+                                            animate={{ height: isChatExpanded ? 'auto' : 'auto' }}
+                                            transition={{ duration: 0.3 }}
                                         >
-                                            Rechercher
-                                        </button>
+                                            <div className="p-4 border-b border-gray-200">
+                                                <div className="flex items-center gap-2 text-left">
+                                                    <Sparkle className="h-4 w-4 text-blue-600" />
+                                                    <h2 className="text-lg font-semibold text-gray-900">
+                                                        Et bien d'autres possibilités selon vos besoins
+                                                    </h2>
+                                                </div>
+                                                <p className="text-xs text-gray-600 mt-1 text-left">
+                                                    Notre assistant vous aide à trouver le Spark idéal
+                                                </p>
+                                            </div>
+
+                                            {!isChatExpanded ? (
+                                                <div
+                                                    className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                                                    onClick={() => setIsChatExpanded(true)}
+                                                >
+                                                    <div className="relative">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Décrivez votre problématique..."
+                                                            className="w-full px-4 py-3 bg-white rounded-lg border border-gray-200 
+                                                                     focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+                                                                     transition-all cursor-pointer"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                setIsChatExpanded(true);
+                                                            }}
+                                                            readOnly
+                                                        />
+                                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-600">
+                                                            <ArrowRight className="h-4 w-4" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <motion.div
+                                                    className="p-4"
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    transition={{ duration: 0.3 }}
+                                                >
+                                                    <div className="text-sm">
+                                                        <AIChatInterface
+                                                            messages={messages}
+                                                            onMessagesUpdate={handleMessagesUpdate}
+                                                            config={{
+                                                                ...chatConfig,
+                                                                initialMessage: {
+                                                                    role: 'assistant' as const,
+                                                                    content: "Bonjour ! Je peux vous aider à trouver le Spark qui correspond à votre besoin. Décrivez-moi votre problématique."
+                                                                }
+                                                            }}
+                                                            shouldReset={shouldReset}
+                                                        />
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </motion.div>
                                     </div>
                                 </div>
                             </div>
@@ -600,15 +624,17 @@ export function LandingPage() {
                                         <p className="text-sm text-gray-600 mt-1 text-left">{chatConfig.subtitle}</p>
                                     </div>
                                     <div className="p-4">
-                                        <AIChatInterface
-                                            messages={messages}
-                                            onMessagesUpdate={handleMessagesUpdate}
-                                            config={{
-                                                ...chatConfig,
-                                                initialMessage: messages.length > 0 ? messages[0] : chatConfig.initialMessage
-                                            }}
-                                            shouldReset={shouldReset}
-                                        />
+                                        <div className="text-sm">
+                                            <AIChatInterface
+                                                messages={messages}
+                                                onMessagesUpdate={handleMessagesUpdate}
+                                                config={{
+                                                    ...chatConfig,
+                                                    initialMessage: messages.length > 0 ? messages[0] : chatConfig.initialMessage
+                                                }}
+                                                shouldReset={shouldReset}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

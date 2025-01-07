@@ -75,7 +75,7 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
     if (isSubmitted) {
         return (
             <div className="bg-white rounded-lg shadow-lg p-8 text-center relative">
-                <button 
+                <button
                     onClick={handleClose}
                     className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
                 >
@@ -116,7 +116,7 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
                     <div className="flex items-center gap-2">
                         <h2 className="text-xl font-semibold text-gray-900">Confirmez Votre Demande de Consultation</h2>
                     </div>
-                    <button 
+                    <button
                         onClick={onBack}
                         className="text-gray-500 hover:text-gray-700"
                     >
@@ -131,41 +131,41 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
                     <div className="lg:w-80">
                         <div className="bg-gray-50 rounded-lg p-4">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">Résumé de votre besoin</h3>
-                            
+
                             <div className="space-y-4">
                                 {problemSummary.challenge && (
                                     <div>
-                                        <h4 className="text-sm font-medium text-gray-700">Défi</h4>
+                                        <h4 className="text-left text-sm font-medium text-gray-700">Défi</h4>
                                         <p className="text-sm text-gray-600 mt-1">{problemSummary.challenge}</p>
                                     </div>
                                 )}
                                 {problemSummary.currentSituation && (
                                     <div>
-                                        <h4 className="text-sm font-medium text-gray-700">Situation Actuelle</h4>
+                                        <h4 className="text-left text-sm font-medium text-gray-700">Situation Actuelle</h4>
                                         <p className="text-sm text-gray-600 mt-1">{problemSummary.currentSituation}</p>
                                     </div>
                                 )}
                                 {problemSummary.desiredOutcome && (
                                     <div>
-                                        <h4 className="text-sm font-medium text-gray-700">Objectifs</h4>
+                                        <h4 className="text-left text-sm font-medium text-gray-700">Objectifs</h4>
                                         <p className="text-sm text-gray-600 mt-1">{problemSummary.desiredOutcome}</p>
                                     </div>
                                 )}
                                 {problemSummary.constraints && (
                                     <div>
-                                        <h4 className="text-sm font-medium text-gray-700">Contraintes</h4>
+                                        <h4 className="text-left text-sm font-medium text-gray-700">Contraintes</h4>
                                         <p className="text-sm text-gray-600 mt-1">{problemSummary.constraints}</p>
                                     </div>
                                 )}
                                 {problemSummary.stakeholders && (
                                     <div>
-                                        <h4 className="text-sm font-medium text-gray-700">Parties Prenantes</h4>
+                                        <h4 className="text-left text-sm font-medium text-gray-700">Parties Prenantes</h4>
                                         <p className="text-sm text-gray-600 mt-1">{problemSummary.stakeholders}</p>
                                     </div>
                                 )}
                                 {problemSummary.previousAttempts && (
                                     <div>
-                                        <h4 className="text-sm font-medium text-gray-700">Solutions Tentées</h4>
+                                        <h4 className="text-left text-sm font-medium text-gray-700">Solutions Tentées</h4>
                                         <p className="text-sm text-gray-600 mt-1">{problemSummary.previousAttempts}</p>
                                     </div>
                                 )}
@@ -175,7 +175,7 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
                                 <div className="mt-6">
                                     <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg">
                                         <CheckCircle className="h-4 w-4 flex-shrink-0" />
-                                        <span className="text-sm">Votre brief est complet !</span>
+                                        <span className="text-sm">Votre contexte est clair !</span>
                                     </div>
                                 </div>
                             )}
