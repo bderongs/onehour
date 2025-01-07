@@ -27,10 +27,10 @@ export function Header() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <Sparkles className="h-8 w-8 text-indigo-600" />
-              <div className="ml-2 text-xl font-bold">
-                <span className="text-gray-900">Spark</span>
-                <span className="text-indigo-600">ier</span>
+              <Sparkles className="h-8 w-8 text-gray-900" />
+              <div className="ml-2 text-xl font-bold text-gray-900">
+                <span>Spark</span>
+                <span>ier</span>
               </div>
             </Link>
           </div>

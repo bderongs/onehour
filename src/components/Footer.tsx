@@ -20,9 +20,9 @@ export function Footer() {
           <div>
             <div className="flex items-center mb-4">
               <Sparkles className="h-8 w-8 text-indigo-400" />
-              <span className="ml-2 text-xl font-bold">
-                <span className="text-white">Spark</span>
-                <span className="text-indigo-400">ier</span>
+              <span className="ml-2 text-xl font-bold text-indigo-400">
+                <span>Spark</span>
+                <span>ier</span>
               </span>
             </div>
             <p className="text-gray-400">
