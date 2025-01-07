@@ -73,6 +73,13 @@ export function LandingPage() {
         }
     }, [shouldReset]);
 
+    useEffect(() => {
+        if (expandedCallIndex === null) {
+            const randomIndex = Math.floor(Math.random() * expertCalls.length);
+            setExpandedCallIndex(randomIndex);
+        }
+    }, []);
+
     const useCases: UseCase[] = [
         {
             icon: <Package2 className="h-6 w-6" />,
@@ -461,19 +468,13 @@ export function LandingPage() {
                                                 setExpandedCallIndex(expandedCallIndex === index ? null : index);
                                             }}
                                         >
-                                            <div className="p-6 h-full flex flex-col">
+                                            <div className="p-4 h-full flex flex-col">
                                                 <div className="flex justify-between items-start w-full">
-                                                    <div className="p-2 bg-blue-50 rounded-lg w-fit mb-3">
+                                                    <div className="p-1.5 bg-blue-50 rounded-lg w-fit mb-2">
                                                         {React.cloneElement(call.icon as React.ReactElement, {
                                                             className: "h-5 w-5 text-blue-600"
                                                         })}
                                                     </div>
-                                                    {expandedCallIndex !== index && (
-                                                        <div className="flex items-center gap-1 text-blue-600 text-sm text-left">
-                                                            <Clock className="h-4 w-4" />
-                                                            <span>{call.duration}</span>
-                                                        </div>
-                                                    )}
                                                 </div>
 
                                                 <h3 className="text-sm font-semibold text-gray-900 mb-2 text-left">
@@ -528,7 +529,14 @@ export function LandingPage() {
                                                         </button>
                                                     </motion.div>
                                                 ) : (
-                                                    <div className="mt-auto" />
+                                                    <div className="flex flex-col flex-grow">
+                                                        <div className="mt-auto flex items-center justify-end text-sm text-left">
+                                                            <div className="flex items-center gap-1 text-blue-600 mr-2">
+                                                                <Clock className="h-4 w-4 ml-auto" />
+                                                                <span className="w-[15px]">{call.duration}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 )}
                                             </div>
                                         </motion.div>
