@@ -222,10 +222,6 @@ const ConsultantPage = () => {
                             >
                                 <h3 className="text-xl font-semibold mb-3 text-gray-900">{feature.title}</h3>
                                 <p className="text-gray-600 mb-4">{feature.description}</p>
-                                <div className="flex items-center gap-2 text-blue-600">
-                                    <BadgeCheck className="h-5 w-5" />
-                                    <span className="text-sm font-medium">{feature.metrics}</span>
-                                </div>
                             </motion.div>
                         ))}
                     </motion.div>
