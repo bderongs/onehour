@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { submitConsultantForm } from '../services/consultantFormSubmission';
 import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles, Target, Users, ArrowRightCircle, FileText, Package2, User, BarChart, Clock, Euro } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { SparksGrid } from '../components/SparksGrid';
+import { consultantExpertCalls } from '../data/expertCalls';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -28,6 +30,14 @@ const ConsultantPage = () => {
         experience: ''
     });
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
+
+    useEffect(() => {
+        // Always set the first Spark (index 0) to be expanded on load
+        if (expandedCallIndex === null) {
+            setExpandedCallIndex(0);
+        }
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -45,6 +55,26 @@ const ConsultantPage = () => {
             ...formData,
             [e.target.name]: e.target.value
         });
+    };
+
+    const handleSparkCreation = (prefillText: string) => {
+        const element = document.getElementById('signup-form');
+        const headerOffset = 120; // Increased offset to show more of the form header
+
+        if (element) {
+            // Small delay to ensure smooth animation
+            setTimeout(() => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        }
+
+        console.log('Selected spark:', prefillText);
     };
 
     const features = [
@@ -107,36 +137,23 @@ const ConsultantPage = () => {
                         Pour les consultants
                     </h1>
                     <h2 className="text-2xl md:text-4xl font-semibold mb-4 text-gray-800">
-                        Packagez votre expertise en stratégie
+                        Vendez votre expertise en stratégie
                     </h2>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                    <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
                         À des clients qualifiés sous la forme de sessions de 30 minutes à 2h
                     </p>
-                    <div className="max-w-4xl mx-auto mb-12">
-                        <div className="grid grid-cols-3 gap-4 text-center">
-                            <div className="bg-white rounded-xl p-6 shadow-md transform hover:-translate-y-1 transition-transform duration-300">
-                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Clock className="h-6 w-6 text-blue-600" />
-                                </div>
-                                <p className="font-semibold text-gray-900">30min - 2h</p>
-                                <p className="text-sm text-gray-600">par session</p>
-                            </div>
-                            <div className="bg-white rounded-xl p-6 shadow-md transform hover:-translate-y-1 transition-transform duration-300">
-                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Euro className="h-6 w-6 text-blue-600" />
-                                </div>
-                                <p className="font-semibold text-gray-900">500€ min</p>
-                                <p className="text-sm text-gray-600">par Spark</p>
-                            </div>
-                            <div className="bg-white rounded-xl p-6 shadow-md transform hover:-translate-y-1 transition-transform duration-300">
-                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Target className="h-6 w-6 text-blue-600" />
-                                </div>
-                                <p className="font-semibold text-gray-900">10 Sparks</p>
-                                <p className="text-sm text-gray-600">maximum</p>
-                            </div>
-                        </div>
+
+                    {/* Sparks Grid */}
+                    <div className="mb-16">
+                        <SparksGrid
+                            expertCalls={consultantExpertCalls}
+                            expandedCallIndex={expandedCallIndex}
+                            setExpandedCallIndex={setExpandedCallIndex}
+                            onCallClick={handleSparkCreation}
+                            buttonText="Créer mon premier Spark"
+                        />
                     </div>
+
                     <motion.div
                         className="flex flex-col sm:flex-row justify-center gap-4"
                         variants={stagger}
@@ -153,7 +170,7 @@ const ConsultantPage = () => {
                         </motion.button>
                         <motion.button
                             variants={fadeInUp}
-                            onClick={() => document.getElementById('key-features')?.scrollIntoView({ behavior: 'smooth' })}
+                            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                             className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors border border-blue-600"
                         >
                             Découvrir les fonctionnalités
@@ -241,7 +258,7 @@ const ConsultantPage = () => {
                             Créez votre profil maintenant
                         </h2>
                         <p className="text-gray-600">
-                            Commencez gratuitement et développez votre activité de conseil
+                            Packagez vos services en Sparks et commencez à vendre
                         </p>
                     </div>
 

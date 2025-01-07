@@ -5,22 +5,15 @@ import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
 import { UseCaseForm } from '../components/UseCaseForm';
 import { motion } from 'framer-motion';
+import { ExpertCall } from '../types/expertCall';
+import { SparksGrid } from '../components/SparksGrid';
+import { expertCalls } from '../data/expertCalls';
 
 interface UseCase {
     icon: React.ReactNode;
     title: string;
     description: string;
     prefillText: string;
-}
-
-interface ExpertCall {
-    icon: React.ReactNode;
-    title: string;
-    duration: string;
-    prefillText: string;
-    price?: string;
-    description?: string;
-    benefits?: string[];
 }
 
 const fadeInUp = {
@@ -75,6 +68,7 @@ export function LandingPage() {
     }, [shouldReset]);
 
     useEffect(() => {
+        // Always set the first Spark (index 0) to be expanded on load
         if (expandedCallIndex === null) {
             setExpandedCallIndex(0);
         }
@@ -104,139 +98,6 @@ export function LandingPage() {
             title: "Autre sujet",
             description: "J'ai une autre problématique.",
             prefillText: ""
-        }
-    ];
-
-    const expertCalls: ExpertCall[] = [
-        {
-            icon: <Package2 className="h-6 w-6" />,
-            title: "Choisir un CRM",
-            duration: "1h",
-            price: "290€ HT",
-            description: "Un expert en solutions CRM vous aide à comparer et sélectionner la meilleure solution pour votre entreprise.",
-            benefits: [
-                "Analyse de vos besoins spécifiques",
-                "Comparaison des solutions du marché",
-                "Recommandations personnalisées"
-            ],
-            prefillText: "J'ai besoin d'aide pour choisir un CRM adapté à mon entreprise de 50 personnes."
-        },
-        {
-            icon: <Bot className="h-6 w-6" />,
-            title: "Automatiser le support client",
-            duration: "1h30",
-            price: "390€ HT",
-            description: "Optimisez votre service client grâce à l'IA. Un expert vous guide dans l'automatisation intelligente de vos processus.",
-            benefits: [
-                "Audit de vos processus actuels",
-                "Identification des opportunités d'automatisation",
-                "Plan d'implémentation détaillé"
-            ],
-            prefillText: "Je souhaite automatiser notre support client avec l'IA pour réduire le temps de réponse."
-        },
-        {
-            icon: <Users className="h-6 w-6" />,
-            title: "Recruter un CTO",
-            duration: "2h",
-            price: "490€ HT",
-            description: "Un expert en recrutement tech vous accompagne dans la définition du profil et la stratégie de recrutement de votre futur CTO.",
-            benefits: [
-                "Définition du profil idéal",
-                "Stratégie de sourcing",
-                "Grille d'évaluation technique"
-            ],
-            prefillText: "J'ai besoin d'aide pour recruter un CTO pour ma startup en série A."
-        },
-        {
-            icon: <Target className="h-6 w-6" />,
-            title: "Définir ma stratégie marketing",
-            duration: "1h30",
-            price: "390€ HT",
-            description: "Construisez une stratégie marketing efficace avec l'aide d'un expert qui analyse votre marché et vos objectifs.",
-            benefits: [
-                "Analyse de votre positionnement",
-                "Identification des canaux prioritaires",
-                "Plan d'action concret"
-            ],
-            prefillText: "Je cherche à définir ma stratégie marketing digital pour 2024."
-        },
-        {
-            icon: <Zap className="h-6 w-6" />,
-            title: "Optimiser mes process",
-            duration: "1h",
-            price: "290€ HT",
-            description: "Identifiez et éliminez les inefficacités dans vos processus avec l'aide d'un expert en optimisation opérationnelle.",
-            benefits: [
-                "Cartographie des processus",
-                "Identification des points de friction",
-                "Recommandations d'amélioration"
-            ],
-            prefillText: "Je veux optimiser les processus internes de mon entreprise."
-        },
-        {
-            icon: <Shield className="h-6 w-6" />,
-            title: "Audit sécurité",
-            duration: "2h",
-            price: "490€ HT",
-            description: "Évaluez la sécurité de votre infrastructure IT et identifiez les points d'amélioration avec un expert en cybersécurité.",
-            benefits: [
-                "Analyse des vulnérabilités",
-                "Évaluation des risques",
-                "Plan d'action prioritaire"
-            ],
-            prefillText: "J'aimerais faire un audit de sécurité de mon infrastructure IT."
-        },
-        {
-            icon: <Calendar className="h-6 w-6" />,
-            title: "Planifier ma levée de fonds",
-            duration: "1h30",
-            price: "390€ HT",
-            description: "Préparez votre levée de fonds avec un expert qui vous aide à structurer votre approche et maximiser vos chances de succès.",
-            benefits: [
-                "Évaluation de votre maturité",
-                "Stratégie de pitch",
-                "Planning détaillé"
-            ],
-            prefillText: "Je prépare une levée de fonds et j'ai besoin de conseils stratégiques."
-        },
-        {
-            icon: <MessageSquare className="h-6 w-6" />,
-            title: "Améliorer mes ventes",
-            duration: "1h",
-            price: "290€ HT",
-            description: "Boostez vos performances commerciales avec un expert qui analyse votre processus de vente et identifie les leviers de croissance.",
-            benefits: [
-                "Audit du tunnel de vente",
-                "Optimisation du closing",
-                "Techniques d'acquisition"
-            ],
-            prefillText: "Je cherche à améliorer la performance de mon équipe commerciale."
-        },
-        {
-            icon: <FileText className="h-6 w-6" />,
-            title: "Rédiger mon business plan",
-            duration: "2h",
-            price: "490€ HT",
-            description: "Structurez votre business plan avec l'aide d'un expert qui vous guide dans la construction d'un document convaincant.",
-            benefits: [
-                "Structure personnalisée",
-                "Analyse financière",
-                "Storytelling impactant"
-            ],
-            prefillText: "J'ai besoin d'aide pour structurer mon business plan."
-        },
-        {
-            icon: <Briefcase className="h-6 w-6" />,
-            title: "Développer à l'international",
-            duration: "1h30",
-            price: "390€ HT",
-            description: "Planifiez votre expansion internationale avec un expert qui vous aide à identifier les opportunités et éviter les pièges.",
-            benefits: [
-                "Analyse des marchés cibles",
-                "Stratégie d'entrée",
-                "Plan de déploiement"
-            ],
-            prefillText: "Je souhaite développer mon entreprise à l'international."
         }
     ];
 
@@ -453,93 +314,13 @@ export function LandingPage() {
                         {/* Use Case Form Section */}
                         <div className="max-w-4xl mx-auto">
                             <div className={`${showForm ? 'block' : 'hidden'}`}>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
-                                    {expertCalls.map((call, index) => (
-                                        <motion.div
-                                            key={index}
-                                            layout
-                                            variants={fadeInUp}
-                                            className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer
-                                                ${expandedCallIndex === index ? 'md:col-span-2 md:row-span-3' : ''}`}
-                                            onClick={() => {
-                                                if (expandedCallIndex === index) {
-                                                    return;
-                                                }
-                                                setExpandedCallIndex(expandedCallIndex === index ? null : index);
-                                            }}
-                                        >
-                                            <div className="p-4 h-full flex flex-col">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <div className="p-1.5 bg-blue-50 rounded-lg w-fit">
-                                                        <Sparkle className="h-5 w-5 text-blue-600" />
-                                                    </div>
-                                                    <h3 className="text-sm font-semibold text-gray-900 text-left">
-                                                        {call.title}
-                                                    </h3>
-                                                </div>
-
-                                                {expandedCallIndex === index ? (
-                                                    <motion.div
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        transition={{ duration: 0.2 }}
-                                                        className="flex flex-col flex-grow"
-                                                    >
-                                                        <p className="text-gray-600 text-sm mb-4 text-left">
-                                                            {call.description}
-                                                        </p>
-
-                                                        <div className="space-y-4 mb-4">
-                                                            <div className="flex items-center gap-2 text-gray-900 text-left">
-                                                                <Clock className="h-4 w-4 text-blue-600" />
-                                                                <span className="text-sm">{call.duration}</span>
-                                                            </div>
-                                                            <div className="flex items-center gap-2 text-gray-900 text-left">
-                                                                <BadgeCheck className="h-4 w-4 text-blue-600" />
-                                                                <span className="text-sm">{call.price}</span>
-                                                            </div>
-                                                        </div>
-
-                                                        {call.benefits && (
-                                                            <div className="space-y-2 mb-6">
-                                                                {call.benefits.map((benefit, i) => (
-                                                                    <div key={i} className="flex items-start gap-2 text-left">
-                                                                        <CheckCircle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                                                                        <span className="text-sm text-gray-600">{benefit}</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
-
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleUseCaseClick(call.prefillText);
-                                                                setExpandedCallIndex(null);
-                                                            }}
-                                                            className="mt-auto w-full bg-blue-600 text-white px-4 py-2 rounded-lg 
-                                                                     font-semibold hover:bg-blue-700 transition-colors flex items-center 
-                                                                     justify-center gap-2"
-                                                        >
-                                                            Choisir ce Spark
-                                                            <ArrowRight className="h-4 w-4" />
-                                                        </button>
-                                                    </motion.div>
-                                                ) : (
-                                                    <div className="flex flex-col flex-grow">
-                                                        <div className="mt-auto flex items-center justify-between text-sm text-left">
-                                                            <div className="flex items-center gap-1 text-gray-600">
-                                                                <Clock className="h-4 w-4" />
-                                                                <span>{call.duration}</span>
-                                                            </div>
-                                                            <ArrowRight className="h-4 w-4 text-blue-600" />
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </div>
+                                <SparksGrid
+                                    expertCalls={expertCalls}
+                                    expandedCallIndex={expandedCallIndex}
+                                    setExpandedCallIndex={setExpandedCallIndex}
+                                    onCallClick={handleUseCaseClick}
+                                    buttonText="Choisir ce Spark"
+                                />
 
                                 <div className="mt-6 text-center flex flex-col items-center gap-4">
                                     <div className="w-full max-w-6xl">
