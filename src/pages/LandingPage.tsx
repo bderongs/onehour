@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote, Sparkles, ArrowRight, BadgeCheck, FileText } from 'lucide-react';
+import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote, Sparkle, ArrowRight, BadgeCheck, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
@@ -75,8 +75,7 @@ export function LandingPage() {
 
     useEffect(() => {
         if (expandedCallIndex === null) {
-            const randomIndex = Math.floor(Math.random() * expertCalls.length);
-            setExpandedCallIndex(randomIndex);
+            setExpandedCallIndex(0);
         }
     }, []);
 
@@ -453,14 +452,14 @@ export function LandingPage() {
                         {/* Use Case Form Section */}
                         <div className="max-w-4xl mx-auto">
                             <div className={`${showForm ? 'block' : 'hidden'}`}>
-                                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-6xl mx-auto">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
                                     {expertCalls.map((call, index) => (
                                         <motion.div
                                             key={index}
                                             layout
                                             variants={fadeInUp}
                                             className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer
-                                                ${expandedCallIndex === index ? 'md:col-span-2 md:row-span-2' : ''}`}
+                                                ${expandedCallIndex === index ? 'md:col-span-2 md:row-span-3' : ''}`}
                                             onClick={() => {
                                                 if (expandedCallIndex === index) {
                                                     return;
@@ -469,17 +468,14 @@ export function LandingPage() {
                                             }}
                                         >
                                             <div className="p-4 h-full flex flex-col">
-                                                <div className="flex justify-between items-start w-full">
-                                                    <div className="p-1.5 bg-blue-50 rounded-lg w-fit mb-2">
-                                                        {React.cloneElement(call.icon as React.ReactElement, {
-                                                            className: "h-5 w-5 text-blue-600"
-                                                        })}
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <div className="p-1.5 bg-blue-50 rounded-lg w-fit">
+                                                        <Sparkle className="h-5 w-5 text-blue-600" />
                                                     </div>
+                                                    <h3 className="text-sm font-semibold text-gray-900 text-left">
+                                                        {call.title}
+                                                    </h3>
                                                 </div>
-
-                                                <h3 className="text-sm font-semibold text-gray-900 mb-2 text-left">
-                                                    {call.title}
-                                                </h3>
 
                                                 {expandedCallIndex === index ? (
                                                     <motion.div
@@ -596,7 +592,7 @@ export function LandingPage() {
                                     <div className="p-4 border-b border-gray-200">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                                <Sparkles className="h-5 w-5 text-blue-600" />
+                                                <Sparkle className="h-5 w-5 text-blue-600" />
                                                 <h2 className="text-xl font-semibold text-gray-900">{chatConfig.title}</h2>
                                             </div>
                                         </div>
