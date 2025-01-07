@@ -526,11 +526,12 @@ export function LandingPage() {
                                                     </motion.div>
                                                 ) : (
                                                     <div className="flex flex-col flex-grow">
-                                                        <div className="mt-auto flex items-center justify-end text-sm text-left">
-                                                            <div className="flex items-center gap-1 text-blue-600 mr-2">
-                                                                <Clock className="h-4 w-4 ml-auto" />
-                                                                <span className="w-[15px]">{call.duration}</span>
+                                                        <div className="mt-auto flex items-center justify-between text-sm text-left">
+                                                            <div className="flex items-center gap-1 text-gray-600">
+                                                                <Clock className="h-4 w-4" />
+                                                                <span>{call.duration}</span>
                                                             </div>
+                                                            <ArrowRight className="h-4 w-4 text-blue-600" />
                                                         </div>
                                                     </div>
                                                 )}
