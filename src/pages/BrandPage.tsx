@@ -34,7 +34,7 @@ export function BrandPage() {
               <div>
                 <h3 className="text-lg font-semibold mb-6">Symbole seul</h3>
                 <div className="bg-white border border-gray-200 rounded-lg p-12 flex items-center justify-center">
-                  <Logo className="h-48 w-48" color="#3730A3" />
+                  <Logo className="h-48 w-48" color="indigo-800" />
                 </div>
               </div>
             </div>
