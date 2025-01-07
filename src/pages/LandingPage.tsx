@@ -623,6 +623,7 @@ export function LandingPage() {
 
                     {/* Service Packages Section - Replace with Features Section */}
                     <motion.div
+                        id="spark"
                         className="mb-24"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
@@ -657,6 +658,7 @@ export function LandingPage() {
 
                     {/* How it Works Section */}
                     <motion.div
+                        id="how-it-works"
                         className="mb-24"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
@@ -690,6 +692,7 @@ export function LandingPage() {
 
                     {/* Expertise Areas Section */}
                     <motion.div
+                        id="why-brainsparks"
                         className="mb-24"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}

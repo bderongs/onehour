@@ -8,9 +8,10 @@ export function Header() {
   const isPricingPage = location.pathname === '/pricing';
 
   const navigation = [
-    { name: 'Pourquoi Nous Choisir', href: '#why-choose' },
-    { name: 'Nos Experts', href: '#experts' },
+    { name: 'Le Spark', href: '#spark' },
     { name: 'Comment ça Marche', href: '#how-it-works' },
+    { name: 'Pourquoi Brainsparks', href: '#why-brainsparks' },
+
   ];
 
   const scrollToSection = (sectionId: string) => {
@@ -48,13 +49,13 @@ export function Header() {
                 ))}
               </div>
             )}
-            
+
             {isConsultantPage ? (
               <Link
-                to="/pricing"
+                to="/"
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
               >
-                Tarifs
+                Entreprises
               </Link>
             ) : !isConsultantPage && (
               <Link

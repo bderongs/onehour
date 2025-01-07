@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { submitConsultantForm } from '../services/consultantFormSubmission';
-import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles, Target, Users, ArrowRightCircle, FileText } from 'lucide-react';
+import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles, Target, Users, ArrowRightCircle, FileText, Package2, User, BarChart, Clock, Euro } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -70,27 +70,26 @@ const ConsultantPage = () => {
         }
     ];
 
-    const successStories = [
+    const keyFeatures = [
         {
-            name: "Claire Moreau",
-            role: "Consultante Marketing Digital",
-            revenue: "15K€/mois",
-            image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-            quote: "J'ai doublé mon chiffre d'affaires en 6 mois grâce à la visibilité offerte par la plateforme."
+            title: "L'acquisition client simplifiée",
+            description: "Le Spark est un module de conseil structuré et précis. Il vous permet de packager vos offres pour les vendre plus facilement. Il s'agit également d'un excellent moyen pour rencontrer de nouveaux clients avec qui créer une relation plus longue.",
+            icon: <Target className="h-6 w-6" />
         },
         {
-            name: "Pierre Fabre",
-            role: "Expert Transformation Digitale",
-            revenue: "20K€/mois",
-            image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-            quote: "La qualité des leads et la simplicité de gestion m'ont permis de me concentrer sur mes missions à forte valeur ajoutée."
+            title: "Pourquoi packager vos offres ?",
+            description: "Transformer vos services en produits packagés vous permet d'augmenter la clarté de votre offre, et de vendre plus facilement, sans perdre de temps à négocier une lettre de mission. Chaque Spark est vendu au minimum 500€, vous pouvez en proposer 10 différents.",
+            icon: <Package2 className="h-6 w-6" />
         },
         {
-            name: "Anne Rousseau",
-            role: "Consultante RH",
-            revenue: "12K€/mois",
-            image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
-            quote: "Le système de réservation automatisé m'a permis d'optimiser mon planning et d'augmenter mes revenus de 50%."
+            title: "Votre page de profil",
+            description: "En plus de la présence sur notre plateforme vous disposerez d'une page de conversion personnelle sur laquelle vos Sparks seront disponibles et réservables en ligne.",
+            icon: <User className="h-6 w-6" />
+        },
+        {
+            title: "Restez à l'écoute du marché",
+            description: "Les fins de mission peuvent arriver soudainement et vous couter très cher, si vous n'avez pas pris le temps de garder une base commerciale active. Brainsparks vous permet de cumuler vos missions longues avec des sessions de conseil très courtes, sans perdre de temps à faire du commerce, ce qui vous permet de flux continu d'opportunitées pour des missions plus longues.",
+            icon: <BarChart className="h-6 w-6" />
         }
     ];
 
@@ -113,12 +112,30 @@ const ConsultantPage = () => {
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
                         À des clients qualifiés sous la forme de sessions de 30 minutes à 2h
                     </p>
-                    <div className="max-w-3xl mx-auto bg-white rounded-xl p-6 shadow-md mb-8">
-                        <h3 className="text-xl font-semibold mb-4">L'acquisition client simplifiée</h3>
-                        <p className="text-gray-600">
-                            Le Spark est un module de conseil structuré et précis. Il vous permet de packager vos offres pour les vendre plus facilement.
-                            Il s'agit également d'un excellent moyen pour rencontrer de nouveaux clients avec qui créer une relation plus longue.
-                        </p>
+                    <div className="max-w-4xl mx-auto mb-12">
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                            <div className="bg-white rounded-xl p-6 shadow-md transform hover:-translate-y-1 transition-transform duration-300">
+                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Clock className="h-6 w-6 text-blue-600" />
+                                </div>
+                                <p className="font-semibold text-gray-900">30min - 2h</p>
+                                <p className="text-sm text-gray-600">par session</p>
+                            </div>
+                            <div className="bg-white rounded-xl p-6 shadow-md transform hover:-translate-y-1 transition-transform duration-300">
+                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Euro className="h-6 w-6 text-blue-600" />
+                                </div>
+                                <p className="font-semibold text-gray-900">500€ min</p>
+                                <p className="text-sm text-gray-600">par Spark</p>
+                            </div>
+                            <div className="bg-white rounded-xl p-6 shadow-md transform hover:-translate-y-1 transition-transform duration-300">
+                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Target className="h-6 w-6 text-blue-600" />
+                                </div>
+                                <p className="font-semibold text-gray-900">10 Sparks</p>
+                                <p className="text-sm text-gray-600">maximum</p>
+                            </div>
+                        </div>
                     </div>
                     <motion.div
                         className="flex flex-col sm:flex-row justify-center gap-4"
@@ -131,12 +148,12 @@ const ConsultantPage = () => {
                             onClick={() => document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' })}
                             className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2 group"
                         >
-                            Créer mon profil gratuitement
+                            Créer mes premiers Sparks
                             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                         </motion.button>
                         <motion.button
                             variants={fadeInUp}
-                            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                            onClick={() => document.getElementById('key-features')?.scrollIntoView({ behavior: 'smooth' })}
                             className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors border border-blue-600"
                         >
                             Découvrir les fonctionnalités
@@ -144,267 +161,75 @@ const ConsultantPage = () => {
                     </motion.div>
                 </motion.div>
 
-                {/* Success Metrics */}
-                <motion.div
-                    className="bg-white rounded-xl p-8 shadow-md mb-16"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
+                {/* Key Features Section */}
+                <div
+                    id="key-features"
+                    className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
                 >
-                    <div className="grid md:grid-cols-3 gap-8 text-center">
-                        {[
-                            { value: '+50%', label: 'de revenus en moyenne\naprès 6 mois' },
-                            { value: '300+', label: 'consultants utilisent\nnotre plateforme' },
-                            { value: '98%', label: 'de taux de satisfaction\nclient' }
-                        ].map((metric, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                            >
-                                <div className="text-3xl font-bold text-blue-600 mb-2">{metric.value}</div>
-                                <div className="text-gray-600">{metric.label}</div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </motion.div>
-
-                {/* AI Assistant Demo Section */}
-                <motion.div
-                    className="mb-16 bg-white rounded-xl p-8 shadow-md"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <div className="grid md:grid-cols-2 gap-12 items-center">
-                        <div>
+                    {keyFeatures.map((feature, index) => (
+                        <motion.div
+                            key={index}
+                            className="bg-white rounded-xl p-8 shadow-md"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: index * 0.1 }}
+                        >
                             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
                                 <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
                                     <Sparkles className="h-4 w-4" />
-                                    Fonctionnalité phare #1
-                                </div>
-                                <Link
-                                    to="/profile"
-                                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium sm:ml-auto"
-                                >
-                                    Voir un exemple <ArrowRight className="h-4 w-4" />
-                                </Link>
-                            </div>
-                            <h2 className="text-3xl font-bold mb-6">Assistant IA conversationnel</h2>
-                            <div className="space-y-4">
-                                <div className="flex items-start gap-3">
-                                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <span className="text-blue-600 font-semibold">1</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900">Qualification intelligente 24/7</h3>
-                                        <p className="text-gray-600">L'assistant engage la conversation avec vos prospects, comprend leurs enjeux et qualifie leurs besoins, même pendant votre sommeil.</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <span className="text-blue-600 font-semibold">2</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900">Personnalisation contextuelle</h3>
-                                        <p className="text-gray-600">L'IA adapte la conversation en fonction de votre expertise et de vos offres, créant une expérience sur-mesure pour chaque prospect.</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <span className="text-blue-600 font-semibold">3</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900">Conversion naturelle</h3>
-                                        <p className="text-gray-600">Une fois le besoin qualifié, l'assistant guide naturellement vers vos offres les plus pertinentes et facilite la prise de rendez-vous.</p>
-                                    </div>
+                                    Fonctionnalité phare #{index + 1}
                                 </div>
                             </div>
-                        </div>
-                        <div className="bg-gray-50 rounded-xl p-6">
-                            <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
-                                        <Sparkles className="h-4 w-4 text-white" />
-                                    </div>
-                                    <div className="font-medium text-gray-900">Assistant IA</div>
+                            <div className="flex items-start gap-4">
+                                <div className="p-3 bg-blue-50 rounded-lg w-fit h-fit">
+                                    {React.cloneElement(feature.icon as React.ReactElement, {
+                                        className: "h-6 w-6 text-blue-600"
+                                    })}
                                 </div>
-                                <p className="text-gray-600 mb-3">Bonjour ! Je suis là pour comprendre vos enjeux et vous orienter vers les meilleures solutions. Quel défi souhaitez-vous relever ?</p>
-                                <div className="space-y-2">
-                                    <button className="w-full text-left px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600">
-                                        Améliorer notre transformation digitale
-                                    </button>
-                                    <button className="w-full text-left px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600">
-                                        Optimiser nos processus internes
-                                    </button>
-                                    <button className="w-full text-left px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600">
-                                        Former nos équipes à l'agilité
-                                    </button>
-                                </div>
-                            </div>
-                            <p className="text-sm text-gray-500 text-center">Exemple d'interaction avec l'assistant IA</p>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Package Creation Demo Section */}
-                <motion.div
-                    className="mb-16 bg-white rounded-xl p-8 shadow-md"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <div className="grid md:grid-cols-2 gap-12 items-center">
-                        <div className="bg-gray-50 rounded-xl p-6">
-                            <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-                                <h3 className="font-semibold text-gray-900 mb-4">Diagnostic Flash Transformation Digitale</h3>
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <CheckCircle className="h-5 w-5 text-blue-600" />
-                                        <span>Audit de maturité digitale</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <CheckCircle className="h-5 w-5 text-blue-600" />
-                                        <span>Identification des quick wins</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <CheckCircle className="h-5 w-5 text-blue-600" />
-                                        <span>Plan d'action priorisé</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <CheckCircle className="h-5 w-5 text-blue-600" />
-                                        <span>1 200€ HT</span>
-                                    </div>
-                                </div>
-                                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                                    <p className="text-sm text-blue-600">
-                                        <span className="font-semibold">Matching IA :</span> Recommandé pour les PME en début de transformation digitale, avec un besoin de vision claire et un budget limité
+                                <div>
+                                    <h2 className="text-2xl font-bold mb-4">{feature.title}</h2>
+                                    <p className="text-gray-600 leading-relaxed">
+                                        {feature.description}
                                     </p>
                                 </div>
                             </div>
-                            <p className="text-sm text-gray-500 text-center">Exemple d'offre packagée avec matching IA</p>
-                        </div>
-                        <div>
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
-                                <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
-                                    <Sparkles className="h-4 w-4" />
-                                    Fonctionnalité phare #2
-                                </div>
-                                <Link
-                                    to="/profile"
-                                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium sm:ml-auto"
-                                >
-                                    Voir un exemple <ArrowRight className="h-4 w-4" />
-                                </Link>
-                            </div>
-                            <h2 className="text-3xl font-bold mb-6">Offres packagées intelligentes</h2>
-                            <div className="space-y-4">
-                                <div className="flex items-start gap-3">
-                                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <span className="text-blue-600 font-semibold">1</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900">Standardisation efficace</h3>
-                                        <p className="text-gray-600">Créez des offres packagées avec des livrables clairs, des critères d'éligibilité et des prix fixes. Gagnez en productivité en standardisant vos services les plus demandés.</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <span className="text-blue-600 font-semibold">2</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900">Matching automatique</h3>
-                                        <p className="text-gray-600">L'IA analyse les besoins qualifiés et recommande automatiquement vos offres les plus pertinentes, avec une explication claire du matching.</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <span className="text-blue-600 font-semibold">3</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900">Vente simplifiée</h3>
-                                        <p className="text-gray-600">Réduisez votre cycle de vente grâce à des offres précises et des prix transparents. Plus besoin de passer des heures à rédiger des propositions commerciales.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Features Grid */}
-                <motion.div
-                    id="features"
-                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
-                    variants={stagger}
-                    initial="initial"
-                    whileInView="animate"
-                    viewport={{ once: true }}
-                >
-                    {features.map((feature, index) => (
-                        <motion.div
-                            key={index}
-                            variants={fadeInUp}
-                            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
-                        >
-                            <h3 className="text-xl font-semibold mb-3 text-gray-900">{feature.title}</h3>
-                            <p className="text-gray-600 mb-4">{feature.description}</p>
-                            <div className="flex items-center gap-2 text-blue-600">
-                                <BadgeCheck className="h-5 w-5" />
-                                <span className="text-sm font-medium">{feature.metrics}</span>
-                            </div>
                         </motion.div>
                     ))}
-                </motion.div>
+                </div>
 
-                {/* Success Stories */}
-                <motion.div
-                    className="mb-16"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <motion.h2
-                        className="text-3xl font-bold text-center mb-12"
-                        variants={fadeInUp}
-                    >
-                        Ils ont réussi avec nous
-                    </motion.h2>
+                {/* Features Grid with Title */}
+                <div className="mb-16">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                            Pourquoi BrainSparks ?
+                        </h2>
+                    </div>
+
                     <motion.div
-                        className="grid md:grid-cols-3 gap-8"
+                        id="features"
+                        className="grid grid-cols-1 md:grid-cols-4 gap-8"
                         variants={stagger}
                         initial="initial"
                         whileInView="animate"
                         viewport={{ once: true }}
                     >
-                        {successStories.map((story, index) => (
+                        {features.map((feature, index) => (
                             <motion.div
                                 key={index}
                                 variants={fadeInUp}
-                                className="bg-white p-6 rounded-xl shadow-md"
+                                className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
                             >
-                                <div className="flex items-center gap-4 mb-4">
-                                    <img
-                                        src={story.image}
-                                        alt={story.name}
-                                        className="w-16 h-16 rounded-full object-cover"
-                                    />
-                                    <div>
-                                        <h4 className="font-semibold text-gray-900">{story.name}</h4>
-                                        <p className="text-sm text-gray-600">{story.role}</p>
-                                        <p className="text-sm font-semibold text-blue-600">{story.revenue}</p>
-                                    </div>
+                                <h3 className="text-xl font-semibold mb-3 text-gray-900">{feature.title}</h3>
+                                <p className="text-gray-600 mb-4">{feature.description}</p>
+                                <div className="flex items-center gap-2 text-blue-600">
+                                    <BadgeCheck className="h-5 w-5" />
+                                    <span className="text-sm font-medium">{feature.metrics}</span>
                                 </div>
-                                <p className="text-gray-600">"{story.quote}"</p>
                             </motion.div>
                         ))}
                     </motion.div>
-                </motion.div>
+                </div>
 
                 {/* Sign Up Form */}
                 <motion.div
@@ -530,7 +355,7 @@ const ConsultantPage = () => {
                                     type="submit"
                                     className="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group"
                                 >
-                                    Créer mon profil gratuitement
+                                    Créer mes premiers Sparks
                                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                                 </button>
                             </div>
@@ -539,29 +364,6 @@ const ConsultantPage = () => {
                             </p>
                         </form>
                     )}
-                </motion.div>
-
-                {/* Packaging Offers Section */}
-                <motion.div
-                    className="mb-16 bg-white rounded-xl p-8 shadow-md"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <h2 className="text-3xl font-bold mb-6">Pourquoi packager vos offres ?</h2>
-                    <p className="text-gray-600 mb-6">
-                        Transformer vos services en produits packagés vous permet d'augmenter la clarté de votre offre,
-                        et de vendre plus facilement, sans perdre de temps à négocier une lettre de mission.
-                        Chaque Spark est vendu au minimum 500€, vous pouvez en proposer 10 différents.
-                    </p>
-                    <div className="bg-blue-50 p-6 rounded-lg">
-                        <h3 className="text-xl font-semibold mb-4">Votre page de profil</h3>
-                        <p className="text-gray-700">
-                            En plus de la présence sur notre plateforme vous disposerez d'une page de conversion personnelle
-                            sur laquelle vos Sparks seront disponibles et réservables en ligne.
-                        </p>
-                    </div>
                 </motion.div>
             </div>
         </div>
