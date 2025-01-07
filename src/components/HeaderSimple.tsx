@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame } from 'lucide-react';
+import { BrandName } from './BrandName';
 
 export function HeaderSimple() {
   return (
@@ -8,11 +8,7 @@ export function HeaderSimple() {
         <div className="flex h-16">
           <div className="flex items-center">
             <a href="/" className="flex items-center">
-              <Flame className="h-8 w-8 text-gray-900" />
-              <div className="ml-2 text-xl font-bold text-gray-900">
-                <span>Brain</span>
-                <span>Sparks</span>
-              </div>
+              <BrandName color="indigo-900" />
             </a>
           </div>
         </div>

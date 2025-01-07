@@ -1,6 +1,6 @@
 import React from 'react';
-import { Sparkles } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { BrandName } from './BrandName';
 
 const scrollToSection = (sectionId: string) => {
   const element = document.getElementById(sectionId);
@@ -19,11 +19,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center mb-4">
-              <Sparkles className="h-8 w-8 text-indigo-400" />
-              <span className="ml-2 text-xl font-bold text-indigo-400">
-                <span>Spark</span>
-                <span>ier</span>
-              </span>
+              <BrandName color="indigo-400" />
             </div>
             <p className="text-gray-400">
               Le concentré de conseil expertise

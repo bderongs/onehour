@@ -10,6 +10,7 @@ import { Terms } from './pages/Terms';
 import { Privacy } from './pages/Privacy';
 import { LightFooter } from './components/LightFooter';
 import { PricingPage } from './pages/PricingPage';
+import { BrandPage } from './pages/BrandPage';
 
 function App() {
   try {
@@ -85,6 +86,13 @@ function App() {
                 <Privacy />
               </main>
               <Footer />
+            </>
+          } />
+          <Route path="/brand" element={
+            <>
+              <main className="flex-grow">
+                <BrandPage />
+              </main>
             </>
           } />
           <Route path="*" element={

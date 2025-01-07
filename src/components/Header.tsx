@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
+import { BrandName } from './BrandName';
 
 export function Header() {
   const location = useLocation();
@@ -27,11 +27,7 @@ export function Header() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <Sparkles className="h-8 w-8 text-gray-900" />
-              <div className="ml-2 text-xl font-bold text-gray-900">
-                <span>Spark</span>
-                <span>ier</span>
-              </div>
+              <BrandName color="indigo-900" />
             </Link>
           </div>
 
