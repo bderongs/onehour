@@ -348,30 +348,53 @@ export function LandingPage() {
         },
         {
             icon: <Bot className="h-6 w-6" />,
-            title: "Brief IA",
-            description: "Notre IA vous aide à structurer votre brief pour optimiser la session."
+            title: "Précisez votre contexte",
+            description: "Notre IA vous aide à structurer votre demande pour optimiser la session."
         },
         {
             icon: <Users className="h-6 w-6" />,
-            title: "Session Expert",
-            description: "Échangez en direct avec le consultant pour obtenir des réponses concrètes."
+            title: "Échangez avec votre Expert",
+            description: "Discutez en direct avec le consultant pour obtenir des réponses concrètes."
         },
         {
             icon: <FileText className="h-6 w-6" />,
-            title: "Rapport",
+            title: "Recevez votre Rapport",
             description: "Recevez un rapport détaillé prêt à partager avec vos équipes."
         }
     ];
 
     const features = [
         {
+            title: "Format structuré ",
+            description: "Un concentré de conseil pour répondre à une problématique précise, sans engagement et sans perte de temps.",
+            icon: <Zap className="h-6 w-6" />
+        },
+        {
+            title: "Tarif défini",
+            description: "Pas de surprise, le tarif est annoncé avant le début de la session.",
+            icon: <Briefcase className="h-6 w-6" />
+        },
+        {
+            title: "Qualité garantie",
+            description: "Chaque consultant est limité à 10 Sparks maximum, assurant une expertise pointue sur chaque sujet proposé.",
+            icon: <Shield className="h-6 w-6" />
+        },
+        {
+            title: "Gestion simplifiée",
+            description: "Pas de temps masqué ni de gestion commerciale complexe. Réservez votre session et commencez immédiatement.",
+            icon: <Calendar className="h-6 w-6" />
+        }
+    ];
+
+    const about_content = [
+        {
             title: "BrainSparks encadre la prestation",
             description: "BrainSparks va au-delà de la mise en relation, et structure les prestations proposées par nos consultants pour en garantir la pertinence et la qualité. Nos experts ne peuvent proposer que 10 Spark chacun au maximum, ce qui les force à ne proposer des prestations sur lesquelles ils sont réellement experts.",
             icon: <Shield className="h-6 w-6" />
         },
         {
-            title: "BrainSparks s'occupe de la relation commerciale",
-            description: "Sélectionnez un Spark, détaillez votre contexte et réservez la session. La mission commence et s'arrête avec votre rendez-vous.",
+            title: "BrainSparks vous épargne la gestion de la relation commerciale",
+            description: "Pas de temps masqué. Sélectionnez un Spark, détaillez votre contexte et réservez la session. La mission commence et s'arrête avec votre rendez-vous.",
             icon: <Calendar className="h-6 w-6" />
         }
     ];
@@ -682,22 +705,22 @@ export function LandingPage() {
                             </p>
                         </div>
                         <div className="grid md:grid-cols-2 gap-8">
-                            {features.map((feature, index) => (
+                            {about_content.map((item, index) => (
                                 <motion.div
                                     key={index}
                                     variants={fadeInUp}
                                     className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-md"
                                 >
                                     <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
-                                        {React.cloneElement(feature.icon as React.ReactElement, {
+                                        {React.cloneElement(item.icon as React.ReactElement, {
                                             className: "h-6 w-6 text-blue-600"
                                         })}
                                     </div>
                                     <h3 className="text-xl font-semibold mb-4 text-gray-900">
-                                        {feature.title}
+                                        {item.title}
                                     </h3>
                                     <p className="text-gray-600 leading-relaxed">
-                                        {feature.description}
+                                        {item.description}
                                     </p>
                                 </motion.div>
                             ))}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { submitConsultantForm } from '../services/consultantFormSubmission';
-import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles } from 'lucide-react';
+import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles, Target, Users, ArrowRightCircle, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -49,19 +49,24 @@ const ConsultantPage = () => {
 
     const features = [
         {
-            title: "Agenda intelligent",
-            description: "Synchronisez votre calendrier, définissez vos disponibilités et laissez vos clients réserver en toute autonomie. Fini les allers-retours d'emails !",
-            metrics: "Gain de 5h/semaine sur la gestion"
+            title: "Dédié au conseil en stratégie",
+            description: "Contrairement aux plateformes de freelancing low cost, BrainSparks vous permet de renvoyer une image professionnelle, structurée autour de votre offre de conseil en stratégie.",
+            icon: <Target className="h-6 w-6" />
         },
         {
-            title: "Paiements automatisés",
-            description: "Facturation automatique, paiements sécurisés et suivi des revenus en temps réel. Plus besoin de courir après les paiements.",
-            metrics: "Paiement J+3 garanti"
+            title: "Des clients qualifiés",
+            description: "BrainSparks vous assure des clients qualifiés, qui viennent uniquement chercher des prestations de conseil en stratégie. Le tarif minimum d'un Spark est de 500€ pour 30 minutes.",
+            icon: <Users className="h-6 w-6" />
         },
         {
-            title: "Tableau de bord personnalisé",
-            description: "Visualisez vos métriques clés : taux de conversion, revenus, satisfaction client, et optimisez votre activité avec des insights actionnables.",
-            metrics: "Pilotage en temps réel"
+            title: "Un processus d'achat simple",
+            description: "En structurant votre offre sous forme de modules Sparks, vous accédez au marché de la mission courte. Les clients peuvent naviguer votre offre plus facilement et prendre une décision d'achat plus rapide.",
+            icon: <ArrowRightCircle className="h-6 w-6" />
+        },
+        {
+            title: "Un brief précis",
+            description: "Vos clients achètent un Spark et nous nous chargeons d'établir un brief très précis avec eux. Vous optimisez ainsi votre temps et augmentez votre valeur ajoutée.",
+            icon: <FileText className="h-6 w-6" />
         }
     ];
 
@@ -93,35 +98,45 @@ const ConsultantPage = () => {
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Hero Section */}
-                <motion.div 
+                <motion.div
                     className="text-center mb-16"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                 >
                     <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
-                        Développez votre activité de consultant<br />avec l'aide de l'IA
+                        Pour les consultants
                     </h1>
+                    <h2 className="text-2xl md:text-4xl font-semibold mb-4 text-gray-800">
+                        Vendez votre expertise en stratégie
+                    </h2>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                        Un assistant IA intelligent qui qualifie vos prospects 24/7 et une page de profil qui convertit. Créez des offres packagées et laissez l'IA matcher les bonnes solutions à vos clients.
+                        À des clients qualifiés sous la forme de sessions de 30 minutes à 2h
                     </p>
-                    <motion.div 
+                    <div className="max-w-3xl mx-auto bg-white rounded-xl p-6 shadow-md mb-8">
+                        <h3 className="text-xl font-semibold mb-4">L'acquisition client simplifiée</h3>
+                        <p className="text-gray-600">
+                            Le Spark est un module de conseil structuré et précis. Il vous permet de packager vos offres pour les vendre plus facilement.
+                            Il s'agit également d'un excellent moyen pour rencontrer de nouveaux clients avec qui créer une relation plus longue.
+                        </p>
+                    </div>
+                    <motion.div
                         className="flex flex-col sm:flex-row justify-center gap-4"
                         variants={stagger}
                         initial="initial"
                         animate="animate"
                     >
-                        <motion.button 
+                        <motion.button
                             variants={fadeInUp}
-                            onClick={() => document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' })} 
+                            onClick={() => document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' })}
                             className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2 group"
                         >
                             Créer mon profil gratuitement
                             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                         </motion.button>
-                        <motion.button 
+                        <motion.button
                             variants={fadeInUp}
-                            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} 
+                            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                             className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors border border-blue-600"
                         >
                             Découvrir les fonctionnalités
@@ -130,7 +145,7 @@ const ConsultantPage = () => {
                 </motion.div>
 
                 {/* Success Metrics */}
-                <motion.div 
+                <motion.div
                     className="bg-white rounded-xl p-8 shadow-md mb-16"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -158,7 +173,7 @@ const ConsultantPage = () => {
                 </motion.div>
 
                 {/* AI Assistant Demo Section */}
-                <motion.div 
+                <motion.div
                     className="mb-16 bg-white rounded-xl p-8 shadow-md"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -172,8 +187,8 @@ const ConsultantPage = () => {
                                     <Sparkles className="h-4 w-4" />
                                     Fonctionnalité phare #1
                                 </div>
-                                <Link 
-                                    to="/profile" 
+                                <Link
+                                    to="/profile"
                                     className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium sm:ml-auto"
                                 >
                                     Voir un exemple <ArrowRight className="h-4 w-4" />
@@ -237,7 +252,7 @@ const ConsultantPage = () => {
                 </motion.div>
 
                 {/* Package Creation Demo Section */}
-                <motion.div 
+                <motion.div
                     className="mb-16 bg-white rounded-xl p-8 shadow-md"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -280,8 +295,8 @@ const ConsultantPage = () => {
                                     <Sparkles className="h-4 w-4" />
                                     Fonctionnalité phare #2
                                 </div>
-                                <Link 
-                                    to="/profile" 
+                                <Link
+                                    to="/profile"
                                     className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium sm:ml-auto"
                                 >
                                     Voir un exemple <ArrowRight className="h-4 w-4" />
@@ -322,8 +337,8 @@ const ConsultantPage = () => {
                 </motion.div>
 
                 {/* Features Grid */}
-                <motion.div 
-                    id="features" 
+                <motion.div
+                    id="features"
                     className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
                     variants={stagger}
                     initial="initial"
@@ -347,20 +362,20 @@ const ConsultantPage = () => {
                 </motion.div>
 
                 {/* Success Stories */}
-                <motion.div 
+                <motion.div
                     className="mb-16"
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
                 >
-                    <motion.h2 
+                    <motion.h2
                         className="text-3xl font-bold text-center mb-12"
                         variants={fadeInUp}
                     >
                         Ils ont réussi avec nous
                     </motion.h2>
-                    <motion.div 
+                    <motion.div
                         className="grid md:grid-cols-3 gap-8"
                         variants={stagger}
                         initial="initial"
@@ -374,9 +389,9 @@ const ConsultantPage = () => {
                                 className="bg-white p-6 rounded-xl shadow-md"
                             >
                                 <div className="flex items-center gap-4 mb-4">
-                                    <img 
-                                        src={story.image} 
-                                        alt={story.name} 
+                                    <img
+                                        src={story.image}
+                                        alt={story.name}
                                         className="w-16 h-16 rounded-full object-cover"
                                     />
                                     <div>
@@ -392,8 +407,8 @@ const ConsultantPage = () => {
                 </motion.div>
 
                 {/* Sign Up Form */}
-                <motion.div 
-                    id="signup-form" 
+                <motion.div
+                    id="signup-form"
                     className="max-w-2xl mx-auto"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -524,6 +539,29 @@ const ConsultantPage = () => {
                             </p>
                         </form>
                     )}
+                </motion.div>
+
+                {/* Packaging Offers Section */}
+                <motion.div
+                    className="mb-16 bg-white rounded-xl p-8 shadow-md"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <h2 className="text-3xl font-bold mb-6">Pourquoi packager vos offres ?</h2>
+                    <p className="text-gray-600 mb-6">
+                        Transformer vos services en produits packagés vous permet d'augmenter la clarté de votre offre,
+                        et de vendre plus facilement, sans perdre de temps à négocier une lettre de mission.
+                        Chaque Spark est vendu au minimum 500€, vous pouvez en proposer 10 différents.
+                    </p>
+                    <div className="bg-blue-50 p-6 rounded-lg">
+                        <h3 className="text-xl font-semibold mb-4">Votre page de profil</h3>
+                        <p className="text-gray-700">
+                            En plus de la présence sur notre plateforme vous disposerez d'une page de conversion personnelle
+                            sur laquelle vos Sparks seront disponibles et réservables en ligne.
+                        </p>
+                    </div>
                 </motion.div>
             </div>
         </div>
