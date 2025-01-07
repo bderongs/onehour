@@ -58,8 +58,8 @@ export function Logo({ className = "h-8 w-8", color = "indigo-900" }: LogoProps)
       <path d="M17.8 11.8 19 13"/>
       <path d="M15 9h.01"/>
       <path d="M17.8 6.2 19 5"/>
-      <path d="m3 21 9-9"/>
-      <path d="M12.2 6.2 11 5"/>
+      <path d="M3 21 12 12"/>
+      <path d="M12 6 11 5"/>
     </svg>
   );
 } 
