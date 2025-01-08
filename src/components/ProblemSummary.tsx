@@ -31,8 +31,10 @@ export function ProblemSummary({ summary, onConnect, hasUserMessage, isLoading =
     if (!hasUserMessage) {
         return (
             <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex flex-col items-center justify-center text-center py-6">
-                    <MessageSquare className="h-8 w-8 text-gray-400 mb-3" />
+                <div className="flex flex-col items-center text-left py-6">
+                    <div className="flex justify-center w-full mb-3">
+                        <MessageSquare className="h-8 w-8 text-gray-400" />
+                    </div>
                     <p className="text-gray-500 text-sm">
                         Expliquez votre projet à l'assistant pour voir apparaître un résumé de votre besoin ici.
                     </p>
@@ -51,13 +53,13 @@ export function ProblemSummary({ summary, onConnect, hasUserMessage, isLoading =
             </div>
             
             {filledSections.length === 0 ? (
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-500 text-sm text-left">
                     Le résumé de votre besoin apparaîtra ici au fur et à mesure de notre conversation.
                 </p>
             ) : (
                 <div className={`space-y-4 transition-opacity duration-200 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
                     {filledSections.map(section => (
-                        <div key={section.key}>
+                        <div key={section.key} className="text-left">
                             <h4 className="text-sm font-medium text-gray-700">{section.label}</h4>
                             <p className="text-sm text-gray-600 mt-1">{section.value}</p>
                         </div>
@@ -68,7 +70,7 @@ export function ProblemSummary({ summary, onConnect, hasUserMessage, isLoading =
             <div className="mt-6">
                 {summary.readyForAssessment ? (
                     <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg">
+                        <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg text-left">
                             <CheckCircle className="h-4 w-4 flex-shrink-0" />
                             <span className="text-sm">Votre brief est complet ! Vous pouvez prendre rendez-vous ou continuer à ajouter des détails.</span>
                         </div>
@@ -81,7 +83,7 @@ export function ProblemSummary({ summary, onConnect, hasUserMessage, isLoading =
                         </button>
                     </div>
                 ) : filledSections.length > 0 && (
-                    <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-lg">
+                    <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-lg text-left">
                         <AlertCircle className="h-5 w-5" />
                         <span className="text-sm">
                             Continuez la discussion pour compléter votre brief

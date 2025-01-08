@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote, Sparkle, ArrowRight, BadgeCheck, FileText } from 'lucide-react';
+import { Bot, Users, Package2, Plus, Clock, Briefcase, Target, CheckCircle, MessageSquare, Calendar, Zap, ArrowRightCircle, Shield, Award, Star, Quote, Sparkles, ArrowRight, BadgeCheck, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
@@ -33,9 +33,8 @@ const stagger = {
 export function LandingPage() {
     const navigate = useNavigate();
     const [problem, setProblem] = useState('');
-    const [showChat, setShowChat] = useState(false);
-    const [showConnect, setShowConnect] = useState(false);
     const [showForm, setShowForm] = useState(true);
+    const [showConnect, setShowConnect] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [scrollY, setScrollY] = useState(0);
     const [shouldReset, setShouldReset] = useState(false);
@@ -103,6 +102,14 @@ export function LandingPage() {
 
     const handleUseCaseClick = (prefillText: string) => {
         setProblem(prefillText);
+        if (prefillText.trim()) {
+            const initialMessages: Message[] = [{
+                role: 'user',
+                content: prefillText.trim()
+            }];
+            setMessages(initialMessages);
+            setShowForm(false);
+        }
     };
 
     const handleSubmit = (e: React.FormEvent, message: string) => {
@@ -113,7 +120,6 @@ export function LandingPage() {
                 content: message.trim()
             }];
             setMessages(initialMessages);
-            setShowChat(true);
             setShowForm(false);
         }
     };
@@ -128,25 +134,30 @@ export function LandingPage() {
     const handleConnect = () => {
         console.log('LandingPage - handleConnect called, current summary:', problemSummary);
         setShowConnect(true);
-        setShowChat(false);
     };
 
-    const handleBack = () => {
-        setShowConnect(false);
-        setShowChat(false);
-        setShowForm(true);
-        setMessages([]);
-        setShouldReset(true);
-        setProblemSummary({
-            challenge: '',
-            currentSituation: '',
-            desiredOutcome: '',
-            constraints: '',
-            stakeholders: '',
-            previousAttempts: '',
-            readyForAssessment: false
-        });
-        setProblem('');
+    const handleBack = (shouldReset?: boolean) => {
+        if (shouldReset) {
+            // Reset to initial state
+            setShowForm(true);
+            setMessages([]);
+            setShouldReset(true);
+            setProblemSummary({
+                challenge: '',
+                currentSituation: '',
+                desiredOutcome: '',
+                constraints: '',
+                stakeholders: '',
+                previousAttempts: '',
+                readyForAssessment: false
+            });
+            setProblem('');
+            setIsChatExpanded(false);
+            setExpandedCallIndex(0);
+        } else {
+            // Just go back to chat interface while preserving all state
+            setShowConnect(false);
+        }
     };
 
     const handleMessagesUpdate = (newMessages: Message[]) => {
@@ -313,71 +324,72 @@ export function LandingPage() {
 
                         {/* Use Case Form Section */}
                         <div className="max-w-4xl mx-auto">
-                            <div className={`${showForm ? 'block' : 'hidden'}`}>
-                                <SparksGrid
-                                    expertCalls={expertCalls}
-                                    expandedCallIndex={expandedCallIndex}
-                                    setExpandedCallIndex={setExpandedCallIndex}
-                                    onCallClick={handleUseCaseClick}
-                                    buttonText="Choisir ce Spark"
-                                />
+                            <SparksGrid
+                                expertCalls={expertCalls}
+                                expandedCallIndex={expandedCallIndex}
+                                setExpandedCallIndex={setExpandedCallIndex}
+                                onCallClick={handleUseCaseClick}
+                                buttonText="Choisir ce Spark"
+                            />
 
-                                <div className="mt-6 text-center flex flex-col items-center gap-4">
-                                    <div className="w-full max-w-6xl">
-                                        <motion.div
-                                            className="bg-white rounded-xl shadow-md overflow-hidden text-sm"
-                                            animate={{ height: isChatExpanded ? 'auto' : 'auto' }}
-                                            transition={{ duration: 0.3 }}
-                                        >
-                                            <div className="p-4 border-b border-gray-200">
-                                                <div className="flex items-center gap-2 text-left">
-                                                    <Sparkle className="h-4 w-4 text-blue-600" />
-                                                    <h2 className="text-lg font-semibold text-gray-900">
-                                                        Et bien d'autres possibilités selon vos besoins
-                                                    </h2>
-                                                </div>
-                                                <p className="text-xs text-gray-600 mt-1 text-left">
-                                                    Notre assistant vous aide à trouver le Spark idéal
-                                                </p>
+                            <div className="mt-6 text-center flex flex-col items-center gap-4">
+                                <div className="w-full max-w-6xl">
+                                    <motion.div
+                                        className="bg-white rounded-xl shadow-md overflow-hidden text-sm"
+                                        animate={{ height: isChatExpanded ? 'auto' : 'auto' }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <div className="p-4 border-b border-gray-200">
+                                            <div className="flex items-center gap-2 text-left">
+                                                <Sparkles className="h-4 w-4 text-blue-600" />
+                                                <h2 className="text-lg font-semibold text-gray-900">
+                                                    Et bien d'autres possibilités selon vos besoins
+                                                </h2>
                                             </div>
+                                            <p className="text-xs text-gray-600 mt-1 text-left">
+                                                Notre assistant vous aide à trouver le Spark idéal
+                                            </p>
+                                        </div>
 
-                                            {!isChatExpanded ? (
-                                                <div
-                                                    className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-                                                    onClick={() => setIsChatExpanded(true)}
-                                                >
-                                                    <div className="relative">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Décrivez votre problématique..."
-                                                            className="w-full px-4 py-3 bg-white rounded-lg border border-gray-200 
-                                                                     focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                                                                     transition-all cursor-pointer"
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                setIsChatExpanded(true);
-                                                            }}
-                                                            readOnly
-                                                        />
-                                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-600">
-                                                            <ArrowRight className="h-4 w-4" />
-                                                        </div>
+                                        {!isChatExpanded ? (
+                                            <div
+                                                className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                                                onClick={() => setIsChatExpanded(true)}
+                                            >
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Décrivez votre problématique..."
+                                                        className="w-full px-4 py-3 bg-white rounded-lg border border-gray-200 
+                                                                focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+                                                                transition-all cursor-pointer"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setIsChatExpanded(true);
+                                                        }}
+                                                        readOnly
+                                                    />
+                                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-600">
+                                                        <ArrowRight className="h-4 w-4" />
                                                     </div>
                                                 </div>
-                                            ) : (
-                                                <motion.div
-                                                    className="p-4"
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 1 }}
-                                                    transition={{ duration: 0.3 }}
-                                                >
-                                                    <div className="text-sm">
+                                            </div>
+                                        ) : (
+                                            <motion.div
+                                                className="p-4"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                <div className="relative">
+                                                    {/* Chat Interface - Always rendered but conditionally visible */}
+                                                    <div className={`${!showConnect ? 'block' : 'hidden'}`}>
                                                         <AIChatInterface
                                                             messages={messages}
                                                             onMessagesUpdate={handleMessagesUpdate}
                                                             config={{
                                                                 ...chatConfig,
-                                                                initialMessage: {
+                                                                initialMessage: messages.length > 0 ? messages[0] : {
                                                                     role: 'assistant' as const,
                                                                     content: "Bonjour ! Je peux vous aider à trouver le Spark qui correspond à votre besoin. Décrivez-moi votre problématique."
                                                                 }
@@ -385,49 +397,19 @@ export function LandingPage() {
                                                             shouldReset={shouldReset}
                                                         />
                                                     </div>
-                                                </motion.div>
-                                            )}
-                                        </motion.div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            {/* Chat Interface */}
-                            <div className={`slide-down-enter slide-down-enter-active ${showChat && !showConnect ? 'block' : 'hidden'}`}>
-                                <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                                    <div className="p-4 border-b border-gray-200">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <Sparkle className="h-5 w-5 text-blue-600" />
-                                                <h2 className="text-xl font-semibold text-gray-900">{chatConfig.title}</h2>
-                                            </div>
-                                        </div>
-                                        <p className="text-sm text-gray-600 mt-1 text-left">{chatConfig.subtitle}</p>
-                                    </div>
-                                    <div className="p-4">
-                                        <div className="text-sm">
-                                            <AIChatInterface
-                                                messages={messages}
-                                                onMessagesUpdate={handleMessagesUpdate}
-                                                config={{
-                                                    ...chatConfig,
-                                                    initialMessage: messages.length > 0 ? messages[0] : chatConfig.initialMessage
-                                                }}
-                                                shouldReset={shouldReset}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Connect Form */}
-                            <div className={`slide-down-enter slide-down-enter-active ${showConnect ? 'block' : 'hidden'}`}>
-                                <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                                    <ConsultantConnect
-                                        onBack={handleBack}
-                                        problemSummary={problemSummary}
-                                        config={chatConfig}
-                                    />
+                                                    {/* Consultant Connect - Always rendered but conditionally visible */}
+                                                    <div className={`${showConnect ? 'block' : 'hidden'}`}>
+                                                        <ConsultantConnect
+                                                            onBack={handleBack}
+                                                            problemSummary={problemSummary}
+                                                            config={chatConfig}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </motion.div>
                                 </div>
                             </div>
                         </div>
