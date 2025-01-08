@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, BadgeCheck } from 'lucide-react';
 import { ExpertCall } from '../types/expertCall';
+import { Logo } from './Logo';
 
 interface SparksGridProps {
     expertCalls: ExpertCall[];
@@ -44,10 +45,11 @@ export function SparksGrid({
                     <div className="p-4 sm:p-6 h-full flex flex-col">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h3 className="text-lg font-semibold text-gray-900 text-left line-clamp-2 mb-2">
+                                <h3 className="text-lg font-semibold text-gray-900 text-left line-clamp-3">
+                                    <Logo className="h-5 w-5 inline-block align-text-bottom mr-2" color="indigo-600" />
                                     {call.title}
                                 </h3>
-                                <div className="flex flex-col gap-1">
+                                <div className="flex flex-col gap-1 mt-2">
                                     <div className="flex items-center gap-2 text-gray-500 text-sm">
                                         <Clock className="h-4 w-4" />
                                         <span>{call.duration}</span>
