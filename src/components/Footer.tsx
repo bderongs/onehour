@@ -22,7 +22,7 @@ export function Footer() {
               <BrandName color="indigo-400" />
             </div>
             <p className="text-gray-400">
-              Le concentré de conseil expertise
+              Le concentré de conseil expert
             </p>
           </div>
 
@@ -61,8 +61,8 @@ export function Footer() {
           <div className={isSimplifiedFooter ? 'md:col-start-4' : ''}>
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <ul className="space-y-2">
-              <li className="text-gray-400">contact@sparkier.io</li>
-              <li className="text-gray-400">01 23 45 67 89</li>
+              <li><a href="mailto:contact@sparkier.io" className="text-gray-400 hover:text-white">contact@sparkier.io</a></li>
+              <li><a href="tel:0123456789" className="text-gray-400 hover:text-white">01 23 45 67 89</a></li>
             </ul>
           </div>
         </div>
