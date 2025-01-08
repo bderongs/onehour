@@ -42,7 +42,7 @@ export function SparksGrid({
                     }}
                 >
                     <div className="p-4 sm:p-6 h-full flex flex-col">
-                        <div className="flex justify-between items-start mb-4">
+                        <div className="flex justify-between items-start">
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-900 text-left line-clamp-2 mb-2">
                                     {call.title}
@@ -109,11 +109,7 @@ export function SparksGrid({
                             </motion.div>
                         ) : (
                             <div className="flex flex-col flex-grow">
-                                <div className="mt-auto flex items-center justify-between text-sm">
-                                    <div className="flex items-center gap-2">
-                                        <BadgeCheck className="h-4 w-4 text-blue-600" />
-                                        <span className="text-gray-600">Disponible</span>
-                                    </div>
+                                <div className="mt-auto flex items-center justify-end text-sm">
                                     <ArrowRight className="h-4 w-4 text-blue-600" />
                                 </div>
                             </div>
