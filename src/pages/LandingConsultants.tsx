@@ -125,7 +125,7 @@ const LandingConsultants = () => {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* Hero Section */}
                 <motion.div
                     className="text-center mb-16"
@@ -133,15 +133,15 @@ const LandingConsultants = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                 >
-                    <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
+                    <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 text-gray-900 leading-tight px-2">
                         Packagez votre expertise
                     </h1>
-                    <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
+                    <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-8 sm:mb-12 px-2">
                         Vendez des modules de conseil à des clients qualifiés sous la forme de sessions de 30&nbsp;minutes à 2&nbsp;heures.
                     </p>
 
                     {/* Sparks Grid */}
-                    <div className="mb-16">
+                    <div className="mb-12 sm:mb-16">
                         <SparksGrid
                             expertCalls={consultantExpertCalls}
                             expandedCallIndex={expandedCallIndex}
@@ -152,7 +152,7 @@ const LandingConsultants = () => {
                     </div>
 
                     <motion.div
-                        className="flex justify-center gap-4"
+                        className="flex flex-col sm:flex-row justify-center gap-4"
                         variants={stagger}
                         initial="initial"
                         animate="animate"
@@ -160,17 +160,17 @@ const LandingConsultants = () => {
                         <motion.button
                             variants={fadeInUp}
                             onClick={() => document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2 group"
+                            className="w-full sm:w-auto bg-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2 group"
                         >
-                            Créer mes premiers Sparks
+                            <span className="whitespace-nowrap">Créer mes premiers Sparks</span>
                             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                         </motion.button>
-                        <motion.div variants={fadeInUp}>
+                        <motion.div variants={fadeInUp} className="w-full sm:w-auto">
                             <Link
-                                to="/consultant/arnaud-lacaze"
-                                className="bg-white text-blue-600 border-2 border-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors inline-flex items-center justify-center gap-2 group"
+                                to="/profile"
+                                className="w-full sm:w-auto bg-white text-blue-600 border-2 border-blue-600 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors inline-flex items-center justify-center gap-2 group"
                             >
-                                Voir un profil exemple
+                                <span className="whitespace-nowrap">Voir un profil exemple</span>
                                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                             </Link>
                         </motion.div>
@@ -180,31 +180,31 @@ const LandingConsultants = () => {
                 {/* Key Features Section */}
                 <div
                     id="key-features"
-                    className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-12 sm:mb-16"
                 >
                     {keyFeatures.map((feature, index) => (
                         <motion.div
                             key={index}
-                            className="bg-white rounded-xl p-8 shadow-md"
+                            className="bg-white rounded-xl p-6 sm:p-8 shadow-md"
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.5, delay: index * 0.1 }}
                         >
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
                                 <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
                                     <Sparkles className="h-4 w-4" />
                                     Fonctionnalité phare #{index + 1}
                                 </div>
                             </div>
-                            <div className="flex items-start gap-4">
-                                <div className="p-3 bg-blue-50 rounded-lg w-fit h-fit">
+                            <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                                <div className="p-2 sm:p-3 bg-blue-50 rounded-lg w-fit h-fit">
                                     {React.cloneElement(feature.icon as React.ReactElement, {
                                         className: "h-6 w-6 text-blue-600"
                                     })}
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl font-bold mb-4">{feature.title}</h2>
+                                    <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">{feature.title}</h2>
                                     <p className="text-gray-600 leading-relaxed">
                                         {feature.description}
                                     </p>
@@ -215,16 +215,16 @@ const LandingConsultants = () => {
                 </div>
 
                 {/* Features Grid with Title */}
-                <div className="mb-16">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                <div className="mb-12 sm:mb-16">
+                    <div className="text-center mb-8 sm:mb-12">
+                        <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-gray-900 px-2">
                             Pourquoi Sparkier ?
                         </h2>
                     </div>
 
                     <motion.div
                         id="features"
-                        className="grid grid-cols-1 md:grid-cols-4 gap-8"
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8"
                         variants={stagger}
                         initial="initial"
                         whileInView="animate"
@@ -234,7 +234,7 @@ const LandingConsultants = () => {
                             <motion.div
                                 key={index}
                                 variants={fadeInUp}
-                                className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+                                className="bg-white p-4 sm:p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
                             >
                                 <h3 className="text-xl font-semibold mb-3 text-gray-900">{feature.title}</h3>
                                 <p className="text-gray-600 mb-4">{feature.description}</p>
@@ -246,7 +246,7 @@ const LandingConsultants = () => {
                 {/* Sign Up Form */}
                 <motion.div
                     id="signup-form"
-                    className="max-w-2xl mx-auto"
+                    className="max-w-2xl mx-auto px-3 sm:px-0"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -268,7 +268,7 @@ const LandingConsultants = () => {
                             <p>Notre équipe va vous contacter dans les 24h pour finaliser la création de votre profil et vous accompagner dans la prise en main de la plateforme.</p>
                         </div>
                     ) : (
-                        <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-md">
+                        <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-xl shadow-md">
                             <div className="space-y-6">
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div>
