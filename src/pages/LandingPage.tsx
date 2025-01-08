@@ -109,6 +109,8 @@ export function LandingPage() {
             }];
             setMessages(initialMessages);
             setShowForm(false);
+            setShowConnect(false);
+            setIsChatExpanded(true);
         }
     };
 
@@ -121,6 +123,8 @@ export function LandingPage() {
             }];
             setMessages(initialMessages);
             setShowForm(false);
+            setShowConnect(false);
+            setIsChatExpanded(true);
         }
     };
 
@@ -140,6 +144,7 @@ export function LandingPage() {
         if (shouldReset) {
             // Reset to initial state
             setShowForm(true);
+            setShowConnect(false);
             setMessages([]);
             setShouldReset(true);
             setProblemSummary({

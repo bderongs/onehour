@@ -72,6 +72,12 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
         onBack(true);
     };
 
+    const handleBack = (e: React.MouseEvent) => {
+        e.preventDefault();
+        setIsSubmitted(false);
+        onBack();
+    };
+
     if (isSubmitted) {
         return (
             <div className="relative">
@@ -126,10 +132,7 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
                         <h2 className="text-xl font-semibold text-gray-900">Confirmez Votre Demande de Consultation</h2>
                     </div>
                     <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            onBack();
-                        }}
+                        onClick={handleBack}
                         className="text-gray-500 hover:text-gray-700"
                     >
                         <ArrowLeft className="h-6 w-6" />
