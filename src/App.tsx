@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
-import { LandingPage } from './pages/LandingPage';
+import { LandingClients } from './pages/LandingClients';
 import { FAQ } from './pages/FAQ';
-import ConsultantPage from './pages/ConsultantPage';
+import LandingConsultants from './pages/LandingConsultants';
 import { AutomationLandingPage } from './pages/AutomationLandingPage';
 import ConsultantProfilePage from './pages/ConsultantProfilePage';
 import { Header } from './components/Header';
@@ -21,7 +21,7 @@ function App() {
             <>
               <Header />
               <main className="flex-grow pt-16">
-                <LandingPage />
+                <LandingConsultants />
               </main>
               <Footer />
             </>
@@ -39,7 +39,7 @@ function App() {
             <>
               <Header />
               <main className="flex-grow pt-16">
-                <ConsultantPage />
+                <LandingConsultants />
               </main>
               <Footer />
             </>
