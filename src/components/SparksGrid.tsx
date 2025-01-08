@@ -34,7 +34,7 @@ export function SparksGrid({
                     variants={fadeInUp}
                     className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer
                         transform-gpu hover:scale-[1.02]
-                        ${expandedCallIndex === index ? 'sm:col-span-2 md:row-span-3' : ''}`}
+                        ${expandedCallIndex === index ? 'sm:col-span-2 md:row-span-3 h-full' : ''}`}
                     onClick={() => {
                         if (expandedCallIndex === index) {
                             return;
@@ -69,26 +69,32 @@ export function SparksGrid({
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.2 }}
-                                className="flex flex-col flex-grow"
+                                className="flex flex-col flex-grow mt-4"
                             >
-                                <p className="text-gray-600 text-sm mb-4 text-left">
-                                    {call.description}
-                                </p>
+                                <div className="border-t border-gray-100" />
+                                
+                                <div className="space-y-4 py-4 flex-grow">
+                                    <p className="text-gray-600 text-sm leading-relaxed text-left">
+                                        {call.description}
+                                    </p>
 
-                                {call.benefits && (
-                                    <div className="space-y-2 mb-6">
-                                        <div className="text-sm font-medium text-gray-900 mb-2 text-left">Bénéfices :</div>
-                                        {call.benefits.map((benefit, i) => (
-                                            <div key={i} className="flex items-start gap-2 text-left">
-                                                <CheckCircle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                                                <span className="text-sm text-gray-600">{benefit}</span>
+                                    {call.benefits && (
+                                        <div className="space-y-3 text-left">
+                                            <div className="text-sm font-medium text-gray-900">Ce que vous obtiendrez :</div>
+                                            <div className="space-y-2.5">
+                                                {call.benefits.map((benefit, i) => (
+                                                    <div key={i} className="flex items-start gap-2">
+                                                        <CheckCircle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                                                        <span className="text-sm text-gray-600 leading-relaxed">{benefit}</span>
+                                                    </div>
+                                                ))}
                                             </div>
-                                        ))}
-                                    </div>
-                                )}
+                                        </div>
+                                    )}
+                                </div>
 
-                                <div className="mt-auto">
-                                    <div className="text-center mb-3">
+                                <div className="space-y-4 border-t border-gray-100 pt-4">
+                                    <div className="text-center">
                                         <div className="text-sm text-gray-500">Prochaine disponibilité</div>
                                         <div className="text-sm font-medium text-gray-900">
                                             Lundi 15 avril, 14h00
