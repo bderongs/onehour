@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { CheckCircle, Star, ArrowRight, Linkedin, Twitter, Globe, X, BadgeCheck, Sparkles, AlertCircle, MessageSquare } from 'lucide-react';
-import { LightFooter } from '../components/LightFooter';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
 import { CHAT_CONFIGS } from '../types/chat';

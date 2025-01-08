@@ -134,13 +134,10 @@ const ConsultantPage = () => {
                     transition={{ duration: 0.6 }}
                 >
                     <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
-                        Pour les consultants
+                        Packagez votre expertise
                     </h1>
-                    <h2 className="text-2xl md:text-4xl font-semibold mb-4 text-gray-800">
-                        Vendez votre expertise en stratégie
-                    </h2>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
-                        À des clients qualifiés sous la forme de sessions de 30 minutes à 2h
+                        Vendez des modules de conseil à des clients qualifiés sous la forme de sessions de 30&nbsp;minutes à 2&nbsp;heures.
                     </p>
 
                     {/* Sparks Grid */}
@@ -155,7 +152,7 @@ const ConsultantPage = () => {
                     </div>
 
                     <motion.div
-                        className="flex flex-col sm:flex-row justify-center gap-4"
+                        className="flex justify-center"
                         variants={stagger}
                         initial="initial"
                         animate="animate"
@@ -167,13 +164,6 @@ const ConsultantPage = () => {
                         >
                             Créer mes premiers Sparks
                             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                        </motion.button>
-                        <motion.button
-                            variants={fadeInUp}
-                            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors border border-blue-600"
-                        >
-                            Découvrir les fonctionnalités
                         </motion.button>
                     </motion.div>
                 </motion.div>

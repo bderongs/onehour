@@ -67,7 +67,7 @@ function App() {
               <main className="flex-grow">
                 <ConsultantProfilePage />
               </main>
-              <LightFooter />
+              <Footer />
             </>
           } />
           <Route path="/terms" element={
@@ -90,9 +90,11 @@ function App() {
           } />
           <Route path="/brand" element={
             <>
+              <Header />
               <main className="flex-grow">
                 <BrandPage />
               </main>
+              <Footer />
             </>
           } />
           <Route path="*" element={

@@ -51,15 +51,15 @@ export function Logo({ className = "h-8 w-8", color = "indigo-900" }: LogoProps)
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M15 4V2"/>
-      <path d="M15 16v-2"/>
-      <path d="M8 9h2"/>
-      <path d="M20 9h2"/>
-      <path d="M17.8 11.8 19 13"/>
-      <path d="M15 9h.01"/>
-      <path d="M17.8 6.2 19 5"/>
-      <path d="M12 11.8 11 13"/>
-      <path d="M12 6 11 5"/>
+      <path d="M12 4V1"/>
+      <path d="M12 23v-3"/>
+      <path d="M1 12h3"/>
+      <path d="M20 12h3"/>
+      <path d="M17.7 17.7 20 20"/>
+      <path d="M12 12h.01"/>
+      <path d="M17.7 6.3 20 4"/>
+      <path d="M6.3 17.7 4 20"/>
+      <path d="M6.3 6.3 4 4"/>
     </svg>
   );
 } 

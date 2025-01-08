@@ -2,7 +2,6 @@ import React from 'react';
 import { Logo } from '../components/Logo';
 import { BrandName } from '../components/BrandName';
 import { HeaderSimple } from '../components/HeaderSimple';
-import { LightFooter } from '../components/LightFooter';
 
 export function BrandPage() {
   return (
@@ -113,7 +112,6 @@ export function BrandPage() {
         </div>
       </main>
 
-      <LightFooter />
     </div>
   );
 } 
