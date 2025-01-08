@@ -20,7 +20,7 @@ const stagger = {
     }
 };
 
-const ConsultantPage = () => {
+const LandingConsultants = () => {
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -152,7 +152,7 @@ const ConsultantPage = () => {
                     </div>
 
                     <motion.div
-                        className="flex justify-center"
+                        className="flex justify-center gap-4"
                         variants={stagger}
                         initial="initial"
                         animate="animate"
@@ -165,6 +165,15 @@ const ConsultantPage = () => {
                             Créer mes premiers Sparks
                             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                         </motion.button>
+                        <motion.div variants={fadeInUp}>
+                            <Link
+                                to="/consultant/arnaud-lacaze"
+                                className="bg-white text-blue-600 border-2 border-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors inline-flex items-center justify-center gap-2 group"
+                            >
+                                Voir un profil exemple
+                                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                            </Link>
+                        </motion.div>
                     </motion.div>
                 </motion.div>
 
@@ -373,4 +382,4 @@ const ConsultantPage = () => {
     );
 };
 
-export default ConsultantPage;
+export default LandingConsultants;
