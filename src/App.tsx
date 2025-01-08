@@ -21,7 +21,7 @@ function App() {
             <>
               <Header />
               <main className="flex-grow pt-16">
-                <LandingConsultants />
+                <LandingClients />
               </main>
               <Footer />
             </>

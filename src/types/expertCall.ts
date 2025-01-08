@@ -6,4 +6,5 @@ export interface ExpertCall {
     price?: string;
     description?: string;
     benefits?: string[];
+    highlight?: string;
 } 
