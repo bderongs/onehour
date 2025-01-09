@@ -5,7 +5,6 @@ import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
 import { UseCaseForm } from '../components/UseCaseForm';
 import { motion } from 'framer-motion';
-import { ExpertCall } from '../types/expertCall';
 import { SparksGrid } from '../components/SparksGrid';
 import { expertCalls } from '../data/expertCalls';
 

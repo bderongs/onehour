@@ -1,8 +1,46 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, BadgeCheck } from 'lucide-react';
 import { ExpertCall } from '../types/expertCall';
 import { Logo } from './Logo';
+
+// Utility function to get next available business date
+const getNextBusinessDate = () => {
+    const date = new Date();
+    const randomDays = Math.floor(Math.random() * 2) + 1; // 1 or 2 days
+    
+    for (let i = 0; i < randomDays;) {
+        date.setDate(date.getDate() + 1);
+        // Skip weekends (0 is Sunday, 6 is Saturday)
+        if (date.getDay() !== 0 && date.getDay() !== 6) {
+            i++;
+        }
+    }
+
+    // Generate random time
+    // First decide morning (9-12) or afternoon (13-18)
+    const isMorning = Math.random() < 0.5;
+    let hours;
+    if (isMorning) {
+        hours = Math.floor(Math.random() * (12 - 9 + 1)) + 9; // 9 to 12
+    } else {
+        hours = Math.floor(Math.random() * (18 - 13 + 1)) + 13; // 13 to 18
+    }
+    
+    // Generate random minutes (0, 15, 30, 45)
+    const minutes = Math.floor(Math.random() * 4) * 15;
+    
+    date.setHours(hours, minutes, 0);
+    
+    // Format the date in French
+    return date.toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        hour: 'numeric',
+        minute: '2-digit'
+    });
+};
 
 interface SparksGridProps {
     expertCalls: ExpertCall[];
@@ -25,6 +63,11 @@ export function SparksGrid({
     onCallClick,
     buttonText
 }: SparksGridProps) {
+    // Memoize the dates for each card
+    const availableDates = useMemo(() => {
+        return expertCalls.map(() => getNextBusinessDate());
+    }, [expertCalls.length]); // Only regenerate if the number of calls changes
+
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto px-4 sm:px-0">
             {expertCalls.map((call, index) => (
@@ -97,7 +140,7 @@ export function SparksGrid({
                                     <div className="text-center">
                                         <div className="text-sm text-gray-500">Prochaine disponibilité</div>
                                         <div className="text-sm font-medium text-gray-900">
-                                            Lundi 15 avril, 14h00
+                                            {availableDates[index]}
                                         </div>
                                     </div>
                                     <button
