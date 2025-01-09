@@ -10,7 +10,7 @@ export const expertCalls: ExpertCall[] = [
         icon: createIcon(Package2),
         title: "Choisir un CRM",
         duration: "1h",
-        price: "290€ HT",
+        price: "400€ HT",
         description: "Un expert en solutions CRM vous aide à comparer et sélectionner la meilleure solution pour votre entreprise.",
         benefits: [
             "Analyse de vos besoins spécifiques",
@@ -23,7 +23,7 @@ export const expertCalls: ExpertCall[] = [
         icon: createIcon(Bot),
         title: "Automatiser le support client",
         duration: "1h30",
-        price: "390€ HT",
+        price: "600€ HT",
         description: "Optimisez votre service client grâce à l'IA. Un expert vous guide dans l'automatisation intelligente de vos processus.",
         benefits: [
             "Audit de vos processus actuels",
@@ -36,7 +36,7 @@ export const expertCalls: ExpertCall[] = [
         icon: createIcon(Users),
         title: "Recruter un CTO",
         duration: "2h",
-        price: "490€ HT",
+        price: "800€ HT",
         description: "Un expert en recrutement tech vous accompagne dans la définition du profil et la stratégie de recrutement de votre futur CTO.",
         benefits: [
             "Définition du profil idéal",
@@ -49,7 +49,7 @@ export const expertCalls: ExpertCall[] = [
         icon: createIcon(Target),
         title: "Définir ma stratégie marketing",
         duration: "1h30",
-        price: "390€ HT",
+        price: "600€ HT",
         description: "Construisez une stratégie marketing efficace avec l'aide d'un expert qui analyse votre marché et vos objectifs.",
         benefits: [
             "Analyse de votre positionnement",
@@ -62,7 +62,7 @@ export const expertCalls: ExpertCall[] = [
         icon: createIcon(Zap),
         title: "Optimiser mes process",
         duration: "1h",
-        price: "290€ HT",
+        price: "400€ HT",
         description: "Identifiez et éliminez les inefficacités dans vos processus avec l'aide d'un expert en optimisation opérationnelle.",
         benefits: [
             "Cartographie des processus",
@@ -75,7 +75,7 @@ export const expertCalls: ExpertCall[] = [
         icon: createIcon(Shield),
         title: "Audit sécurité",
         duration: "2h",
-        price: "490€ HT",
+        price: "800€ HT",
         description: "Évaluez la sécurité de votre infrastructure IT et identifiez les points d'amélioration avec un expert en cybersécurité.",
         benefits: [
             "Analyse des vulnérabilités",
@@ -88,7 +88,7 @@ export const expertCalls: ExpertCall[] = [
         icon: createIcon(Calendar),
         title: "Planifier ma levée de fonds",
         duration: "1h30",
-        price: "390€ HT",
+        price: "600€ HT",
         description: "Préparez votre levée de fonds avec un expert qui vous aide à structurer votre approche et maximiser vos chances de succès.",
         benefits: [
             "Évaluation de votre maturité",
@@ -101,7 +101,7 @@ export const expertCalls: ExpertCall[] = [
         icon: createIcon(MessageSquare),
         title: "Améliorer mes ventes",
         duration: "1h",
-        price: "290€ HT",
+        price: "400€ HT",
         description: "Boostez vos performances commerciales avec un expert qui analyse votre processus de vente et identifie les leviers de croissance.",
         benefits: [
             "Audit du tunnel de vente",
@@ -114,7 +114,7 @@ export const expertCalls: ExpertCall[] = [
         icon: createIcon(FileText),
         title: "Rédiger mon business plan",
         duration: "2h",
-        price: "490€ HT",
+        price: "800€ HT",
         description: "Structurez votre business plan avec l'aide d'un expert qui vous guide dans la construction d'un document convaincant.",
         benefits: [
             "Structure personnalisée",
@@ -127,7 +127,7 @@ export const expertCalls: ExpertCall[] = [
         icon: createIcon(Briefcase),
         title: "Développer à l'international",
         duration: "1h30",
-        price: "390€ HT",
+        price: "600€ HT",
         description: "Planifiez votre expansion internationale avec un expert qui vous aide à identifier les opportunités et éviter les pièges.",
         benefits: [
             "Analyse des marchés cibles",

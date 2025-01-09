@@ -85,7 +85,7 @@ const LandingConsultants = () => {
         },
         {
             title: "Des clients qualifiés",
-            description: "Sparkier vous assure des clients qualifiés, qui viennent uniquement chercher des prestations de conseil en stratégie. Le tarif minimum d'un Spark est de 500€ pour 30 minutes.",
+            description: "Sparkier vous assure des clients qualifiés, qui viennent uniquement chercher des prestations de conseil en stratégie. Le tarif minimum d'un Spark est de 200€ pour 30 minutes.",
             icon: <Users className="h-6 w-6" />
         },
         {
@@ -108,7 +108,7 @@ const LandingConsultants = () => {
         },
         {
             title: "Pourquoi packager vos offres ?",
-            description: "Transformer vos services en produits packagés vous permet d'augmenter la clarté de votre offre, et de vendre plus facilement, sans perdre de temps à négocier une lettre de mission. Chaque Spark est vendu au minimum 500€, vous pouvez en proposer 10 différents.",
+            description: "Transformer vos services en produits packagés vous permet d'augmenter la clarté de votre offre, et de vendre plus facilement, sans perdre de temps à négocier une lettre de mission. Chaque Spark est vendu au minimum 200€, vous pouvez en proposer 10 différents.",
             icon: <Package2 className="h-6 w-6" />
         },
         {
