@@ -348,11 +348,11 @@ export function LandingClients() {
                                             <div className="flex items-center gap-2 text-left">
                                                 <Sparkles className="h-4 w-4 text-blue-600" />
                                                 <h2 className="text-lg font-semibold text-gray-900">
-                                                    Et bien d'autres possibilités selon vos besoins
+                                                    Rechercher un Spark
                                                 </h2>
                                             </div>
                                             <p className="text-xs text-gray-600 mt-1 text-left">
-                                                Notre assistant vous aide à trouver le Spark idéal
+                                                Notre assistant IA vous aide à trouver le Spark qu'il vous faut
                                             </p>
                                         </div>
 
@@ -443,9 +443,9 @@ export function LandingClients() {
                                 <motion.div
                                     key={index}
                                     variants={fadeInUp}
-                                    className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-md"
+                                    className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-md text-center"
                                 >
-                                    <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
+                                    <div className="p-3 bg-blue-50 rounded-lg w-fit mx-auto mb-4">
                                         {React.cloneElement(feature.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
                                     </div>
                                     <h3 className="text-xl font-semibold mb-2 text-gray-900">{feature.title}</h3>
