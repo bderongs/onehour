@@ -320,10 +320,10 @@ export function LandingClients() {
                         transition={{ duration: 0.6 }}
                     >
                         <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
-                            Découvrez le Spark
+                            Boostez votre activité avec les <span className="highlight">Sparks</span>
                         </h1>
                         <p className="text-xl md:text-2xl mb-12 text-gray-600 max-w-3xl mx-auto">
-                            Un concentré de conseil : 30 min à 2h avec un expert.
+                        Les Sparks allient <span className="highlight">IA</span> et <span className="highlight">experts métiers</span> pour mettre l'expertise du monde entier au service de votre réussite.
                         </p>
 
                         {/* Use Case Form Section */}
@@ -430,7 +430,7 @@ export function LandingClients() {
                     >
                         <div className="text-center mb-16">
                             <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Le Spark: un concentré de conseil
+                                Le <span className="highlight">Spark</span>: un concentré de conseil
                             </h2>
                             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
                                 Une décision importante à prendre ? Un problème à régler ? Besoin de visibilité sur un sujet complexe ?
@@ -465,7 +465,7 @@ export function LandingClients() {
                     >
                         <div className="text-center mb-16">
                             <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Comment ça marche ?
+                                Comment ça <span className="highlight">marche</span> ?
                             </h2>
                             <p className="text-xl text-gray-600">
                                 Un processus simple en quatre étapes
@@ -499,7 +499,7 @@ export function LandingClients() {
                     >
                         <div className="text-center mb-16">
                             <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                                Pourquoi Sparkier ?
+                                Pourquoi <span className="highlight">Sparkier</span> ?
                             </h2>
                             <p className="text-xl text-gray-600">
                                 Une nouvelle approche du conseil, simple et efficace
@@ -537,7 +537,7 @@ export function LandingClients() {
                         transition={{ duration: 0.5 }}
                     >
                         <h2 className="text-3xl font-bold mb-6 text-gray-900">
-                            Prêt à commencer ?
+                            Prêt à <span className="highlight">commencer</span> ?
                         </h2>
                         <p className="text-xl text-gray-600 mb-8">
                             Décrivez votre problématique et trouvez l'expert qu'il vous faut
@@ -583,6 +583,26 @@ export function LandingClients() {
                     transform: translateY(0);
                     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
                     overflow: hidden;
+                }
+                .highlight {
+                    position: relative;
+                    display: inline-block;
+                }
+                .highlight::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 30%;
+                    background-color: rgba(96, 165, 250, 0.2);
+                    z-index: -1;
+                    transform: rotate(-2deg);
+                    transition: all 0.3s ease;
+                }
+                .highlight:hover::after {
+                    height: 40%;
+                    background-color: rgba(96, 165, 250, 0.3);
                 }
             `}</style>
 
