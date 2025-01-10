@@ -4,7 +4,7 @@ import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles, Target, Users, Arr
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { SparksGrid } from '../components/SparksGrid';
-import { consultantExpertCalls } from '../data/expertCalls';
+import { expertCalls } from '../data/expertCalls';
 import '../styles/highlight.css';
 
 const fadeInUp = {
@@ -144,7 +144,7 @@ const LandingConsultants = () => {
                     {/* Sparks Grid */}
                     <div className="mb-12 sm:mb-16">
                         <SparksGrid
-                            expertCalls={consultantExpertCalls}
+                            expertCalls={expertCalls}
                             expandedCallIndex={expandedCallIndex}
                             setExpandedCallIndex={setExpandedCallIndex}
                             onCallClick={handleSparkCreation}

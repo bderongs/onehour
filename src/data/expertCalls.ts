@@ -137,10 +137,3 @@ export const expertCalls: ExpertCall[] = [
         prefillText: "Je souhaite développer mon entreprise à l'international."
     }
 ];
-
-// Consultant version of the same Sparks
-export const consultantExpertCalls: ExpertCall[] = expertCalls.map(call => ({
-    ...call,
-    description: call.description?.replace("Un expert", "Vous"),
-    prefillText: `Créer un Spark: ${call.title}`
-})); 
