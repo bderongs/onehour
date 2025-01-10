@@ -585,6 +585,9 @@ export function LandingClients() {
                     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
                     overflow: hidden;
                 }
+                html {
+                    scroll-padding-top: 80px; /* Add padding for fixed header */
+                }
             `}</style>
 
             <div className="hidden">

@@ -103,7 +103,6 @@ interface ProblemSummary {
 }
 
 export default function ConsultantProfilePage() {
-    const [scrollY, setScrollY] = useState(0);
     const [nextAvailability] = useState(getNextWorkingDay());
     const [modal, setModal] = useState<ModalState>({ isOpen: false, package: null, type: 'info' });
     const [showChat, setShowChat] = useState(false);
@@ -127,24 +126,6 @@ export default function ConsultantProfilePage() {
             setShouldReset(false);
         }
     }, [shouldReset]);
-
-    // Enhanced scroll reset effect
-    useEffect(() => {
-        // Reset scroll on mount
-        window.scrollTo(0, 0);
-        
-        // Handle refresh/reload cases
-        if ('scrollRestoration' in history) {
-            history.scrollRestoration = 'manual';
-        }
-        
-        // Cleanup
-        return () => {
-            if ('scrollRestoration' in history) {
-                history.scrollRestoration = 'auto';
-            }
-        };
-    }, []);
 
     // Add function to handle modal
     const openModal = (pkg: ServicePackage, index: number) => {
@@ -426,12 +407,10 @@ export default function ConsultantProfilePage() {
                 <div 
                     className="absolute inset-0 opacity-30"
                     style={{
-                        transform: `translateY(${scrollY * 0.2}px)`,
                         backgroundImage: `
-                            radial-gradient(circle at 50% ${30 + (scrollY * 0.02)}%, rgba(147, 197, 253, 0.2) 0%, transparent 40%),
-                            radial-gradient(circle at ${70 - (scrollY * 0.01)}% ${60 + (scrollY * 0.01)}%, rgba(165, 180, 252, 0.2) 0%, transparent 40%)
-                        `,
-                        transition: 'transform 0.1s ease-out'
+                            radial-gradient(circle at 50% 30%, rgba(147, 197, 253, 0.2) 0%, transparent 40%),
+                            radial-gradient(circle at 70% 60%, rgba(165, 180, 252, 0.2) 0%, transparent 40%)
+                        `
                     }}
                 />
             </div>

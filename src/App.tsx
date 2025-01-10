@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { LandingClients } from './pages/LandingClients';
 import { FAQ } from './pages/FAQ';
 import LandingConsultants from './pages/LandingConsultants';
@@ -11,8 +11,29 @@ import { Privacy } from './pages/Privacy';
 import { LightFooter } from './components/LightFooter';
 import { PricingPage } from './pages/PricingPage';
 import { BrandPage } from './pages/BrandPage';
+import { useEffect } from 'react';
 
 function App() {
+  const location = useLocation();
+
+  // Reset scroll position when route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  // Set manual scroll restoration
+  useEffect(() => {
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    return () => {
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'auto';
+      }
+    };
+  }, []);
+
   try {
     return (
       <div className="min-h-screen flex flex-col">
