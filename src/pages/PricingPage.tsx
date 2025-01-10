@@ -37,48 +37,46 @@ export function PricingPage() {
 
     const tiers = [
         {
-            name: 'Starter',
+            name: 'Lancement',
             price: '0€',
             period: '/mois',
-            description: 'Idéal pour découvrir Sparkier et lancer votre activité',
+            description: 'Accélérez votre croissance avec Sparkier',
             features: [
-                'Page de profil basique',
+                'Page de profil professionnelle',
                 'Assistant IA de qualification (100 messages/mois)',
-                '1 offre packagée',
-                'Agenda en ligne',
-                'Paiements sécurisés',
+                '10 Sparks pour présenter vos services',
             ],
             cta: 'Commencer gratuitement',
-            highlight: false,
+            highlight: true,
             action: scrollToSignup
         },
         {
-            name: 'Pro',
+            name: 'Premium',
             price: '49€',
             period: '/mois',
-            description: 'Pour les consultants qui veulent accélérer leur croissance',
+            description: 'Des services premium bientôt disponibles',
             features: [
                 'Page de profil personnalisée',
                 'Assistant IA illimité',
-                'Offres packagées illimitées',
+                'Sparks illimités',
                 'Agenda en ligne',
                 'Paiements sécurisés',
                 'Analytics avancés',
                 'Support prioritaire',
                 'Intégration calendrier',
             ],
-            cta: 'Démarrer l\'essai gratuit',
-            highlight: true,
-            action: scrollToSignup
+            cta: 'Bientôt disponible',
+            highlight: false,
+            action: () => {}
         },
         {
             name: 'Enterprise',
-            price: '199€',
-            period: '/mois',
+            price: 'Sur mesure',
+            period: '',
             description: 'Solution complète pour les cabinets de conseil',
             features: [
                 'Tout ce qui est inclus dans Pro',
-                'Pages de profil pour 5 consultants',
+                'Pages de profil pour tous les consultants',
                 'Assistant IA personnalisé',
                 'Marque blanche possible',
                 'Account manager dédié',
@@ -86,9 +84,9 @@ export function PricingPage() {
                 'SSO & contrôles admin',
                 'Formation personnalisée',
             ],
-            cta: 'Contacter les ventes',
+            cta: 'Bientôt disponible',
             highlight: false,
-            action: () => { window.location.href = 'mailto:contact@sparkier.io'; }
+            action: () => {}
         }
     ];
 
@@ -98,10 +96,10 @@ export function PricingPage() {
                 {/* Header */}
                 <div className="text-center mb-16">
                     <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                        Développez votre activité avec Sparkier
+                        Développez votre activité avec <span className="highlight">Sparkier</span>
                     </h1>
                     <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                        Des tarifs transparents pour vous accompagner à chaque étape de votre croissance.
+                        Des tarifs <span className="highlight">transparents</span> pour vous accompagner à chaque étape de votre croissance.
                     </p>
                 </div>
 
@@ -110,14 +108,14 @@ export function PricingPage() {
                     {tiers.map((tier, index) => (
                         <div 
                             key={tier.name}
-                            className={`bg-white rounded-2xl shadow-xl p-8 relative ${
+                            className={`bg-white rounded-2xl shadow-xl p-8 relative flex flex-col ${
                                 tier.highlight ? 'ring-2 ring-blue-600' : ''
                             }`}
                         >
                             {tier.highlight && (
                                 <div className="absolute -top-5 left-0 right-0 mx-auto w-fit">
                                     <span className="bg-blue-600 text-white text-sm font-medium px-4 py-1 rounded-full">
-                                        Le plus populaire
+                                        Disponible maintenant
                                     </span>
                                 </div>
                             )}
@@ -129,7 +127,7 @@ export function PricingPage() {
                                     <span className="text-gray-600 ml-1">{tier.period}</span>
                                 </div>
                             </div>
-                            <ul className="space-y-4 mb-8">
+                            <ul className="space-y-4 mb-8 flex-grow">
                                 {tier.features.map((feature) => (
                                     <li key={feature} className="flex items-start">
                                         <Check className="h-5 w-5 text-blue-600 flex-shrink-0 mt-1" />
@@ -146,7 +144,9 @@ export function PricingPage() {
                                 onClick={tier.action}
                             >
                                 {tier.cta}
-                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                {tier.highlight && (
+                                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                )}
                             </button>
                         </div>
                     ))}
@@ -155,22 +155,22 @@ export function PricingPage() {
                 {/* FAQ Section */}
                 <div className="mt-24">
                     <h2 className="text-3xl font-bold text-center mb-12">Questions fréquentes</h2>
-                    <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <div className="grid gap-8 max-w-3xl mx-auto">
                         <div>
-                            <h3 className="font-semibold text-lg mb-2">Puis-je changer de plan à tout moment ?</h3>
-                            <p className="text-gray-600">Oui, vous pouvez upgrader ou downgrader votre plan à tout moment. Les changements seront effectifs à votre prochaine période de facturation.</p>
+                            <h3 className="font-semibold text-lg mb-2">Combien coûte Sparkier.io ?</h3>
+                            <p className="text-gray-600">Pour le lancement, Sparkier.io est <span className="highlight">entièrement gratuit</span>. Vous pouvez créer et publier 10 Sparks sans frais. À terme, nous proposerons un modèle d'abonnement mensuel en fonction du niveau de service choisi, ainsi qu'une rémunération en cas d'apport d'affaire.</p>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-lg mb-2">Y a-t-il un engagement de durée ?</h3>
-                            <p className="text-gray-600">Non, tous nos plans sont sans engagement. Vous pouvez annuler à tout moment.</p>
+                            <h3 className="font-semibold text-lg mb-2">Y a-t-il une commission si un client me contacte via ma page personnelle ?</h3>
+                            <p className="text-gray-600">Non. Il n'y aura <span className="highlight">jamais de commission</span> pour les clients qui vous contactent directement via votre page personnelle Sparkier. Vous conservez <span className="highlight">100 % de vos revenus</span>. Nous ne prélevons une commission que si un client est amené directement via la plateforme Sparkier, et non via votre page personnelle. Ce modèle restera valable, même après le lancement.</p>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-lg mb-2">Comment fonctionne l'essai gratuit ?</h3>
-                            <p className="text-gray-600">L'essai gratuit du plan Pro dure 14 jours et vous donne accès à toutes les fonctionnalités. Aucune carte bancaire n'est requise.</p>
+                            <h3 className="font-semibold text-lg mb-2">Comment le futur abonnement sera-t-il structuré ?</h3>
+                            <p className="text-gray-600">Nous lancerons prochainement plusieurs formules d'abonnement mensuel offrant différents niveaux de services. Ces formules incluront des <span className="highlight">fonctionnalités avancées</span> comme des outils d'automatisation, des options de personnalisation supplémentaires et un support premium. Le tarif dépendra des fonctionnalités choisies.</p>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-lg mb-2">Quels moyens de paiement acceptez-vous ?</h3>
-                            <p className="text-gray-600">Nous acceptons les cartes de crédit (Visa, Mastercard, AMEX) et les prélèvements SEPA pour les entreprises en Europe.</p>
+                            <h3 className="font-semibold text-lg mb-2">Puis-je continuer à utiliser Sparkier.io gratuitement après le lancement payant ?</h3>
+                            <p className="text-gray-600"><span className="highlight">Oui</span>, le plan de lancement restera <span className="highlight">gratuit pour nos premiers clients</span>. Vous pourrez continuer à utiliser la plateforme sans frais, même après la mise en place des formules payantes. Nous souhaitons récompenser nos premiers utilisateurs pour leur confiance et leur engagement.</p>
                         </div>
                     </div>
                 </div>
@@ -179,7 +179,7 @@ export function PricingPage() {
                 <div id="signup-form" className="max-w-2xl mx-auto mt-24">
                     <div className="text-center mb-8">
                         <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                            Rejoignez Sparkier
+                            Rejoignez Sparkier maintenant !
                         </h2>
                         <p className="text-gray-600">
                             Créez votre profil et commencez à développer votre activité
