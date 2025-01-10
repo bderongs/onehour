@@ -19,7 +19,7 @@ export function Header() {
     if (element) {
       const headerOffset = 80;
       const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      const offsetPosition = elementPosition + window.scrollY - headerOffset;
 
       window.scrollTo({
         top: offsetPosition,
@@ -33,7 +33,7 @@ export function Header() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
+            <Link to={isConsultantPage || isPricingPage ? "/consultants" : "/"} className="flex items-center">
               <BrandName color="indigo-900" />
             </Link>
           </div>
@@ -65,18 +65,13 @@ export function Header() {
                 )}
                 {isConsultantPage ? (
                   <Link
-                    to="/"
-                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                    to="/profile"
+                    className="text-indigo-600 hover:text-indigo-900 px-3 py-2 text-sm font-medium"
                   >
-                    Entreprises
+                    Voir un exemple de profil
                   </Link>
                 ) : !isPricingPage && (
-                  <Link
-                    to="/consultants"
-                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-                  >
-                    Devenir consultant
-                  </Link>
+                  <></>
                 )}
               </div>
             </div>
