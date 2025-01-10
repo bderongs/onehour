@@ -1,12 +1,26 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BrandName } from './BrandName';
+import { ArrowLeft } from 'lucide-react';
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const isConsultantPage = location.pathname === '/consultants';
   const isPricingPage = location.pathname === '/pricing';
   const isBrandPage = location.pathname === '/brand';
+  const isLandingClientsPage = location.pathname === '/';
+  const isPrivacyPage = location.pathname === '/privacy';
+  const isTermsPage = location.pathname === '/terms';
+
+  const handleBackClick = () => {
+    const referrer = document.referrer;
+    if (referrer && referrer.includes('sparkier.io')) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
 
   const navigation = [
     { name: 'Le Spark', href: '#spark' },
@@ -40,7 +54,7 @@ export function Header() {
 
           {!isBrandPage && (
             <div className="flex items-center space-x-8">
-              {!isConsultantPage && !isPricingPage && (
+              {isLandingClientsPage && (
                 <div className="hidden md:flex space-x-8">
                   {navigation.map((item) => (
                     <button
@@ -55,12 +69,29 @@ export function Header() {
               )}
 
               <div className="flex items-center space-x-4">
+                {(isPrivacyPage || isTermsPage) && (
+                  <button
+                    onClick={handleBackClick}
+                    className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-1" />
+                    Retour
+                  </button>
+                )}
                 {isConsultantPage && (
                   <Link
                     to="/pricing"
                     className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
                   >
                     Tarifs
+                  </Link>
+                )}
+                {isPricingPage && (
+                  <Link
+                    to="/consultants"
+                    className="text-indigo-600 hover:text-indigo-900 px-3 py-2 text-sm font-medium"
+                  >
+                    Pourquoi Sparkier ?
                   </Link>
                 )}
                 {isConsultantPage ? (
