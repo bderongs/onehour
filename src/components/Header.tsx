@@ -6,12 +6,12 @@ export function Header() {
   const location = useLocation();
   const isConsultantPage = location.pathname === '/consultants';
   const isPricingPage = location.pathname === '/pricing';
+  const isBrandPage = location.pathname === '/brand';
 
   const navigation = [
     { name: 'Le Spark', href: '#spark' },
     { name: 'Comment ça Marche', href: '#how-it-works' },
     { name: 'Pourquoi Sparkier', href: '#why-sparkier' },
-
   ];
 
   const scrollToSection = (sectionId: string) => {
@@ -38,37 +38,49 @@ export function Header() {
             </Link>
           </div>
 
-          <div className="flex items-center space-x-8">
-            {!isConsultantPage && !isPricingPage && (
-              <div className="hidden md:flex space-x-8">
-                {navigation.map((item) => (
-                  <button
-                    key={item.name}
-                    onClick={() => scrollToSection(item.href)}
+          {!isBrandPage && (
+            <div className="flex items-center space-x-8">
+              {!isConsultantPage && !isPricingPage && (
+                <div className="hidden md:flex space-x-8">
+                  {navigation.map((item) => (
+                    <button
+                      key={item.name}
+                      onClick={() => scrollToSection(item.href)}
+                      className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                    >
+                      {item.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex items-center space-x-4">
+                {isConsultantPage && (
+                  <Link
+                    to="/pricing"
                     className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
                   >
-                    {item.name}
-                  </button>
-                ))}
+                    Tarifs
+                  </Link>
+                )}
+                {isConsultantPage ? (
+                  <Link
+                    to="/"
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                  >
+                    Entreprises
+                  </Link>
+                ) : !isPricingPage && (
+                  <Link
+                    to="/consultants"
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                  >
+                    Devenir consultant
+                  </Link>
+                )}
               </div>
-            )}
-
-            {isConsultantPage ? (
-              <Link
-                to="/"
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-              >
-                Entreprises
-              </Link>
-            ) : !isConsultantPage && (
-              <Link
-                to="/consultants"
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-              >
-                Devenir consultant
-              </Link>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </nav>
     </header>

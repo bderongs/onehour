@@ -1,12 +1,11 @@
 import React from 'react';
 import { Logo } from '../components/Logo';
 import { BrandName } from '../components/BrandName';
-import { HeaderSimple } from '../components/HeaderSimple';
+
 
 export function BrandPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <HeaderSimple />
       
       <main className="pt-24 pb-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
