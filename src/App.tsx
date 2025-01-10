@@ -8,7 +8,6 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Terms } from './pages/Terms';
 import { Privacy } from './pages/Privacy';
-import { LightFooter } from './components/LightFooter';
 import { PricingPage } from './pages/PricingPage';
 import { BrandPage } from './pages/BrandPage';
 import { useEffect } from 'react';
@@ -70,15 +69,6 @@ function App() {
               <Header />
               <main className="flex-grow pt-16">
                 <PricingPage />
-              </main>
-              <Footer />
-            </>
-          } />
-          <Route path="/automation" element={
-            <>
-              <Header />
-              <main className="flex-grow pt-16">
-                <AutomationLandingPage />
               </main>
               <Footer />
             </>
