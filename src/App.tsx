@@ -2,7 +2,6 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { LandingClients } from './pages/LandingClients';
 import { FAQ } from './pages/FAQ';
 import LandingConsultants from './pages/LandingConsultants';
-import { AutomationLandingPage } from './pages/AutomationLandingPage';
 import ConsultantProfilePage from './pages/ConsultantProfilePage';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
