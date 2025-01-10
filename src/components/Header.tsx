@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BrandName } from './BrandName';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Menu, X } from 'lucide-react';
 
 export function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isConsultantPage = location.pathname === '/consultants';
@@ -40,6 +41,7 @@ export function Header() {
         behavior: 'smooth'
       });
     }
+    setIsMenuOpen(false);
   };
 
   return (
@@ -53,59 +55,128 @@ export function Header() {
           </div>
 
           {!isBrandPage && (
-            <div className="flex items-center space-x-8">
-              {isLandingClientsPage && (
-                <div className="hidden md:flex space-x-8">
-                  {navigation.map((item) => (
+            <>
+              <div className="flex items-center space-x-8">
+                {isLandingClientsPage && (
+                  <div className="hidden md:flex space-x-8">
+                    {navigation.map((item) => (
+                      <button
+                        key={item.name}
+                        onClick={() => scrollToSection(item.href)}
+                        className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                      >
+                        {item.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="hidden md:flex items-center space-x-4">
+                  {(isPrivacyPage || isTermsPage) && (
                     <button
-                      key={item.name}
-                      onClick={() => scrollToSection(item.href)}
+                      onClick={handleBackClick}
+                      className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                    >
+                      <ArrowLeft className="w-4 h-4 mr-1" />
+                      Retour
+                    </button>
+                  )}
+                  {isConsultantPage && (
+                    <Link
+                      to="/pricing"
                       className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
                     >
-                      {item.name}
-                    </button>
-                  ))}
+                      Tarifs
+                    </Link>
+                  )}
+                  {isPricingPage && (
+                    <Link
+                      to="/consultants"
+                      className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                    >
+                      Pourquoi Sparkier ?
+                    </Link>
+                  )}
+                  {(isConsultantPage || isPricingPage) && (
+                    <Link
+                      to="/profile"
+                      className="text-indigo-600 hover:text-indigo-900 px-3 py-2 text-sm font-medium"
+                    >
+                      Voir un exemple de profil
+                    </Link>
+                  )}
                 </div>
-              )}
-
-              <div className="flex items-center space-x-4">
-                {(isPrivacyPage || isTermsPage) && (
-                  <button
-                    onClick={handleBackClick}
-                    className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-1" />
-                    Retour
-                  </button>
-                )}
-                {isConsultantPage && (
-                  <Link
-                    to="/pricing"
-                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-                  >
-                    Tarifs
-                  </Link>
-                )}
-                {isPricingPage && (
-                  <Link
-                    to="/consultants"
-                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-                  >
-                    Pourquoi Sparkier ?
-                  </Link>
-                )}
-                {(isConsultantPage || isPricingPage) && (
-                  <Link
-                    to="/profile"
-                    className="text-indigo-600 hover:text-indigo-900 px-3 py-2 text-sm font-medium"
-                  >
-                    Voir un exemple de profil
-                  </Link>
-                )}
               </div>
-            </div>
+
+              {/* Mobile menu button */}
+              <div className="flex items-center md:hidden">
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                >
+                  <span className="sr-only">Open main menu</span>
+                  {isMenuOpen ? (
+                    <X className="block h-6 w-6" aria-hidden="true" />
+                  ) : (
+                    <Menu className="block h-6 w-6" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+            </>
           )}
         </div>
+
+        {/* Mobile menu */}
+        {!isBrandPage && isMenuOpen && (
+          <div className="md:hidden">
+            <div className="pt-2 pb-3 space-y-1">
+              {isLandingClientsPage && navigation.map((item) => (
+                <button
+                  key={item.name}
+                  onClick={() => scrollToSection(item.href)}
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                >
+                  {item.name}
+                </button>
+              ))}
+              {(isPrivacyPage || isTermsPage) && (
+                <button
+                  onClick={handleBackClick}
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                >
+                  <div className="flex items-center">
+                    <ArrowLeft className="w-4 h-4 mr-1" />
+                    Retour
+                  </div>
+                </button>
+              )}
+              {isConsultantPage && (
+                <Link
+                  to="/pricing"
+                  className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                >
+                  Tarifs
+                </Link>
+              )}
+              {isPricingPage && (
+                <Link
+                  to="/consultants"
+                  className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                >
+                  Pourquoi Sparkier ?
+                </Link>
+              )}
+              {(isConsultantPage || isPricingPage) && (
+                <Link
+                  to="/profile"
+                  className="block px-3 py-2 text-base font-medium text-indigo-600 hover:text-indigo-900 hover:bg-gray-50"
+                >
+                  Voir un exemple de profil
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </nav>
     </header>
   );
