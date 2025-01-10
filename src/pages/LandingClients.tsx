@@ -7,6 +7,7 @@ import { UseCaseForm } from '../components/UseCaseForm';
 import { motion } from 'framer-motion';
 import { SparksGrid } from '../components/SparksGrid';
 import { expertCalls } from '../data/expertCalls';
+import '../styles/highlight.css';
 
 interface UseCase {
     icon: React.ReactNode;
@@ -583,26 +584,6 @@ export function LandingClients() {
                     transform: translateY(0);
                     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
                     overflow: hidden;
-                }
-                .highlight {
-                    position: relative;
-                    display: inline-block;
-                }
-                .highlight::after {
-                    content: '';
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 30%;
-                    background-color: rgba(96, 165, 250, 0.2);
-                    z-index: -1;
-                    transform: rotate(-2deg);
-                    transition: all 0.3s ease;
-                }
-                .highlight:hover::after {
-                    height: 40%;
-                    background-color: rgba(96, 165, 250, 0.3);
                 }
             `}</style>
 
