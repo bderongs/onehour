@@ -89,7 +89,7 @@ export function Header() {
                 {isPricingPage && (
                   <Link
                     to="/consultants"
-                    className="text-indigo-600 hover:text-indigo-900 px-3 py-2 text-sm font-medium"
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
                   >
                     Pourquoi Sparkier ?
                   </Link>
@@ -101,7 +101,14 @@ export function Header() {
                   >
                     Voir un exemple de profil
                   </Link>
-                ) : !isPricingPage && (
+                ) : isPricingPage ? (
+                  <Link
+                    to="/profile"
+                    className="text-indigo-600 hover:text-indigo-900 px-3 py-2 text-sm font-medium"
+                  >
+                    Voir un exemple de profil
+                  </Link>
+                ) : (
                   <></>
                 )}
               </div>
