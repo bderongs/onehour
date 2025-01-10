@@ -94,22 +94,13 @@ export function Header() {
                     Pourquoi Sparkier ?
                   </Link>
                 )}
-                {isConsultantPage ? (
+                {(isConsultantPage || isPricingPage) && (
                   <Link
                     to="/profile"
                     className="text-indigo-600 hover:text-indigo-900 px-3 py-2 text-sm font-medium"
                   >
                     Voir un exemple de profil
                   </Link>
-                ) : isPricingPage ? (
-                  <Link
-                    to="/profile"
-                    className="text-indigo-600 hover:text-indigo-900 px-3 py-2 text-sm font-medium"
-                  >
-                    Voir un exemple de profil
-                  </Link>
-                ) : (
-                  <></>
                 )}
               </div>
             </div>
