@@ -13,6 +13,7 @@ export function Header() {
   const isLandingClientsPage = location.pathname === '/';
   const isPrivacyPage = location.pathname === '/privacy';
   const isTermsPage = location.pathname === '/terms';
+  const isFAQPage = location.pathname === '/faq';
 
   const handleBackClick = () => {
     const referrer = document.referrer;
@@ -72,7 +73,7 @@ export function Header() {
                 )}
 
                 <div className="hidden md:flex items-center space-x-4">
-                  {(isPrivacyPage || isTermsPage) && (
+                  {(isPrivacyPage || isTermsPage || isFAQPage) && (
                     <button
                       onClick={handleBackClick}
                       className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
@@ -139,7 +140,7 @@ export function Header() {
                   {item.name}
                 </button>
               ))}
-              {(isPrivacyPage || isTermsPage) && (
+              {(isPrivacyPage || isTermsPage || isFAQPage) && (
                 <button
                   onClick={handleBackClick}
                   className="block w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"

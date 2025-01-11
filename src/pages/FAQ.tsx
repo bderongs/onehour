@@ -1,6 +1,5 @@
 import React from 'react';
-import { HelpCircle, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { HelpCircle } from 'lucide-react';
 
 interface FAQItem {
     question: string;
@@ -8,28 +7,14 @@ interface FAQItem {
 }
 
 export function FAQ() {
-    const navigate = useNavigate();
-
     const faqs: FAQItem[] = [
         {
             question: "Qu'est-ce que Sparkier ?",
-            answer: "Sparkier est un service de micro-consulting qui vous met en relation avec des experts qualifiés pour des sessions de conseil d'une heure. Notre plateforme permet de résoudre rapidement vos problématiques professionnelles avec l'aide d'experts triés sur le volet."
-        },
-        {
-            question: "Comment fonctionne le service ?",
-            answer: (
-                <ol className="list-decimal list-inside space-y-2">
-                    <li>Décrivez votre problématique via notre formulaire</li>
-                    <li>Notre IA vous aide à préciser vos besoins</li>
-                    <li>Réservez un créneau d'une heure avec un expert</li>
-                    <li>Connectez-vous pour votre session de conseil</li>
-                    <li>Recevez un compte-rendu détaillé après la session</li>
-                </ol>
-            )
+            answer: "Sparkier est un service de micro-consulting qui vous met en relation avec des experts qualifiés pour des sessions de conseil de 30 minutes à 2 heures, structurée autour d'une problématique précise (Spark). Notre plateforme permet de résoudre rapidement vos problématiques professionnelles avec l'aide d'experts triés sur le volet."
         },
         {
             question: "Combien coûte une session ?",
-            answer: "Chaque session de conseil coûte 150€ TTC pour une heure. Ce tarif unique comprend la session de conseil, la préparation de l'expert, et le compte-rendu détaillé généré par notre IA."
+            answer: "Le prix total est indiqué pour chaque session (Spark). Ce tarif unique comprend la session de conseil, la préparation de l'expert, et le compte-rendu."
         },
         {
             question: "Qui sont vos experts ?",
@@ -41,7 +26,7 @@ export function FAQ() {
         },
         {
             question: "Comment se déroule une session de conseil ?",
-            answer: "Les sessions se déroulent en visioconférence via notre plateforme sécurisée. Pendant l'heure de conseil, vous interagissez directement avec l'expert pendant que notre IA prend des notes. Après la session, vous recevez un compte-rendu détaillé avec les points clés et les actions recommandées."
+            answer: "Les sessions se déroulent en visioconférence. Pendant l'heure de conseil, vous interagissez directement avec l'expert. Après la session, vous recevez un compte-rendu détaillé avec les points clés et les actions recommandées."
         },
         {
             question: "Que se passe-t-il si je ne suis pas satisfait ?",
@@ -68,17 +53,6 @@ export function FAQ() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pt-20">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                {/* Header */}
-                <div className="flex items-center mb-8">
-                    <button
-                        onClick={() => navigate('/')}
-                        className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors"
-                    >
-                        <ArrowLeft className="h-5 w-5 mr-2" />
-                        Retour à l'accueil
-                    </button>
-                </div>
-
                 <div className="text-center mb-12">
                     <div className="flex justify-center mb-4">
                         <HelpCircle className="h-12 w-12 text-indigo-600" />

@@ -1,16 +1,21 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { BrandName } from './BrandName';
 
-const scrollToSection = (sectionId: string) => {
-  const element = document.getElementById(sectionId);
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth' });
+const scrollToSection = (sectionId: string, navigate: any, currentPath: string) => {
+  if (currentPath === '/') {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  } else {
+    navigate(`/#${sectionId}`);
   }
 };
 
 export function Footer() {
   const location = useLocation();
+  const navigate = useNavigate();
   const isConsultantsPage = location.pathname === '/consultants';
   const isPricingPage = location.pathname === '/pricing';
   const isProfilePage = location.pathname === '/profile';
@@ -35,17 +40,17 @@ export function Footer() {
                 <h3 className="text-lg font-semibold mb-4">Liens Rapides</h3>
                 <ul className="space-y-2">
                   <li>
-                    <button onClick={() => scrollToSection('why-choose')} className="text-gray-400 hover:text-white">
+                    <button onClick={() => scrollToSection('why-choose', navigate, location.pathname)} className="text-gray-400 hover:text-white">
                       Pourquoi Nous Choisir
                     </button>
                   </li>
                   <li>
-                    <button onClick={() => scrollToSection('experts')} className="text-gray-400 hover:text-white">
+                    <button onClick={() => scrollToSection('experts', navigate, location.pathname)} className="text-gray-400 hover:text-white">
                       Nos Experts
                     </button>
                   </li>
                   <li>
-                    <button onClick={() => scrollToSection('how-it-works')} className="text-gray-400 hover:text-white">
+                    <button onClick={() => scrollToSection('how-it-works', navigate, location.pathname)} className="text-gray-400 hover:text-white">
                       Comment ça Marche
                     </button>
                   </li>
