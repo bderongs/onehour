@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, ArrowRight, CheckCircle, BadgeCheck } from 'lucide-react';
-import { ExpertCall } from '../types/expertCall';
+import { Clock, ArrowRight, CheckCircle } from 'lucide-react';
+import { Spark } from '../types/spark';
 import { Logo } from './Logo';
 
 // Utility function to get next available business date
@@ -43,7 +43,7 @@ const getNextBusinessDate = () => {
 };
 
 interface SparksGridProps {
-    expertCalls: ExpertCall[];
+    expertCalls: Spark[];
     expandedCallIndex: number | null;
     setExpandedCallIndex: (index: number | null) => void;
     onCallClick: (prefillText: string) => void;

@@ -5,7 +5,7 @@ import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
 import { motion } from 'framer-motion';
 import { SparksGrid } from '../components/SparksGrid';
-import { expertCalls } from '../data/expertCalls';
+import { sparks } from '../data/sparks';
 import '../styles/highlight.css';
 
 interface UseCase {
@@ -302,7 +302,7 @@ export function LandingClients() {
                     {/* Use Case Form Section */}
                     <div className="mb-12 sm:mb-16">
                         <SparksGrid
-                            expertCalls={expertCalls}
+                            expertCalls={sparks}
                             expandedCallIndex={expandedCallIndex}
                             setExpandedCallIndex={setExpandedCallIndex}
                             onCallClick={handleUseCaseClick}

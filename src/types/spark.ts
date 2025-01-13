@@ -1,5 +1,4 @@
-export interface ExpertCall {
-    icon: React.ReactNode;
+export interface Spark {
     title: string;
     duration: string;
     prefillText: string;
