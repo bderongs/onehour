@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, ArrowRight, CheckCircle } from 'lucide-react';
+import { Clock, ArrowRight, CheckCircle, Plus } from 'lucide-react';
 import { Spark } from '../types/spark';
 import { Logo } from './Logo';
 
@@ -48,6 +48,10 @@ interface SparksGridProps {
     setExpandedCallIndex: (index: number | null) => void;
     onCallClick: (prefillText: string) => void;
     buttonText: string;
+    showAvailability?: boolean;
+    showCreateCard?: boolean;
+    showDetailsButton?: boolean;
+    onDetailsClick?: (spark: Spark) => void;
 }
 
 const fadeInUp = {
@@ -61,7 +65,11 @@ export function SparksGrid({
     expandedCallIndex,
     setExpandedCallIndex,
     onCallClick,
-    buttonText
+    buttonText,
+    showAvailability = true,
+    showCreateCard = false,
+    showDetailsButton = false,
+    onDetailsClick
 }: SparksGridProps) {
     // Memoize the dates for each card
     const availableDates = useMemo(() => {
@@ -137,25 +145,45 @@ export function SparksGrid({
                                 </div>
 
                                 <div className="space-y-4 border-t border-gray-100 pt-4">
-                                    <div className="text-center">
-                                        <div className="text-sm text-gray-500">Prochaine disponibilité</div>
-                                        <div className="text-sm font-medium text-gray-900">
-                                            {availableDates[index]}
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onCallClick(call.prefillText);
-                                            setExpandedCallIndex(null);
-                                        }}
-                                        className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg 
-                                                text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center 
-                                                justify-center gap-2"
-                                    >
-                                        {buttonText}
-                                        <ArrowRight className="h-4 w-4" />
-                                    </button>
+                                    {showAvailability && (
+                                        <>
+                                            <div className="text-center">
+                                                <div className="text-sm text-gray-500">Prochaine disponibilité</div>
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    {availableDates[index]}
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col gap-2">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onCallClick(call.prefillText);
+                                                        setExpandedCallIndex(null);
+                                                    }}
+                                                    className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg 
+                                                            text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center 
+                                                            justify-center gap-2"
+                                                >
+                                                    {buttonText}
+                                                    <ArrowRight className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                    {showDetailsButton && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onDetailsClick?.(call);
+                                            }}
+                                            className="w-full bg-white text-blue-600 border-2 border-blue-600 px-4 py-3 rounded-lg 
+                                                    text-sm font-semibold hover:bg-blue-50 transition-colors flex items-center 
+                                                    justify-center gap-2"
+                                        >
+                                            En savoir plus
+                                            <ArrowRight className="h-4 w-4" />
+                                        </button>
+                                    )}
                                 </div>
                             </motion.div>
                         ) : (
@@ -168,6 +196,30 @@ export function SparksGrid({
                     </div>
                 </motion.div>
             ))}
+            
+            {showCreateCard && (
+                <motion.div
+                    layout
+                    variants={fadeInUp}
+                    className={`bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer
+                        transform-gpu hover:scale-[1.02] border-2 border-dashed border-blue-200`}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onCallClick("");
+                    }}
+                >
+                    <div className="p-4 sm:p-6 h-full flex flex-col">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 mb-3">
+                            <Plus className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Créez votre Spark</h3>
+                        <p className="text-sm text-gray-600">Transformez votre expertise en offre packagée</p>
+                        <div className="mt-auto flex items-center justify-end text-sm">
+                            <ArrowRight className="h-4 w-4 text-blue-600" />
+                        </div>
+                    </div>
+                </motion.div>
+            )}
         </div>
     );
 } 

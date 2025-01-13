@@ -117,6 +117,15 @@ function App() {
               <Footer />
             </>
           } />
+          <Route path="/spark/:sparkUrl" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <SparkProductPage />
+              </main>
+              <Footer />
+            </>
+          } />
           <Route path="*" element={
             <>
               <Header />

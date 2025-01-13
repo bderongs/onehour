@@ -27,4 +27,5 @@ export interface Spark {
         role?: string;
     }>;
     nextSteps?: string[];
+    url: string;
 } 

@@ -1,8 +1,17 @@
 import { Spark } from '../types/spark';
 
+const generateUrl = (title: string): string => {
+    return title
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove accents
+        .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with hyphens
+        .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+};
+
 export const sparks: Spark[] = [
     {
-        title: "Check-Up Stratégique Express",
+        title: "Check-up stratégique express",
         duration: "1h",
         price: "400€ HT",
         description: "Faire un état des lieux rapide de votre stratégie actuelle et identifier un ou deux axes prioritaires d'amélioration.",
@@ -13,6 +22,7 @@ export const sparks: Spark[] = [
         ],
         prefillText: "J'aimerais faire un état des lieux de notre stratégie d'entreprise.",
         highlight: "Stratégie",
+        url: generateUrl("Check-Up Stratégique Express"),
         detailedDescription: `Le Check-Up Stratégique Express est conçu pour les dirigeants et managers qui souhaitent rapidement évaluer leur stratégie actuelle et identifier les opportunités d'amélioration les plus impactantes.
 
 En une heure, nous analyserons ensemble votre situation actuelle, vos objectifs, et les principaux défis auxquels vous faites face. À l'issue de la session, vous aurez une vision claire des actions prioritaires à mettre en place pour optimiser votre stratégie.
@@ -92,7 +102,7 @@ Cette session est particulièrement utile si vous :
         ]
     },
     {
-        title: "Boost Commercial Express",
+        title: "Boost commercial express",
         duration: "1h",
         price: "400€ HT",
         description: "Identifier une opportunité immédiate pour augmenter vos ventes, que ce soit à travers une nouvelle approche client ou une optimisation de vos pratiques existantes.",
@@ -102,10 +112,89 @@ Cette session est particulièrement utile si vous :
             "Plan d'action concret"
         ],
         prefillText: "Je cherche à booster rapidement nos ventes.",
-        highlight: "Commerce"
+        highlight: "Commerce",
+        url: generateUrl("Boost Commercial Express"),
+        detailedDescription: `Le Boost Commercial Express est conçu pour les entreprises qui souhaitent rapidement identifier et saisir des opportunités d'augmentation de leurs ventes. Cette session intensive d'une heure se concentre sur l'analyse de vos pratiques commerciales actuelles pour détecter des leviers d'amélioration immédiatement actionnables.
+
+En une heure, nous examinerons vos processus de vente, vos indicateurs clés et vos points de friction actuels pour identifier les opportunités les plus prometteuses. Vous repartirez avec un plan d'action concret et des recommandations pratiques à mettre en œuvre dès le lendemain.
+
+Cette session est particulièrement utile si vous :
+• Constatez une stagnation ou une baisse de vos ventes
+• Souhaitez optimiser votre processus commercial
+• Cherchez à améliorer votre taux de conversion
+• Voulez tester de nouvelles approches commerciales`,
+        methodology: [
+            "Analyse rapide de vos KPIs commerciaux actuels",
+            "Identification des goulots d'étranglement dans votre tunnel de vente",
+            "Évaluation de vos outils et processus de vente",
+            "Benchmark rapide avec les meilleures pratiques du secteur",
+            "Définition d'actions concrètes à fort impact"
+        ],
+        targetAudience: [
+            "Directeurs commerciaux cherchant un regard externe",
+            "Entrepreneurs souhaitant booster leurs ventes",
+            "Responsables de business development",
+            "Équipes commerciales en quête de nouvelles approches"
+        ],
+        prerequisites: [
+            "Accès à vos principaux indicateurs commerciaux",
+            "Description de votre processus de vente actuel",
+            "Exemples de situations commerciales typiques",
+            "Identification des principaux freins à la vente"
+        ],
+        deliverables: [
+            "Diagnostic flash de votre performance commerciale",
+            "2-3 opportunités d'amélioration à impact rapide",
+            "Plan d'action détaillé sur 30 jours",
+            "Outils et templates pour optimiser vos process",
+            "Recommandations pour le suivi des résultats"
+        ],
+        expertProfile: {
+            expertise: [
+                "Développement commercial",
+                "Sales enablement",
+                "Négociation",
+                "CRM et outils de vente"
+            ],
+            experience: "12+ ans d'expérience en direction commerciale et conseil en vente"
+        },
+        faq: [
+            {
+                question: "Quels résultats puis-je espérer ?",
+                answer: "L'objectif est d'identifier au moins une action qui peut générer une augmentation de 10-20% de vos ventes dans les 30 prochains jours."
+            },
+            {
+                question: "Comment se préparer au mieux ?",
+                answer: "Préparez vos chiffres clés des 3-6 derniers mois et une liste de vos principaux défis commerciaux. Notre IA vous guidera dans cette préparation."
+            },
+            {
+                question: "La session est-elle adaptée aux grands comptes ?",
+                answer: "Oui, nous adaptons l'approche selon votre contexte, que ce soit pour des ventes B2B complexes ou des cycles de vente plus courts."
+            }
+        ],
+        testimonials: [
+            {
+                text: "Les recommandations étaient immédiatement applicables et ont généré une augmentation de 15% de nos ventes dès le premier mois.",
+                author: "Thomas Laurent",
+                role: "Directeur Commercial",
+                company: "SalesForce"
+            },
+            {
+                text: "La session m'a permis d'identifier un point de friction majeur dans notre processus de vente que nous avons pu corriger rapidement.",
+                author: "Sophie Martin",
+                role: "CEO",
+                company: "GrowthTech"
+            }
+        ],
+        nextSteps: [
+            "Mise en place des actions prioritaires identifiées",
+            "Suivi des KPIs sur 30 jours",
+            "Session de review des résultats (optionnel)",
+            "Ajustement du plan d'action selon les premiers retours"
+        ]
     },
     {
-        title: "Essentiels du Recrutement",
+        title: "Processus de recrutement",
         duration: "1h30",
         price: "600€ HT",
         description: "Réviser une stratégie de recrutement ou un processus d'entretien pour attirer et sélectionner les meilleurs talents.",
@@ -115,10 +204,89 @@ Cette session est particulièrement utile si vous :
             "Outils de sélection efficaces"
         ],
         prefillText: "J'ai besoin d'aide pour améliorer notre processus de recrutement.",
-        highlight: "RH"
+        highlight: "RH",
+        url: generateUrl("Processus de Recrutement"),
+        detailedDescription: `La session Processus deRecrutement est conçue pour les entreprises qui souhaitent optimiser leur approche du recrutement afin d'attirer et de sélectionner les meilleurs talents de manière plus efficace et plus fiable.
+
+En 1h30, nous analyserons en profondeur votre processus de recrutement actuel, depuis la définition des besoins jusqu'à l'intégration des nouveaux collaborateurs. Vous repartirez avec des outils concrets et des méthodologies éprouvées pour améliorer significativement la qualité et l'efficacité de vos recrutements.
+
+Cette session est particulièrement utile si vous :
+• Rencontrez des difficultés à attirer les bons profils
+• Souhaitez réduire votre temps de recrutement
+• Voulez améliorer votre taux de conversion
+• Cherchez à optimiser vos coûts de recrutement`,
+        methodology: [
+            "Audit complet de votre processus de recrutement actuel",
+            "Analyse de vos canaux de sourcing",
+            "Évaluation de vos méthodes de sélection",
+            "Optimisation de votre marque employeur",
+            "Structuration du processus d'entretien"
+        ],
+        targetAudience: [
+            "DRH et RRH en quête d'amélioration continue",
+            "Managers impliqués dans le recrutement",
+            "Startups en phase de croissance rapide",
+            "PME souhaitant professionnaliser leur recrutement"
+        ],
+        prerequisites: [
+            "Description de votre processus de recrutement actuel",
+            "Statistiques basiques de vos recrutements récents",
+            "Exemples de vos supports de recrutement",
+            "Identification de vos principaux défis"
+        ],
+        deliverables: [
+            "Diagnostic détaillé de votre processus actuel",
+            "Plan d'optimisation sur mesure",
+            "Boîte à outils de recrutement (grilles d'entretien, tests...)",
+            "Guide des meilleures pratiques",
+            "Templates de communication candidats"
+        ],
+        expertProfile: {
+            expertise: [
+                "Recrutement et talent acquisition",
+                "Assessment et évaluation",
+                "Marque employeur",
+                "SIRH et outils RH"
+            ],
+            experience: "10+ ans d'expérience en recrutement et conseil RH"
+        },
+        faq: [
+            {
+                question: "La session peut-elle couvrir plusieurs types de postes ?",
+                answer: "Oui, nous adaptons les recommandations selon vos besoins spécifiques, qu'il s'agisse de profils techniques, commerciaux ou managériaux."
+            },
+            {
+                question: "Quels outils sont recommandés ?",
+                answer: "Nous vous conseillons sur les meilleurs outils adaptés à votre contexte, de l'ATS aux plateformes d'évaluation, en tenant compte de votre budget et de vos contraintes."
+            },
+            {
+                question: "Comment mesurer les résultats ?",
+                answer: "Nous définissons ensemble des KPIs clairs : temps de recrutement, coût par recrutement, qualité des candidatures, taux de conversion, etc."
+            }
+        ],
+        testimonials: [
+            {
+                text: "Nous avons réduit notre temps de recrutement de 40% tout en améliorant la qualité des profils sélectionnés.",
+                author: "Claire Dubois",
+                role: "DRH",
+                company: "TechCorp"
+            },
+            {
+                text: "Les outils fournis nous ont permis de structurer nos entretiens et d'être beaucoup plus efficaces dans notre sélection.",
+                author: "Marc Leroy",
+                role: "Responsable Recrutement",
+                company: "InnovGroup"
+            }
+        ],
+        nextSteps: [
+            "Implémentation des nouveaux outils et processus",
+            "Formation des équipes aux nouvelles méthodes",
+            "Suivi des indicateurs de performance",
+            "Session de review après 3 mois (optionnel)"
+        ]
     },
     {
-        title: "Sprint IA",
+        title: "Sprint ia",
         duration: "1h30",
         price: "600€ HT",
         description: "Identifier un cas d'usage concret pour intégrer l'intelligence artificielle dans vos processus métiers.",
@@ -128,10 +296,11 @@ Cette session est particulièrement utile si vous :
             "Recommandations pratiques"
         ],
         prefillText: "Je souhaite identifier des cas d'usage concrets de l'IA dans mon entreprise.",
-        highlight: "IA"
+        highlight: "IA",
+        url: generateUrl("Sprint IA")
     },
     {
-        title: "Optimisation des Process",
+        title: "Optimisation des process",
         duration: "1h",
         price: "400€ HT",
         description: "Analyser un processus interne pour identifier des opportunités de simplification ou d'amélioration.",
@@ -141,10 +310,11 @@ Cette session est particulièrement utile si vous :
             "Solutions d'optimisation"
         ],
         prefillText: "Je veux optimiser nos processus internes.",
-        highlight: "Process"
+        highlight: "Process",
+        url: generateUrl("Optimisation des Process")
     },
     {
-        title: "Validation Produit-Marché",
+        title: "Validation produit-marché",
         duration: "1h30",
         price: "600€ HT",
         description: "Tester rapidement si votre produit ou service correspond aux attentes du marché.",
@@ -154,10 +324,11 @@ Cette session est particulièrement utile si vous :
             "Recommandations d'ajustement"
         ],
         prefillText: "Je souhaite valider l'adéquation de mon produit avec le marché.",
-        highlight: "Produit"
+        highlight: "Produit",
+        url: generateUrl("Validation Produit-Marché")
     },
     {
-        title: "Quick Wins Marketing",
+        title: "Quick wins marketing",
         duration: "1h",
         price: "400€ HT",
         description: "Trouver une ou deux actions marketing immédiates pour augmenter votre visibilité ou votre engagement client.",
@@ -167,10 +338,11 @@ Cette session est particulièrement utile si vous :
             "Plan d'exécution simple"
         ],
         prefillText: "Je cherche des actions marketing rapides à mettre en place.",
-        highlight: "Marketing"
+        highlight: "Marketing",
+        url: generateUrl("Quick Wins Marketing")
     },
     {
-        title: "Navigation de Crise",
+        title: "Navigation de crise",
         duration: "1h30",
         price: "600€ HT",
         description: "Discuter d'une crise ou d'un problème spécifique pour élaborer une réponse rapide et efficace.",
@@ -180,10 +352,11 @@ Cette session est particulièrement utile si vous :
             "Stratégie de communication"
         ],
         prefillText: "J'ai besoin d'aide pour gérer une situation de crise.",
-        highlight: "Urgence"
+        highlight: "Urgence",
+        url: generateUrl("Navigation de Crise")
     },
     {
-        title: "Dynamique d'Équipe",
+        title: "Dynamique d'équipe",
         duration: "1h",
         price: "400€ HT",
         description: "Identifier un blocage dans la dynamique d'équipe et proposer des pistes pour améliorer la collaboration.",
@@ -193,10 +366,11 @@ Cette session est particulièrement utile si vous :
             "Plan d'amélioration"
         ],
         prefillText: "Je souhaite améliorer la dynamique de mon équipe.",
-        highlight: "Management"
+        highlight: "Management",
+        url: generateUrl("Dynamique d'Équipe")
     },
     {
-        title: "Diagnostic Financier Express",
+        title: "Diagnostic financier express",
         duration: "1h30",
         price: "600€ HT",
         description: "Examiner rapidement vos finances pour identifier une priorité immédiate : gestion des coûts, trésorerie, ou marges.",
@@ -206,6 +380,7 @@ Cette session est particulièrement utile si vous :
             "Recommandations concrètes"
         ],
         prefillText: "J'aimerais faire un check-up rapide de nos finances.",
-        highlight: "Finance"
+        highlight: "Finance",
+        url: generateUrl("Diagnostic Financier Express")
     }
 ]; 

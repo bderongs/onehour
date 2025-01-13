@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { submitConsultantForm } from '../services/consultantFormSubmission';
-import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles, Target, Users, ArrowRightCircle, FileText, Package2, User, BarChart, Clock, Euro } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles, Target, Users, ArrowRightCircle, FileText, Package2, User, BarChart, Clock, Euro, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { SparksGrid } from '../components/SparksGrid';
 import { sparks } from '../data/sparks';
+import { Spark } from '../types/spark';
 import '../styles/highlight.css';
 
 const fadeInUp = {
@@ -22,6 +23,7 @@ const stagger = {
 };
 
 const LandingConsultants = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -32,6 +34,24 @@ const LandingConsultants = () => {
     });
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
+    const [selectedSpark, setSelectedSpark] = useState<Spark | null>(null);
+
+    useEffect(() => {
+        // Handle hash-based navigation
+        if (window.location.hash === '#signup-form') {
+            const element = document.getElementById('signup-form');
+            if (element) {
+                const headerOffset = 120;
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    }, []); // Run only once when component mounts
 
     useEffect(() => {
         // Always set the first Spark (index 0) to be expanded on load
@@ -141,14 +161,30 @@ const LandingConsultants = () => {
                         Transformez vos expertises en <span className="highlight">Sparks</span> : des modules de conseil packagés et <span className="highlight">prêts à vendre</span>.
                     </p>
 
+                    {/* Example Sparks Section */}
+                    <div className="text-center mb-6">
+                        <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3">
+                            Exemples de Sparks populaires
+                        </h3>
+                        <p className="text-gray-600 max-w-3xl mx-auto mb-6">
+                            Découvrez comment d'autres consultants structurent leurs offres. Inspirez-vous de ces exemples pour créer vos propres Sparks personnalisés.
+                        </p>
+                    </div>
+
                     {/* Sparks Grid */}
                     <div className="mb-12 sm:mb-16">
                         <SparksGrid
-                            expertCalls={sparks}
+                            expertCalls={sparks.slice(0, 3)}
                             expandedCallIndex={expandedCallIndex}
                             setExpandedCallIndex={setExpandedCallIndex}
                             onCallClick={handleSparkCreation}
                             buttonText="Créer mon premier Spark"
+                            showAvailability={false}
+                            showCreateCard={true}
+                            showDetailsButton={true}
+                            onDetailsClick={(spark) => {
+                                navigate(`/spark/${spark.url}`);
+                            }}
                         />
                     </div>
 
