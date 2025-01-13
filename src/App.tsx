@@ -11,7 +11,7 @@ import { PricingPage } from './pages/PricingPage';
 import { BrandPage } from './pages/BrandPage';
 import { SparkProductPage } from './pages/SparkProductPage';
 import { useEffect } from 'react';
-
+import { initializeGoatCounter } from './utils/analytics';
 function App() {
   const location = useLocation();
 
@@ -31,6 +31,10 @@ function App() {
         history.scrollRestoration = 'auto';
       }
     };
+  }, []);
+
+  useEffect(() => {
+    initializeGoatCounter();
   }, []);
 
   try {
