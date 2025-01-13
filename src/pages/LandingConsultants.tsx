@@ -303,10 +303,11 @@ const LandingConsultants = () => {
                         viewport={{ once: true }}
                     >
                         {[
+                            "Maximisez votre rentabilité en éliminant les phases commerciales chronophages",
+                             "Augmentez votre taux de conversion grâce à des offres standardisées et prêtes à l'emploi",
                             "Gagnez du temps sur la préparation de vos offres",
-                            "Augmentez votre taux de conversion grâce à des offres standardisées et prêtes à l'emploi",
-                            "Proposez une expérience client fluide avec des briefs précis et une prise de rendez-vous simplifiée",
-                            "Maximisez votre rentabilité en éliminant les phases commerciales chronophages"
+                            "Proposez une expérience client fluide avec des briefs précis et une prise de rendez-vous simplifiée"
+                           
                         ].map((advantage, index) => (
                             <motion.div
                                 key={index}
