@@ -9,6 +9,7 @@ import { Terms } from './pages/Terms';
 import { Privacy } from './pages/Privacy';
 import { PricingPage } from './pages/PricingPage';
 import { BrandPage } from './pages/BrandPage';
+import { SparkProductPage } from './pages/SparkProductPage';
 import { useEffect } from 'react';
 
 function App() {
@@ -76,6 +77,15 @@ function App() {
             <>
               <main className="flex-grow">
                 <ConsultantProfilePage />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/demospark" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <SparkProductPage />
               </main>
               <Footer />
             </>

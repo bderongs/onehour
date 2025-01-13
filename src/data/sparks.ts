@@ -12,7 +12,84 @@ export const sparks: Spark[] = [
             "Recommandations prioritaires"
         ],
         prefillText: "J'aimerais faire un état des lieux de notre stratégie d'entreprise.",
-        highlight: "Stratégie"
+        highlight: "Stratégie",
+        detailedDescription: `Le Check-Up Stratégique Express est conçu pour les dirigeants et managers qui souhaitent rapidement évaluer leur stratégie actuelle et identifier les opportunités d'amélioration les plus impactantes.
+
+En une heure, nous analyserons ensemble votre situation actuelle, vos objectifs, et les principaux défis auxquels vous faites face. À l'issue de la session, vous aurez une vision claire des actions prioritaires à mettre en place pour optimiser votre stratégie.
+
+Cette session est particulièrement utile si vous :
+• Sentez que votre stratégie actuelle n'est pas optimale
+• Faites face à des changements dans votre marché
+• Souhaitez valider vos intuitions stratégiques
+• Cherchez à prioriser vos initiatives`,
+        methodology: [
+            "Analyse rapide de votre situation actuelle et de vos objectifs",
+            "Identification des écarts entre la situation actuelle et désirée",
+            "Évaluation des forces et faiblesses de votre stratégie",
+            "Définition des axes d'amélioration prioritaires",
+            "Recommandations concrètes et actionnables"
+        ],
+        targetAudience: [
+            "Dirigeants d'entreprise en quête de clarté stratégique",
+            "Managers confrontés à des choix stratégiques",
+            "Startups en phase de croissance",
+            "PME cherchant à optimiser leur positionnement"
+        ],
+        prerequisites: [
+            "Une stratégie ou des objectifs existants à analyser",
+            "Des données basiques sur votre marché et votre performance",
+            "Une ouverture d'esprit pour remettre en question les approches actuelles"
+        ],
+        deliverables: [
+            "Diagnostic synthétique de votre stratégie actuelle",
+            "Identification de 2-3 axes d'amélioration prioritaires",
+            "Plan d'action initial avec premières étapes concrètes",
+            "Compte-rendu écrit de la session avec les points clés",
+            "Recommandations pour les prochaines étapes"
+        ],
+        expertProfile: {
+            expertise: [
+                "Stratégie d'entreprise",
+                "Développement commercial",
+                "Management",
+                "Innovation"
+            ],
+            experience: "15+ ans d'expérience en conseil stratégique auprès de PME et startups"
+        },
+        faq: [
+            {
+                question: "Comment se déroule concrètement la session ?",
+                answer: "La session se déroule en visioconférence. Nous commençons par un rapide tour d'horizon de votre situation, puis nous analysons en détail 2-3 aspects clés de votre stratégie. Nous terminons par des recommandations concrètes et actionnables."
+            },
+            {
+                question: "Que dois-je préparer avant la session ?",
+                answer: "Il est utile de préparer un bref résumé de votre stratégie actuelle, vos principaux objectifs et les défis que vous rencontrez. Notre IA vous guidera dans cette préparation avant la session."
+            },
+            {
+                question: "Comment maximiser la valeur de cette session ?",
+                answer: "Pour tirer le meilleur parti de cette session, venez avec des questions précises et des points spécifiques que vous souhaitez aborder. Plus vos interrogations seront ciblées, plus nos recommandations seront pertinentes."
+            }
+        ],
+        testimonials: [
+            {
+                text: "En une heure, j'ai obtenu une clarté que je cherchais depuis des mois. Les recommandations étaient concrètes et directement applicables.",
+                author: "Marie Dubois",
+                role: "CEO",
+                company: "TechStart"
+            },
+            {
+                text: "Le format court nous a forcés à aller à l'essentiel. Très efficace pour identifier rapidement les points d'amélioration critiques.",
+                author: "Pierre Martin",
+                role: "Directeur Commercial",
+                company: "InnovCorp"
+            }
+        ],
+        nextSteps: [
+            "Mise en œuvre des recommandations prioritaires",
+            "Session de suivi pour évaluer les progrès (optionnel)",
+            "Accompagnement plus approfondi si nécessaire",
+            "Documentation détaillée des points d'amélioration identifiés"
+        ]
     },
     {
         title: "Boost Commercial Express",
