@@ -13,7 +13,6 @@ export function Header() {
   const isLandingClientsPage = location.pathname === '/';
   const isPrivacyPage = location.pathname === '/privacy';
   const isTermsPage = location.pathname === '/terms';
-  const isFAQPage = location.pathname === '/faq';
 
   const handleBackClick = () => {
     const referrer = document.referrer;
@@ -46,7 +45,7 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white z-50 border-b border-gray-200">
+    <header className={`fixed top-0 left-0 right-0 z-50 ${isPrivacyPage || isTermsPage ? 'bg-gray-900' : 'bg-transparent'}`}>
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -73,7 +72,7 @@ export function Header() {
                 )}
 
                 <div className="hidden md:flex items-center space-x-4">
-                  {(isPrivacyPage || isTermsPage || isFAQPage) && (
+                  {(isPrivacyPage || isTermsPage) && (
                     <button
                       onClick={handleBackClick}
                       className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
@@ -140,7 +139,7 @@ export function Header() {
                   {item.name}
                 </button>
               ))}
-              {(isPrivacyPage || isTermsPage || isFAQPage) && (
+              {(isPrivacyPage || isTermsPage) && (
                 <button
                   onClick={handleBackClick}
                   className="block w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"

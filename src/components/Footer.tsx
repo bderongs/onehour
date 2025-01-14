@@ -61,7 +61,6 @@ export function Footer() {
             <div className={isConsultantSection ? 'md:col-start-2' : ''}>
               <h3 className="text-lg font-semibold mb-4">Ressources</h3>
               <ul className="space-y-2">
-                {!isConsultantSection && <li><a href="/faq" className="text-gray-400 hover:text-white">FAQ</a></li>}
                 <li><a href="/privacy" className="text-gray-400 hover:text-white">Politique de Confidentialité</a></li>
                 <li><a href="/terms" className="text-gray-400 hover:text-white">Termes et Conditions</a></li>
               </ul>
@@ -71,7 +70,6 @@ export function Footer() {
               <h3 className="text-lg font-semibold mb-4">Contact</h3>
               <ul className="space-y-2">
                 <li><a href="mailto:contact@sparkier.io" className="text-gray-400 hover:text-white">contact@sparkier.io</a></li>
-                <li><a href="tel:0123456789" className="text-gray-400 hover:text-white">01 23 45 67 89</a></li>
                 {location.pathname === '/' && (
                   <li className="pt-2">
                     <a href="/consultants" className="text-indigo-400 hover:text-indigo-300 font-medium">

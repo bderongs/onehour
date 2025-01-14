@@ -1,6 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { LandingClients } from './pages/LandingClients';
-import { FAQ } from './pages/FAQ';
 import LandingConsultants from './pages/LandingConsultants';
 import ConsultantProfilePage from './pages/ConsultantProfilePage';
 import { Header } from './components/Header';
@@ -11,6 +10,7 @@ import { PricingPage } from './pages/PricingPage';
 import { BrandPage } from './pages/BrandPage';
 import { SparkProductPage } from './pages/SparkProductPage';
 import { useEffect } from 'react';
+import React from 'react';
 
 function App() {
   const location = useLocation();
@@ -42,15 +42,6 @@ function App() {
               <Header />
               <main className="flex-grow pt-16">
                 <LandingClients />
-              </main>
-              <Footer />
-            </>
-          } />
-          <Route path="/faq" element={
-            <>
-              <Header />
-              <main className="flex-grow pt-16">
-                <FAQ />
               </main>
               <Footer />
             </>
