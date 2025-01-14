@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { signUpWithEmail } from '../services/auth';
-import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles, Target, Users, ArrowRightCircle, FileText, Package2, User, BarChart, Clock, Euro, X } from 'lucide-react';
+import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles, Target, Users, ArrowRightCircle, FileText, Package2, User, BarChart, Clock, Euro, X, Store } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SparksGrid } from '../components/SparksGrid';
@@ -251,22 +251,22 @@ const LandingConsultants = () => {
                         {
                             title: "Des offres prêtes à vendre en quelques minutes",
                             description: "Plus besoin de rédiger des dizaines de pages de propositions. Notre IA vous accompagne via un chatbot intuitif : décrivez vos compétences et vos services, et laissez l'IA construire automatiquement des Sparks clairs et attrayants.",
-                            icon: <Target className="h-6 w-6" />
+                            icon: <Package2 className="h-6 w-6" />
                         },
                         {
                             title: "Votre vitrine de conseil personnelle",
                             description: "Chaque consultant dispose d'une page personnalisée présentant ses Sparks. Vos prospects peuvent parcourir vos offres, choisir celle qui correspond à leurs besoins et prendre rendez-vous instantanément. Simplifiez l'achat de vos services !",
-                            icon: <Users className="h-6 w-6" />
+                            icon: <Store className="h-6 w-6" />
                         },
                         {
                             title: "Une IA qui prépare vos sessions",
                             description: "Avant chaque mission, notre IA mène un entretien exploratoire avec le client et vous fournit un brief ultra-précis. Plus besoin de perdre du temps à clarifier les attentes : vous êtes efficace dès la première minute.",
-                            icon: <ArrowRightCircle className="h-6 w-6" />
+                            icon: <Sparkles className="h-6 w-6" />
                         },
                         {
                             title: "Gagnez du temps, augmentez vos revenus",
                             description: "En packageant vos offres avec Sparkier.io, vous réduisez le temps passé en phase commerciale et maximisez votre temps de conseil facturable. Plus de missions, moins de stress !",
-                            icon: <FileText className="h-6 w-6" />
+                            icon: <Clock className="h-6 w-6" />
                         }
                     ].map((feature, index) => (
                         <motion.div
