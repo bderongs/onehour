@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle, X } from 'lucide-react';
 import { submitToGoogleForm } from '../services/formSubmission';
 import { ChatConfig } from '../types/chat';
+import { Notification } from '../components/Notification';
 
 interface ContactForm {
     name: string;
@@ -26,6 +27,7 @@ interface ConsultantConnectProps {
 
 export function ConsultantConnect({ onBack, problemSummary, config }: ConsultantConnectProps) {
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [form, setForm] = useState<ContactForm>({
         name: '',
         email: '',
@@ -56,8 +58,16 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
             });
 
             setIsSubmitted(true);
+            setNotification({
+                type: 'success',
+                message: config.confirmationMessage
+            });
         } catch (error) {
             console.error('Error submitting consultation:', error);
+            setNotification({
+                type: 'error',
+                message: 'Une erreur est survenue lors de l\'envoi du formulaire. Veuillez réessayer.'
+            });
         }
     };
 
@@ -126,6 +136,14 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
 
     return (
         <>
+            {notification && (
+                <Notification
+                    type={notification.type}
+                    message={notification.message}
+                    onClose={() => setNotification(null)}
+                />
+            )}
+            
             <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">

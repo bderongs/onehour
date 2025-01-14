@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Check, ArrowRight, CheckCircle } from 'lucide-react';
 import { submitConsultantForm } from '../services/consultantFormSubmission';
+import { Notification } from '../components/Notification';
 
 export function PricingPage() {
     const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ export function PricingPage() {
         experience: ''
     });
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -19,8 +21,16 @@ export function PricingPage() {
             await submitConsultantForm(formData);
             setIsSubmitted(true);
             setFormData({ firstName: '', lastName: '', linkedin: '', email: '', expertise: '', experience: '' });
+            setNotification({
+                type: 'success',
+                message: 'Bienvenue chez Sparkier ! Notre équipe vous contactera dans les 24h pour finaliser votre profil.'
+            });
         } catch (error) {
             console.error('Error submitting form:', error);
+            setNotification({
+                type: 'error',
+                message: 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.'
+            });
         }
     };
 
@@ -92,6 +102,14 @@ export function PricingPage() {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen pt-16">
+            {notification && (
+                <Notification
+                    type={notification.type}
+                    message={notification.message}
+                    onClose={() => setNotification(null)}
+                />
+            )}
+            
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 {/* Header */}
                 <div className="text-center mb-16">

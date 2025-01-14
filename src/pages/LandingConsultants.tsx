@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SparksGrid } from '../components/SparksGrid';
 import { sparks } from '../data/sparks';
 import { Spark } from '../types/spark';
+import { Notification } from '../components/Notification';
 import '../styles/highlight.css';
 
 const fadeInUp = {
@@ -156,24 +157,11 @@ const LandingConsultants = () => {
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
             {notification && (
-                <div className={`fixed top-4 right-4 left-4 sm:left-auto sm:w-96 p-4 rounded-lg shadow-lg ${
-                    notification.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-                } z-50`}>
-                    <div className="flex items-start gap-3">
-                        {notification.type === 'success' ? (
-                            <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        ) : (
-                            <X className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-                        )}
-                        <div className="flex-1">{notification.message}</div>
-                        <button 
-                            onClick={() => setNotification(null)}
-                            className="flex-shrink-0 text-gray-400 hover:text-gray-500"
-                        >
-                            <X className="h-5 w-5" />
-                        </button>
-                    </div>
-                </div>
+                <Notification
+                    type={notification.type}
+                    message={notification.message}
+                    onClose={() => setNotification(null)}
+                />
             )}
             
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
