@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { submitConsultantForm } from '../services/consultantFormSubmission';
+import { signUpWithEmail } from '../services/auth';
 import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles, Target, Users, ArrowRightCircle, FileText, Package2, User, BarChart, Clock, Euro, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,6 +33,7 @@ const LandingConsultants = () => {
         experience: ''
     });
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
     const [selectedSpark, setSelectedSpark] = useState<Spark | null>(null);
 
@@ -63,11 +64,19 @@ const LandingConsultants = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await submitConsultantForm(formData);
+            await signUpWithEmail(formData);
             setIsSubmitted(true);
             setFormData({ firstName: '', lastName: '', linkedin: '', email: '', expertise: '', experience: '' });
+            setNotification({
+                type: 'success',
+                message: 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.'
+            });
         } catch (error) {
             console.error('Error submitting form:', error);
+            setNotification({
+                type: 'error',
+                message: 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.'
+            });
         }
     };
 
@@ -146,6 +155,27 @@ const LandingConsultants = () => {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+            {notification && (
+                <div className={`fixed top-4 right-4 left-4 sm:left-auto sm:w-96 p-4 rounded-lg shadow-lg ${
+                    notification.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                } z-50`}>
+                    <div className="flex items-start gap-3">
+                        {notification.type === 'success' ? (
+                            <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        ) : (
+                            <X className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                        )}
+                        <div className="flex-1">{notification.message}</div>
+                        <button 
+                            onClick={() => setNotification(null)}
+                            className="flex-shrink-0 text-gray-400 hover:text-gray-500"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                    </div>
+                </div>
+            )}
+            
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* Hero Section */}
                 <motion.div
@@ -203,7 +233,7 @@ const LandingConsultants = () => {
                             onClick={() => document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' })}
                             className="w-full sm:w-auto bg-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2 group"
                         >
-                            <span className="whitespace-nowrap">Créer mes premiers Sparks</span>
+                            <span className="whitespace-nowrap">Créer mes premiers Sparks gratuitement</span>
                             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                         </motion.button>
                         <motion.div variants={fadeInUp} className="w-full sm:w-auto">
@@ -363,7 +393,7 @@ const LandingConsultants = () => {
                         Prêt à <span className="highlight">propulser</span> votre activité de conseil ?
                     </h2>
                     <p className="text-lg text-gray-600 mb-8">
-                        👉 Créez vos premiers <span className="highlight">Sparks</span> gratuitement dès aujourd'hui !<br />
+                        👉 Créez vos premiers Sparks <span className="highlight"> gratuitement</span> dès aujourd'hui !<br />
                         Il ne vous faut que quelques minutes pour transformer vos compétences en <span className="highlight">offres irrésistibles</span>.
                     </p>
                     <p className="text-lg text-gray-600 italic">
@@ -495,7 +525,7 @@ const LandingConsultants = () => {
                                     type="submit"
                                     className="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group"
                                 >
-                                    Créer mes premiers Sparks
+                                    Créer mes premiers Sparks gratuitement
                                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                                 </button>
                             </div>

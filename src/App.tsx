@@ -9,6 +9,7 @@ import { Privacy } from './pages/Privacy';
 import { PricingPage } from './pages/PricingPage';
 import { BrandPage } from './pages/BrandPage';
 import { SparkProductPage } from './pages/SparkProductPage';
+import AuthCallback from './pages/AuthCallback';
 import { useEffect } from 'react';
 import React from 'react';
 import { initializeGoatCounter } from './utils/analytics';
@@ -42,6 +43,7 @@ function App() {
     return (
       <div className="min-h-screen flex flex-col">
         <Routes>
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/" element={
             <>
               <Header />
