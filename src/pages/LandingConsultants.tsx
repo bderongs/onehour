@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { signUpWithEmail } from '../services/auth';
+import { signUpConsultantWithEmail } from '../services/auth';
 import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles, Target, Users, ArrowRightCircle, FileText, Package2, User, BarChart, Clock, Euro, X, Store } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -65,7 +65,7 @@ const LandingConsultants = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await signUpWithEmail(formData);
+            await signUpConsultantWithEmail(formData);
             setIsSubmitted(true);
             setFormData({ firstName: '', lastName: '', linkedin: '', email: '', expertise: '', experience: '' });
             setNotification({

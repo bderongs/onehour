@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, Users, Package2, Plus, Briefcase, MessageSquare, Calendar, Zap, Shield, Sparkles, ArrowRight, FileText } from 'lucide-react';
+import { Bot, Users, Package2, Plus, Briefcase, MessageSquare, Calendar, Zap, Shield, Sparkles, ArrowRight, FileText, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
 import { motion } from 'framer-motion';
 import { SparksGrid } from '../components/SparksGrid';
 import { sparks } from '../data/sparks';
+import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
+import { CHAT_CONFIGS } from '../data/chatConfigs';
+import type { DocumentSummary } from '../types/chat';
+import { signUpClientWithEmail, type ClientSignUpData } from '../services/auth';
+import { Notification } from '../components/Notification';
 import '../styles/highlight.css';
-
-interface UseCase {
-    icon: React.ReactNode;
-    title: string;
-    description: string;
-    prefillText: string;
-}
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -37,16 +35,24 @@ export function LandingClients() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [scrollY, setScrollY] = useState(0);
     const [shouldReset, setShouldReset] = useState(false);
-    const [problemSummary, setProblemSummary] = useState({
+    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const [formData, setFormData] = useState<ClientSignUpData>({
+        firstName: '',
+        lastName: '',
+        company: '',
+        email: '',
+        role: '',
+        industry: ''
+    });
+    const [documentSummary, setDocumentSummary] = useState<DocumentSummary>({
         challenge: '',
         currentSituation: '',
         desiredOutcome: '',
         constraints: '',
         stakeholders: '',
         previousAttempts: '',
-        readyForAssessment: false
+        hasEnoughData: false
     });
-    const [searchQuery, setSearchQuery] = useState('');
     const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
     const [isChatExpanded, setIsChatExpanded] = useState(false);
 
@@ -72,32 +78,6 @@ export function LandingClients() {
         }
     }, []);
 
-    const useCases: UseCase[] = [
-        {
-            icon: <Package2 className="h-6 w-6" />,
-            title: "Choisir un logiciel",
-            description: "Sélectionnez les meilleurs logiciels pour votre activité.",
-            prefillText: "Je cherche à choisir un logiciel pour mon entreprise. J'ai besoin d'aide pour comparer les solutions du marché et identifier celle qui correspond le mieux à mes besoins spécifiques."
-        },
-        {
-            icon: <Bot className="h-6 w-6" />,
-            title: "IA & Entreprise",
-            description: "Automatisez vos processus avec l'IA et économisez des heures de travail manuel.",
-            prefillText: "Je souhaite comprendre comment l'intelligence artificielle pourrait être utile dans mon entreprise. J'aimerais identifier les opportunités concrètes d'application et les bénéfices potentiels."
-        },
-        {
-            icon: <Users className="h-6 w-6" />,
-            title: "Recrutement",
-            description: "Sélectionnez les meilleurs candidats avec un expert du domaine.",
-            prefillText: "Je dois recruter dans un domaine que je ne maîtrise pas et j'ai besoin d'un expert pour m'aider à évaluer les compétences des candidats lors des entretiens."
-        },
-        {
-            icon: <Plus className="h-6 w-6" />,
-            title: "Autre sujet",
-            description: "J'ai une autre problématique.",
-            prefillText: ""
-        }
-    ];
 
     const handleUseCaseClick = (prefillText: string) => {
         setProblem(prefillText);
@@ -135,8 +115,19 @@ export function LandingClients() {
     };
 
     const handleConnect = () => {
-        console.log('LandingClients - handleConnect called, current summary:', problemSummary);
-        setShowConnect(true);
+        console.log('LandingClients - handleConnect called, current summary:', documentSummary);
+        // Scroll to the sign-up form with smooth behavior
+        const element = document.getElementById('signup-form');
+        if (element) {
+            const headerOffset = 120;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
     };
 
     const handleBack = (shouldReset?: boolean) => {
@@ -146,14 +137,14 @@ export function LandingClients() {
             setShowConnect(false);
             setMessages([]);
             setShouldReset(true);
-            setProblemSummary({
+            setDocumentSummary({
                 challenge: '',
                 currentSituation: '',
                 desiredOutcome: '',
                 constraints: '',
                 stakeholders: '',
                 previousAttempts: '',
-                readyForAssessment: false
+                hasEnoughData: false
             });
             setProblem('');
             setIsChatExpanded(false);
@@ -170,57 +161,42 @@ export function LandingClients() {
             const msg = newMessages[i];
             if (msg.role === 'assistant' && msg.summary) {
                 console.log('LandingClients - Found summary in message:', msg.summary);
-                setProblemSummary(msg.summary);
+                setDocumentSummary(msg.summary);
                 break;
             }
         }
     };
 
-    const chatConfig = {
-        initialMessage: {
-            role: 'assistant' as const,
-            content: "Bonjour ! Je suis l'assistant virtuel de Sparkier. Mon rôle est de vous aider à clarifier votre besoin avant de vous mettre en relation avec l'expert le plus pertinent. Plus je comprends précisément votre situation, plus nous pourrons vous proposer des solutions adaptées. Pouvez-vous me parler de votre projet ?"
-        },
-        systemPrompt: `You are Sparkier Consulting's AI assistant.
-            Your primary role is to help clarify the client's needs before matching them with the most relevant expert.
-            Guide the conversation to gather comprehensive information that will help identify the best consultant.
-            
-            When a user presents their initial problem:
-            1) Acknowledge their need
-            2) Ask specific follow-up questions about unclear aspects. Only one question at a time.
-            3) Keep responses short and focused
-            4) Ask one question at a time
+    const handleFormSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await signUpClientWithEmail(formData);
+            setFormData({
+                firstName: '',
+                lastName: '',
+                company: '',
+                email: '',
+                role: '',
+                industry: ''
+            });
+            setNotification({
+                type: 'success',
+                message: 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.'
+            });
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            setNotification({
+                type: 'error',
+                message: 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.'
+            });
+        }
+    };
 
-            Focus on gathering details about:
-            1) Current situation specifics
-            2) Desired outcomes and success criteria
-            3) Previous attempts or solutions tried
-            4) Constraints (budget, timeline, technical limitations)
-            5) Key stakeholders involved
-            6) Decision-making process
-
-            Do not suggest specific solutions - that's the expert's role.
-            When you have gathered sufficient information, explain that you'll help match them with the most relevant expert. No need to suggest a meeting as this is taken care of in the next step.`,
-        title: "Assistant Sparkier",
-        subtitle: "Je vous aide à trouver l'expert idéal",
-        onConnect: handleConnect,
-        submitMessage: "En soumettant ce formulaire, vous serez contacté par l'un de nos consultants experts dans les prochaines 24 heures.",
-        confirmationMessage: "Nous avons bien reçu votre demande. L'un de nos consultants experts vous contactera dans les prochaines 24 heures pour approfondir votre projet et vous proposer les solutions les plus adaptées.",
-        summaryInstructions: `Analyze the conversation and create a JSON summary with the following structure.
-        IMPORTANT: The summary must be in the same language as the conversation (French if the conversation is in French).
-        IMPORTANT: Do not return any other output than the JSON with all fields filled.
-        IMPORTANT: The readyForAssessment field must be a boolean (true/false), not a string.
-        IMPORTANT: All fields must be filled with non-empty strings, except readyForAssessment which must be a boolean.
-        
-        {
-            "challenge": "Brief description of the main challenge or project",
-            "currentSituation": "Current state and context",
-            "desiredOutcome": "Desired outcomes and success criteria",
-            "constraints": "Budget, timeline, and technical constraints",
-            "stakeholders": "Key stakeholders involved",
-            "previousAttempts": "Previous solutions or attempts",
-            "readyForAssessment": false
-        }`
+    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
     };
 
     const howItWorks = [
@@ -284,6 +260,13 @@ export function LandingClients() {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+            {notification && (
+                <Notification
+                    type={notification.type}
+                    message={notification.message}
+                    onClose={() => setNotification(null)}
+                />
+            )}
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* Hero Section */}
                 <motion.div
@@ -364,13 +347,10 @@ export function LandingClients() {
                                                     <AIChatInterface
                                                         messages={messages}
                                                         onMessagesUpdate={handleMessagesUpdate}
-                                                        config={{
-                                                            ...chatConfig,
-                                                            initialMessage: messages.length > 0 ? messages[0] : {
-                                                                role: 'assistant' as const,
-                                                                content: "Bonjour ! Je peux vous aider à trouver le Spark qui correspond à votre besoin. Décrivez-moi votre problématique."
-                                                            }
-                                                        }}
+                                                        template={DOCUMENT_TEMPLATES.spark_finder}
+                                                        systemPrompt={CHAT_CONFIGS.spark_finder.systemPrompt}
+                                                        summaryInstructions={CHAT_CONFIGS.spark_finder.summaryInstructions}
+                                                        onConnect={handleConnect}
                                                         shouldReset={shouldReset}
                                                     />
                                                 </div>
@@ -379,8 +359,10 @@ export function LandingClients() {
                                                 <div className={`${showConnect ? 'block' : 'hidden'}`}>
                                                     <ConsultantConnect
                                                         onBack={handleBack}
-                                                        problemSummary={problemSummary}
-                                                        config={chatConfig}
+                                                        documentSummary={documentSummary}
+                                                        template={DOCUMENT_TEMPLATES.consultant_qualification}
+                                                        confirmationMessage={CHAT_CONFIGS.consultant_qualification.confirmationMessage}
+                                                        submitMessage={CHAT_CONFIGS.consultant_qualification.submitMessage}
                                                     />
                                                 </div>
                                             </div>
@@ -501,28 +483,186 @@ export function LandingClients() {
                     </div>
                 </motion.div>
 
-                {/* CTA Section */}
+                {/* CTA Section with Sign Up Form */}
                 <motion.div
-                    className="text-center"
+                    id="signup-form"
+                    className="max-w-2xl mx-auto px-3 sm:px-0"
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
                 >
-                    <h2 className="text-3xl font-bold mb-6 text-gray-900">
-                        Prêt à <span className="highlight">commencer</span> ?
-                    </h2>
-                    <p className="text-xl text-gray-600 mb-8">
-                        Décrivez votre problématique et trouvez l'expert qu'il vous faut
-                    </p>
-                    <button
-                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2 group"
-                    >
-                        Commencer maintenant
-                        <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                    </button>
+                    <div className="text-center mb-8">
+                        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                            Prêt à <span className="highlight">commencer</span> ?
+                        </h2>
+                        <p className="text-gray-600">
+                            Créez votre compte et trouvez l'expert qu'il vous faut
+                        </p>
+                    </div>
+
+                    <form onSubmit={handleFormSubmit} className="bg-white p-6 sm:p-8 rounded-xl shadow-md">
+                        <div className="space-y-6">
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Prénom
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="firstName"
+                                        value={formData.firstName}
+                                        onChange={handleFormChange}
+                                        required
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Votre prénom"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Nom
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="lastName"
+                                        value={formData.lastName}
+                                        onChange={handleFormChange}
+                                        required
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Votre nom"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Entreprise
+                                </label>
+                                <input
+                                    type="text"
+                                    name="company"
+                                    value={formData.company}
+                                    onChange={handleFormChange}
+                                    required
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Nom de votre entreprise"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Email professionnel
+                                </label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleFormChange}
+                                    required
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="vous@entreprise.com"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Fonction
+                                </label>
+                                <input
+                                    type="text"
+                                    name="role"
+                                    value={formData.role}
+                                    onChange={handleFormChange}
+                                    required
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Votre fonction dans l'entreprise"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Secteur d'activité
+                                </label>
+                                <select
+                                    name="industry"
+                                    value={formData.industry}
+                                    onChange={handleFormChange}
+                                    required
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                    <option value="">Sélectionnez votre secteur</option>
+                                    <option value="tech">Technologies</option>
+                                    <option value="finance">Finance</option>
+                                    <option value="retail">Commerce & Distribution</option>
+                                    <option value="manufacturing">Industrie</option>
+                                    <option value="services">Services</option>
+                                    <option value="healthcare">Santé</option>
+                                    <option value="other">Autre</option>
+                                </select>
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group"
+                            >
+                                Créer mon compte
+                                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                            </button>
+                        </div>
+                        <p className="mt-4 text-sm text-gray-500 text-center">
+                            En créant votre compte, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
+                        </p>
+                    </form>
                 </motion.div>
+
+                {/* Connect Form */}
+                {showConnect && (
+                    <div className="max-w-4xl mx-auto px-4 mb-8">
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                            <ConsultantConnect 
+                                onBack={handleBack}
+                                documentSummary={documentSummary}
+                                template={DOCUMENT_TEMPLATES.spark_finder}
+                                confirmationMessage={CHAT_CONFIGS.spark_finder.confirmationMessage}
+                                submitMessage={CHAT_CONFIGS.spark_finder.submitMessage}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                {/* Chat Interface */}
+                {!showForm && !showConnect && (
+                    <div className={`max-w-4xl mx-auto px-4 mb-8 ${isChatExpanded ? 'block' : 'hidden'}`}>
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                            <div className="p-4 border-b border-gray-200">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Sparkles className="h-5 w-5 text-blue-600" />
+                                        <h2 className="text-xl font-semibold text-gray-900">{CHAT_CONFIGS.spark_finder.title}</h2>
+                                    </div>
+                                    <button 
+                                        onClick={() => handleBack(true)}
+                                        className="text-gray-500 hover:text-gray-700"
+                                    >
+                                        <X className="h-6 w-6" />
+                                    </button>
+                                </div>
+                                <p className="text-sm text-gray-600 mt-1">{CHAT_CONFIGS.spark_finder.subtitle}</p>
+                            </div>
+                            <div className="p-4">
+                                <AIChatInterface
+                                    template={DOCUMENT_TEMPLATES.spark_finder}
+                                    messages={messages}
+                                    onMessagesUpdate={handleMessagesUpdate}
+                                    shouldReset={shouldReset}
+                                    onConnect={handleConnect}
+                                    systemPrompt={CHAT_CONFIGS.spark_finder.systemPrompt}
+                                    summaryInstructions={CHAT_CONFIGS.spark_finder.summaryInstructions}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <style>{`

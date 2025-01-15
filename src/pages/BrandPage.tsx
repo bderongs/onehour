@@ -2,11 +2,9 @@ import React from 'react';
 import { Logo } from '../components/Logo';
 import { BrandName } from '../components/BrandName';
 
-
 export function BrandPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      
       <main className="pt-24 pb-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Brand Introduction */}
@@ -25,8 +23,14 @@ export function BrandPage() {
             <div className="space-y-8">
               <div>
                 <h3 className="text-lg font-semibold mb-6">Version standard</h3>
-                <div className="bg-white border border-gray-200 rounded-lg p-12 flex items-center justify-center">
-                  <BrandName size="lg" color="indigo-900" />
+                <div className="bg-white border border-gray-200 rounded-lg p-12 flex flex-col items-center justify-center gap-4">
+                  <div className="relative w-[320px] h-[132px] border-2 border-dashed border-gray-300 flex items-center justify-center">
+                    <div className="brandname-download absolute inset-0 flex items-center justify-center scale-150">
+                      <BrandName size="lg" color="indigo-900" />
+                    </div>
+                    <div className="absolute -top-6 left-0 right-0 text-xs text-gray-500 text-center">320px</div>
+                    <div className="absolute -right-6 top-0 bottom-0 text-xs text-gray-500 flex items-center justify-center" style={{ writingMode: 'vertical-rl' }}>132px</div>
+                  </div>
                 </div>
               </div>
               <div>

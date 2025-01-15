@@ -6,7 +6,9 @@ export async function submitToGoogleForm(data: any) {
         'entry.1980778891': data.name,             // Replace with your actual form field IDs
         'entry.410712562': data.email,
         'entry.1260668012': data.phone,
-        'entry.921299297': data.problemSummary,
+        'entry.1234567890': data.name,
+        'entry.0987654321': data.email,
+        'entry.921299297': data.documentSummary,
         'entry.1306789927': data.chatHistory
     });
 

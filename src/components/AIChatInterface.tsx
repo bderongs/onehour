@@ -1,28 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { analyzeWithOpenAI } from '../services/openai';
-import { ProblemSummary } from './ProblemSummary';
-import { ChatConfig } from '../types/chat';
+import { DocumentSummary } from './DocumentSummary';
+import type { DocumentTemplate, DocumentSummary as DocumentSummaryType } from '../types/chat';
 
 export interface Message {
     role: 'user' | 'assistant';
     content: string;
-    summary?: any;
+    summary?: DocumentSummaryType;
 }
 
 interface AIChatInterfaceProps {
-    config: ChatConfig;
+    template: DocumentTemplate;
     messages?: Message[];
     onMessagesUpdate?: (messages: Message[]) => void;
     shouldReset?: boolean;
+    onConnect?: () => void;
+    systemPrompt?: string;
+    summaryInstructions?: string;
 }
 
-export function AIChatInterface({ config, messages: externalMessages, onMessagesUpdate, shouldReset = false }: AIChatInterfaceProps) {
+export function AIChatInterface({ 
+    template, 
+    messages: externalMessages, 
+    onMessagesUpdate, 
+    shouldReset = false,
+    onConnect,
+    systemPrompt,
+    summaryInstructions
+}: AIChatInterfaceProps) {
     const [messages, setMessages] = useState<Message[]>(externalMessages || []);
     const [newMessage, setNewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSummaryLoading, setIsSummaryLoading] = useState(false);
-    const [problemSummary, setProblemSummary] = useState<any>({});
+    const [documentSummary, setDocumentSummary] = useState<DocumentSummaryType>({ hasEnoughData: false });
     const [isInitialized, setIsInitialized] = useState(false);
 
     // Add ref for scrolling
@@ -36,7 +47,7 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
         if (shouldReset) {
             setMessages(externalMessages || []);
             setNewMessage('');
-            setProblemSummary({});
+            setDocumentSummary({ hasEnoughData: false });
             setIsInitialized(false);
         }
     }, [shouldReset, externalMessages]);
@@ -45,15 +56,15 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
     useEffect(() => {
         if (externalMessages && externalMessages.length > 0) {
             setMessages(externalMessages);
-        } else if (messages.length === 0) {
-            setMessages([config.initialMessage]);
+        } else if (messages.length === 0 && systemPrompt) {
+            setMessages([{ role: 'assistant', content: systemPrompt }]);
         }
-    }, [externalMessages, config.initialMessage]);
+    }, [externalMessages, systemPrompt, messages.length]);
 
     // Handle initial AI response when external messages are provided
     useEffect(() => {
         const getInitialResponse = async () => {
-            if (!externalMessages || externalMessages.length === 0 || isInitialized) return;
+            if (!externalMessages || externalMessages.length === 0 || isInitialized || !systemPrompt) return;
             
             // Don't respond if the last message is from the assistant
             if (externalMessages[externalMessages.length - 1].role === 'assistant') {
@@ -65,7 +76,7 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
             try {
                 const aiResponse = await analyzeWithOpenAI(
                     [
-                        { role: 'system' as const, content: config.systemPrompt },
+                        { role: 'system' as const, content: systemPrompt },
                         ...externalMessages.map(msg => ({
                             role: msg.role,
                             content: msg.content
@@ -95,7 +106,7 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
         };
 
         getInitialResponse();
-    }, [externalMessages, config.systemPrompt, isInitialized]);
+    }, [externalMessages, systemPrompt, isInitialized]);
 
     // Keep focus on textarea after sending message
     useEffect(() => {
@@ -106,15 +117,14 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
 
     // Function to get summary if needed
     const updateSummaryIfNeeded = async (messagesForSummary: Message[]) => {
-        if (!config.summaryInstructions || !messagesForSummary.some(m => m.role === 'user')) return;
+        if (!summaryInstructions || !messagesForSummary.some(m => m.role === 'user')) return;
 
-        console.log('AIChatInterface - Updating summary, messages:', messagesForSummary);
         setIsSummaryLoading(true);
 
         try {
             const summaryResponse = await analyzeWithOpenAI(
                 [
-                    { role: 'system', content: config.summaryInstructions },
+                    { role: 'system', content: summaryInstructions },
                     ...messagesForSummary.map((msg): Message => ({
                         role: msg.role,
                         content: msg.content
@@ -124,65 +134,24 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
                         content: 'Please analyze the conversation above and provide a JSON summary following the specified format.' 
                     }
                 ],
-                true // Use summary mode
+                true
             );
 
             if (summaryResponse) {
                 try {
-                    // Try to extract JSON if it's wrapped in other text
                     const jsonMatch = summaryResponse.match(/\{[\s\S]*\}/);
                     const jsonStr = jsonMatch ? jsonMatch[0] : summaryResponse;
                     
-                    console.log('AIChatInterface - Raw summary response:', summaryResponse);
-                    console.log('AIChatInterface - Extracted JSON:', jsonStr);
-                    
                     const parsedSummary = JSON.parse(jsonStr);
-                    console.log('AIChatInterface - Parsed summary:', parsedSummary);
                     
-                    // Validate content fields and readyForAssessment
-                    const requiredFields = [
-                        'challenge',
-                        'currentSituation',
-                        'desiredOutcome',
-                        'constraints',
-                        'stakeholders',
-                        'previousAttempts',
-                        'readyForAssessment'
-                    ];
-                    const hasAllFields = requiredFields.every(field => {
-                        if (field === 'readyForAssessment') {
-                            return typeof parsedSummary[field] === 'boolean';
+                    setDocumentSummary(parsedSummary);
+                    if (onMessagesUpdate) {
+                        const messagesWithSummary = [...messagesForSummary];
+                        const lastMessage = messagesWithSummary[messagesWithSummary.length - 1];
+                        if (lastMessage && lastMessage.role === 'assistant') {
+                            lastMessage.summary = parsedSummary;
                         }
-                        return field in parsedSummary && 
-                               typeof parsedSummary[field] === 'string' && 
-                               parsedSummary[field].trim() !== '';
-                    });
-                    
-                    if (hasAllFields) {
-                        console.log('AIChatInterface - Setting valid summary:', parsedSummary);
-                        setProblemSummary(parsedSummary);
-                        if (onMessagesUpdate) {
-                            // Create a new message that includes the summary
-                            const messagesWithSummary = [...messagesForSummary];
-                            const lastMessage = messagesWithSummary[messagesWithSummary.length - 1];
-                            if (lastMessage && lastMessage.role === 'assistant') {
-                                // Append the summary to the last assistant message
-                                lastMessage.summary = parsedSummary;
-                            }
-                            console.log('AIChatInterface - Calling onMessagesUpdate with messages and summary');
-                            onMessagesUpdate(messagesWithSummary);
-                        }
-                    } else {
-                        console.error('AIChatInterface - Summary missing required fields or has invalid values:', 
-                            requiredFields.filter(field => {
-                                if (field === 'readyForAssessment') {
-                                    return typeof parsedSummary[field] !== 'boolean';
-                                }
-                                return !(field in parsedSummary && 
-                                       typeof parsedSummary[field] === 'string' && 
-                                       parsedSummary[field].trim() !== '');
-                            })
-                        );
+                        onMessagesUpdate(messagesWithSummary);
                     }
                 } catch (e) {
                     console.error('Failed to parse summary JSON:', e);
@@ -216,7 +185,7 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMessage.trim() || isLoading) return;
+        if (!newMessage.trim() || isLoading || !systemPrompt) return;
 
         const userMessage = newMessage.trim();
         setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
@@ -227,28 +196,27 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
             const updatedMessages: Message[] = [...messages, { role: 'user', content: userMessage }];
             const aiResponse = await analyzeWithOpenAI(
                 [
-                    { role: 'system', content: config.systemPrompt },
+                    { role: 'system', content: systemPrompt },
                     ...updatedMessages.map((msg): Message => ({
                         role: msg.role,
                         content: msg.content
                     }))
                 ],
-                false // regular chat response
+                false
             );
 
             if (aiResponse) {
                 const newMessages: Message[] = [...updatedMessages, { role: 'assistant', content: aiResponse }];
                 updateMessages(newMessages);
-                setIsLoading(false); // Set loading to false before updating summary
+                setIsLoading(false);
 
-                // Update summary after the response
                 await updateSummaryIfNeeded(newMessages);
             }
         } catch (error) {
             console.error('Error getting AI response:', error);
             setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: "I apologize, but I'm having trouble connecting. Please try again."
+                content: "Je suis désolé, mais j'ai des difficultés à me connecter. Veuillez réessayer."
             }]);
             setIsLoading(false);
         }
@@ -348,9 +316,10 @@ export function AIChatInterface({ config, messages: externalMessages, onMessages
             </div>
 
             <div ref={summaryContainerRef} className="lg:w-80">
-                <ProblemSummary 
-                    summary={problemSummary} 
-                    onConnect={config.onConnect}
+                <DocumentSummary 
+                    template={template}
+                    summary={documentSummary}
+                    onConnect={onConnect}
                     hasUserMessage={messages.some(m => m.role === 'user')}
                     isLoading={isSummaryLoading}
                 />

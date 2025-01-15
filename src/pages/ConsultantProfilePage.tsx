@@ -2,7 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import { CheckCircle, Star, ArrowRight, Linkedin, Twitter, Globe, X, BadgeCheck, Sparkles, AlertCircle, MessageSquare } from 'lucide-react';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
-import { CHAT_CONFIGS } from '../types/chat';
+import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
+import { CHAT_CONFIGS } from '../data/chatConfigs';
+import type { DocumentSummary } from '../types/chat';
 
 interface ServicePackage {
     title: string;
@@ -92,16 +94,6 @@ function getAvailabilityForDuration(duration: string): string {
     return availabilityDate.toLocaleDateString('fr-FR', options);
 }
 
-interface ProblemSummary {
-    challenge: string;
-    currentSituation: string;
-    desiredOutcome: string;
-    constraints: string;
-    stakeholders: string;
-    previousAttempts: string;
-    readyForAssessment: boolean;
-}
-
 export default function ConsultantProfilePage() {
     const [nextAvailability] = useState(getNextWorkingDay());
     const [modal, setModal] = useState<ModalState>({ isOpen: false, package: null, type: 'info' });
@@ -109,14 +101,14 @@ export default function ConsultantProfilePage() {
     const [showConnect, setShowConnect] = useState(false);
     const [messages, setMessages] = useState<Message[]>([CHAT_CONFIGS.consultant_qualification.initialMessage]);
     const [shouldReset, setShouldReset] = useState(false);
-    const [problemSummary, setProblemSummary] = useState<ProblemSummary>({
+    const [documentSummary, setDocumentSummary] = useState<DocumentSummary>({
         challenge: '',
         currentSituation: '',
-        desiredOutcome: '',
+        desiredOutcome: '', 
         constraints: '',
         stakeholders: '',
         previousAttempts: '',
-        readyForAssessment: false
+        hasEnoughData: false
     });
     useScrollAnimation();
 
@@ -298,7 +290,7 @@ export default function ConsultantProfilePage() {
     };
 
     const handleConnect = () => {
-        console.log('ConsultantProfilePage - handleConnect called, current summary:', problemSummary);
+        console.log('ConsultantProfilePage - handleConnect called, current summary:', documentSummary);
         setShowConnect(true);
         setShowChat(false);
     };
@@ -309,14 +301,14 @@ export default function ConsultantProfilePage() {
         setShowChat(false);
         setShouldReset(true);
         setMessages([CHAT_CONFIGS.consultant_qualification.initialMessage]);
-        setProblemSummary({
+        setDocumentSummary({
             challenge: '',
             currentSituation: '',
             desiredOutcome: '',
             constraints: '',
             stakeholders: '',
             previousAttempts: '',
-            readyForAssessment: false
+            hasEnoughData: false
         });
     };
 
@@ -328,10 +320,15 @@ export default function ConsultantProfilePage() {
             const msg = newMessages[i];
             if (msg.role === 'assistant' && msg.summary) {
                 console.log('ConsultantProfilePage - Found summary in message:', msg.summary);
-                setProblemSummary(msg.summary);
+                setDocumentSummary(msg.summary);
                 break;
             }
         }
+    };
+
+    const combinedTemplate = {
+        ...DOCUMENT_TEMPLATES.consultant_qualification,
+        onConnect: handleConnect
     };
 
     return (
@@ -535,14 +532,13 @@ export default function ConsultantProfilePage() {
                         </div>
                         <div className="p-4">
                             <AIChatInterface
-                                config={{
-                                    ...CHAT_CONFIGS.consultant_qualification,
-                                    onConnect: handleConnect,
-                                    submitMessage: "Je vous recontacterai personnellement dans les 24 heures pour approfondir notre discussion et voir comment je peux vous aider au mieux dans votre projet."
-                                }}
+                                template={DOCUMENT_TEMPLATES.consultant_qualification}
                                 messages={messages}
                                 onMessagesUpdate={handleMessagesUpdate}
                                 shouldReset={shouldReset}
+                                onConnect={handleConnect}
+                                systemPrompt={CHAT_CONFIGS.consultant_qualification.systemPrompt}
+                                summaryInstructions={CHAT_CONFIGS.consultant_qualification.summaryInstructions}
                             />
                         </div>
                     </div>
@@ -553,12 +549,10 @@ export default function ConsultantProfilePage() {
                     <div className="bg-white rounded-xl shadow-md overflow-hidden">
                         <ConsultantConnect 
                             onBack={handleBack}
-                            problemSummary={problemSummary}
-                            config={{
-                                ...CHAT_CONFIGS.consultant_qualification,
-                                onConnect: handleConnect,
-                                submitMessage: "Je vous recontacterai personnellement dans les 24 heures pour approfondir notre discussion et voir comment je peux vous aider au mieux dans votre projet."
-                            }}
+                            documentSummary={documentSummary}
+                            template={DOCUMENT_TEMPLATES.consultant_qualification}
+                            confirmationMessage={CHAT_CONFIGS.consultant_qualification.confirmationMessage}
+                            submitMessage={CHAT_CONFIGS.consultant_qualification.submitMessage}
                         />
                     </div>
                 </div>

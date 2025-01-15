@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase'
 
-export interface SignUpData {
+export interface ConsultantSignUpData {
     email: string;
     firstName: string;
     lastName: string;
@@ -9,7 +9,16 @@ export interface SignUpData {
     experience: string;
 }
 
-export const signUpWithEmail = async (data: SignUpData) => {
+export interface ClientSignUpData {
+    email: string;
+    firstName: string;
+    lastName: string;
+    company: string;
+    role: string;
+    industry: string;
+}
+
+export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
     // First, create the auth user
     const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
@@ -36,6 +45,42 @@ export const signUpWithEmail = async (data: SignUpData) => {
                 linkedin: data.linkedin,
                 expertise: data.expertise,
                 experience: data.experience,
+                created_at: new Date().toISOString()
+            }
+        ])
+
+    if (profileError) throw profileError
+
+    return authData
+}
+
+export const signUpClientWithEmail = async (data: ClientSignUpData) => {
+    // First, create the auth user
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: generateSecurePassword(), // We'll send this via email
+        options: {
+            data: {
+                first_name: data.firstName,
+                last_name: data.lastName,
+            }
+        }
+    })
+
+    if (authError) throw authError
+
+    // Then, store additional user data in a client_profiles table
+    const { error: profileError } = await supabase
+        .from('client_profiles')
+        .insert([
+            {
+                id: authData.user?.id,
+                email: data.email,
+                first_name: data.firstName,
+                last_name: data.lastName,
+                company: data.company,
+                role: data.role,
+                industry: data.industry,
                 created_at: new Date().toISOString()
             }
         ])

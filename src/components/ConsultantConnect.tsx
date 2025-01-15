@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle, X } from 'lucide-react';
 import { submitToGoogleForm } from '../services/formSubmission';
-import { ChatConfig } from '../types/chat';
+import type { DocumentTemplate, DocumentSummary } from '../types/chat';
 import { Notification } from '../components/Notification';
 
 interface ContactForm {
@@ -13,19 +13,19 @@ interface ContactForm {
 
 interface ConsultantConnectProps {
     onBack: (shouldReset?: boolean) => void;
-    problemSummary: {
-        challenge: string;
-        currentSituation: string;
-        desiredOutcome: string;
-        constraints: string;
-        stakeholders: string;
-        previousAttempts: string;
-        readyForAssessment: boolean;
-    };
-    config: ChatConfig;
+    documentSummary: DocumentSummary;
+    template: DocumentTemplate;
+    confirmationMessage: string;
+    submitMessage: string;
 }
 
-export function ConsultantConnect({ onBack, problemSummary, config }: ConsultantConnectProps) {
+export function ConsultantConnect({ 
+    onBack, 
+    documentSummary, 
+    template,
+    confirmationMessage,
+    submitMessage
+}: ConsultantConnectProps) {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [form, setForm] = useState<ContactForm>({
@@ -35,15 +35,15 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
         preferredContact: 'email'
     });
 
-    console.log('ConsultantConnect - Received problemSummary:', problemSummary);
+    console.log('ConsultantConnect - Received documentSummary:', documentSummary);
     console.log('ConsultantConnect - Summary values:', {
-        challenge: problemSummary.challenge || 'missing',
-        currentSituation: problemSummary.currentSituation || 'missing',
-        desiredOutcome: problemSummary.desiredOutcome || 'missing',
-        constraints: problemSummary.constraints || 'missing',
-        stakeholders: problemSummary.stakeholders || 'missing',
-        previousAttempts: problemSummary.previousAttempts || 'missing',
-        readyForAssessment: problemSummary.readyForAssessment
+        challenge: documentSummary.challenge || 'missing',
+        currentSituation: documentSummary.currentSituation || 'missing',
+        desiredOutcome: documentSummary.desiredOutcome || 'missing',
+        constraints: documentSummary.constraints || 'missing',
+        stakeholders: documentSummary.stakeholders || 'missing',
+        previousAttempts: documentSummary.previousAttempts || 'missing',
+        hasEnoughData: documentSummary.hasEnoughData
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -54,13 +54,20 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
                 name: form.name,
                 email: form.email,
                 phone: form.phone || '',
-                problemSummary: JSON.stringify(problemSummary)
+                preferredContact: form.preferredContact,
+                challenge: documentSummary.challenge || 'missing',
+                currentSituation: documentSummary.currentSituation || 'missing',
+                desiredOutcome: documentSummary.desiredOutcome || 'missing',
+                constraints: documentSummary.constraints || 'missing',
+                stakeholders: documentSummary.stakeholders || 'missing',
+                previousAttempts: documentSummary.previousAttempts || 'missing',
+                hasEnoughData: documentSummary.hasEnoughData
             });
 
             setIsSubmitted(true);
             setNotification({
                 type: 'success',
-                message: config.confirmationMessage
+                message: confirmationMessage
             });
         } catch (error) {
             console.error('Error submitting consultation:', error);
@@ -103,7 +110,7 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
                         Merci pour Votre Demande !
                     </h1>
                     <p className="text-lg text-gray-600 mb-8 max-w-2xl">
-                        {config.confirmationMessage}
+                        {confirmationMessage}
                     </p>
                     <div className="w-full max-w-md bg-gray-50 p-6 rounded-lg">
                         <p className="text-gray-600 space-y-2">
@@ -166,45 +173,45 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
                             <h3 className="text-lg font-semibold text-gray-900 mb-4 text-left">Résumé de votre besoin</h3>
 
                             <div className="space-y-4">
-                                {problemSummary.challenge && (
+                                {documentSummary.challenge && (
                                     <div className="text-left">
                                         <h4 className="text-sm font-medium text-gray-700">Défi</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{problemSummary.challenge}</p>
+                                        <p className="text-sm text-gray-600 mt-1">{documentSummary.challenge}</p>
                                     </div>
                                 )}
-                                {problemSummary.currentSituation && (
+                                {documentSummary.currentSituation && (
                                     <div className="text-left">
                                         <h4 className="text-sm font-medium text-gray-700">Situation Actuelle</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{problemSummary.currentSituation}</p>
+                                        <p className="text-sm text-gray-600 mt-1">{documentSummary.currentSituation}</p>
                                     </div>
                                 )}
-                                {problemSummary.desiredOutcome && (
+                                {documentSummary.desiredOutcome && (
                                     <div className="text-left">
                                         <h4 className="text-sm font-medium text-gray-700">Objectifs</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{problemSummary.desiredOutcome}</p>
+                                        <p className="text-sm text-gray-600 mt-1">{documentSummary.desiredOutcome}</p>
                                     </div>
                                 )}
-                                {problemSummary.constraints && (
+                                {documentSummary.constraints && (
                                     <div className="text-left">
                                         <h4 className="text-sm font-medium text-gray-700">Contraintes</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{problemSummary.constraints}</p>
+                                        <p className="text-sm text-gray-600 mt-1">{documentSummary.constraints}</p>
                                     </div>
                                 )}
-                                {problemSummary.stakeholders && (
+                                {documentSummary.stakeholders && (
                                     <div className="text-left">
                                         <h4 className="text-sm font-medium text-gray-700">Parties Prenantes</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{problemSummary.stakeholders}</p>
+                                        <p className="text-sm text-gray-600 mt-1">{documentSummary.stakeholders}</p>
                                     </div>
                                 )}
-                                {problemSummary.previousAttempts && (
+                                {documentSummary.previousAttempts && (
                                     <div className="text-left">
                                         <h4 className="text-sm font-medium text-gray-700">Solutions Tentées</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{problemSummary.previousAttempts}</p>
+                                        <p className="text-sm text-gray-600 mt-1">{documentSummary.previousAttempts}</p>
                                     </div>
                                 )}
                             </div>
 
-                            {problemSummary.readyForAssessment && (
+                            {documentSummary.hasEnoughData && (
                                 <div className="mt-6">
                                     <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg text-left">
                                         <CheckCircle className="h-4 w-4 flex-shrink-0" />
@@ -288,7 +295,7 @@ export function ConsultantConnect({ onBack, problemSummary, config }: Consultant
 
                             <div className="bg-blue-50 p-4 rounded-lg">
                                 <p className="text-blue-800">
-                                    {config.submitMessage}
+                                    {submitMessage}
                                 </p>
                             </div>
 
