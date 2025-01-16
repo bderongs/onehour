@@ -12,10 +12,7 @@ export function generateSystemPrompt(template: DocumentTemplate, roleDescription
     return `${roleDescription}
 
 Posez des questions pertinentes pour comprendre :
-${fieldDescriptions}
-
-Posez une question à la fois.
-Une fois que vous avez suffisamment d'informations, confirmez que vous avez bien compris le besoin en le résumant.`;
+${fieldDescriptions}`;
 }
 
 /**
@@ -29,7 +26,7 @@ export function generateSummaryInstructions(template: DocumentTemplate): string 
     }, {} as Record<string, string>);
     jsonFormat.hasEnoughData = "boolean indiquant si nous avons suffisamment d'informations";
 
-    return `Analysez la conversation et créez un résumé JSON des informations.
+    return `Analysez la conversation et créez un résumé JSON des informations, dans la langue de la conversation.
 Le JSON doit suivre exactement ce format:
 ${JSON.stringify(jsonFormat, null, 4)}`;
 } 
