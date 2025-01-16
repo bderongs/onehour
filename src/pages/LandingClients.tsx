@@ -629,40 +629,6 @@ export function LandingClients() {
                         </div>
                     </div>
                 )}
-
-                {/* Chat Interface */}
-                {!showForm && !showConnect && (
-                    <div className={`max-w-4xl mx-auto px-4 mb-8 ${isChatExpanded ? 'block' : 'hidden'}`}>
-                        <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                            <div className="p-4 border-b border-gray-200">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <Sparkles className="h-5 w-5 text-blue-600" />
-                                        <h2 className="text-xl font-semibold text-gray-900">{CHAT_CONFIGS.spark_finder.title}</h2>
-                                    </div>
-                                    <button 
-                                        onClick={() => handleBack(true)}
-                                        className="text-gray-500 hover:text-gray-700"
-                                    >
-                                        <X className="h-6 w-6" />
-                                    </button>
-                                </div>
-                                <p className="text-sm text-gray-600 mt-1">{CHAT_CONFIGS.spark_finder.subtitle}</p>
-                            </div>
-                            <div className="p-4">
-                                <AIChatInterface
-                                    template={DOCUMENT_TEMPLATES.spark_finder}
-                                    messages={messages}
-                                    onMessagesUpdate={handleMessagesUpdate}
-                                    shouldReset={shouldReset}
-                                    onConnect={handleConnect}
-                                    systemPrompt={CHAT_CONFIGS.spark_finder.systemPrompt}
-                                    summaryInstructions={CHAT_CONFIGS.spark_finder.summaryInstructions}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
 
             <style>{`
