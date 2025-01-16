@@ -58,12 +58,14 @@ export function DocumentSummary({ template, summary, onConnect, hasUserMessage, 
                                         {template.documentCompleteMessage || "Document complet !"}
                                     </span>
                                 </div>
-                                <button
-                                    onClick={onConnect}
-                                    className="w-full mt-4 bg-blue-600 text-white py-2.5 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                                >
-                                    Continuer
-                                </button>
+                                {onConnect && (
+                                    <button
+                                        onClick={onConnect}
+                                        className="w-full mt-4 bg-blue-600 text-white py-2.5 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                    >
+                                        Continuer
+                                    </button>
+                                )}
                             </div>
                         ) : (
                             <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-lg mt-4">

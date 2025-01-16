@@ -36,33 +36,19 @@ export interface DocumentField {
     };
 }
 
-export interface SparkFinderSummary {
-    challenge: string;
-    context: string;
-    urgency: string;
-    domain: string;
-    expectations: string;
+// Dynamic type that creates a summary type based on a DocumentTemplate's fields
+type DocumentSummaryFromTemplate<T extends DocumentTemplate> = {
+    [K in T['fields'][number]['key']]: T['fields'][number]['type'] extends 'list' 
+        ? string[] 
+        : T['fields'][number]['type'] extends 'boolean'
+            ? boolean
+            : string;
+} & {
     hasEnoughData: boolean;
-}
+};
 
-export interface ConsultantQualificationSummary {
-    challenge: string;
-    currentSituation: string;
-    desiredOutcome: string;
-    constraints: string;
-    stakeholders: string;
-    previousAttempts: string;
+// The DocumentSummary type is now a union of all possible template field combinations
+export type DocumentSummary = {
+    [K: string]: string | string[] | boolean;
     hasEnoughData: boolean;
-}
-
-export interface AutomationAssessmentSummary {
-    processes: string[];
-    currentTools: string;
-    volume: string;
-    constraints: string;
-    expectedBenefits: string;
-    complexity: string;
-    hasEnoughData: boolean;
-}
-
-export type DocumentSummary = SparkFinderSummary | ConsultantQualificationSummary | AutomationAssessmentSummary; 
+}; 

@@ -173,42 +173,24 @@ export function ConsultantConnect({
                             <h3 className="text-lg font-semibold text-gray-900 mb-4 text-left">Résumé de votre besoin</h3>
 
                             <div className="space-y-4">
-                                {documentSummary.challenge && (
-                                    <div className="text-left">
-                                        <h4 className="text-sm font-medium text-gray-700">Défi</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{documentSummary.challenge}</p>
-                                    </div>
-                                )}
-                                {documentSummary.currentSituation && (
-                                    <div className="text-left">
-                                        <h4 className="text-sm font-medium text-gray-700">Situation Actuelle</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{documentSummary.currentSituation}</p>
-                                    </div>
-                                )}
-                                {documentSummary.desiredOutcome && (
-                                    <div className="text-left">
-                                        <h4 className="text-sm font-medium text-gray-700">Objectifs</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{documentSummary.desiredOutcome}</p>
-                                    </div>
-                                )}
-                                {documentSummary.constraints && (
-                                    <div className="text-left">
-                                        <h4 className="text-sm font-medium text-gray-700">Contraintes</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{documentSummary.constraints}</p>
-                                    </div>
-                                )}
-                                {documentSummary.stakeholders && (
-                                    <div className="text-left">
-                                        <h4 className="text-sm font-medium text-gray-700">Parties Prenantes</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{documentSummary.stakeholders}</p>
-                                    </div>
-                                )}
-                                {documentSummary.previousAttempts && (
-                                    <div className="text-left">
-                                        <h4 className="text-sm font-medium text-gray-700">Solutions Tentées</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{documentSummary.previousAttempts}</p>
-                                    </div>
-                                )}
+                                {template.fields.map(field => {
+                                    const value = documentSummary[field.key];
+                                    if (!value) return null;
+
+                                    return (
+                                        <div key={field.key} className="text-left">
+                                            <h4 className="text-sm font-medium text-gray-700">{field.label}</h4>
+                                            <p className="text-sm text-gray-600 mt-1">
+                                                {field.type === 'list'
+                                                    ? (value as string[]).join(', ')
+                                                    : field.type === 'boolean'
+                                                        ? (value ? 'Oui' : 'Non')
+                                                        : value as string
+                                                }
+                                            </p>
+                                        </div>
+                                    );
+                                })}
                             </div>
 
                             {documentSummary.hasEnoughData && (
