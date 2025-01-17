@@ -1,4 +1,5 @@
 export interface Spark {
+    id: string;
     title: string;
     duration: string;
     prefillText: string;

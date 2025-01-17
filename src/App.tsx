@@ -9,6 +9,9 @@ import { Privacy } from './pages/Privacy';
 import { PricingPage } from './pages/PricingPage';
 import { BrandPage } from './pages/BrandPage';
 import { SparkProductPage } from './pages/SparkProductPage';
+import { SparkManagementPage } from './pages/SparkManagementPage';
+import { SparkCreatePage } from './pages/SparkCreatePage';
+import { SparkEditPage } from './pages/SparkEditPage';
 import AuthCallback from './pages/AuthCallback';
 import { useEffect } from 'react';
 import { initializeGoatCounter } from './utils/analytics';
@@ -114,11 +117,38 @@ function App() {
               <Footer />
             </>
           } />
-          <Route path="/spark/:sparkUrl" element={
+          <Route path="/sparks/:sparkUrl" element={
             <>
               <Header />
               <main className="flex-grow pt-16">
                 <SparkProductPage />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/sparks/manage" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <SparkManagementPage />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/sparks/create" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <SparkCreatePage />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/sparks/edit/:sparkUrl" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <SparkEditPage />
               </main>
               <Footer />
             </>

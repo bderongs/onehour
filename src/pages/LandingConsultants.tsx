@@ -174,7 +174,11 @@ const LandingConsultants = () => {
                             </div>
                         ) : (
                             <SparksGrid
-                                sparks={sparks.filter(spark => !spark.consultant).slice(0, 3)}
+                                sparks={sparks.filter(spark => [
+                                    'fda49682-dd97-4e3a-b9db-52a234348454',
+                                    '60f1dcb7-a91b-4821-9fdd-7c19f240aa4d',
+                                    '886c9a5c-19f6-429e-90fd-e3305eb37cf8'
+                                ].includes(spark.id))}
                                 expandedCallIndex={expandedCallIndex}
                                 setExpandedCallIndex={setExpandedCallIndex}
                                 onCallClick={handleSparkCreation}
@@ -183,7 +187,7 @@ const LandingConsultants = () => {
                                 showCreateCard={true}
                                 showDetailsButton={true}
                                 onDetailsClick={(spark) => {
-                                    navigate(`/spark/${spark.url}`);
+                                    navigate(`/sparks/${spark.url}`);
                                 }}
                             />
                         )}

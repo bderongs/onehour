@@ -1,8 +1,10 @@
 import { supabase } from '../lib/supabase';
 import type { Spark } from '../types/spark';
+import { generateSlug, ensureUniqueSlug } from '../utils/url';
 
 // Convert database snake_case to camelCase for frontend
 const transformSparkFromDB = (dbSpark: any): Spark => ({
+    id: dbSpark.id,
     title: dbSpark.title,
     duration: dbSpark.duration,
     price: dbSpark.price,
@@ -93,9 +95,18 @@ export const getSparksByConsultant = async (consultantId: string): Promise<Spark
 };
 
 export const createSpark = async (spark: Spark): Promise<Spark> => {
+    // Generate URL from title
+    const baseSlug = generateSlug(spark.title);
+    const url = await ensureUniqueSlug(baseSlug);
+
+    const sparkWithUrl = {
+        ...spark,
+        url
+    };
+
     const { data, error } = await supabase
         .from('sparks')
-        .insert([transformSparkToDB(spark)])
+        .insert([transformSparkToDB(sparkWithUrl)])
         .select()
         .single();
 
@@ -108,9 +119,16 @@ export const createSpark = async (spark: Spark): Promise<Spark> => {
 };
 
 export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<Spark> => {
+    // If title is being updated, generate new URL
+    let updatedSpark = { ...spark };
+    if (spark.title) {
+        const baseSlug = generateSlug(spark.title);
+        updatedSpark.url = await ensureUniqueSlug(baseSlug, url);
+    }
+
     const { data, error } = await supabase
         .from('sparks')
-        .update(transformSparkToDB(spark as Spark))
+        .update(transformSparkToDB(updatedSpark as Spark))
         .eq('url', url)
         .select()
         .single();
