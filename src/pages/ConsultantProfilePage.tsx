@@ -8,11 +8,67 @@ import type { DocumentSummary } from '../types/chat';
 import { Spark } from '../types/spark';
 import { getSparksByConsultant } from '../services/sparks';
 import { formatDuration, formatPrice } from '../utils/format';
+import { useNavigate } from 'react-router-dom';
 
-interface ModalState {
-    isOpen: boolean;
-    package: Spark | null;
-    type: 'info' | 'booking';
+interface Review {
+    name: string;
+    role: string;
+    company: string;
+    review: string;
+    rating: number;
+    initials: string;
+    image: string;
+}
+
+// Keep track of used times to avoid duplicates
+const usedTimes = new Set<string>();
+
+function getAvailabilityForDuration(duration: string): string {
+    const now = new Date();
+    
+    // Generate a random day in the next 1-3 days
+    const daysToAdd = Math.floor(Math.random() * 3) + 1;
+    const availabilityDate = new Date(now);
+    availabilityDate.setDate(availabilityDate.getDate() + daysToAdd);
+    
+    // Keep adding days until we find a weekday (1-5, Monday-Friday)
+    while (availabilityDate.getDay() === 0 || availabilityDate.getDay() === 6) {
+        availabilityDate.setDate(availabilityDate.getDate() + 1);
+    }
+
+    // Generate a random time during working hours (9:00-17:00)
+    // We'll try up to 10 times to find an unused time
+    let time = '';
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    while (attempts < maxAttempts) {
+        // Generate hours between 9 and 16 (to ensure end time is before 17:00)
+        const hours = Math.floor(Math.random() * 8) + 9;
+        // Generate minutes in 15-minute increments (0, 15, 30, 45)
+        const minutes = Math.floor(Math.random() * 4) * 15;
+        
+        time = `${hours.toString().padStart(2, '0')}h${minutes === 0 ? '00' : minutes}`;
+        
+        // Check if this time is already used
+        const dateTimeKey = `${availabilityDate.toDateString()}-${time}`;
+        if (!usedTimes.has(dateTimeKey)) {
+            usedTimes.add(dateTimeKey);
+            break;
+        }
+        
+        attempts++;
+    }
+
+    // If we couldn't find an unused time, just use the last generated one
+    
+    // Format the date in French
+    const options: Intl.DateTimeFormatOptions = { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'long' 
+    };
+    return `${availabilityDate.toLocaleDateString('fr-FR', options)}, ${time}`;
 }
 
 function useScrollAnimation() {
@@ -38,38 +94,8 @@ function useScrollAnimation() {
     }, []);
 }
 
-function getAvailabilityForDuration(duration: string): string {
-    const now = new Date();
-    let daysToAdd = 1;
-    
-    // Add more days based on duration
-    if (duration.includes("minutes")) {
-        daysToAdd = 1; // Next day for discovery calls
-    } else if (duration.includes("mois")) {
-        daysToAdd = 30; // One month for monthly services
-    } else {
-        daysToAdd = 7; // One week for all other services
-    }
-    
-    const availabilityDate = new Date(now);
-    availabilityDate.setDate(availabilityDate.getDate() + daysToAdd);
-    
-    // Keep adding days until we find a weekday (1-5, Monday-Friday)
-    while (availabilityDate.getDay() === 0 || availabilityDate.getDay() === 6) {
-        availabilityDate.setDate(availabilityDate.getDate() + 1);
-    }
-    
-    // Format the date in French
-    const options: Intl.DateTimeFormatOptions = { 
-        weekday: 'long', 
-        day: 'numeric', 
-        month: 'long' 
-    };
-    return availabilityDate.toLocaleDateString('fr-FR', options);
-}
-
 export default function ConsultantProfilePage() {
-    const [modal, setModal] = useState<ModalState>({ isOpen: false, package: null, type: 'info' });
+    const navigate = useNavigate();
     const [showChat, setShowChat] = useState(false);
     const [showConnect, setShowConnect] = useState(false);
     const [messages, setMessages] = useState<Message[]>([CHAT_CONFIGS.consultant_qualification.initialMessage]);
@@ -86,62 +112,8 @@ export default function ConsultantProfilePage() {
         previousAttempts: '',
         hasEnoughData: false
     });
-    useScrollAnimation();
 
-    const CONSULTANT_ID = '3c957f54-d43b-4cef-bd65-b519cd8b09d1';
-
-    // Fetch sparks when component mounts
-    useEffect(() => {
-        const fetchSparks = async () => {
-            try {
-                const fetchedSparks = await getSparksByConsultant(CONSULTANT_ID);
-                setSparks(fetchedSparks);
-                setLoading(false);
-            } catch (err) {
-                console.error('Error fetching sparks:', err);
-                setError('Failed to load sparks. Please try again later.');
-                setLoading(false);
-            }
-        };
-
-        fetchSparks();
-    }, []);
-
-    // Reset shouldReset after it's been consumed
-    useEffect(() => {
-        if (shouldReset) {
-            setShouldReset(false);
-        }
-    }, [shouldReset]);
-
-    // Add function to handle modal
-    const openModal = (pkg: Spark, index: number) => {
-        setModal({ 
-            isOpen: true, 
-            package: pkg, 
-            type: index === 0 ? 'booking' : 'info'
-        });
-        document.body.style.overflow = 'hidden'; // Prevent background scroll
-    };
-
-    const closeModal = () => {
-        setModal({ isOpen: false, package: null, type: 'info' });
-        document.body.style.overflow = 'unset'; // Restore scroll
-    };
-
-    // Add function to get time based on package duration
-    const getTimeForDuration = (duration: string): string => {
-        if (duration.includes("mois")) {
-            return "10h";
-        } else if (duration.includes("semaine")) {
-            return "11h";
-        } else if (duration.includes("jours") || duration.includes("journée")) {
-            return "14h30";
-        }
-        return "14h"; // Default time for short calls
-    };
-
-    const clientReviews = [
+    const clientReviews: Review[] = [
         {
             name: "Pascal Dubois",
             role: "CTO",
@@ -171,11 +143,44 @@ export default function ConsultantProfilePage() {
         }
     ];
 
+    useScrollAnimation();
+
+    const CONSULTANT_ID = '3c957f54-d43b-4cef-bd65-b519cd8b09d1';
+
+    // Add function to handle navigation to spark product page
+    const handleSparkClick = (pkg: Spark) => {
+        navigate(`/sparks/${pkg.url}`);
+    };
+
     // No need to filter sparks anymore since we're fetching only the consultant's sparks
     const consultingPackages = sparks;
 
     // Calculate average rating
-    const averageRating = clientReviews.reduce((acc, review) => acc + review.rating, 0) / clientReviews.length;
+    const averageRating = clientReviews.reduce((acc: number, review: Review) => acc + review.rating, 0) / clientReviews.length;
+
+    // Fetch sparks when component mounts
+    useEffect(() => {
+        const fetchSparks = async () => {
+            try {
+                const fetchedSparks = await getSparksByConsultant(CONSULTANT_ID);
+                setSparks(fetchedSparks);
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching sparks:', err);
+                setError('Failed to load sparks. Please try again later.');
+                setLoading(false);
+            }
+        };
+
+        fetchSparks();
+    }, []);
+
+    // Reset shouldReset after it's been consumed
+    useEffect(() => {
+        if (shouldReset) {
+            setShouldReset(false);
+        }
+    }, [shouldReset]);
 
     const handleChatOpen = () => {
         setShowChat(true);
@@ -537,11 +542,11 @@ export default function ConsultantProfilePage() {
                                             <div className="text-center mb-3">
                                                 <div className="text-sm text-gray-500">Prochaine disponibilité</div>
                                                 <div className="text-sm font-medium text-gray-900">
-                                                    {getAvailabilityForDuration(pkg.duration)}, {getTimeForDuration(pkg.duration)}
+                                                    {getAvailabilityForDuration(pkg.duration)}
                                                 </div>
                                             </div>
                                             <button 
-                                                onClick={() => openModal(pkg, index)}
+                                                onClick={() => handleSparkClick(pkg)}
                                                 className={`w-full font-medium px-4 py-2 rounded-lg transition-colors ${
                                                     index === 0 
                                                     ? "bg-blue-600 hover:bg-blue-700 text-white" 
@@ -699,388 +704,6 @@ export default function ConsultantProfilePage() {
                     </div>}
                 </div>
             </main>
-
-            {/* Modal */}
-            {modal.isOpen && modal.package && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                    <div 
-                        className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative
-                        transform transition-all duration-300 scale-100"
-                    >
-                        <button 
-                            onClick={closeModal}
-                            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-                        >
-                            <X className="h-6 w-6" />
-                        </button>
-
-                        {modal.type === 'booking' ? (
-                            <div className="p-6">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-gray-900">Réserver un créneau</h2>
-                                        <p className="text-gray-500 mt-1">{modal.package.title} - {formatDuration(modal.package.duration)}</p>
-                                    </div>
-                                    {modal.package.highlight && (
-                                        <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-                                            {modal.package.highlight}
-                                        </span>
-                                    )}
-                                </div>
-
-                                <div className="space-y-6">
-                                    {/* Calendar Section */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-3">Sélectionnez une date</h3>
-                                        <div className="bg-gray-50 p-4 rounded-lg">
-                                            <p className="text-sm text-gray-600 mb-2">
-                                                Prochaines disponibilités :
-                                            </p>
-                                            <div className="space-y-2">
-                                                <button className="w-full text-left p-3 bg-white rounded-lg hover:bg-blue-50 transition-colors">
-                                                    <div className="font-medium">Lundi 15 avril</div>
-                                                    <div className="text-sm text-gray-500">14:00 - 14:15</div>
-                                                </button>
-                                                <button className="w-full text-left p-3 bg-white rounded-lg hover:bg-blue-50 transition-colors">
-                                                    <div className="font-medium">Mardi 16 avril</div>
-                                                    <div className="text-sm text-gray-500">10:30 - 10:45</div>
-                                                </button>
-                                                <button className="w-full text-left p-3 bg-white rounded-lg hover:bg-blue-50 transition-colors">
-                                                    <div className="font-medium">Mardi 16 avril</div>
-                                                    <div className="text-sm text-gray-500">15:00 - 15:15</div>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Contact Info Section */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-3">Vos informations</h3>
-                                        <div className="space-y-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Nom complet
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                    placeholder="John Doe"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Email professionnel
-                                                </label>
-                                                <input
-                                                    type="email"
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                    placeholder="john@company.com"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Message (optionnel)
-                                                </label>
-                                                <textarea
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                    rows={3}
-                                                    placeholder="Décrivez brièvement votre projet ou vos besoins..."
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="pt-4">
-                                        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors">
-                                            Confirmer le rendez-vous
-                                        </button>
-                                        <p className="text-sm text-gray-500 text-center mt-2">
-                                            Un lien vers la visioconférence vous sera envoyé par email
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="p-6">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-gray-900">{modal.package.title}</h2>
-                                        <p className="text-gray-500">{formatDuration(modal.package.duration)}</p>
-                                        <div className="text-lg font-bold text-gray-900 mt-1">{formatPrice(modal.package.price)}</div>
-                                    </div>
-                                    {modal.package.highlight && (
-                                        <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-                                            {modal.package.highlight}
-                                        </span>
-                                    )}
-                                </div>
-
-                                <div className="space-y-8">
-                                    {/* Overview Section */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-3">Vue d'ensemble</h3>
-                                        <p className="text-gray-600">{modal.package.description}</p>
-                                    </div>
-
-                                    {/* Process Section */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-3">Déroulement</h3>
-                                        <div className="space-y-4">
-                                            {modal.package.title === "Diagnostic Flash" && (
-                                                <>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">1</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Analyse préliminaire</h4>
-                                                            <p className="text-sm text-gray-600">Évaluation rapide de votre situation actuelle et identification des points clés à approfondir.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">2</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Entretiens ciblés</h4>
-                                                            <p className="text-sm text-gray-600">Sessions courtes avec les parties prenantes clés pour comprendre les enjeux et contraintes.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">3</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Synthèse et recommandations</h4>
-                                                            <p className="text-sm text-gray-600">Présentation des conclusions et plan d'action priorisé.</p>
-                                                        </div>
-                                                    </div>
-                                                </>
-                                            )}
-                                            {modal.package.title === "Sprint Innovation" && (
-                                                <>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">1</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Cadrage et préparation (Jour 1)</h4>
-                                                            <p className="text-sm text-gray-600">Définition du challenge, cartographie des parties prenantes et préparation des ateliers.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">2</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Idéation et conception (Jours 2-3)</h4>
-                                                            <p className="text-sm text-gray-600">Ateliers de créativité, priorisation des idées et élaboration des premiers concepts.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">3</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Prototypage (Jour 4)</h4>
-                                                            <p className="text-sm text-gray-600">Création de maquettes et prototypes pour tester les concepts retenus.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">4</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Validation et plan d'action (Jour 5)</h4>
-                                                            <p className="text-sm text-gray-600">Tests utilisateurs, affinage des solutions et définition de la roadmap.</p>
-                                                        </div>
-                                                    </div>
-                                                </>
-                                            )}
-                                            {modal.package.title === "Transformation Agile" && (
-                                                <>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">1</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Phase d'évaluation (2 semaines)</h4>
-                                                            <p className="text-sm text-gray-600">Diagnostic de maturité agile, analyse des processus et identification des axes d'amélioration.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">2</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Mise en place du framework (1 mois)</h4>
-                                                            <p className="text-sm text-gray-600">Formation des équipes, définition des rôles et responsabilités, mise en place des rituels agiles.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">3</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Accompagnement et coaching (1.5 mois)</h4>
-                                                            <p className="text-sm text-gray-600">Support quotidien des équipes, résolution des blocages, ajustements des pratiques.</p>
-                                                        </div>
-                                                    </div>
-                                                </>
-                                            )}
-                                            {modal.package.title === "Mentorat Direction" && (
-                                                <>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">1</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Sessions mensuelles individuelles</h4>
-                                                            <p className="text-sm text-gray-600">Accompagnement personnalisé sur les enjeux stratégiques et opérationnels.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">2</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Support continu</h4>
-                                                            <p className="text-sm text-gray-600">Disponibilité par email et appels courts pour les situations urgentes.</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-3">
-                                                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">3</div>
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">Revues trimestrielles</h4>
-                                                            <p className="text-sm text-gray-600">Évaluation des progrès et ajustement des objectifs.</p>
-                                                        </div>
-                                                    </div>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Deliverables Section */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-3">Livrables</h3>
-                                        <ul className="space-y-3">
-                                            {(modal.package?.deliverables || modal.package?.benefits || []).map((item: string, i: number) => (
-                                                <li key={i} className="flex items-start gap-3">
-                                                    <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                    <span className="text-gray-600">{item}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-
-                                    {/* Benefits Section */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-3">Bénéfices</h3>
-                                        <div className="grid md:grid-cols-2 gap-4">
-                                            {modal.package.title === "Diagnostic Flash" && (
-                                                <>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Vision claire des priorités d'amélioration</span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Plan d'action immédiatement actionnable</span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Identification des quick wins</span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Alignement des parties prenantes</span>
-                                                    </div>
-                                                </>
-                                            )}
-                                            {modal.package.title === "Sprint Innovation" && (
-                                                <>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Solutions innovantes validées</span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Accélération du time-to-market</span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Réduction des risques projet</span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Engagement des équipes</span>
-                                                    </div>
-                                                </>
-                                            )}
-                                            {modal.package.title === "Transformation Agile" && (
-                                                <>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Amélioration de la vélocité</span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Meilleure collaboration</span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Réduction du time-to-market</span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Satisfaction client accrue</span>
-                                                    </div>
-                                                </>
-                                            )}
-                                            {modal.package.title === "Mentorat Direction" && (
-                                                <>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Vision stratégique renforcée</span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Meilleures prises de décision</span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Développement du leadership</span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-gray-600">Accès à un réseau d'experts</span>
-                                                    </div>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* For Whom Section */}
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-3">Pour qui ?</h3>
-                                        <div className="bg-gray-50 p-4 rounded-lg">
-                                            {modal.package.title === "Diagnostic Flash" && (
-                                                <p className="text-sm text-gray-600">
-                                                    Idéal pour les PME et ETI souhaitant rapidement identifier leurs axes d'amélioration en matière de transformation digitale. 
-                                                    Particulièrement adapté aux entreprises en phase de réflexion sur leur stratégie numérique.
-                                                </p>
-                                            )}
-                                            {modal.package.title === "Sprint Innovation" && (
-                                                <p className="text-sm text-gray-600">
-                                                    Pour les équipes produit, innovation ou transformation souhaitant accélérer le développement d'une solution innovante. 
-                                                    Adapté aux entreprises de toute taille ayant un challenge spécifique à résoudre.
-                                                </p>
-                                            )}
-                                            {modal.package.title === "Transformation Agile" && (
-                                                <p className="text-sm text-gray-600">
-                                                    Destiné aux organisations souhaitant adopter ou améliorer leurs pratiques agiles à l'échelle. 
-                                                    Particulièrement pertinent pour les équipes de plus de 50 personnes cherchant à gagner en efficacité.
-                                                </p>
-                                            )}
-                                            {modal.package.title === "Mentorat Direction" && (
-                                                <p className="text-sm text-gray-600">
-                                                    Pour les dirigeants et cadres dirigeants souhaitant être accompagnés dans leur réflexion stratégique et leur prise de décision. 
-                                                    Idéal pour les leaders confrontés à des enjeux de transformation majeurs.
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="pt-4">
-                                        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors">
-                                            Réserver un créneau
-                                        </button>
-                                        <p className="text-sm text-gray-500 text-center mt-2">
-                                            Disponibilité : {getAvailabilityForDuration(modal.package.duration)}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
