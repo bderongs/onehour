@@ -285,7 +285,7 @@ export function LandingClients() {
                     {/* Use Case Form Section */}
                     <div className="mb-12 sm:mb-16">
                         <SparksGrid
-                            expertCalls={sparks}
+                            expertCalls={sparks.filter(spark => spark.consultant !== 'arnaud')}
                             expandedCallIndex={expandedCallIndex}
                             setExpandedCallIndex={setExpandedCallIndex}
                             onCallClick={handleUseCaseClick}

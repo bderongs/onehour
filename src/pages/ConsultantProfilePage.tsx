@@ -5,14 +5,13 @@ import { ConsultantConnect } from '../components/ConsultantConnect';
 import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
 import { CHAT_CONFIGS } from '../data/chatConfigs';
 import type { DocumentSummary } from '../types/chat';
+import { Spark } from '../types/spark';
+import { sparks } from '../data/sparks';
 
-interface ServicePackage {
-    title: string;
-    duration: string;
-    price: string;
-    description: string;
-    deliverables: string[];
-    highlight?: string;
+interface ModalState {
+    isOpen: boolean;
+    package: Spark | null;
+    type: 'info' | 'booking';
 }
 
 function getNextWorkingDay(): string {
@@ -55,13 +54,6 @@ function useScrollAnimation() {
 
         return () => elements.forEach(el => observer.unobserve(el));
     }, []);
-}
-
-// Add new interface for modal state
-interface ModalState {
-    isOpen: boolean;
-    package: ServicePackage | null;
-    type: 'info' | 'booking';
 }
 
 function getAvailabilityForDuration(duration: string): string {
@@ -120,7 +112,7 @@ export default function ConsultantProfilePage() {
     }, [shouldReset]);
 
     // Add function to handle modal
-    const openModal = (pkg: ServicePackage, index: number) => {
+    const openModal = (pkg: Spark, index: number) => {
         setModal({ 
             isOpen: true, 
             package: pkg, 
@@ -151,7 +143,7 @@ export default function ConsultantProfilePage() {
             name: "Pascal Dubois",
             role: "CTO",
             company: "TechCorp",
-            review: "Service exceptionnel ! J'ai pu résoudre mon problème en une heure seulement. Miguel était très compétent et a parfaitement compris nos besoins.",
+            review: "Service exceptionnel ! J'ai pu résoudre mon problème en une heure seulement. Arnaud était très compétent et a parfaitement compris nos besoins.",
             rating: 5,
             initials: "PL",
             image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5"
@@ -160,7 +152,7 @@ export default function ConsultantProfilePage() {
             name: "Marie Jarry",
             role: "Directrice Innovation",
             company: "ScienceLab",
-            review: "Miguel est très professionnel et à l'écoute. Je recommande vivement. La qualité des conseils a dépassé mes attentes.",
+            review: "Arnaud est très professionnel et à l'écoute. Je recommande vivement. La qualité des conseils a dépassé mes attentes.",
             rating: 5,
             initials: "MC",
             image: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe"
@@ -176,96 +168,7 @@ export default function ConsultantProfilePage() {
         }
     ];
 
-    const servicePackages: ServicePackage[] = [
-        {
-            title: "Appel Découverte",
-            duration: "15 minutes",
-            price: "Gratuit",
-            description: "Un premier échange pour comprendre vos enjeux et voir comment je peux vous aider dans votre transformation.",
-            deliverables: [
-                "Présentation de votre contexte",
-                "Identification des challenges",
-                "Discussion des solutions possibles",
-                "Recommandations initiales"
-            ],
-            highlight: "Sans engagement"
-        },
-        {
-            title: "Diagnostic Flash",
-            duration: "1 journée",
-            price: "1\u00A0200\u00A0€",
-            description: "Évaluation rapide de votre transformation digitale et identification des axes d'amélioration prioritaires.",
-            deliverables: [
-                "Audit express de maturité digitale",
-                "Identification des quick wins",
-                "Recommandations prioritaires",
-                "Compte rendu détaillé"
-            ],
-            highlight: "Idéal pour démarrer"
-        },
-        {
-            title: "Sprint Innovation",
-            duration: "5 jours",
-            price: "5\u00A0000\u00A0€",
-            description: "Accompagnement intensif pour accélérer un projet d'innovation ou résoudre un défi stratégique.",
-            deliverables: [
-                "Animation d'ateliers design thinking",
-                "Prototype conceptuel",
-                "Feuille de route détaillée",
-                "Présentation des résultats"
-            ],
-            highlight: "Best-seller"
-        },
-        {
-            title: "Transformation Agile",
-            duration: "3 mois",
-            price: "Sur mesure",
-            description: "Programme complet de transformation agile adapté à votre contexte et vos objectifs.",
-            deliverables: [
-                "Diagnostic organisationnel",
-                "Formation des équipes",
-                "Mise en place du framework",
-                "Coaching des managers"
-            ]
-        },
-        {
-            title: "Mentorat Direction",
-            duration: "6 mois",
-            price: "2\u00A0500€/mois",
-            description: "Accompagnement personnalisé des dirigeants dans leur vision et execution stratégique.",
-            deliverables: [
-                "Sessions mensuelles one-to-one",
-                "Support continu à distance",
-                "Revues stratégiques trimestrielles",
-                "Accès à mon réseau"
-            ]
-        },
-        {
-            title: "Innovation Workshop",
-            duration: "2 jours",
-            price: "2\u00A0400€",
-            description: "Workshop intensif pour générer des idées innovantes et construire une vision produit partagée avec vos équipes.",
-            deliverables: [
-                "Facilitation d'ateliers créatifs",
-                "Cartographie d'opportunités",
-                "Priorisation des initiatives",
-                "Synthèse et plan d'action"
-            ]
-        },
-        {
-            title: "Digital Assessment",
-            duration: "2 semaines",
-            price: "4\u00A0800\u00A0€",
-            description: "Audit complet de votre maturité digitale et de vos processus avec recommandations détaillées.",
-            deliverables: [
-                "Analyse des processus actuels",
-                "Benchmark sectoriel",
-                "Plan de transformation",
-                "Présentation exécutive"
-            ],
-            highlight: "Popular"
-        }
-    ];
+    const consultingPackages = sparks.filter(spark => spark.consultant === 'arnaud');
 
     // Calculate average rating
     const averageRating = clientReviews.reduce((acc, review) => acc + review.rating, 0) / clientReviews.length;
@@ -561,7 +464,7 @@ export default function ConsultantProfilePage() {
                 <div className="scroll-animation overflow-hidden mb-8">
                     <div className="flex overflow-x-auto pb-6 scrollbar-hide">
                         <div className="flex gap-4 mx-auto px-4 py-2">
-                            {servicePackages.map((pkg, index) => (
+                            {consultingPackages.map((pkg, index) => (
                                 <div 
                                     key={index}
                                     className="flex flex-col bg-white rounded-xl shadow-md w-80 flex-shrink-0 
@@ -585,7 +488,7 @@ export default function ConsultantProfilePage() {
                                         <div className="mt-auto">
                                             <div className="text-sm font-medium text-gray-900 mb-2">Ce qui est inclus :</div>
                                             <ul className="space-y-2">
-                                                {pkg.deliverables.map((item, i) => (
+                                                {(pkg.deliverables || pkg.benefits || []).map((item, i) => (
                                                     <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
                                                         <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
                                                         <span>{item}</span>
@@ -691,7 +594,7 @@ export default function ConsultantProfilePage() {
                     </div>
 
                     {/* Toolkit Section */}
-                    <div className="scroll-animation bg-white p-6 rounded-lg shadow-md mb-8">
+                    {/*<div className="scroll-animation bg-white p-6 rounded-lg shadow-md mb-8">
                         <h3 className="text-xl font-semibold mb-4">Toolkit</h3>
                         <div className="space-y-4">
                             <div>
@@ -732,10 +635,10 @@ export default function ConsultantProfilePage() {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>*/}
 
                     {/* Recent Missions Section */}
-                    <div className="scroll-animation bg-white p-6 rounded-lg shadow-md mb-16">
+                    {<div className="scroll-animation bg-white p-6 rounded-lg shadow-md mb-16">
                         <h3 className="text-xl font-semibold mb-4">Mes dernières missions</h3>
                         <div className="space-y-6">
                             <div className="border-l-4 border-blue-600 pl-4">
@@ -756,7 +659,7 @@ export default function ConsultantProfilePage() {
                                 <div className="text-sm text-gray-500 mt-2">2022 - 4 mois</div>
                             </div>
                         </div>
-                    </div>
+                    </div>}
                 </div>
             </main>
 
@@ -1000,7 +903,7 @@ export default function ConsultantProfilePage() {
                                     <div>
                                         <h3 className="text-lg font-semibold mb-3">Livrables</h3>
                                         <ul className="space-y-3">
-                                            {modal.package.deliverables.map((item, i) => (
+                                            {(modal.package.deliverables || modal.package.benefits || []).map((item, i) => (
                                                 <li key={i} className="flex items-start gap-3">
                                                     <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                                     <span className="text-gray-600">{item}</span>

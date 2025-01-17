@@ -6,6 +6,7 @@ export interface Spark {
     description?: string;
     benefits?: string[];
     highlight?: string;
+    consultant?: string; // ID or name of the consultant this spark belongs to
     // Additional properties for detailed view
     detailedDescription?: string;
     methodology?: string[];

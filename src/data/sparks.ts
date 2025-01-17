@@ -11,6 +11,116 @@ const generateUrl = (title: string): string => {
 
 export const sparks: Spark[] = [
     {
+        consultant: 'arnaud',
+        title: "Appel Découverte",
+        duration: "30 minutes",
+        price: "Gratuit",
+        description: "Un premier échange pour comprendre vos enjeux et évaluer comment je peux vous accompagner dans votre transformation.",
+        benefits: [
+            "Présentation de votre contexte",
+            "Identification des challenges",
+            "Évaluation des besoins",
+            "Recommandations initiales"
+        ],
+        prefillText: "J'aimerais discuter de mes enjeux de transformation.",
+        highlight: "Sans engagement",
+        url: generateUrl("Appel Découverte"),
+        deliverables: [
+            "Présentation de votre contexte",
+            "Identification des challenges",
+            "Évaluation des besoins",
+            "Recommandations initiales"
+        ]
+    },
+    {
+        consultant: 'arnaud',
+        title: "Consultation Flash",
+        duration: "1 heure",
+        price: "250€",
+        description: "Session de conseil rapide pour débloquer une situation ou obtenir un avis expert sur un sujet précis.",
+        benefits: [
+            "Analyse de la problématique",
+            "Solutions concrètes",
+            "Recommandations pratiques",
+            "Compte-rendu synthétique"
+        ],
+        prefillText: "J'ai besoin d'un avis expert rapide sur une situation.",
+        highlight: "Solution rapide",
+        url: generateUrl("Consultation Flash"),
+        deliverables: [
+            "Analyse de la problématique",
+            "Solutions concrètes",
+            "Recommandations pratiques",
+            "Compte-rendu synthétique"
+        ]
+    },
+    {
+        consultant: 'arnaud',
+        title: "Session Stratégique",
+        duration: "90 minutes",
+        price: "375€",
+        description: "Session approfondie pour élaborer une stratégie ou résoudre un défi complexe avec un plan d'action détaillé.",
+        benefits: [
+            "Analyse approfondie",
+            "Plan d'action détaillé",
+            "Identification des risques",
+            "Priorisation des actions"
+        ],
+        prefillText: "Je souhaite élaborer une stratégie pour un défi complexe.",
+        highlight: "Best-seller",
+        url: generateUrl("Session Stratégique"),
+        deliverables: [
+            "Analyse approfondie",
+            "Plan d'action détaillé",
+            "Identification des risques",
+            "Priorisation des actions"
+        ]
+    },
+    {
+        consultant: 'arnaud',
+        title: "Workshop Innovation",
+        duration: "2 heures",
+        price: "500€",
+        description: "Session collaborative pour générer des idées innovantes et définir une vision produit avec votre équipe.",
+        benefits: [
+            "Animation d'atelier créatif",
+            "Génération d'idées",
+            "Priorisation des concepts",
+            "Synthèse et next steps"
+        ],
+        prefillText: "Je veux organiser un atelier d'innovation avec mon équipe.",
+        highlight: "Collaboration",
+        url: generateUrl("Workshop Innovation"),
+        deliverables: [
+            "Animation d'atelier créatif",
+            "Génération d'idées",
+            "Priorisation des concepts",
+            "Synthèse et next steps"
+        ]
+    },
+    {
+        consultant: 'arnaud',
+        title: "Diagnostic Express",
+        duration: "2 heures",
+        price: "500€",
+        description: "Évaluation rapide de votre maturité digitale ou agile avec recommandations concrètes.",
+        benefits: [
+            "Audit express",
+            "Quick wins identifiés",
+            "Recommandations prioritaires",
+            "Plan d'action immédiat"
+        ],
+        prefillText: "Je souhaite évaluer rapidement notre maturité digitale.",
+        highlight: "Diagnostic",
+        url: generateUrl("Diagnostic Express"),
+        deliverables: [
+            "Audit express",
+            "Quick wins identifiés",
+            "Recommandations prioritaires",
+            "Plan d'action immédiat"
+        ]
+    },
+    {
         title: "Check-up stratégique express",
         duration: "1h",
         price: "400€ HT",

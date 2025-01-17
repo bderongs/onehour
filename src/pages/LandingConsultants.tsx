@@ -192,7 +192,7 @@ const LandingConsultants = () => {
                     {/* Sparks Grid */}
                     <div className="mb-12 sm:mb-16">
                         <SparksGrid
-                            expertCalls={sparks.slice(0, 3)}
+                            expertCalls={sparks.filter(spark => spark.consultant !== 'arnaud').slice(0, 3)}
                             expandedCallIndex={expandedCallIndex}
                             setExpandedCallIndex={setExpandedCallIndex}
                             onCallClick={handleSparkCreation}
