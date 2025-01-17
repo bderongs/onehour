@@ -338,8 +338,11 @@ export default function ConsultantProfilePage() {
                             <div className="flex flex-col md:flex-row md:items-start gap-6">
                                 <div className="w-40 h-40 md:w-72 md:h-96 mx-auto md:mx-0 flex-shrink-0 bg-gray-400 rounded-2xl border-4 border-white overflow-hidden">
                                     <img
-                                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
+                                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&w=800&q=80"
                                         alt="Arnaud Lacaze"
+                                        width={288}
+                                        height={384}
+                                        loading="eager"
                                         className="w-full h-full object-cover"
                                         style={{ objectPosition: '50% 10%' }}
                                     />
