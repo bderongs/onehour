@@ -7,6 +7,7 @@ import { CHAT_CONFIGS } from '../data/chatConfigs';
 import type { DocumentSummary } from '../types/chat';
 import { Spark } from '../types/spark';
 import { getSparksByConsultant } from '../services/sparks';
+import { formatDuration, formatPrice } from '../utils/format';
 
 interface ModalState {
     isOpen: boolean;
@@ -508,8 +509,10 @@ export default function ConsultantProfilePage() {
                                             <div className="flex justify-between items-start mb-4">
                                                 <div>
                                                     <h4 className="text-lg font-semibold text-gray-900">{pkg.title}</h4>
-                                                    <p className="text-sm text-gray-500">{pkg.duration}</p>
-                                                    <div className="text-sm font-bold text-gray-900 mt-1">{pkg.price}</div>
+                                                    <div className="flex items-center gap-4 text-gray-500">
+                                                        <span>{formatDuration(pkg.duration)}</span>
+                                                        <div className="text-sm font-bold text-gray-900">{formatPrice(pkg.price)}</div>
+                                                    </div>
                                                 </div>
                                                 {pkg.highlight && (
                                                     <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
@@ -716,7 +719,7 @@ export default function ConsultantProfilePage() {
                                 <div className="flex justify-between items-start mb-6">
                                     <div>
                                         <h2 className="text-2xl font-bold text-gray-900">Réserver un créneau</h2>
-                                        <p className="text-gray-500 mt-1">{modal.package.title} - {modal.package.duration}</p>
+                                        <p className="text-gray-500 mt-1">{modal.package.title} - {formatDuration(modal.package.duration)}</p>
                                     </div>
                                     {modal.package.highlight && (
                                         <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
@@ -802,8 +805,8 @@ export default function ConsultantProfilePage() {
                                 <div className="flex justify-between items-start mb-6">
                                     <div>
                                         <h2 className="text-2xl font-bold text-gray-900">{modal.package.title}</h2>
-                                        <p className="text-gray-500">{modal.package.duration}</p>
-                                        <div className="text-lg font-bold text-gray-900 mt-1">{modal.package.price}</div>
+                                        <p className="text-gray-500">{formatDuration(modal.package.duration)}</p>
+                                        <div className="text-lg font-bold text-gray-900 mt-1">{formatPrice(modal.package.price)}</div>
                                     </div>
                                     {modal.package.highlight && (
                                         <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">

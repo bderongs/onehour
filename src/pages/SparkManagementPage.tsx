@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, Eye } from 'lucide-react';
 import { getSparks } from '../services/sparks';
 import type { Spark } from '../types/spark';
+import { formatDuration, formatPrice } from '../utils/format';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -110,8 +111,8 @@ export function SparkManagementPage() {
                                 <div>
                                     <h2 className="text-xl font-semibold text-gray-900 mb-2">{spark.title}</h2>
                                     <div className="flex items-center gap-4 text-gray-600 text-sm">
-                                        <span>{spark.duration}</span>
-                                        <span>{spark.price}</span>
+                                        <span>{formatDuration(spark.duration)}</span>
+                                        <span>{formatPrice(spark.price)}</span>
                                     </div>
                                 </div>
                                 {spark.highlight && (

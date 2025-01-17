@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Spark } from '../types/spark';
 import { Plus, X } from 'lucide-react';
+import { formatDuration, formatPrice } from '../utils/format';
 
 interface SparkFormProps {
     initialData?: Spark;
@@ -87,6 +88,31 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
         onSubmit(data);
     };
 
+    // Add helper functions to parse inputs
+    const parseDuration = (value: string): string => {
+        // If it's already in ISO format, return as is
+        if (value.includes('PT') || value.includes(':')) {
+            return value;
+        }
+        
+        // Try to parse as minutes first
+        const minutes = parseInt(value);
+        if (!isNaN(minutes)) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:00`;
+        }
+        
+        return value;
+    };
+
+    const parsePrice = (value: string): number | null => {
+        // Remove currency symbol, spaces, and convert comma to dot
+        const cleanValue = value.replace(/[€\s]/g, '').replace(',', '.');
+        const number = parseFloat(cleanValue);
+        return isNaN(number) ? null : number;
+    };
+
     return (
         <form onSubmit={handleSubmit} className="space-y-8">
             {/* Basic Information */}
@@ -107,27 +133,39 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Durée
+                            Durée (en minutes)
                         </label>
                         <input
                             type="text"
                             value={formData.duration || ''}
-                            onChange={(e) => handleChange('duration', e.target.value)}
+                            onChange={(e) => handleChange('duration', parseDuration(e.target.value))}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            placeholder="ex: 90 (pour 1h30)"
                             required
                         />
+                        {formData.duration && (
+                            <div className="mt-1 text-sm text-gray-500">
+                                {formatDuration(formData.duration)}
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Prix
+                            Prix (€)
                         </label>
                         <input
                             type="text"
                             value={formData.price || ''}
-                            onChange={(e) => handleChange('price', e.target.value)}
+                            onChange={(e) => handleChange('price', parsePrice(e.target.value)?.toString() || '')}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            placeholder="ex: 1500"
                             required
                         />
+                        {formData.price && (
+                            <div className="mt-1 text-sm text-gray-500">
+                                {formatPrice(formData.price)}
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">

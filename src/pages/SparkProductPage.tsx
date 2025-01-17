@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { getSparkByUrl } from '../services/sparks';
 import type { Spark } from '../types/spark';
+import { formatDuration, formatPrice } from '../utils/format';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -115,9 +116,9 @@ export function SparkProductPage() {
                             <div className="flex flex-wrap gap-4">
                                 <div className="flex items-center gap-2 text-gray-600">
                                     <Clock className="h-5 w-5" />
-                                    <span>{spark.duration}</span>
+                                    <span>{formatDuration(spark.duration)}</span>
                                 </div>
-                                <div className="text-xl font-bold text-gray-900">{spark.price}</div>
+                                <div className="text-xl font-bold text-gray-900">{formatPrice(spark.price)}</div>
                             </div>
                         </div>
                         {/* Desktop Booking Button */}

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, Plus } from 'lucide-react';
 import { Spark } from '../types/spark';
 import { Logo } from './Logo';
+import { formatDuration, formatPrice } from '../utils/format';
 
 // Utility function to get next available business date
 const getNextBusinessDate = () => {
@@ -103,9 +104,9 @@ export function SparksGrid({
                                 <div className="flex flex-col gap-1 mt-2">
                                     <div className="flex items-center gap-2 text-gray-500 text-sm">
                                         <Clock className="h-4 w-4" />
-                                        <span>{spark.duration}</span>
+                                        <span>{formatDuration(spark.duration)}</span>
                                     </div>
-                                    <div className="text-sm font-bold text-gray-900 text-left">{spark.price}</div>
+                                    <div className="text-sm font-bold text-gray-900 text-left">{formatPrice(spark.price)}</div>
                                 </div>
                             </div>
                             {spark.highlight && (
