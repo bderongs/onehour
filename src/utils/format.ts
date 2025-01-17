@@ -56,6 +56,10 @@ export function formatPrice(price: string | number | null | undefined): string {
         return 'Prix sur demande';
     }
 
+    if (numericPrice === 0) {
+        return 'Gratuit';
+    }
+
     return new Intl.NumberFormat('fr-FR', {
         style: 'currency',
         currency: 'EUR',
