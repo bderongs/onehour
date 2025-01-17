@@ -6,19 +6,6 @@ const openai = new OpenAI({
     dangerouslyAllowBrowser: true
 });
 
-function ensureString(response: any): string {
-    if (typeof response === 'string') return response;
-    if (typeof response === 'object') {
-        try {
-            const values = Object.values(response).filter(val => val !== undefined && val !== null);
-            return values.join('. ');
-        } catch {
-            return String(response);
-        }
-    }
-    return String(response);
-}
-
 export async function analyzeWithOpenAI(
     messages: { role: 'user' | 'assistant' | 'system', content: string }[], 
     isSummaryMode: boolean = false

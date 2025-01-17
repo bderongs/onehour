@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { signUpConsultantWithEmail } from '../services/auth';
-import { BadgeCheck, CheckCircle, ArrowRight, Star, Sparkles, Target, Users, ArrowRightCircle, FileText, Package2, User, BarChart, Clock, Euro, X, Store } from 'lucide-react';
+import { CheckCircle, ArrowRight, Sparkles, Package2, Clock, Store } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { SparksGrid } from '../components/SparksGrid';
 import { sparks } from '../data/sparks';
-import { Spark } from '../types/spark';
 import { Notification } from '../components/Notification';
 import '../styles/highlight.css';
 
@@ -36,7 +35,6 @@ const LandingConsultants = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
-    const [selectedSpark, setSelectedSpark] = useState<Spark | null>(null);
 
     useEffect(() => {
         // Handle hash-based navigation
@@ -107,52 +105,6 @@ const LandingConsultants = () => {
 
         console.log('Selected spark:', prefillText);
     };
-
-    const features = [
-        {
-            title: "Dédié au conseil en stratégie",
-            description: "Contrairement aux plateformes de freelancing low cost, Sparkier vous permet de renvoyer une image professionnelle, structurée autour de votre offre de conseil en stratégie.",
-            icon: <Target className="h-6 w-6" />
-        },
-        {
-            title: "Des clients qualifiés",
-            description: "Sparkier vous assure des clients qualifiés, qui viennent uniquement chercher des prestations de conseil en stratégie. Le tarif minimum d'un Spark est de 200€ pour 30 minutes.",
-            icon: <Users className="h-6 w-6" />
-        },
-        {
-            title: "Un processus d'achat simple",
-            description: "En structurant votre offre sous forme de modules Sparks, vous accédez au marché de la mission courte. Les clients peuvent naviguer votre offre plus facilement et prendre une décision d'achat plus rapide.",
-            icon: <ArrowRightCircle className="h-6 w-6" />
-        },
-        {
-            title: "Un brief précis",
-            description: "Vos clients achètent un Spark et nous nous chargeons d'établir un brief très précis avec eux. Vous optimisez ainsi votre temps et augmentez votre valeur ajoutée.",
-            icon: <FileText className="h-6 w-6" />
-        }
-    ];
-
-    const keyFeatures = [
-        {
-            title: "L'acquisition client simplifiée",
-            description: "Le Spark est un module de conseil structuré et précis. Il vous permet de packager vos offres pour les vendre plus facilement. Il s'agit également d'un excellent moyen pour rencontrer de nouveaux clients avec qui créer une relation plus longue.",
-            icon: <Target className="h-6 w-6" />
-        },
-        {
-            title: "Pourquoi packager vos offres ?",
-            description: "Transformer vos services en produits packagés vous permet d'augmenter la clarté de votre offre, et de vendre plus facilement, sans perdre de temps à négocier une lettre de mission. Chaque Spark est vendu au minimum 200€, vous pouvez en proposer 10 différents.",
-            icon: <Package2 className="h-6 w-6" />
-        },
-        {
-            title: "Votre page de profil",
-            description: "En plus de la présence sur notre plateforme vous disposerez d'une page de conversion personnelle sur laquelle vos Sparks seront disponibles et réservables en ligne.",
-            icon: <User className="h-6 w-6" />
-        },
-        {
-            title: "Restez à l'écoute du marché",
-            description: "Les fins de mission peuvent arriver soudainement et vous couter très cher, si vous n'avez pas pris le temps de garder une base commerciale active. Sparkier vous permet de cumuler vos missions longues avec des sessions de conseil très courtes, sans perdre de temps à faire du commerce, ce qui vous permet de flux continu d'opportunitées pour des missions plus longues.",
-            icon: <BarChart className="h-6 w-6" />
-        }
-    ];
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">

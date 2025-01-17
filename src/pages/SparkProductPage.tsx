@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, Star, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
-import { Spark } from '../types/spark';
+import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { sparks } from '../data/sparks';
-import { Logo } from '../components/Logo';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },

@@ -105,7 +105,7 @@ export function PricingPage() {
 
                 {/* Pricing Grid */}
                 <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                    {tiers.map((tier, index) => (
+                    {tiers.map((tier) => (
                         <div 
                             key={tier.name}
                             className={`bg-white rounded-2xl shadow-xl p-8 relative flex flex-col ${

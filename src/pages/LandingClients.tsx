@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, Users, Package2, Plus, Briefcase, MessageSquare, Calendar, Zap, Shield, Sparkles, ArrowRight, FileText, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Bot, Users, Briefcase, MessageSquare, Calendar, Zap, Shield, Sparkles, ArrowRight, FileText} from 'lucide-react';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
 import { motion } from 'framer-motion';
@@ -19,21 +18,10 @@ const fadeInUp = {
     transition: { duration: 0.5 }
 };
 
-const stagger = {
-    animate: {
-        transition: {
-            staggerChildren: 0.1
-        }
-    }
-};
-
 export function LandingClients() {
-    const navigate = useNavigate();
     const [problem, setProblem] = useState('');
-    const [showForm, setShowForm] = useState(true);
     const [showConnect, setShowConnect] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
-    const [scrollY, setScrollY] = useState(0);
     const [shouldReset, setShouldReset] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [formData, setFormData] = useState<ClientSignUpData>({
@@ -57,15 +45,6 @@ export function LandingClients() {
     const [isChatExpanded, setIsChatExpanded] = useState(false);
 
     useEffect(() => {
-        const handleScroll = () => {
-            setScrollY(window.scrollY);
-        };
-
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    useEffect(() => {
         if (shouldReset) {
             setShouldReset(false);
         }
@@ -78,7 +57,6 @@ export function LandingClients() {
         }
     }, []);
 
-
     const handleUseCaseClick = (prefillText: string) => {
         setProblem(prefillText);
         if (prefillText.trim()) {
@@ -87,7 +65,6 @@ export function LandingClients() {
                 content: prefillText.trim()
             }];
             setMessages(initialMessages);
-            setShowForm(false);
             setShowConnect(false);
             setIsChatExpanded(true);
         }
@@ -101,7 +78,6 @@ export function LandingClients() {
                 content: message.trim()
             }];
             setMessages(initialMessages);
-            setShowForm(false);
             setShowConnect(false);
             setIsChatExpanded(true);
         }
@@ -133,7 +109,6 @@ export function LandingClients() {
     const handleBack = (shouldReset?: boolean) => {
         if (shouldReset) {
             // Reset to initial state
-            setShowForm(true);
             setShowConnect(false);
             setMessages([]);
             setShouldReset(true);

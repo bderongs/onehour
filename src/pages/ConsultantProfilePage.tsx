@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { CheckCircle, Star, ArrowRight, Linkedin, Twitter, Globe, X, BadgeCheck, Sparkles, AlertCircle, MessageSquare } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { CheckCircle, Star, ArrowRight, Linkedin, Twitter, Globe, X, BadgeCheck, Sparkles, AlertCircle } from 'lucide-react';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
 import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
@@ -12,25 +12,6 @@ interface ModalState {
     isOpen: boolean;
     package: Spark | null;
     type: 'info' | 'booking';
-}
-
-function getNextWorkingDay(): string {
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    // Keep adding days until we find a weekday (1-5, Monday-Friday)
-    while (tomorrow.getDay() === 0 || tomorrow.getDay() === 6) {
-        tomorrow.setDate(tomorrow.getDate() + 1);
-    }
-    
-    // Format the date in French
-    const options: Intl.DateTimeFormatOptions = { 
-        weekday: 'long', 
-        day: 'numeric', 
-        month: 'long' 
-    };
-    return tomorrow.toLocaleDateString('fr-FR', options);
 }
 
 function useScrollAnimation() {
@@ -87,7 +68,6 @@ function getAvailabilityForDuration(duration: string): string {
 }
 
 export default function ConsultantProfilePage() {
-    const [nextAvailability] = useState(getNextWorkingDay());
     const [modal, setModal] = useState<ModalState>({ isOpen: false, package: null, type: 'info' });
     const [showChat, setShowChat] = useState(false);
     const [showConnect, setShowConnect] = useState(false);
@@ -187,11 +167,6 @@ export default function ConsultantProfilePage() {
             }
         }, 50); // Reduced delay to start scroll earlier in the animation
     };
-
-    const handleChatClose = () => {
-        setShowChat(false);
-    };
-
     const handleConnect = () => {
         console.log('ConsultantProfilePage - handleConnect called, current summary:', documentSummary);
         setShowConnect(true);
@@ -227,11 +202,6 @@ export default function ConsultantProfilePage() {
                 break;
             }
         }
-    };
-
-    const combinedTemplate = {
-        ...DOCUMENT_TEMPLATES.consultant_qualification,
-        onConnect: handleConnect
     };
 
     return (
@@ -1047,3 +1017,5 @@ export default function ConsultantProfilePage() {
         </div>
     );
 }
+
+

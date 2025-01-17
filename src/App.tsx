@@ -11,7 +11,6 @@ import { BrandPage } from './pages/BrandPage';
 import { SparkProductPage } from './pages/SparkProductPage';
 import AuthCallback from './pages/AuthCallback';
 import { useEffect } from 'react';
-import React from 'react';
 import { initializeGoatCounter } from './utils/analytics';
 
 function App() {

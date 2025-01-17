@@ -100,4 +100,84 @@ function generateSecurePassword(): string {
         password += charset[randomIndex]
     }
     return password
-} 
+}
+
+export type UserRole = 'client' | 'consultant' | 'admin';
+
+export interface UserProfile {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    linkedin?: string;
+    expertise: string;
+    experience: string;
+    role: UserRole;
+}
+
+// Transform database snake_case to camelCase
+const transformProfileFromDB = (profile: any): UserProfile => ({
+    id: profile.id,
+    email: profile.email,
+    firstName: profile.first_name,
+    lastName: profile.last_name,
+    linkedin: profile.linkedin,
+    expertise: profile.expertise,
+    experience: profile.experience,
+    role: profile.role,
+});
+
+export const getCurrentUser = async (): Promise<UserProfile | null> => {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+        console.error('Error getting user:', authError);
+        return null;
+    }
+
+    const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+    if (profileError || !profile) {
+        console.error('Error getting profile:', profileError);
+        return null;
+    }
+
+    return transformProfileFromDB(profile);
+};
+
+export const isConsultant = async (): Promise<boolean> => {
+    const user = await getCurrentUser();
+    return user?.role === 'consultant';
+};
+
+export const isAdmin = async (): Promise<boolean> => {
+    const user = await getCurrentUser();
+    return user?.role === 'admin';
+};
+
+export const isClient = async (): Promise<boolean> => {
+    const user = await getCurrentUser();
+    return user?.role === 'client';
+};
+
+export const updateUserRole = async (userId: string, role: UserRole): Promise<void> => {
+    // Only admins can update roles
+    const currentUser = await getCurrentUser();
+    if (currentUser?.role !== 'admin') {
+        throw new Error('Only administrators can update user roles');
+    }
+
+    const { error } = await supabase
+        .from('profiles')
+        .update({ role })
+        .eq('id', userId);
+
+    if (error) {
+        console.error('Error updating user role:', error);
+        throw error;
+    }
+}; 

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, Plus } from 'lucide-react';
 import { Spark } from '../types/spark';

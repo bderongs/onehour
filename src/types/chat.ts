@@ -36,17 +36,6 @@ export interface DocumentField {
     };
 }
 
-// Dynamic type that creates a summary type based on a DocumentTemplate's fields
-type DocumentSummaryFromTemplate<T extends DocumentTemplate> = {
-    [K in T['fields'][number]['key']]: T['fields'][number]['type'] extends 'list' 
-        ? string[] 
-        : T['fields'][number]['type'] extends 'boolean'
-            ? boolean
-            : string;
-} & {
-    hasEnoughData: boolean;
-};
-
 // The DocumentSummary type is now a union of all possible template field combinations
 export type DocumentSummary = {
     [K: string]: string | string[] | boolean;

@@ -1,4 +1,3 @@
-import React from 'react';
 import { CheckCircle, AlertCircle, RefreshCw, FileText } from 'lucide-react';
 import type { DocumentTemplate, DocumentSummary as DocumentSummaryType } from '../types/chat';
 

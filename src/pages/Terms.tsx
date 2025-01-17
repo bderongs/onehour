@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function Terms() {
     return (
         <div className="bg-white min-h-screen py-16">
