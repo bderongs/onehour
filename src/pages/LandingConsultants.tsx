@@ -4,7 +4,8 @@ import { CheckCircle, ArrowRight, Sparkles, Package2, Clock, Store } from 'lucid
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { SparksGrid } from '../components/SparksGrid';
-import { sparks } from '../data/sparks';
+import { getSparks } from '../services/sparks';
+import type { Spark } from '../types/spark';
 import { Notification } from '../components/Notification';
 import '../styles/highlight.css';
 
@@ -24,6 +25,9 @@ const stagger = {
 
 const LandingConsultants = () => {
     const navigate = useNavigate();
+    const [sparks, setSparks] = useState<Spark[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -35,6 +39,22 @@ const LandingConsultants = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
+
+    useEffect(() => {
+        const fetchSparks = async () => {
+            try {
+                const fetchedSparks = await getSparks();
+                setSparks(fetchedSparks);
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching sparks:', err);
+                setError('Failed to load sparks. Please try again later.');
+                setLoading(false);
+            }
+        };
+
+        fetchSparks();
+    }, []);
 
     useEffect(() => {
         // Handle hash-based navigation
@@ -143,19 +163,30 @@ const LandingConsultants = () => {
 
                     {/* Sparks Grid */}
                     <div className="mb-12 sm:mb-16">
-                        <SparksGrid
-                            expertCalls={sparks.filter(spark => spark.consultant !== 'arnaud').slice(0, 3)}
-                            expandedCallIndex={expandedCallIndex}
-                            setExpandedCallIndex={setExpandedCallIndex}
-                            onCallClick={handleSparkCreation}
-                            buttonText="Créer mon premier Spark"
-                            showAvailability={false}
-                            showCreateCard={true}
-                            showDetailsButton={true}
-                            onDetailsClick={(spark) => {
-                                navigate(`/spark/${spark.url}`);
-                            }}
-                        />
+                        {loading ? (
+                            <div className="text-center py-8">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                                <p className="mt-4 text-gray-600">Loading sparks...</p>
+                            </div>
+                        ) : error ? (
+                            <div className="text-center py-8">
+                                <p className="text-red-600">{error}</p>
+                            </div>
+                        ) : (
+                            <SparksGrid
+                                sparks={sparks.filter(spark => !spark.consultant).slice(0, 3)}
+                                expandedCallIndex={expandedCallIndex}
+                                setExpandedCallIndex={setExpandedCallIndex}
+                                onCallClick={handleSparkCreation}
+                                buttonText="Créer mon premier Spark"
+                                showAvailability={false}
+                                showCreateCard={true}
+                                showDetailsButton={true}
+                                onDetailsClick={(spark) => {
+                                    navigate(`/spark/${spark.url}`);
+                                }}
+                            />
+                        )}
                     </div>
 
                     <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-8 sm:mb-12 px-2">

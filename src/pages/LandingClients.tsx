@@ -4,7 +4,8 @@ import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
 import { motion } from 'framer-motion';
 import { SparksGrid } from '../components/SparksGrid';
-import { sparks } from '../data/sparks';
+import { getSparks } from '../services/sparks';
+import type { Spark } from '../types/spark';
 import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
 import { CHAT_CONFIGS } from '../data/chatConfigs';
 import type { DocumentSummary } from '../types/chat';
@@ -24,6 +25,9 @@ export function LandingClients() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [shouldReset, setShouldReset] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const [sparks, setSparks] = useState<Spark[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [formData, setFormData] = useState<ClientSignUpData>({
         firstName: '',
         lastName: '',
@@ -43,6 +47,22 @@ export function LandingClients() {
     });
     const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
     const [isChatExpanded, setIsChatExpanded] = useState(false);
+
+    useEffect(() => {
+        const fetchSparks = async () => {
+            try {
+                const fetchedSparks = await getSparks();
+                setSparks(fetchedSparks);
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching sparks:', err);
+                setError('Failed to load sparks. Please try again later.');
+                setLoading(false);
+            }
+        };
+
+        fetchSparks();
+    }, []);
 
     useEffect(() => {
         if (shouldReset) {
@@ -254,18 +274,29 @@ export function LandingClients() {
                         Boostez votre activité avec les <span className="highlight">Sparks</span>
                     </h1>
                     <p className="text-xl md:text-2xl mb-12 text-gray-600 max-w-3xl mx-auto">
-                    Les Sparks allient <span className="highlight">IA</span> et <span className="highlight">experts métiers</span> pour mettre l'expertise du monde entier au service de votre réussite.
+                        Les Sparks allient <span className="highlight">IA</span> et <span className="highlight">experts métiers</span> pour mettre l'expertise du monde entier au service de votre réussite.
                     </p>
 
                     {/* Use Case Form Section */}
                     <div className="mb-12 sm:mb-16">
-                        <SparksGrid
-                            expertCalls={sparks.filter(spark => spark.consultant !== 'arnaud')}
-                            expandedCallIndex={expandedCallIndex}
-                            setExpandedCallIndex={setExpandedCallIndex}
-                            onCallClick={handleUseCaseClick}
-                            buttonText="Choisir ce Spark"
-                        />
+                        {loading ? (
+                            <div className="text-center py-8">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                                <p className="mt-4 text-gray-600">Loading sparks...</p>
+                            </div>
+                        ) : error ? (
+                            <div className="text-center py-8">
+                                <p className="text-red-600">{error}</p>
+                            </div>
+                        ) : (
+                            <SparksGrid
+                                sparks={sparks.filter(spark => !spark.consultant).slice(0, 3)}
+                                expandedCallIndex={expandedCallIndex}
+                                setExpandedCallIndex={setExpandedCallIndex}
+                                onCallClick={handleUseCaseClick}
+                                buttonText="Choisir ce Spark"
+                            />
+                        )}
 
                         <div className="mt-6 text-center flex flex-col items-center gap-4">
                             <div className="w-full max-w-6xl">

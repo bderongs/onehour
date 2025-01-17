@@ -6,7 +6,7 @@ import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
 import { CHAT_CONFIGS } from '../data/chatConfigs';
 import type { DocumentSummary } from '../types/chat';
 import { Spark } from '../types/spark';
-import { sparks } from '../data/sparks';
+import { getSparksByConsultant } from '../services/sparks';
 
 interface ModalState {
     isOpen: boolean;
@@ -73,6 +73,9 @@ export default function ConsultantProfilePage() {
     const [showConnect, setShowConnect] = useState(false);
     const [messages, setMessages] = useState<Message[]>([CHAT_CONFIGS.consultant_qualification.initialMessage]);
     const [shouldReset, setShouldReset] = useState(false);
+    const [sparks, setSparks] = useState<Spark[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [documentSummary, setDocumentSummary] = useState<DocumentSummary>({
         challenge: '',
         currentSituation: '',
@@ -83,6 +86,25 @@ export default function ConsultantProfilePage() {
         hasEnoughData: false
     });
     useScrollAnimation();
+
+    const CONSULTANT_ID = '3c957f54-d43b-4cef-bd65-b519cd8b09d1';
+
+    // Fetch sparks when component mounts
+    useEffect(() => {
+        const fetchSparks = async () => {
+            try {
+                const fetchedSparks = await getSparksByConsultant(CONSULTANT_ID);
+                setSparks(fetchedSparks);
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching sparks:', err);
+                setError('Failed to load sparks. Please try again later.');
+                setLoading(false);
+            }
+        };
+
+        fetchSparks();
+    }, []);
 
     // Reset shouldReset after it's been consumed
     useEffect(() => {
@@ -148,7 +170,8 @@ export default function ConsultantProfilePage() {
         }
     ];
 
-    const consultingPackages = sparks.filter(spark => spark.consultant === 'arnaud');
+    // No need to filter sparks anymore since we're fetching only the consultant's sparks
+    const consultingPackages = sparks;
 
     // Calculate average rating
     const averageRating = clientReviews.reduce((acc, review) => acc + review.rating, 0) / clientReviews.length;
@@ -167,6 +190,8 @@ export default function ConsultantProfilePage() {
             }
         }, 50); // Reduced delay to start scroll earlier in the animation
     };
+
+
     const handleConnect = () => {
         console.log('ConsultantProfilePage - handleConnect called, current summary:', documentSummary);
         setShowConnect(true);
@@ -434,59 +459,95 @@ export default function ConsultantProfilePage() {
                 <div className="scroll-animation overflow-hidden mb-8">
                     <div className="flex overflow-x-auto pb-6 scrollbar-hide">
                         <div className="flex gap-4 mx-auto px-4 py-2">
-                            {consultingPackages.map((pkg, index) => (
-                                <div 
-                                    key={index}
-                                    className="flex flex-col bg-white rounded-xl shadow-md w-80 flex-shrink-0 
-                                    hover:shadow-lg transition-all duration-200 ease-out hover:scale-[1.02]
-                                    transform-gpu"
-                                >
-                                    <div className="p-6 flex flex-col h-full">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div>
-                                                <h4 className="text-lg font-semibold text-gray-900">{pkg.title}</h4>
-                                                <p className="text-sm text-gray-500">{pkg.duration}</p>
-                                                <div className="text-sm font-bold text-gray-900 mt-1">{pkg.price}</div>
+                            {loading ? (
+                                // Loading state
+                                Array(3).fill(0).map((_, index) => (
+                                    <div 
+                                        key={index}
+                                        className="flex flex-col bg-white rounded-xl shadow-md w-80 flex-shrink-0 animate-pulse"
+                                    >
+                                        <div className="p-6">
+                                            <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                                            <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+                                            <div className="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
+                                            <div className="h-20 bg-gray-200 rounded mb-4"></div>
+                                            <div className="space-y-2">
+                                                <div className="h-4 bg-gray-200 rounded"></div>
+                                                <div className="h-4 bg-gray-200 rounded"></div>
+                                                <div className="h-4 bg-gray-200 rounded"></div>
                                             </div>
-                                            {pkg.highlight && (
-                                                <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                                    {pkg.highlight}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
-                                        <div className="mt-auto">
-                                            <div className="text-sm font-medium text-gray-900 mb-2">Ce qui est inclus :</div>
-                                            <ul className="space-y-2">
-                                                {(pkg.deliverables || pkg.benefits || []).map((item, i) => (
-                                                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                                                        <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                        <span>{item}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
                                         </div>
                                     </div>
-                                    <div className="p-6 pt-0">
-                                        <div className="text-center mb-3">
-                                            <div className="text-sm text-gray-500">Prochaine disponibilité</div>
-                                            <div className="text-sm font-medium text-gray-900">
-                                                {getAvailabilityForDuration(pkg.duration)}, {getTimeForDuration(pkg.duration)}
-                                            </div>
-                                        </div>
+                                ))
+                            ) : error ? (
+                                // Error state
+                                <div className="w-full flex items-center justify-center py-8">
+                                    <div className="text-center">
+                                        <div className="text-red-500 mb-2">Une erreur est survenue lors du chargement des services</div>
                                         <button 
-                                            onClick={() => openModal(pkg, index)}
-                                            className={`w-full font-medium px-4 py-2 rounded-lg transition-colors ${
-                                                index === 0 
-                                                ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                                                : "bg-gray-50 hover:bg-gray-100 text-gray-900"
-                                            }`}
+                                            onClick={() => window.location.reload()} 
+                                            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                                         >
-                                            {index === 0 ? "Prendre RDV" : "En savoir plus"}
+                                            Réessayer
                                         </button>
                                     </div>
                                 </div>
-                            ))}
+                            ) : (
+                                // Normal state with data
+                                consultingPackages.map((pkg, index) => (
+                                    <div 
+                                        key={index}
+                                        className="flex flex-col bg-white rounded-xl shadow-md w-80 flex-shrink-0 
+                                        hover:shadow-lg transition-all duration-200 ease-out hover:scale-[1.02]
+                                        transform-gpu"
+                                    >
+                                        <div className="p-6 flex flex-col h-full">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div>
+                                                    <h4 className="text-lg font-semibold text-gray-900">{pkg.title}</h4>
+                                                    <p className="text-sm text-gray-500">{pkg.duration}</p>
+                                                    <div className="text-sm font-bold text-gray-900 mt-1">{pkg.price}</div>
+                                                </div>
+                                                {pkg.highlight && (
+                                                    <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                                                        {pkg.highlight}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
+                                            <div className="mt-auto">
+                                                <div className="text-sm font-medium text-gray-900 mb-2">Ce qui est inclus :</div>
+                                                <ul className="space-y-2">
+                                                    {(pkg.deliverables || pkg.benefits || []).map((item: string, i: number) => (
+                                                        <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                                                            <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                                                            <span>{item}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div className="p-6 pt-0">
+                                            <div className="text-center mb-3">
+                                                <div className="text-sm text-gray-500">Prochaine disponibilité</div>
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    {getAvailabilityForDuration(pkg.duration)}, {getTimeForDuration(pkg.duration)}
+                                                </div>
+                                            </div>
+                                            <button 
+                                                onClick={() => openModal(pkg, index)}
+                                                className={`w-full font-medium px-4 py-2 rounded-lg transition-colors ${
+                                                    index === 0 
+                                                    ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                                                    : "bg-gray-50 hover:bg-gray-100 text-gray-900"
+                                                }`}
+                                            >
+                                                {index === 0 ? "Prendre RDV" : "En savoir plus"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>
@@ -873,7 +934,7 @@ export default function ConsultantProfilePage() {
                                     <div>
                                         <h3 className="text-lg font-semibold mb-3">Livrables</h3>
                                         <ul className="space-y-3">
-                                            {(modal.package.deliverables || modal.package.benefits || []).map((item, i) => (
+                                            {(modal.package?.deliverables || modal.package?.benefits || []).map((item: string, i: number) => (
                                                 <li key={i} className="flex items-start gap-3">
                                                     <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                                     <span className="text-gray-600">{item}</span>
@@ -1017,5 +1078,3 @@ export default function ConsultantProfilePage() {
         </div>
     );
 }
-
-

@@ -43,7 +43,7 @@ const getNextBusinessDate = () => {
 };
 
 interface SparksGridProps {
-    expertCalls: Spark[];
+    sparks: Spark[];
     expandedCallIndex: number | null;
     setExpandedCallIndex: (index: number | null) => void;
     onCallClick: (prefillText: string) => void;
@@ -61,7 +61,7 @@ const fadeInUp = {
 };
 
 export function SparksGrid({
-    expertCalls,
+    sparks,
     expandedCallIndex,
     setExpandedCallIndex,
     onCallClick,
@@ -73,12 +73,12 @@ export function SparksGrid({
 }: SparksGridProps) {
     // Memoize the dates for each card
     const availableDates = useMemo(() => {
-        return expertCalls.map(() => getNextBusinessDate());
-    }, [expertCalls.length]); // Only regenerate if the number of calls changes
+        return sparks.map(() => getNextBusinessDate());
+    }, [sparks.length]); // Only regenerate if the number of calls changes
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto px-4 sm:px-0">
-            {expertCalls.map((call, index) => (
+            {sparks.map((spark, index) => (
                 <motion.div
                     key={index}
                     layout
@@ -98,19 +98,19 @@ export function SparksGrid({
                             <div>
                                 <h3 className="text-lg font-semibold text-gray-900 text-left line-clamp-3">
                                     <Logo className="h-5 w-5 inline-block align-text-bottom mr-2" color="indigo-600" />
-                                    {call.title}
+                                    {spark.title}
                                 </h3>
                                 <div className="flex flex-col gap-1 mt-2">
                                     <div className="flex items-center gap-2 text-gray-500 text-sm">
                                         <Clock className="h-4 w-4" />
-                                        <span>{call.duration}</span>
+                                        <span>{spark.duration}</span>
                                     </div>
-                                    <div className="text-sm font-bold text-gray-900 text-left">{call.price}</div>
+                                    <div className="text-sm font-bold text-gray-900 text-left">{spark.price}</div>
                                 </div>
                             </div>
-                            {call.highlight && (
+                            {spark.highlight && (
                                 <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                    {call.highlight}
+                                    {spark.highlight}
                                 </span>
                             )}
                         </div>
@@ -126,14 +126,14 @@ export function SparksGrid({
                                 
                                 <div className="space-y-4 py-4 flex-grow">
                                     <p className="text-gray-600 text-sm leading-relaxed text-left">
-                                        {call.description}
+                                        {spark.description}
                                     </p>
 
-                                    {call.benefits && (
+                                    {spark.benefits && (
                                         <div className="space-y-3 text-left">
                                             <div className="text-sm font-medium text-gray-900">Ce que vous obtiendrez :</div>
                                             <div className="space-y-2.5">
-                                                {call.benefits.map((benefit, i) => (
+                                                {spark.benefits.map((benefit, i) => (
                                                     <div key={i} className="flex items-start gap-2">
                                                         <CheckCircle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
                                                         <span className="text-sm text-gray-600 leading-relaxed">{benefit}</span>
@@ -157,7 +157,7 @@ export function SparksGrid({
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        onCallClick(call.prefillText);
+                                                        onCallClick(spark.prefillText);
                                                         setExpandedCallIndex(null);
                                                     }}
                                                     className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg 
@@ -174,7 +174,7 @@ export function SparksGrid({
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                onDetailsClick?.(call);
+                                                onDetailsClick?.(spark);
                                             }}
                                             className="w-full bg-white text-blue-600 border-2 border-blue-600 px-4 py-3 rounded-lg 
                                                     text-sm font-semibold hover:bg-blue-50 transition-colors flex items-center 

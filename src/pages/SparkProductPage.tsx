@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
-import { sparks } from '../data/sparks';
+import { getSparkByUrl } from '../services/sparks';
+import type { Spark } from '../types/spark';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -14,15 +15,34 @@ export function SparkProductPage() {
     const { sparkUrl } = useParams();
     const navigate = useNavigate();
     const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+    const [spark, setSpark] = useState<Spark | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    // Find the spark by URL
-    const spark = sparks.find(s => s.url === sparkUrl);
+    useEffect(() => {
+        const fetchSpark = async () => {
+            if (!sparkUrl) {
+                navigate('/');
+                return;
+            }
 
-    // If spark not found, redirect to home
-    if (!spark) {
-        navigate('/');
-        return null;
-    }
+            try {
+                const fetchedSpark = await getSparkByUrl(sparkUrl);
+                if (!fetchedSpark) {
+                    navigate('/');
+                    return;
+                }
+                setSpark(fetchedSpark);
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching spark:', err);
+                setError('Failed to load spark details. Please try again later.');
+                setLoading(false);
+            }
+        };
+
+        fetchSpark();
+    }, [sparkUrl, navigate]);
 
     const handleBooking = () => {
         // Navigate to LandingConsultants page with hash
@@ -32,6 +52,33 @@ export function SparkProductPage() {
     const handleBack = () => {
         navigate(-1);
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading spark details...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error || !spark) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-red-600">{error || 'Spark not found'}</p>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="mt-4 text-blue-600 hover:text-blue-700"
+                    >
+                        Return to home
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
