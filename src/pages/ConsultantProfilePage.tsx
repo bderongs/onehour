@@ -23,7 +23,7 @@ interface Review {
 // Keep track of used times to avoid duplicates
 const usedTimes = new Set<string>();
 
-function getAvailabilityForDuration(duration: string): string {
+function getNextAvailability(): string {
     const now = new Date();
     
     // Generate a random day in the next 1-3 days
@@ -542,7 +542,7 @@ export default function ConsultantProfilePage() {
                                             <div className="text-center mb-3">
                                                 <div className="text-sm text-gray-500">Prochaine disponibilité</div>
                                                 <div className="text-sm font-medium text-gray-900">
-                                                    {getAvailabilityForDuration(pkg.duration)}
+                                                    {getNextAvailability()}
                                                 </div>
                                             </div>
                                             <button 
