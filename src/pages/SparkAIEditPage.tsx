@@ -199,16 +199,6 @@ export function SparkAIEditPage() {
                                     />
                                 </div>
                             </div>
-                            <button
-                                onClick={handleSave}
-                                disabled={isSaving}
-                                className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg font-semibold 
-                                        hover:bg-blue-700 transition-colors flex items-center justify-center gap-2
-                                        disabled:bg-blue-400 disabled:cursor-not-allowed"
-                            >
-                                {isSaving ? 'Enregistrement...' : 'Enregistrer les modifications'}
-                                <ArrowRight className="h-5 w-5" />
-                            </button>
                         </div>
                     </div>
 
@@ -347,6 +337,23 @@ export function SparkAIEditPage() {
                                     </div>
                                 </motion.section>
                             )}
+
+                            {/* Save Button */}
+                            <motion.div
+                                className="mt-8"
+                                variants={fadeInUp}
+                            >
+                                <button
+                                    onClick={handleSave}
+                                    disabled={isSaving}
+                                    className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg font-semibold 
+                                            hover:bg-blue-700 transition-colors flex items-center justify-center gap-2
+                                            disabled:bg-blue-400 disabled:cursor-not-allowed"
+                                >
+                                    {isSaving ? 'Enregistrement...' : 'Enregistrer les modifications'}
+                                    <ArrowRight className="h-5 w-5" />
+                                </button>
+                            </motion.div>
                         </div>
                     </div>
                 </div>
