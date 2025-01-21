@@ -17,7 +17,6 @@ import AuthCallback from './pages/AuthCallback';
 import { SignInPage } from './pages/SignInPage';
 import { useEffect } from 'react';
 import { initializeGoatCounter } from './utils/analytics';
-import { ConsultantDashboard } from './pages/ConsultantDashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { ClientDashboard } from './pages/ClientDashboard';
 
@@ -172,15 +171,6 @@ function App() {
               <Header />
               <main className="flex-grow pt-16">
                 <SparkAIEditPage />
-              </main>
-              <Footer />
-            </>
-          } />
-          <Route path="/consultant/dashboard" element={
-            <>
-              <Header />
-              <main className="flex-grow pt-16">
-                <ConsultantDashboard />
               </main>
               <Footer />
             </>

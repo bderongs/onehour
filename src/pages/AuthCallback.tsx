@@ -92,7 +92,7 @@ export default function AuthCallback() {
             // Redirect based on role
             switch (profile.role) {
                 case 'consultant':
-                    navigate('/consultant/dashboard');
+                    navigate('/sparks/manage');
                     break;
                 case 'admin':
                     navigate('/admin/dashboard');

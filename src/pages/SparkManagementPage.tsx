@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, Eye, Sparkles } from 'lucide-react';
-import { getSparks } from '../services/sparks';
 import type { Spark } from '../types/spark';
 import { formatDuration, formatPrice } from '../utils/format';
+import { supabase } from '../lib/supabase';
+import { getSparks, getSparksByConsultant } from '../services/sparks';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -17,23 +18,52 @@ export function SparkManagementPage() {
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [userRole, setUserRole] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchSparks = async () => {
+        const fetchUserAndSparks = async () => {
             try {
-                const fetchedSparks = await getSparks();
-                // TODO: Filter sparks by consultant ID once authentication is implemented
+                // Get current user and their role
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    navigate('/signin');
+                    return;
+                }
+
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', user.id)
+                    .single();
+
+                if (!profile) {
+                    throw new Error('Profile not found');
+                }
+
+                // Only allow consultants and admins to access this page
+                if (profile.role !== 'consultant' && profile.role !== 'admin') {
+                    navigate('/');
+                    return;
+                }
+
+                setUserRole(profile.role);
+
+                // Fetch sparks based on role
+                const fetchedSparks = profile.role === 'consultant' 
+                    ? await getSparksByConsultant(user.id)
+                    : await getSparks();
+
                 setSparks(fetchedSparks);
                 setLoading(false);
             } catch (err) {
-                console.error('Error fetching sparks:', err);
+                console.error('Error fetching data:', err);
                 setError('Failed to load sparks. Please try again later.');
                 setLoading(false);
             }
         };
 
-        fetchSparks();
-    }, []);
+        fetchUserAndSparks();
+    }, [navigate]);
 
     const handleCreateSpark = () => {
         navigate('/sparks/create');
