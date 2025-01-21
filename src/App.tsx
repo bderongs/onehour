@@ -15,6 +15,7 @@ import { SparkEditPage } from './pages/SparkEditPage';
 import { SparkAIEditPage } from './pages/SparkAIEditPage';
 import AuthCallback from './pages/AuthCallback';
 import { SignInPage } from './pages/SignInPage';
+import { SignUpPage } from './pages/SignUpPage';
 import { useEffect } from 'react';
 import { initializeGoatCounter } from './utils/analytics';
 import { AdminDashboard } from './pages/AdminDashboard';
@@ -55,6 +56,15 @@ function App() {
               <Header />
               <main className="flex-grow pt-16">
                 <SignInPage />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/signup" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <SignUpPage />
               </main>
               <Footer />
             </>

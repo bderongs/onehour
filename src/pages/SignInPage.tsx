@@ -69,7 +69,7 @@ export function SignInPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             {notification && (
                 <Notification
                     type={notification.type}
@@ -77,7 +77,7 @@ export function SignInPage() {
                     onClose={() => setNotification(null)}
                 />
             )}
-            <div className="max-w-md w-full space-y-8">
+            <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md space-y-6">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
                         Connectez-vous à votre compte
@@ -85,7 +85,7 @@ export function SignInPage() {
                     <p className="mt-2 text-center text-sm text-gray-600">
                         Vous n'avez pas encore de compte ?{' '}
                         <button
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate('/signup')}
                             className="font-medium text-indigo-600 hover:text-indigo-500"
                         >
                             Inscrivez-vous
