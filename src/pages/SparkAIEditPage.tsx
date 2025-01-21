@@ -59,10 +59,11 @@ export function SparkAIEditPage() {
         // Update messages immediately to show the user's message
         setMessages(newMessages);
 
-        // Add loading indicator
+        // Add loading indicator with animated dots
         setMessages(prev => [...prev, { 
             role: 'assistant' as const, 
-            content: "Je réfléchis à votre demande..." 
+            content: '⋯', // This will be rendered as the three dots animation by the AIChatInterface
+            isLoading: true // Add this flag to identify loading messages
         }]);
 
         try {
@@ -100,7 +101,12 @@ export function SparkAIEditPage() {
             // Update the spark preview with only the modified fields
             const updatedSpark = {
                 ...spark,
-                ...response.document
+                ...Object.fromEntries(
+                    Object.entries(response.document).map(([key, value]) => [
+                        key,
+                        value === "Non défini" ? null : value
+                    ])
+                )
             };
             setSpark(updatedSpark);
         } catch (error) {
@@ -189,6 +195,7 @@ export function SparkAIEditPage() {
                                         systemPrompt="dummy"
                                         shouldReset={false}
                                         onConnect={() => {}}
+                                        shouldHandleAICall={false}
                                     />
                                 </div>
                             </div>

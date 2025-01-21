@@ -9,6 +9,7 @@ export type Message = {
     role: 'user' | 'assistant';
     content: string;
     summary?: DocumentSummaryType | Partial<Spark>;
+    isLoading?: boolean;
 };
 
 interface AIChatInterfaceProps {
@@ -20,20 +21,22 @@ interface AIChatInterfaceProps {
     systemPrompt?: string;
     summaryInstructions?: string;
     hideSummary?: boolean;
+    shouldHandleAICall?: boolean;
 }
 
 export function AIChatInterface({ 
     template, 
-    messages: externalMessages, 
+    messages: initialMessages = [], 
     onMessagesUpdate, 
     shouldReset = false,
     onConnect,
     systemPrompt,
     summaryInstructions,
-    hideSummary = false
+    hideSummary = false,
+    shouldHandleAICall = true
 }: AIChatInterfaceProps) {
-    const [messages, setMessages] = useState<Message[]>(externalMessages || []);
-    const [newMessage, setNewMessage] = useState('');
+    const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSummaryLoading, setIsSummaryLoading] = useState(false);
     const [documentSummary, setDocumentSummary] = useState<DocumentSummaryType>({ hasEnoughData: false });
@@ -48,29 +51,29 @@ export function AIChatInterface({
     // Reset state when shouldReset changes
     useEffect(() => {
         if (shouldReset) {
-            setMessages(externalMessages || []);
-            setNewMessage('');
+            setMessages(initialMessages);
+            setInputValue('');
             setDocumentSummary({ hasEnoughData: false });
             setIsInitialized(false);
         }
-    }, [shouldReset, externalMessages]);
+    }, [shouldReset, initialMessages]);
 
     // Initialize messages when component mounts
     useEffect(() => {
-        if (externalMessages && externalMessages.length > 0) {
-            setMessages(externalMessages);
+        if (initialMessages && initialMessages.length > 0) {
+            setMessages(initialMessages);
         } else if (messages.length === 0 && systemPrompt) {
             setMessages([{ role: 'assistant', content: systemPrompt }]);
         }
-    }, [externalMessages, systemPrompt, messages.length]);
+    }, [initialMessages, systemPrompt, messages.length]);
 
     // Handle initial AI response when external messages are provided
     useEffect(() => {
         const getInitialResponse = async () => {
-            if (!externalMessages || externalMessages.length === 0 || isInitialized || !systemPrompt) return;
+            if (!initialMessages || initialMessages.length === 0 || isInitialized || !systemPrompt) return;
             
             // Don't respond if the last message is from the assistant
-            if (externalMessages[externalMessages.length - 1].role === 'assistant') {
+            if (initialMessages[initialMessages.length - 1].role === 'assistant') {
                 setIsInitialized(true);
                 return;
             }
@@ -80,7 +83,7 @@ export function AIChatInterface({
                 const aiResponse = await analyzeWithOpenAI(
                     [
                         { role: 'system' as const, content: systemPrompt },
-                        ...externalMessages.map(msg => ({
+                        ...initialMessages.map(msg => ({
                             role: msg.role,
                             content: msg.content
                         }))
@@ -90,7 +93,7 @@ export function AIChatInterface({
 
                 if (aiResponse) {
                     const updatedMessages: Message[] = [
-                        ...externalMessages,
+                        ...initialMessages,
                         { role: 'assistant', content: aiResponse }
                     ];
                     updateMessages(updatedMessages);
@@ -99,7 +102,7 @@ export function AIChatInterface({
             } catch (error) {
                 console.error('Error getting initial AI response:', error);
                 const errorMessages: Message[] = [
-                    ...externalMessages,
+                    ...initialMessages,
                     { role: 'assistant', content: "Je suis désolé, mais j'ai des difficultés à me connecter. Veuillez réessayer." }
                 ];
                 updateMessages(errorMessages);
@@ -109,7 +112,7 @@ export function AIChatInterface({
         };
 
         getInitialResponse();
-    }, [externalMessages, systemPrompt, isInitialized]);
+    }, [initialMessages, systemPrompt, isInitialized]);
 
     // Keep focus on textarea after sending message
     useEffect(() => {
@@ -188,40 +191,52 @@ export function AIChatInterface({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMessage.trim() || isLoading || !systemPrompt) return;
+        if (!inputValue.trim()) return;
 
-        const userMessage = newMessage.trim();
-        setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
-        setNewMessage('');
-        setIsLoading(true);
+        const userMessage: Message = {
+            role: 'user',
+            content: inputValue.trim()
+        };
 
-        try {
-            const updatedMessages: Message[] = [...messages, { role: 'user', content: userMessage }];
-            const aiResponse = await analyzeWithOpenAI(
-                [
-                    { role: 'system', content: systemPrompt },
-                    ...updatedMessages.map((msg): Message => ({
-                        role: msg.role,
-                        content: msg.content
-                    }))
-                ],
-                false
-            );
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
+        setInputValue('');
 
-            if (aiResponse) {
-                const newMessages: Message[] = [...updatedMessages, { role: 'assistant', content: aiResponse }];
-                updateMessages(newMessages);
+        if (onMessagesUpdate) {
+            onMessagesUpdate(updatedMessages);
+        }
+
+        // Only make AI call if shouldHandleAICall is true
+        if (shouldHandleAICall && systemPrompt) {
+            try {
+                setIsLoading(true);
+                const aiResponse = await analyzeWithOpenAI(
+                    [
+                        { role: 'system', content: systemPrompt },
+                        ...updatedMessages.map(msg => ({
+                            role: msg.role,
+                            content: msg.content
+                        }))
+                    ],
+                    false
+                );
+
+                if (aiResponse) {
+                    const assistantMessage: Message = {
+                        role: 'assistant',
+                        content: aiResponse
+                    };
+                    const newMessages = [...updatedMessages, assistantMessage];
+                    setMessages(newMessages);
+                    if (onMessagesUpdate) {
+                        onMessagesUpdate(newMessages);
+                    }
+                }
+            } catch (error) {
+                console.error('Error getting AI response:', error);
+            } finally {
                 setIsLoading(false);
-
-                await updateSummaryIfNeeded(newMessages);
             }
-        } catch (error) {
-            console.error('Error getting AI response:', error);
-            setMessages(prev => [...prev, {
-                role: 'assistant',
-                content: "Je suis désolé, mais j'ai des difficultés à me connecter. Veuillez réessayer."
-            }]);
-            setIsLoading(false);
         }
     };
 
@@ -233,7 +248,7 @@ export function AIChatInterface({
     };
 
     const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setNewMessage(e.target.value);
+        setInputValue(e.target.value);
         e.target.style.height = 'auto';
         e.target.style.height = `${e.target.scrollHeight}px`;
     };
@@ -274,11 +289,19 @@ export function AIChatInterface({
                                     }`}
                                 style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
                             >
-                                {formatMessage(message.content)}
+                                {message.isLoading ? (
+                                    <div className="flex space-x-2">
+                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+                                    </div>
+                                ) : (
+                                    formatMessage(message.content)
+                                )}
                             </div>
                         </div>
                     ))}
-                    {isLoading && (
+                    {isLoading && !messages.some(m => m.isLoading) && (
                         <div className="flex justify-start">
                             <div className="bg-gray-100 text-gray-800 p-3 rounded-lg">
                                 <div className="flex space-x-2">
@@ -295,7 +318,7 @@ export function AIChatInterface({
                     <div className="relative flex-grow">
                         <textarea
                             ref={textareaRef}
-                            value={newMessage}
+                            value={inputValue}
                             onChange={handleInput}
                             onKeyDown={handleKeyDown}
                             className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 pr-10"
