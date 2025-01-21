@@ -12,6 +12,7 @@ import { SparkProductPage } from './pages/SparkProductPage';
 import { SparkManagementPage } from './pages/SparkManagementPage';
 import { SparkCreatePage } from './pages/SparkCreatePage';
 import { SparkEditPage } from './pages/SparkEditPage';
+import { SparkAIEditPage } from './pages/SparkAIEditPage';
 import AuthCallback from './pages/AuthCallback';
 import { useEffect } from 'react';
 import { initializeGoatCounter } from './utils/analytics';
@@ -149,6 +150,15 @@ function App() {
               <Header />
               <main className="flex-grow pt-16">
                 <SparkEditPage />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/sparks/ai-edit/:sparkUrl" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <SparkAIEditPage />
               </main>
               <Footer />
             </>

@@ -41,6 +41,24 @@ Inutile de faire un résumé de la conversation, il est proposé à l'utilisateu
         submitMessage: "Réserver ma consultation",
         confirmationMessage: DOCUMENT_TEMPLATES.consultant_qualification.documentCompleteMessage || "Excellent ! J'ai tous les détails nécessaires pour préparer votre consultation avec Arnaud",
         onConnect: () => {}
+    },
+    spark_content_assistant: {
+        initialMessage: {
+            role: 'assistant',
+            content: "Bonjour ! Je suis votre assistant d'édition de Spark. Je peux vous aider à modifier tous les aspects de votre Spark : titre, description, prix, durée, méthodologie, etc. Que souhaitez-vous modifier ?"
+        },
+        title: "Édition de Spark",
+        subtitle: "Notre assistant IA vous aide à améliorer votre Spark",
+        roleDescription: `Vous êtes un assistant spécialisé dans l'édition de Sparks.
+Votre rôle est d'aider les consultants à améliorer leur Spark en fonction de leurs demandes.
+Vous pouvez modifier tous les aspects du Spark : titre, description, prix, durée, méthodologie, etc.
+Écoutez attentivement les demandes de modification et n'effectuez que les changements demandés.
+Assurez-vous que les modifications restent cohérentes avec l'ensemble du Spark et que l'offre du Spark est claire et attractive.`,
+        systemPrompt: "",  // Will be set after initialization
+        summaryInstructions: "",  // Will be set after initialization
+        submitMessage: "Enregistrer les modifications",
+        confirmationMessage: "Parfait ! Les modifications de votre Spark ont été enregistrées.",
+        onConnect: () => {}
     }
 };
 

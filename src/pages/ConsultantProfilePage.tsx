@@ -229,7 +229,10 @@ export default function ConsultantProfilePage() {
             const msg = newMessages[i];
             if (msg.role === 'assistant' && msg.summary) {
                 console.log('ConsultantProfilePage - Found summary in message:', msg.summary);
-                setDocumentSummary(msg.summary);
+                // Check if the summary is a DocumentSummary by checking for hasEnoughData property
+                if ('hasEnoughData' in msg.summary) {
+                    setDocumentSummary(msg.summary as DocumentSummary);
+                }
                 break;
             }
         }

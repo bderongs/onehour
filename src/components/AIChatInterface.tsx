@@ -3,12 +3,13 @@ import { ArrowRight } from 'lucide-react';
 import { analyzeWithOpenAI } from '../services/openai';
 import { DocumentSummary } from './DocumentSummary';
 import type { DocumentTemplate, DocumentSummary as DocumentSummaryType } from '../types/chat';
+import type { Spark } from '../types/spark';
 
-export interface Message {
+export type Message = {
     role: 'user' | 'assistant';
     content: string;
-    summary?: DocumentSummaryType;
-}
+    summary?: DocumentSummaryType | Partial<Spark>;
+};
 
 interface AIChatInterfaceProps {
     template: DocumentTemplate;
@@ -18,6 +19,7 @@ interface AIChatInterfaceProps {
     onConnect?: () => void;
     systemPrompt?: string;
     summaryInstructions?: string;
+    hideSummary?: boolean;
 }
 
 export function AIChatInterface({ 
@@ -27,7 +29,8 @@ export function AIChatInterface({
     shouldReset = false,
     onConnect,
     systemPrompt,
-    summaryInstructions
+    summaryInstructions,
+    hideSummary = false
 }: AIChatInterfaceProps) {
     const [messages, setMessages] = useState<Message[]>(externalMessages || []);
     const [newMessage, setNewMessage] = useState('');
@@ -315,15 +318,17 @@ export function AIChatInterface({
                 </form>
             </div>
 
-            <div ref={summaryContainerRef} className="lg:w-80">
-                <DocumentSummary 
-                    template={template}
-                    summary={documentSummary}
-                    onConnect={onConnect}
-                    hasUserMessage={messages.some(m => m.role === 'user')}
-                    isLoading={isSummaryLoading}
-                />
-            </div>
+            {!hideSummary && (
+                <div ref={summaryContainerRef} className="lg:w-80">
+                    <DocumentSummary 
+                        template={template}
+                        summary={documentSummary}
+                        onConnect={onConnect}
+                        hasUserMessage={messages.some(m => m.role === 'user')}
+                        isLoading={isSummaryLoading}
+                    />
+                </div>
+            )}
         </div>
     );
 }

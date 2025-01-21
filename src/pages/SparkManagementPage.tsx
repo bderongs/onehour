@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Eye } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, Sparkles } from 'lucide-react';
 import { getSparks } from '../services/sparks';
 import type { Spark } from '../types/spark';
 import { formatDuration, formatPrice } from '../utils/format';
@@ -41,6 +41,10 @@ export function SparkManagementPage() {
 
     const handleEditSpark = (sparkUrl: string) => {
         navigate(`/sparks/edit/${sparkUrl}`);
+    };
+
+    const handleAIEditSpark = (sparkUrl: string) => {
+        navigate(`/sparks/ai-edit/${sparkUrl}`);
     };
 
     const handlePreviewSpark = (sparkUrl: string) => {
@@ -138,6 +142,13 @@ export function SparkManagementPage() {
                                     title="Edit"
                                 >
                                     <Edit2 className="h-5 w-5" />
+                                </button>
+                                <button
+                                    onClick={() => handleAIEditSpark(spark.url)}
+                                    className="text-blue-600 hover:text-blue-700 transition-colors"
+                                    title="AI Edit"
+                                >
+                                    <Sparkles className="h-5 w-5" />
                                 </button>
                                 <button
                                     onClick={() => handleDeleteSpark(spark.url)}
