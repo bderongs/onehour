@@ -26,26 +26,34 @@ const transformSparkFromDB = (dbSpark: any): Spark => ({
 });
 
 // Convert frontend camelCase to snake_case for database
-const transformSparkToDB = (spark: Spark) => ({
-    title: spark.title,
-    duration: spark.duration,
-    price: spark.price,
-    description: spark.description,
-    benefits: spark.benefits,
-    prefill_text: spark.prefillText,
-    highlight: spark.highlight,
-    consultant: spark.consultant,
-    url: spark.url,
-    detailed_description: spark.detailedDescription,
-    methodology: spark.methodology,
-    target_audience: spark.targetAudience,
-    prerequisites: spark.prerequisites,
-    deliverables: spark.deliverables,
-    expert_profile: spark.expertProfile,
-    faq: spark.faq,
-    testimonials: spark.testimonials,
-    next_steps: spark.nextSteps,
-});
+const transformSparkToDB = (spark: Partial<Spark>): Record<string, any> => {
+    const transformed: Record<string, any> = {};
+    
+    // Map each field with proper snake_case conversion
+    Object.entries(spark).forEach(([key, value]) => {
+        if (value === undefined) return;
+        
+        // Convert camelCase to snake_case
+        const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+        
+        // Special handling for nested objects
+        if (key === 'expertProfile' && value) {
+            transformed['expert_profile'] = value;
+        } else if (key === 'targetAudience') {
+            transformed['target_audience'] = value;
+        } else if (key === 'prefillText') {
+            transformed['prefill_text'] = value;
+        } else if (key === 'detailedDescription') {
+            transformed['detailed_description'] = value;
+        } else if (key === 'nextSteps') {
+            transformed['next_steps'] = value;
+        } else {
+            transformed[snakeKey] = value;
+        }
+    });
+
+    return transformed;
+};
 
 export const getSparks = async (): Promise<Spark[]> => {
     const { data, error } = await supabase
@@ -119,26 +127,82 @@ export const createSpark = async (spark: Spark): Promise<Spark> => {
 };
 
 export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<Spark> => {
+    // First, verify the spark exists
+    const { data: existingSpark, error: fetchError } = await supabase
+        .from('sparks')
+        .select('*')
+        .eq('url', url)
+        .single();
+
+    console.log('Existing spark:', existingSpark);
+
+    if (fetchError) {
+        console.error('Error fetching spark:', fetchError);
+        throw fetchError;
+    }
+
+    if (!existingSpark) {
+        throw new Error(`Spark with URL ${url} not found`);
+    }
+
     // If title is being updated, generate new URL
     let updatedSpark = { ...spark };
     if (spark.title) {
         const baseSlug = generateSlug(spark.title);
-        updatedSpark.url = await ensureUniqueSlug(baseSlug, url);
+        // Only generate a new URL if the title has changed
+        if (baseSlug !== url) {
+            const { data } = await supabase
+                .from('sparks')
+                .select('url')
+                .eq('url', baseSlug)
+                .single();
+
+            // If the URL is already taken, generate a unique one
+            if (data) {
+                updatedSpark.url = await ensureUniqueSlug(baseSlug);
+            } else {
+                updatedSpark.url = baseSlug;
+            }
+        }
     }
 
-    const { data, error } = await supabase
+    // Remove id and transform using the same function as create
+    const { id, ...updateFields } = updatedSpark;
+    const transformedUpdate = transformSparkToDB(updateFields);
+
+    // Enhanced debugging logs
+    console.log('Original update fields:', updateFields);
+    console.log('Transformed update fields:', transformedUpdate);
+    console.log('Updating spark with URL:', url);
+
+    // First update the spark - try without select first
+    const { error: updateError } = await supabase
         .from('sparks')
-        .update(transformSparkToDB(updatedSpark as Spark))
-        .eq('url', url)
-        .select()
+        .update(transformedUpdate)
+        .eq('url', url);
+
+    if (updateError) {
+        console.error('Error updating spark:', updateError);
+        throw updateError;
+    }
+
+    // Then fetch the updated record
+    const { data: updatedData, error: fetchUpdatedError } = await supabase
+        .from('sparks')
+        .select('*')
+        .eq('url', updatedSpark.url || url)
         .single();
 
-    if (error) {
-        console.error('Error updating spark:', error);
-        throw error;
+    if (fetchUpdatedError) {
+        console.error('Error fetching updated spark:', fetchUpdatedError);
+        throw fetchUpdatedError;
     }
 
-    return transformSparkFromDB(data);
+    if (!updatedData) {
+        throw new Error(`Failed to fetch updated spark with URL ${url}`);
+    }
+
+    return transformSparkFromDB(updatedData);
 };
 
 export const deleteSpark = async (url: string): Promise<void> => {

@@ -10,6 +10,7 @@ create table profiles (
     linkedin text,
     expertise text not null,
     experience text not null,
+    company text,
     role user_role not null default 'client',
     created_at timestamp with time zone default timezone('utc'::text, now()) not null,
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null
@@ -83,26 +84,39 @@ create policy "Sparks are viewable by everyone."
     on sparks for select
     using ( true );
 
-create policy "Only consultants can insert sparks."
+create policy "Consultants and admins can insert sparks."
     on sparks for insert
     with check (
         exists (
             select 1 from profiles
             where id = auth.uid()
-            and role = 'consultant'
+            and (role = 'consultant' or role = 'admin')
         )
-        and auth.uid() = consultant
+        and (
+            auth.uid() = consultant
+            or exists (
+                select 1 from profiles
+                where id = auth.uid()
+                and role = 'admin'
+            )
+        )
     );
 
-create policy "Consultants can update their own sparks."
+create policy "Consultants can update their own sparks and admins can update any spark."
     on sparks for update
     using (
-        exists (
+        (exists (
             select 1 from profiles
             where id = auth.uid()
             and role = 'consultant'
         )
-        and auth.uid() = consultant
+        and auth.uid() = consultant)
+        or
+        (exists (
+            select 1 from profiles
+            where id = auth.uid()
+            and role = 'admin'
+        ))
     );
 
 create policy "Consultants can delete their own sparks and admins can delete any spark."

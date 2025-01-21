@@ -19,11 +19,12 @@ export interface ClientSignUpData {
 }
 
 export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
-    // First, create the auth user
+    // Create the auth user with email confirmation
     const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
-        password: generateSecurePassword(), // We'll send this via email
+        password: 'temp-' + Math.random().toString(36).slice(-8), // Temporary password that will be changed during confirmation
         options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
             data: {
                 first_name: data.firstName,
                 last_name: data.lastName,
@@ -45,6 +46,7 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
                 linkedin: data.linkedin,
                 expertise: data.expertise,
                 experience: data.experience,
+                role: 'consultant',
                 created_at: new Date().toISOString()
             }
         ])
@@ -55,11 +57,12 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
 }
 
 export const signUpClientWithEmail = async (data: ClientSignUpData) => {
-    // First, create the auth user
+    // Create the auth user with email confirmation
     const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
-        password: generateSecurePassword(), // We'll send this via email
+        password: 'temp-' + Math.random().toString(36).slice(-8), // Temporary password that will be changed during confirmation
         options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
             data: {
                 first_name: data.firstName,
                 last_name: data.lastName,
@@ -69,9 +72,9 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
 
     if (authError) throw authError
 
-    // Then, store additional user data in a client_profiles table
+    // Then, store additional user data in the profiles table
     const { error: profileError } = await supabase
-        .from('client_profiles')
+        .from('profiles')
         .insert([
             {
                 id: authData.user?.id,
@@ -79,8 +82,9 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
                 first_name: data.firstName,
                 last_name: data.lastName,
                 company: data.company,
-                role: data.role,
-                industry: data.industry,
+                role: 'client',
+                expertise: data.industry, // Using industry as expertise for clients
+                experience: data.role, // Using role as experience for clients
                 created_at: new Date().toISOString()
             }
         ])
@@ -88,18 +92,6 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
     if (profileError) throw profileError
 
     return authData
-}
-
-// Helper function to generate a secure random password
-function generateSecurePassword(): string {
-    const length = 16
-    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*'
-    let password = ''
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * charset.length)
-        password += charset[randomIndex]
-    }
-    return password
 }
 
 export type UserRole = 'client' | 'consultant' | 'admin';
@@ -178,6 +170,17 @@ export const updateUserRole = async (userId: string, role: UserRole): Promise<vo
 
     if (error) {
         console.error('Error updating user role:', error);
+        throw error;
+    }
+};
+
+export const resendConfirmationEmail = async (email: string): Promise<void> => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback`
+    });
+
+    if (error) {
+        console.error('Error sending confirmation email:', error);
         throw error;
     }
 }; 

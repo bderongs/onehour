@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BrandName } from './BrandName';
 import { ArrowLeft, Menu, X } from 'lucide-react';
+import { ProfileMenu } from './ProfileMenu';
+import { supabase } from '../lib/supabase';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isConsultantPage = location.pathname === '/consultants';
@@ -13,6 +16,15 @@ export function Header() {
   const isLandingClientsPage = location.pathname === '/';
   const isPrivacyPage = location.pathname === '/privacy';
   const isTermsPage = location.pathname === '/terms';
+  const isAuthPage = location.pathname === '/signin';
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleBackClick = () => {
     const referrer = document.referrer;
@@ -97,7 +109,7 @@ export function Header() {
                       Pourquoi Sparkier ?
                     </Link>
                   )}
-                  {(isConsultantPage || isPricingPage) && (
+                  {(isConsultantPage || isPricingPage) && !isAuthenticated && (
                     <Link
                       to="/profile"
                       className="text-indigo-600 hover:text-indigo-900 px-3 py-2 text-sm font-medium"
@@ -105,14 +117,33 @@ export function Header() {
                       Voir un exemple de profil
                     </Link>
                   )}
+                  {isAuthenticated ? (
+                    <ProfileMenu />
+                  ) : !isAuthPage && (
+                    <Link
+                      to="/signin"
+                      className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      Se connecter
+                    </Link>
+                  )}
                 </div>
               </div>
 
               {/* Mobile menu button */}
               <div className="flex items-center md:hidden">
+                {isAuthenticated && <ProfileMenu />}
+                {!isAuthenticated && !isAuthPage && (
+                  <Link
+                    to="/signin"
+                    className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2"
+                  >
+                    Se connecter
+                  </Link>
+                )}
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                  className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 ml-2"
                 >
                   <span className="sr-only">Open main menu</span>
                   {isMenuOpen ? (
@@ -166,7 +197,7 @@ export function Header() {
                   Pourquoi Sparkier ?
                 </Link>
               )}
-              {(isConsultantPage || isPricingPage) && (
+              {(isConsultantPage || isPricingPage) && !isAuthenticated && (
                 <Link
                   to="/profile"
                   className="block px-3 py-2 text-base font-medium text-indigo-600 hover:text-indigo-900 hover:bg-gray-50"

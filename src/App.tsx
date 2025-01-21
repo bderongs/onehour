@@ -14,8 +14,12 @@ import { SparkCreatePage } from './pages/SparkCreatePage';
 import { SparkEditPage } from './pages/SparkEditPage';
 import { SparkAIEditPage } from './pages/SparkAIEditPage';
 import AuthCallback from './pages/AuthCallback';
+import { SignInPage } from './pages/SignInPage';
 import { useEffect } from 'react';
 import { initializeGoatCounter } from './utils/analytics';
+import { ConsultantDashboard } from './pages/ConsultantDashboard';
+import { AdminDashboard } from './pages/AdminDashboard';
+import { ClientDashboard } from './pages/ClientDashboard';
 
 function App() {
   const location = useLocation();
@@ -47,6 +51,15 @@ function App() {
       <div className="min-h-screen flex flex-col">
         <Routes>
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/signin" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <SignInPage />
+              </main>
+              <Footer />
+            </>
+          } />
           <Route path="/" element={
             <>
               <Header />
@@ -159,6 +172,96 @@ function App() {
               <Header />
               <main className="flex-grow pt-16">
                 <SparkAIEditPage />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/consultant/dashboard" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <ConsultantDashboard />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/consultant/profile" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <div>Profile page coming soon</div>
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/admin/dashboard" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <AdminDashboard />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/admin/consultants" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <div>Consultant management coming soon</div>
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/admin/clients" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <div>Client management coming soon</div>
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/admin/settings" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <div>Settings coming soon</div>
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/client/dashboard" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <ClientDashboard />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/client/conversations" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <div>Conversations coming soon</div>
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/client/documents" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <div>Documents coming soon</div>
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/sparks/explore" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <div>Spark exploration coming soon</div>
               </main>
               <Footer />
             </>
