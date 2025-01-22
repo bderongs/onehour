@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { BrandName } from './BrandName';
 import { ArrowLeft, Menu, X } from 'lucide-react';
 import { ProfileMenu } from './ProfileMenu';
@@ -10,12 +10,14 @@ export function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { sparkUrl } = useParams();
   const isConsultantPage = location.pathname === '/consultants';
   const isPricingPage = location.pathname === '/pricing';
   const isBrandPage = location.pathname === '/brand';
   const isLandingClientsPage = location.pathname === '/';
   const isPrivacyPage = location.pathname === '/privacy';
   const isTermsPage = location.pathname === '/terms';
+  const isSparkProductPage = location.pathname.startsWith('/sparks/') && sparkUrl && !location.pathname.includes('/edit') && !location.pathname.includes('/ai-edit');
   const isAuthPage = location.pathname === '/signin';
 
   useEffect(() => {
@@ -27,12 +29,7 @@ export function Header() {
   }, []);
 
   const handleBackClick = () => {
-    const referrer = document.referrer;
-    if (referrer && referrer.includes('sparkier.io')) {
-      navigate(-1);
-    } else {
-      navigate('/');
-    }
+    navigate(-1);
   };
 
   const navigation = [
@@ -57,7 +54,7 @@ export function Header() {
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 shadow-sm ${isPrivacyPage || isTermsPage ? 'bg-gray-900' : 'bg-white'}`}>
+    <header className="fixed top-0 left-0 right-0 z-50 shadow-sm bg-white">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -84,7 +81,7 @@ export function Header() {
                 )}
 
                 <div className="hidden md:flex items-center space-x-4">
-                  {(isPrivacyPage || isTermsPage) && (
+                  {(isPrivacyPage || isTermsPage || isSparkProductPage) && (
                     <button
                       onClick={handleBackClick}
                       className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
@@ -170,7 +167,7 @@ export function Header() {
                   {item.name}
                 </button>
               ))}
-              {(isPrivacyPage || isTermsPage) && (
+              {(isPrivacyPage || isTermsPage || isSparkProductPage) && (
                 <button
                   onClick={handleBackClick}
                   className="block w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
