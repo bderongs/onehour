@@ -59,7 +59,7 @@ export function Header() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to={isConsultantPage || isPricingPage ? "/consultants" : "/"} className="flex items-center">
-              <BrandName color="indigo-900" />
+              <BrandName color="blue-900" />
             </Link>
           </div>
 
@@ -109,7 +109,7 @@ export function Header() {
                   {(isConsultantPage || isPricingPage) && !isAuthenticated && (
                     <Link
                       to="/profile"
-                      className="text-indigo-600 hover:text-indigo-900 px-3 py-2 text-sm font-medium"
+                      className="text-blue-600 hover:text-blue-900 px-3 py-2 text-sm font-medium"
                     >
                       Voir un exemple de profil
                     </Link>
@@ -119,7 +119,7 @@ export function Header() {
                   ) : !isAuthPage && (
                     <Link
                       to="/signin"
-                      className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       Se connecter
                     </Link>
@@ -133,14 +133,14 @@ export function Header() {
                 {!isAuthenticated && !isAuthPage && (
                   <Link
                     to="/signin"
-                    className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2"
+                    className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2"
                   >
                     Se connecter
                   </Link>
                 )}
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 ml-2"
+                  className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 ml-2"
                 >
                   <span className="sr-only">Open main menu</span>
                   {isMenuOpen ? (
@@ -197,7 +197,7 @@ export function Header() {
               {(isConsultantPage || isPricingPage) && !isAuthenticated && (
                 <Link
                   to="/profile"
-                  className="block px-3 py-2 text-base font-medium text-indigo-600 hover:text-indigo-900 hover:bg-gray-50"
+                  className="block px-3 py-2 text-base font-medium text-blue-600 hover:text-blue-900 hover:bg-gray-50"
                 >
                   Voir un exemple de profil
                 </Link>

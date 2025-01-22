@@ -178,7 +178,7 @@ export function SignInPage() {
                             Vous n'avez pas encore de compte ?{' '}
                             <button
                                 onClick={() => navigate('/signup')}
-                                className="font-medium text-indigo-600 hover:text-indigo-500"
+                                className="font-medium text-blue-600 hover:text-blue-500"
                             >
                                 Inscrivez-vous
                             </button>
@@ -218,7 +218,7 @@ export function SignInPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                         >
                             {loading ? (
                                 <span className="absolute left-0 inset-y-0 flex items-center pl-3">
@@ -257,14 +257,14 @@ export function SignInPage() {
                             <button
                                 type="button"
                                 onClick={() => setIsPasswordResetMode(false)}
-                                className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                             >
                                 Retour
                             </button>
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                                className="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                             >
                                 {loading ? 'Envoi...' : 'Envoyer'}
                             </button>
@@ -322,7 +322,7 @@ export function SignInPage() {
                                 <button
                                     type="button"
                                     onClick={() => setIsPasswordResetMode(true)}
-                                    className="font-medium text-indigo-600 hover:text-indigo-500"
+                                    className="font-medium text-blue-600 hover:text-blue-500"
                                 >
                                     Mot de passe oublié ?
                                 </button>
@@ -333,7 +333,7 @@ export function SignInPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {loading ? (
                                     <span className="absolute left-0 inset-y-0 flex items-center pl-3">

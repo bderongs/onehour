@@ -66,7 +66,7 @@ export function SignUpPage() {
                         Vous avez déjà un compte ?{' '}
                         <button
                             onClick={() => navigate('/signin')}
-                            className="font-medium text-indigo-600 hover:text-indigo-500"
+                            className="font-medium text-blue-600 hover:text-blue-500"
                         >
                             Connectez-vous
                         </button>

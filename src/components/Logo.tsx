@@ -35,7 +35,18 @@ export function Logo({ className = "h-8 w-8", color = "indigo-900" }: LogoProps)
       'indigo-700': '#4338ca',
       'indigo-800': '#3730a3',
       'indigo-900': '#312e81',
-      'indigo-950': '#1e1b4b'
+      'indigo-950': '#1e1b4b',
+      'blue-50': '#eff6ff',
+      'blue-100': '#dbeafe',
+      'blue-200': '#bfdbfe',
+      'blue-300': '#93c5fd',
+      'blue-400': '#60a5fa',
+      'blue-500': '#3b82f6',
+      'blue-600': '#2563eb',
+      'blue-700': '#1d4ed8',
+      'blue-800': '#1e40af',
+      'blue-900': '#1e3a8a',
+      'blue-950': '#172554'
     };
     return colorMap[color] || 'currentColor';
   }, [color]);
