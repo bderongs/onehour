@@ -8,6 +8,7 @@ export function SignInPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isPasswordResetMode, setIsPasswordResetMode] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [errorType, setErrorType] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -86,6 +87,11 @@ export function SignInPage() {
     };
 
     const handleForgotPassword = async () => {
+        if (!isPasswordResetMode) {
+            setIsPasswordResetMode(true);
+            return;
+        }
+
         if (!email) {
             setNotification({
                 type: 'error',
@@ -105,6 +111,7 @@ export function SignInPage() {
                 type: 'success',
                 message: 'Un email de réinitialisation de mot de passe vous a été envoyé.'
             });
+            setIsPasswordResetMode(false);
         } catch (error: any) {
             setNotification({
                 type: 'error',
@@ -159,12 +166,14 @@ export function SignInPage() {
             <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md space-y-6">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        {(errorType === 'expired_confirmation' || errorType === 'invalid_token')
-                            ? 'Renvoyer le lien de confirmation'
-                            : 'Connectez-vous à votre compte'
+                        {isPasswordResetMode
+                            ? 'Réinitialisation du mot de passe'
+                            : (errorType === 'expired_confirmation' || errorType === 'invalid_token')
+                                ? 'Renvoyer le lien de confirmation'
+                                : 'Connectez-vous à votre compte'
                         }
                     </h2>
-                    {(errorType !== 'expired_confirmation' && errorType !== 'invalid_token') && (
+                    {(errorType !== 'expired_confirmation' && errorType !== 'invalid_token' && !isPasswordResetMode) && (
                         <p className="mt-2 text-center text-sm text-gray-600">
                             Vous n'avez pas encore de compte ?{' '}
                             <button
@@ -173,6 +182,11 @@ export function SignInPage() {
                             >
                                 Inscrivez-vous
                             </button>
+                        </p>
+                    )}
+                    {isPasswordResetMode && (
+                        <p className="mt-2 text-center text-sm text-gray-600">
+                            Nous vous enverrons un email avec les instructions pour réinitialiser votre mot de passe.
                         </p>
                     )}
                 </div>
@@ -213,6 +227,48 @@ export function SignInPage() {
                             ) : null}
                             {loading ? 'Envoi en cours...' : 'Renvoyer le lien de confirmation'}
                         </button>
+                    </form>
+                ) : isPasswordResetMode ? (
+                    <form onSubmit={(e) => { e.preventDefault(); handleForgotPassword(); }} className="mt-8 space-y-6">
+                        <div className="rounded-md">
+                            <div>
+                                <label htmlFor="email-address" className="sr-only">
+                                    Adresse email
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Mail className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        id="email-address"
+                                        name="email"
+                                        type="email"
+                                        autoComplete="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="appearance-none rounded-md relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                        placeholder="Adresse email"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between space-x-4">
+                            <button
+                                type="button"
+                                onClick={() => setIsPasswordResetMode(false)}
+                                className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                                Retour
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                            >
+                                {loading ? 'Envoi...' : 'Envoyer'}
+                            </button>
+                        </div>
                     </form>
                 ) : (
                     <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -265,7 +321,7 @@ export function SignInPage() {
                             <div className="text-sm">
                                 <button
                                     type="button"
-                                    onClick={handleForgotPassword}
+                                    onClick={() => setIsPasswordResetMode(true)}
                                     className="font-medium text-indigo-600 hover:text-indigo-500"
                                 >
                                     Mot de passe oublié ?
