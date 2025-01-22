@@ -21,9 +21,7 @@ if (!supabaseAnonKey) {
 
 // Determine the site URL based on the environment
 // Used for authentication redirects and callbacks
-const siteUrl = import.meta.env.DEV 
-  ? 'http://localhost:5173'
-  : 'https://www.sparkier.io'
+const siteUrl = window.location.origin;
 
 // Initialize Supabase client with configuration
 // - PKCE flow for secure authentication
@@ -35,7 +33,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,  // Automatically refresh the token before it expires
     persistSession: true,    // Keep the user logged in between page refreshes
     detectSessionInUrl: true, // Look for auth tokens in the URL
-    flowType: 'pkce'         // Use PKCE (Proof Key for Code Exchange) flow for enhanced security
+    flowType: 'pkce',         // Use PKCE (Proof Key for Code Exchange) flow for enhanced security
+    storage: window.localStorage
   },
   global: {
     headers: {

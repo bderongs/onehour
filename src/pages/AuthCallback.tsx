@@ -14,7 +14,7 @@ export default function AuthCallback() {
     useEffect(() => {
         const setupSession = async () => {
             try {
-                // Get the session from URL
+                // First check if we already have a session
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
                 
                 if (sessionError) throw sessionError;
@@ -26,39 +26,82 @@ export default function AuthCallback() {
                 } else {
                     // Check for error in URL parameters first
                     const urlParams = new URLSearchParams(window.location.search);
-                    if (urlParams.get('error_code') === 'otp_expired') {
-                        // Get email from URL if present
-                        const email = urlParams.get('email') || '';
-                        // Redirect to sign in page with error message and email
-                        navigate(`/signin?error=expired_confirmation&message=Le lien de confirmation a expiré. Veuillez entrer votre email pour en recevoir un nouveau.&email=${encodeURIComponent(email)}`);
-                        return;
-                    }
+                    const code = urlParams.get('code');
+                    const email = urlParams.get('email') || '';
 
-                    // Try to exchange the token from URL
-                    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-                    const accessToken = hashParams.get('access_token');
-                    const refreshToken = hashParams.get('refresh_token');
-                    const email = hashParams.get('email') || urlParams.get('email') || '';
-
-                    if (!accessToken) {
-                        navigate(`/signin?error=invalid_token&message=Le lien de confirmation est invalide. Veuillez entrer votre email pour en recevoir un nouveau.&email=${encodeURIComponent(email)}`);
-                        return;
-                    }
-
-                    const { data, error } = await supabase.auth.setSession({
-                        access_token: accessToken,
-                        refresh_token: refreshToken || '',
+                    // Debug logging
+                    console.log('URL Search params:', {
+                        fullUrl: window.location.href,
+                        search: window.location.search,
+                        params: Object.fromEntries(urlParams.entries()),
+                        code
                     });
 
-                    if (error) throw error;
+                    // Handle various error cases
+                    if (urlParams.get('error') === 'access_denied' && urlParams.get('error_code') === 'otp_expired') {
+                        navigate(`/signin?error=expired_confirmation&message=Le lien de confirmation a expiré. Veuillez vous inscrire à nouveau pour recevoir un nouveau lien.&email=${encodeURIComponent(email)}`);
+                        return;
+                    }
 
-                    if (data?.session) {
-                        setShowPasswordForm(true);
+                    if (urlParams.get('error_description')) {
+                        const errorDesc = urlParams.get('error_description') || '';
+                        if (errorDesc.includes('expired')) {
+                            navigate(`/signin?error=expired_confirmation&message=Le lien de confirmation a expiré. Veuillez vous inscrire à nouveau pour recevoir un nouveau lien.&email=${encodeURIComponent(email)}`);
+                        } else {
+                            navigate(`/signin?error=auth_error&message=${encodeURIComponent(errorDesc)}&email=${encodeURIComponent(email)}`);
+                        }
+                        return;
+                    }
+
+                    // If we have a code, exchange it for a session
+                    if (code) {
+                        // The code is present in the URL, exchange it for a session
+                        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+                        if (error) {
+                            console.error('Error exchanging code for session:', error);
+                            throw error;
+                        }
+
+                        if (data?.session) {
+                            setShowPasswordForm(true);
+                        } else {
+                            throw new Error('No session established after code exchange');
+                        }
+                    } else {
+                        // Check for tokens in hash params as fallback
+                        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                        const accessToken = hashParams.get('access_token');
+                        const refreshToken = hashParams.get('refresh_token');
+
+                        if (!accessToken) {
+                            console.error('No code or access token found in URL');
+                            navigate(`/signin?error=invalid_token&message=Le lien de confirmation est invalide. Veuillez entrer votre email pour en recevoir un nouveau.&email=${encodeURIComponent(email)}`);
+                            return;
+                        }
+
+                        // Try to set the session with the tokens
+                        const { data, error } = await supabase.auth.setSession({
+                            access_token: accessToken,
+                            refresh_token: refreshToken || '',
+                        });
+
+                        if (error) {
+                            console.error('Error setting session:', error);
+                            throw error;
+                        }
+
+                        if (data?.session) {
+                            setShowPasswordForm(true);
+                        } else {
+                            throw new Error('No session established');
+                        }
                     }
                 }
             } catch (err) {
                 console.error('Error setting up session:', err);
-                setError('Échec de la configuration de la session. Veuillez réessayer.');
+                const email = new URLSearchParams(window.location.search).get('email') || '';
+                navigate(`/signin?error=auth_error&message=Échec de la configuration de la session. Veuillez réessayer.&email=${encodeURIComponent(email)}`);
             } finally {
                 setLoading(false);
             }
