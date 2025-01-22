@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Notification } from '../components/Notification';
 
@@ -24,13 +24,25 @@ export default function AuthCallback() {
                     setShowPasswordForm(true);
                     setLoading(false);
                 } else {
+                    // Check for error in URL parameters first
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get('error_code') === 'otp_expired') {
+                        // Get email from URL if present
+                        const email = urlParams.get('email') || '';
+                        // Redirect to sign in page with error message and email
+                        navigate(`/signin?error=expired_confirmation&message=Le lien de confirmation a expiré. Veuillez entrer votre email pour en recevoir un nouveau.&email=${encodeURIComponent(email)}`);
+                        return;
+                    }
+
                     // Try to exchange the token from URL
                     const hashParams = new URLSearchParams(window.location.hash.substring(1));
                     const accessToken = hashParams.get('access_token');
                     const refreshToken = hashParams.get('refresh_token');
+                    const email = hashParams.get('email') || urlParams.get('email') || '';
 
                     if (!accessToken) {
-                        throw new Error('Token d\'accès non trouvé');
+                        navigate(`/signin?error=invalid_token&message=Le lien de confirmation est invalide. Veuillez entrer votre email pour en recevoir un nouveau.&email=${encodeURIComponent(email)}`);
+                        return;
                     }
 
                     const { data, error } = await supabase.auth.setSession({
@@ -95,7 +107,7 @@ export default function AuthCallback() {
                     navigate('/sparks/manage');
                     break;
                 case 'admin':
-                    navigate('/admin/dashboard');
+                    navigate('/sparks/manage');
                     break;
                 case 'client':
                     navigate('/client/dashboard');
