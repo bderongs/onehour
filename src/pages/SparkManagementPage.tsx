@@ -18,7 +18,6 @@ export function SparkManagementPage() {
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [userRole, setUserRole] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUserAndSparks = async () => {
@@ -45,8 +44,6 @@ export function SparkManagementPage() {
                     navigate('/');
                     return;
                 }
-
-                setUserRole(profile.role);
 
                 // Fetch sparks based on role
                 const fetchedSparks = profile.role === 'consultant' 

@@ -9,13 +9,16 @@ export function SignInPage() {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const [errorType, setErrorType] = useState<string | null>(null);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
     useEffect(() => {
         // Check for error messages in URL
         const errorMessage = searchParams.get('message');
-        const errorType = searchParams.get('error');
+        const error = searchParams.get('error');
+        setErrorType(error);
+        
         if (errorMessage) {
             setNotification({
                 type: 'error',
@@ -156,12 +159,12 @@ export function SignInPage() {
             <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md space-y-6">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        {(searchParams.get('error') === 'expired_confirmation' || searchParams.get('error') === 'invalid_token')
+                        {(errorType === 'expired_confirmation' || errorType === 'invalid_token')
                             ? 'Renvoyer le lien de confirmation'
                             : 'Connectez-vous à votre compte'
                         }
                     </h2>
-                    {(searchParams.get('error') !== 'expired_confirmation' && searchParams.get('error') !== 'invalid_token') && (
+                    {(errorType !== 'expired_confirmation' && errorType !== 'invalid_token') && (
                         <p className="mt-2 text-center text-sm text-gray-600">
                             Vous n'avez pas encore de compte ?{' '}
                             <button
@@ -173,7 +176,7 @@ export function SignInPage() {
                         </p>
                     )}
                 </div>
-                {(searchParams.get('error') === 'expired_confirmation' || searchParams.get('error') === 'invalid_token') ? (
+                {(errorType === 'expired_confirmation' || errorType === 'invalid_token') ? (
                     <form onSubmit={(e) => { e.preventDefault(); handleResendConfirmation(); }} className="mt-8 space-y-6">
                         <div className="rounded-md">
                             <div>
