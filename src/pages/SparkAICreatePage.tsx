@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ArrowLeft } from 'lucide-react';
+import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ArrowLeft, Sparkles } from 'lucide-react';
 import type { Spark } from '../types/spark';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
@@ -192,6 +192,13 @@ export function SparkAICreatePage() {
                     <div className="lg:w-1/2">
                         <div className="sticky top-8">
                             <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+                                <div className="p-4 border-b border-gray-200">
+                                    <div className="flex items-center gap-2">
+                                        <Sparkles className="h-5 w-5 text-blue-600" />
+                                        <h2 className="text-xl font-semibold text-gray-900">{CHAT_CONFIGS.spark_content_assistant.title}</h2>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mt-1">{CHAT_CONFIGS.spark_content_assistant.subtitle}</p>
+                                </div>
                                 <div className="p-4">
                                     <AIChatInterface
                                         template={DOCUMENT_TEMPLATES.spark_content_assistant}
