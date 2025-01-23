@@ -7,6 +7,7 @@ import { formatDuration, formatPrice } from '../utils/format';
 import { supabase } from '../lib/supabase';
 import { getSparks, getSparksByConsultant, deleteSpark } from '../services/sparks';
 import { Notification } from '../components/Notification';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -20,6 +21,10 @@ export function SparkManagementPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; sparkUrl: string | null }>({
+        isOpen: false,
+        sparkUrl: null
+    });
 
     useEffect(() => {
         const fetchUserAndSparks = async () => {
@@ -56,7 +61,7 @@ export function SparkManagementPage() {
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
-                setError('Failed to load sparks. Please try again later.');
+                setError('Impossible de charger les Sparks. Veuillez réessayer plus tard.');
                 setLoading(false);
             }
         };
@@ -81,15 +86,21 @@ export function SparkManagementPage() {
     };
 
     const handleDeleteSpark = async (sparkUrl: string) => {
-        if (window.confirm('Are you sure you want to delete this spark?')) {
-            try {
-                await deleteSpark(sparkUrl);
-                setSparks(sparks.filter(spark => spark.url !== sparkUrl));
-                setNotification({ type: 'success', message: 'Spark successfully deleted' });
-            } catch (error) {
-                console.error('Error deleting spark:', error);
-                setNotification({ type: 'error', message: 'Failed to delete spark. Please try again.' });
-            }
+        setDeleteConfirm({ isOpen: true, sparkUrl });
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deleteConfirm.sparkUrl) return;
+        
+        try {
+            await deleteSpark(deleteConfirm.sparkUrl);
+            setSparks(sparks.filter(spark => spark.url !== deleteConfirm.sparkUrl));
+            setNotification({ type: 'success', message: 'Le Spark a été supprimé avec succès' });
+        } catch (error) {
+            console.error('Error deleting spark:', error);
+            setNotification({ type: 'error', message: 'Échec de la suppression du Spark. Veuillez réessayer.' });
+        } finally {
+            setDeleteConfirm({ isOpen: false, sparkUrl: null });
         }
     };
 
@@ -98,7 +109,7 @@ export function SparkManagementPage() {
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading sparks...</p>
+                    <p className="mt-4 text-gray-600">Chargement des Sparks...</p>
                 </div>
             </div>
         );
@@ -108,12 +119,12 @@ export function SparkManagementPage() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
                 <div className="text-center">
-                    <p className="text-red-600">{error}</p>
+                    <p className="text-red-600">Impossible de charger les Sparks. Veuillez réessayer plus tard.</p>
                     <button
                         onClick={() => window.location.reload()}
                         className="mt-4 text-blue-600 hover:text-blue-700"
                     >
-                        Try again
+                        Réessayer
                     </button>
                 </div>
             </div>
@@ -129,6 +140,16 @@ export function SparkManagementPage() {
                     onClose={() => setNotification(null)}
                 />
             )}
+            <ConfirmDialog
+                isOpen={deleteConfirm.isOpen}
+                title="Supprimer le Spark"
+                message="Êtes-vous sûr de vouloir supprimer ce spark ? Cette action est irréversible."
+                confirmLabel="Supprimer"
+                cancelLabel="Annuler"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeleteConfirm({ isOpen: false, sparkUrl: null })}
+                variant="danger"
+            />
             <div className="max-w-7xl mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="mb-8">

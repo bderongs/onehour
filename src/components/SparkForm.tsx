@@ -34,7 +34,17 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
         }
     );
 
+    const [highlightError, setHighlightError] = useState<string | null>(null);
+
     const handleChange = (field: keyof Spark, value: any) => {
+        if (field === 'highlight') {
+            const words = value.trim().split(/\s+/);
+            if (words.length > 2) {
+                setHighlightError('Le tag ne peut pas dépasser 2 mots');
+            } else {
+                setHighlightError(null);
+            }
+        }
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
@@ -113,6 +123,18 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
         return isNaN(number) ? null : number;
     };
 
+    const handleHighlightBlur = () => {
+        if (formData.highlight) {
+            const words = formData.highlight.trim().split(/\s+/);
+            if (words.length > 2) {
+                // Trim to 2 words
+                const trimmedValue = words.slice(0, 2).join(' ');
+                setFormData(prev => ({ ...prev, highlight: trimmedValue }));
+                setHighlightError(null); // Clear the error message after trimming
+            }
+        }
+    };
+
     return (
         <form onSubmit={handleSubmit} className="space-y-8">
             {/* Basic Information */}
@@ -175,8 +197,15 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
                             type="text"
                             value={formData.highlight || ''}
                             onChange={(e) => handleChange('highlight', e.target.value)}
+                            onBlur={handleHighlightBlur}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            placeholder="2 mots maximum"
                         />
+                        {highlightError && (
+                            <div className="mt-1 text-sm text-red-500">
+                                {highlightError}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
