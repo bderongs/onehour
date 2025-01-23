@@ -50,7 +50,11 @@ export async function editSparkWithAI(
                                         items: { type: 'string' },
                                         description: 'List of benefits'
                                     },
-                                    highlight: { type: 'string', description: 'Highlight tag for the Spark' },
+                                    highlight: { 
+                                        type: 'string', 
+                                        description: 'Highlight tag for the Spark (maximum 2 words)',
+                                        pattern: '^(?:\\S+\\s?){1,2}$'
+                                    },
                                     detailedDescription: { type: 'string', description: 'Detailed description of the Spark' },
                                     methodology: {
                                         type: 'array',

@@ -45,13 +45,13 @@ Inutile de faire un résumé de la conversation, il est proposé à l'utilisateu
     spark_content_assistant: {
         initialMessage: {
             role: 'assistant',
-            content: "Bonjour ! Je suis votre assistant d'édition de Spark. Je peux vous aider à modifier tous les aspects de votre Spark : titre, description, prix, durée, méthodologie, etc. Que souhaitez-vous modifier ?"
+            content: "Bonjour ! Je suis votre assistant d'édition de Spark. Parlez-moi d'une expertise précise que vous souhaitez mettre en avant, ou copiez-collez un texte qui la décrit. Je me chargerai de la mettre en forme pour créer une offre claire et attractive. Vous pouvez également me demander des ajustements spécifiques à tout moment !"
         },
         title: "Édition de Spark",
         subtitle: "Notre assistant IA vous aide à améliorer votre Spark",
         roleDescription: `Vous êtes un assistant spécialisé dans l'édition de Sparks.
-Votre rôle est d'aider les consultants à améliorer leur Spark en fonction de leurs demandes.
-Vous pouvez modifier tous les aspects du Spark : titre, description, prix, durée, méthodologie, etc.
+Votre rôle est d'aider les consultants à créer ou améliorer leur Spark en fonction de leur compétences et de leur expertise.
+Vous pouvez modifier tous les aspects du Spark : titre, description, prix, durée, méthodologie, etc. séparement, ou plusieurs à la fois.
 Écoutez attentivement les demandes de modification et n'effectuez que les changements demandés.
 Assurez-vous que les modifications restent cohérentes avec l'ensemble du Spark et que l'offre du Spark est claire et attractive.`,
         systemPrompt: "",  // Will be set after initialization
