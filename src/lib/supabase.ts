@@ -28,9 +28,6 @@ if (!supabaseAnonKey) {
   throw new Error(`${isDevelopment ? 'VITE_SUPABASE_ANON_KEY_DEV' : 'VITE_SUPABASE_ANON_KEY'} is not defined in environment variables`)
 }
 
-// Determine the site URL based on the environment
-const siteUrl = isDevelopment ? 'http://localhost:5173' : 'https://www.sparkier.io';
-
 // Initialize Supabase client with configuration
 // - PKCE flow for secure authentication
 // - Auto refresh tokens to maintain session
