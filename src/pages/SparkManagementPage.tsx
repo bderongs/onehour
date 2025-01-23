@@ -5,7 +5,8 @@ import { Plus, Edit2, Trash2, Eye, Sparkles } from 'lucide-react';
 import type { Spark } from '../types/spark';
 import { formatDuration, formatPrice } from '../utils/format';
 import { supabase } from '../lib/supabase';
-import { getSparks, getSparksByConsultant } from '../services/sparks';
+import { getSparks, getSparksByConsultant, deleteSpark } from '../services/sparks';
+import { Notification } from '../components/Notification';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -18,6 +19,7 @@ export function SparkManagementPage() {
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
     useEffect(() => {
         const fetchUserAndSparks = async () => {
@@ -79,9 +81,15 @@ export function SparkManagementPage() {
     };
 
     const handleDeleteSpark = async (sparkUrl: string) => {
-        // TODO: Implement delete functionality
         if (window.confirm('Are you sure you want to delete this spark?')) {
-            console.log('Delete spark:', sparkUrl);
+            try {
+                await deleteSpark(sparkUrl);
+                setSparks(sparks.filter(spark => spark.url !== sparkUrl));
+                setNotification({ type: 'success', message: 'Spark successfully deleted' });
+            } catch (error) {
+                console.error('Error deleting spark:', error);
+                setNotification({ type: 'error', message: 'Failed to delete spark. Please try again.' });
+            }
         }
     };
 
@@ -114,6 +122,13 @@ export function SparkManagementPage() {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+            {notification && (
+                <Notification
+                    type={notification.type}
+                    message={notification.message}
+                    onClose={() => setNotification(null)}
+                />
+            )}
             <div className="max-w-7xl mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="mb-8">
