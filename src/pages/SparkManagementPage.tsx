@@ -63,7 +63,7 @@ export function SparkManagementPage() {
     }, [navigate]);
 
     const handleCreateSpark = () => {
-        navigate('/sparks/create');
+        navigate('/sparks/ai-create');
     };
 
     const handleEditSpark = (sparkUrl: string) => {
@@ -116,20 +116,25 @@ export function SparkManagementPage() {
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
             <div className="max-w-7xl mx-auto px-4 py-8">
                 {/* Header */}
-                <div className="flex justify-between items-center mb-8">
+                <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">Mes Sparks</h1>
-                    <button
-                        onClick={handleCreateSpark}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 
-                                transition-colors flex items-center gap-2"
-                    >
-                        <Plus className="h-5 w-5" />
-                        Créer un Spark
-                    </button>
                 </div>
 
                 {/* Sparks Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Create New Spark Card */}
+                    <motion.div
+                        onClick={handleCreateSpark}
+                        className="bg-white rounded-xl shadow-md p-6 cursor-pointer border-2 border-dashed border-blue-300 hover:border-blue-500 transition-colors flex flex-col items-center justify-center min-h-[250px]"
+                        variants={fadeInUp}
+                        initial="initial"
+                        animate="animate"
+                    >
+                        <Plus className="h-12 w-12 text-blue-500 mb-4" />
+                        <h2 className="text-xl font-semibold text-blue-600">Créer un Spark</h2>
+                        <p className="text-gray-500 text-sm text-center mt-2">Cliquez pour créer un nouveau Spark</p>
+                    </motion.div>
+
                     {sparks.map((spark) => (
                         <motion.div
                             key={spark.url}

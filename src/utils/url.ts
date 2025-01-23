@@ -24,14 +24,18 @@ export const ensureUniqueSlug = async (baseSlug: string, currentUrl?: string): P
     let isUnique = false;
 
     while (!isUnique) {
-        const { data } = await supabase
+        const { data, error } = await supabase
             .from('sparks')
             .select('url')
             .eq('url', slug)
-            .neq('url', currentUrl || '') // Ignore current URL when updating
-            .single();
+            .neq('url', currentUrl || '');
 
-        if (!data) {
+        if (error) {
+            console.error('Error checking URL uniqueness:', error);
+            throw error;
+        }
+
+        if (!data || data.length === 0) {
             isUnique = true;
         } else {
             counter++;

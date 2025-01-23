@@ -13,6 +13,7 @@ import { SparkManagementPage } from './pages/SparkManagementPage';
 import { SparkCreatePage } from './pages/SparkCreatePage';
 import { SparkEditPage } from './pages/SparkEditPage';
 import { SparkAIEditPage } from './pages/SparkAIEditPage';
+import { SparkAICreatePage } from './pages/SparkAICreatePage';
 import AuthCallback from './pages/AuthCallback';
 import { SignInPage } from './pages/SignInPage';
 import { SignUpPage } from './pages/SignUpPage';
@@ -181,6 +182,15 @@ function App() {
               <Header />
               <main className="flex-grow pt-16">
                 <SparkAIEditPage />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/sparks/ai-create" element={
+            <>
+              <Header />
+              <main className="flex-grow pt-16">
+                <SparkAICreatePage />
               </main>
               <Footer />
             </>

@@ -32,12 +32,21 @@ const transformSparkToDB = (spark: Partial<Spark>): Record<string, any> => {
     // Map each field with proper snake_case conversion
     Object.entries(spark).forEach(([key, value]) => {
         if (value === undefined) return;
+        if (key === 'id') return; // Skip the id field
         
         // Convert camelCase to snake_case
         const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
         
+        // Clean up and transform specific fields
+        if (key === 'price' && value) {
+            transformed[snakeKey] = value.toString().replace(/[^0-9]/g, '');
+        } else if (key === 'duration') {
+            // Always provide a valid interval value, default to 60 minutes
+            const minutes = value ? parseInt(value.toString().replace(/[^0-9]/g, ''), 10) : 60;
+            transformed[snakeKey] = `${minutes} minutes`;
+        }
         // Special handling for nested objects
-        if (key === 'expertProfile' && value) {
+        else if (key === 'expertProfile' && value) {
             transformed['expert_profile'] = value;
         } else if (key === 'targetAudience') {
             transformed['target_audience'] = value;
@@ -102,19 +111,22 @@ export const getSparksByConsultant = async (consultantId: string): Promise<Spark
     return data.map(transformSparkFromDB);
 };
 
-export const createSpark = async (spark: Spark): Promise<Spark> => {
+export const createSpark = async (spark: Omit<Spark, 'id'>): Promise<Spark> => {
     // Generate URL from title
     const baseSlug = generateSlug(spark.title);
     const url = await ensureUniqueSlug(baseSlug);
 
-    const sparkWithUrl = {
+    // Create a new object without the id field and with the generated URL
+    const sparkData = {
         ...spark,
         url
     };
 
+    console.log('Spark data:', transformSparkToDB(sparkData));
+
     const { data, error } = await supabase
         .from('sparks')
-        .insert([transformSparkToDB(sparkWithUrl)])
+        .insert([transformSparkToDB(sparkData)])
         .select()
         .single();
 
