@@ -145,7 +145,9 @@ export default function ConsultantProfilePage() {
 
     useScrollAnimation();
 
-    const CONSULTANT_ID = '3c957f54-d43b-4cef-bd65-b519cd8b09d1';
+    const DEMO_CONSULTANT_ID = import.meta.env.DEV 
+        ? import.meta.env.VITE_DEMO_CONSULTANT_ID_DEV 
+        : import.meta.env.VITE_DEMO_CONSULTANT_ID;
 
     // Add function to handle navigation to spark product page
     const handleSparkClick = (pkg: Spark) => {
@@ -162,7 +164,7 @@ export default function ConsultantProfilePage() {
     useEffect(() => {
         const fetchSparks = async () => {
             try {
-                const fetchedSparks = await getSparksByConsultant(CONSULTANT_ID);
+                const fetchedSparks = await getSparksByConsultant(DEMO_CONSULTANT_ID);
                 setSparks(fetchedSparks);
                 setLoading(false);
             } catch (err) {
