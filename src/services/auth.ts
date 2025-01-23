@@ -18,13 +18,44 @@ export interface ClientSignUpData {
     industry: string;
 }
 
+// Get the site URL based on environment
+const getSiteUrl = () => {
+    const isDevelopment = import.meta.env.MODE === 'development';
+    return isDevelopment ? 'http://localhost:5173' : 'https://www.sparkier.io';
+};
+
+// Generate a strong temporary password that meets Supabase requirements
+const generateTempPassword = () => {
+    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    
+    // Ensure at least one of each required character type
+    const password = [
+        lowercase[Math.floor(Math.random() * lowercase.length)],
+        uppercase[Math.floor(Math.random() * uppercase.length)],
+        numbers[Math.floor(Math.random() * numbers.length)],
+    ];
+
+    // Add more random characters to make it longer
+    const allChars = lowercase + uppercase + numbers;
+    for (let i = 0; i < 9; i++) {
+        password.push(allChars[Math.floor(Math.random() * allChars.length)]);
+    }
+
+    // Shuffle the password array
+    return password.sort(() => Math.random() - 0.5).join('');
+};
+
 export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
+    const siteUrl = getSiteUrl();
+    
     // Create the auth user with email confirmation
     const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
-        password: 'temp-' + Math.random().toString(36).slice(-8), // Temporary password that will be changed during confirmation
+        password: generateTempPassword(),
         options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: `${siteUrl}/auth/callback`,
             data: {
                 first_name: data.firstName,
                 last_name: data.lastName,
@@ -57,12 +88,14 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
 }
 
 export const signUpClientWithEmail = async (data: ClientSignUpData) => {
+    const siteUrl = getSiteUrl();
+    
     // Create the auth user with email confirmation
     const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
-        password: 'temp-' + Math.random().toString(36).slice(-8), // Temporary password that will be changed during confirmation
+        password: generateTempPassword(),
         options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: `${siteUrl}/auth/callback`,
             data: {
                 first_name: data.firstName,
                 last_name: data.lastName,
@@ -175,8 +208,10 @@ export const updateUserRole = async (userId: string, role: UserRole): Promise<vo
 };
 
 export const resendConfirmationEmail = async (email: string): Promise<void> => {
+    const siteUrl = getSiteUrl();
+    
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback`
+        redirectTo: `${siteUrl}/auth/callback`
     });
 
     if (error) {

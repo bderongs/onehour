@@ -12,102 +12,43 @@ export default function AuthCallback() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const setupSession = async () => {
+        const handleEmailConfirmation = async () => {
             try {
-                // First check if we already have a session
-                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                const urlParams = new URLSearchParams(window.location.search);
+                const tokenHash = urlParams.get('token_hash');
+                const type = urlParams.get('type');
                 
-                if (sessionError) throw sessionError;
+                if (!tokenHash || !type) {
+                    throw new Error('Invalid URL parameters');
+                }
 
-                if (session) {
-                    // User is authenticated, show password form
+                // Verify the OTP
+                const { data, error: verifyError } = await supabase.auth.verifyOtp({
+                    token_hash: tokenHash,
+                    type: type as any, // 'signup' | 'invite' | etc
+                });
+
+                if (verifyError) throw verifyError;
+                
+                if (data?.session) {
                     setShowPasswordForm(true);
                     setLoading(false);
-                } else {
-                    // Check for error in URL parameters first
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const code = urlParams.get('code');
-                    const email = urlParams.get('email') || '';
-
-                    // Debug logging
-                    console.log('URL Search params:', {
-                        fullUrl: window.location.href,
-                        search: window.location.search,
-                        params: Object.fromEntries(urlParams.entries()),
-                        code
-                    });
-
-                    // Handle various error cases
-                    if (urlParams.get('error') === 'access_denied' && urlParams.get('error_code') === 'otp_expired') {
-                        navigate(`/signin?error=expired_confirmation&message=Le lien de confirmation a expiré. Veuillez vous inscrire à nouveau pour recevoir un nouveau lien.&email=${encodeURIComponent(email)}`);
-                        return;
-                    }
-
-                    if (urlParams.get('error_description')) {
-                        const errorDesc = urlParams.get('error_description') || '';
-                        if (errorDesc.includes('expired')) {
-                            navigate(`/signin?error=expired_confirmation&message=Le lien de confirmation a expiré. Veuillez vous inscrire à nouveau pour recevoir un nouveau lien.&email=${encodeURIComponent(email)}`);
-                        } else {
-                            navigate(`/signin?error=auth_error&message=${encodeURIComponent(errorDesc)}&email=${encodeURIComponent(email)}`);
-                        }
-                        return;
-                    }
-
-                    // If we have a code, exchange it for a session
-                    if (code) {
-                        // The code is present in the URL, exchange it for a session
-                        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-
-                        if (error) {
-                            console.error('Error exchanging code for session:', error);
-                            throw error;
-                        }
-
-                        if (data?.session) {
-                            setShowPasswordForm(true);
-                        } else {
-                            throw new Error('No session established after code exchange');
-                        }
-                    } else {
-                        // Check for tokens in hash params as fallback
-                        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-                        const accessToken = hashParams.get('access_token');
-                        const refreshToken = hashParams.get('refresh_token');
-
-                        if (!accessToken) {
-                            console.error('No code or access token found in URL');
-                            navigate(`/signin?error=invalid_token&message=Le lien de confirmation est invalide. Veuillez entrer votre email pour en recevoir un nouveau.&email=${encodeURIComponent(email)}`);
-                            return;
-                        }
-
-                        // Try to set the session with the tokens
-                        const { data, error } = await supabase.auth.setSession({
-                            access_token: accessToken,
-                            refresh_token: refreshToken || '',
-                        });
-
-                        if (error) {
-                            console.error('Error setting session:', error);
-                            throw error;
-                        }
-
-                        if (data?.session) {
-                            setShowPasswordForm(true);
-                        } else {
-                            throw new Error('No session established');
-                        }
-                    }
+                    return;
                 }
-            } catch (err) {
-                console.error('Error setting up session:', err);
+
+                throw new Error('No session established');
+
+            } catch (err: any) {
+                console.error('Error during email confirmation:', err);
                 const email = new URLSearchParams(window.location.search).get('email') || '';
-                navigate(`/signin?error=auth_error&message=Échec de la configuration de la session. Veuillez réessayer.&email=${encodeURIComponent(email)}`);
+                const errorMessage = err.message || 'An error occurred during confirmation';
+                navigate(`/signin?error=auth_error&message=${encodeURIComponent(errorMessage)}&email=${encodeURIComponent(email)}`);
             } finally {
                 setLoading(false);
             }
         };
 
-        setupSession();
+        handleEmailConfirmation();
     }, [navigate]);
 
     const handleSetPassword = async (e: React.FormEvent) => {
