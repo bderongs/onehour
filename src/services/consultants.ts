@@ -101,72 +101,164 @@ export async function getConsultantMissions(consultantId: string): Promise<Consu
 }
 
 export async function updateConsultantReviews(consultantId: string, reviews: ConsultantReview[]): Promise<boolean> {
-    // First, delete all existing reviews for this consultant
-    const { error: deleteError } = await supabase
-        .from('consultant_reviews')
-        .delete()
-        .eq('consultant_id', consultantId);
+    try {
+        // Get current reviews to identify ones that need to be deleted
+        const { data: currentReviews } = await supabase
+            .from('consultant_reviews')
+            .select('id')
+            .eq('consultant_id', consultantId);
 
-    if (deleteError) {
-        console.error('Error deleting existing reviews:', deleteError);
+        if (currentReviews) {
+            const currentIds = new Set(currentReviews.map(r => r.id));
+            const existingReviews = reviews.filter(review => !review.id.startsWith('temp-'));
+            const newReviews = reviews.filter(review => review.id.startsWith('temp-'));
+            const keepIds = new Set(existingReviews.map(r => r.id));
+            const idsToDelete = [...currentIds].filter(id => !keepIds.has(id));
+
+            // Delete reviews that are no longer present
+            if (idsToDelete.length > 0) {
+                const { error: deleteError } = await supabase
+                    .from('consultant_reviews')
+                    .delete()
+                    .in('id', idsToDelete)
+                    .eq('consultant_id', consultantId);
+
+                if (deleteError) {
+                    console.error('Error deleting removed reviews:', deleteError);
+                    return false;
+                }
+            }
+
+            // Update existing reviews one by one to respect RLS
+            for (const review of existingReviews) {
+                const { error: updateError } = await supabase
+                    .from('consultant_reviews')
+                    .update({
+                        reviewer_name: review.client_name,
+                        reviewer_role: review.client_role,
+                        reviewer_company: review.client_company,
+                        review_text: review.review_text,
+                        rating: review.rating,
+                        reviewer_image_url: review.client_image_url
+                    })
+                    .eq('id', review.id)
+                    .eq('consultant_id', consultantId);
+
+                if (updateError) {
+                    console.error('Error updating review:', updateError);
+                    return false;
+                }
+            }
+
+            // Insert new reviews
+            if (newReviews.length > 0) {
+                const { error: insertError } = await supabase
+                    .from('consultant_reviews')
+                    .insert(newReviews.map(review => ({
+                        consultant_id: consultantId,
+                        reviewer_name: review.client_name,
+                        reviewer_role: review.client_role,
+                        reviewer_company: review.client_company,
+                        review_text: review.review_text,
+                        rating: review.rating,
+                        reviewer_image_url: review.client_image_url,
+                        created_at: review.created_at
+                    })));
+
+                if (insertError) {
+                    console.error('Error inserting new reviews:', insertError);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Error in updateConsultantReviews:', error);
         return false;
     }
-
-    // Then insert the new reviews
-    if (reviews.length > 0) {
-        const { error: insertError } = await supabase
-            .from('consultant_reviews')
-            .insert(reviews.map(review => ({
-                // Remove the id field completely to let the database generate a new one
-                consultant_id: consultantId,
-                reviewer_name: review.client_name,
-                reviewer_role: review.client_role,
-                reviewer_company: review.client_company,
-                review_text: review.review_text,
-                rating: review.rating,
-                reviewer_image_url: review.client_image_url,
-                created_at: review.created_at
-            })));
-
-        if (insertError) {
-            console.error('Error inserting new reviews:', insertError);
-            return false;
-        }
-    }
-
-    return true;
 }
 
 export async function updateConsultantMissions(consultantId: string, missions: ConsultantMission[]): Promise<boolean> {
-    // First, delete all existing missions for this consultant
-    const { error: deleteError } = await supabase
-        .from('consultant_missions')
-        .delete()
-        .eq('consultant_id', consultantId);
+    try {
+        // Get current missions to identify ones that need to be deleted
+        const { data: currentMissions } = await supabase
+            .from('consultant_missions')
+            .select('id, title')
+            .eq('consultant_id', consultantId);
 
-    if (deleteError) {
-        console.error('Error deleting existing missions:', deleteError);
+        if (currentMissions) {
+            // Create a map of current missions by title (since we don't have IDs in the frontend)
+            const currentMissionsMap = new Map(currentMissions.map(m => [m.title, m.id]));
+            const newTitles = new Set(missions.map(m => m.title));
+
+            // Find missions to delete (those that exist in DB but not in the new list)
+            const idsToDelete = currentMissions
+                .filter(m => !newTitles.has(m.title))
+                .map(m => m.id);
+
+            // Delete removed missions
+            if (idsToDelete.length > 0) {
+                const { error: deleteError } = await supabase
+                    .from('consultant_missions')
+                    .delete()
+                    .in('id', idsToDelete)
+                    .eq('consultant_id', consultantId);
+
+                if (deleteError) {
+                    console.error('Error deleting removed missions:', deleteError);
+                    return false;
+                }
+            }
+
+            // Separate missions into existing and new ones
+            const existingMissions = missions.filter(m => currentMissionsMap.has(m.title));
+            const newMissions = missions.filter(m => !currentMissionsMap.has(m.title));
+
+            // Update existing missions one by one
+            for (const mission of existingMissions) {
+                const missionId = currentMissionsMap.get(mission.title);
+                const { error: updateError } = await supabase
+                    .from('consultant_missions')
+                    .update({
+                        title: mission.title,
+                        company: mission.company,
+                        description: mission.description,
+                        duration: mission.duration,
+                        start_date: mission.date
+                    })
+                    .eq('id', missionId)
+                    .eq('consultant_id', consultantId);
+
+                if (updateError) {
+                    console.error('Error updating mission:', updateError);
+                    return false;
+                }
+            }
+
+            // Insert new missions
+            if (newMissions.length > 0) {
+                const { error: insertError } = await supabase
+                    .from('consultant_missions')
+                    .insert(newMissions.map(mission => ({
+                        consultant_id: consultantId,
+                        title: mission.title,
+                        company: mission.company,
+                        description: mission.description,
+                        duration: mission.duration,
+                        start_date: mission.date
+                    })));
+
+                if (insertError) {
+                    console.error('Error inserting new missions:', insertError);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Error in updateConsultantMissions:', error);
         return false;
     }
-
-    // Then insert the new missions
-    if (missions.length > 0) {
-        const { error: insertError } = await supabase
-            .from('consultant_missions')
-            .insert(missions.map(mission => ({
-                consultant_id: consultantId,
-                title: mission.title,
-                company: mission.company,
-                description: mission.description,
-                duration: mission.duration,
-                start_date: mission.date
-            })));
-
-        if (insertError) {
-            console.error('Error inserting new missions:', insertError);
-            return false;
-        }
-    }
-
-    return true;
 }
