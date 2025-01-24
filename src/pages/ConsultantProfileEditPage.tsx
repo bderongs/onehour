@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { Loader2, ArrowLeft, Plus, Trash2, X, Edit2, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '../types/consultant';
 import { getConsultantProfile, updateConsultantProfile, getConsultantReviews, getConsultantMissions, updateConsultantReviews, updateConsultantMissions } from '../services/consultants';
 import { Notification } from '../components/Notification';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 
 export default function ConsultantProfileEditPage() {
     const { id } = useParams<{ id: string }>();
@@ -20,6 +21,13 @@ export default function ConsultantProfileEditPage() {
         reviews?: ConsultantReview[],
         missions?: ConsultantMission[]
     }>({});
+    const [editingReviewIndex, setEditingReviewIndex] = useState<number | null>(null);
+    const [editingMissionIndex, setEditingMissionIndex] = useState<number | null>(null);
+    const [deleteConfirm, setDeleteConfirm] = useState<{
+        type: 'review' | 'mission';
+        index: number;
+        isOpen: boolean;
+    } | null>(null);
 
     // Fetch consultant data when component mounts
     useEffect(() => {
@@ -373,285 +381,351 @@ export default function ConsultantProfileEditPage() {
 
                         {/* Reviews Card */}
                         <div className="bg-white rounded-xl shadow-md p-6">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-semibold">Avis clients</h2>
+                            <h2 className="text-xl font-semibold mb-4">Avis clients</h2>
+                            <div className="space-y-4">
+                                {formData.reviews?.map((review, index) => (
+                                    <div key={review.id} className="border rounded-lg p-4">
+                                        {editingReviewIndex === index ? (
+                                            <div className="space-y-4">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <h3 className="font-medium">Avis {index + 1}</h3>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setDeleteConfirm({
+                                                            type: 'review',
+                                                            index,
+                                                            isOpen: true
+                                                        })}
+                                                        className="text-red-500 hover:text-red-600"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Nom du client
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={review.client_name}
+                                                            onChange={(e) => {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    reviews: prev.reviews?.map((r, i) =>
+                                                                        i === index ? { ...r, client_name: e.target.value } : r
+                                                                    )
+                                                                }));
+                                                            }}
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Rôle du client
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={review.client_role || ''}
+                                                            onChange={(e) => {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    reviews: prev.reviews?.map((r, i) =>
+                                                                        i === index ? { ...r, client_role: e.target.value } : r
+                                                                    )
+                                                                }));
+                                                            }}
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Entreprise du client
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={review.client_company || ''}
+                                                            onChange={(e) => {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    reviews: prev.reviews?.map((r, i) =>
+                                                                        i === index ? { ...r, client_company: e.target.value } : r
+                                                                    )
+                                                                }));
+                                                            }}
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Note (1-5)
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            min="1"
+                                                            max="5"
+                                                            value={review.rating}
+                                                            onChange={(e) => {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    reviews: prev.reviews?.map((r, i) =>
+                                                                        i === index ? { ...r, rating: Number(e.target.value) } : r
+                                                                    )
+                                                                }));
+                                                            }}
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                        />
+                                                    </div>
+                                                    <div className="md:col-span-2">
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Texte de l'avis
+                                                        </label>
+                                                        <textarea
+                                                            value={review.review_text}
+                                                            onChange={(e) => {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    reviews: prev.reviews?.map((r, i) =>
+                                                                        i === index ? { ...r, review_text: e.target.value } : r
+                                                                    )
+                                                                }));
+                                                            }}
+                                                            rows={3}
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div 
+                                                className="space-y-4 cursor-pointer hover:bg-gray-50 -m-4 p-4 rounded-lg transition-colors"
+                                                onClick={() => setEditingReviewIndex(index)}
+                                            >
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <h3 className="font-medium text-gray-900">{review.client_name}</h3>
+                                                        <p className="text-sm text-gray-500">
+                                                            {review.client_role} • {review.client_company}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            type="button"
+                                                            className="text-blue-600 hover:text-blue-700"
+                                                        >
+                                                            <Edit2 className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <Star
+                                                            key={i}
+                                                            className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                <p className="text-gray-600 text-sm">{review.review_text}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                                 <button
                                     type="button"
                                     onClick={() => {
+                                        const newReview = {
+                                            id: `temp-${Date.now()}`,
+                                            consultant_id: id || '',
+                                            client_name: '',
+                                            client_role: '',
+                                            client_company: '',
+                                            review_text: '',
+                                            rating: 5,
+                                            created_at: new Date().toISOString()
+                                        };
                                         setFormData(prev => ({
                                             ...prev,
-                                            reviews: [...(prev.reviews || []), {
-                                                id: `temp-${Date.now()}`,
-                                                consultant_id: id || '',
-                                                client_name: '',
-                                                client_role: '',
-                                                client_company: '',
-                                                review_text: '',
-                                                rating: 5,
-                                                created_at: new Date().toISOString()
-                                            }]
+                                            reviews: [...(prev.reviews || []), newReview]
                                         }));
+                                        setEditingReviewIndex((formData.reviews?.length || 0));
                                     }}
-                                    className="flex items-center gap-2 px-3 py-1 text-sm text-blue-600 hover:text-blue-700"
+                                    className="w-full flex items-center justify-center gap-2 p-4 text-blue-600 hover:text-blue-700 border-2 border-dashed border-gray-200 hover:border-blue-200 rounded-lg transition-colors"
                                 >
                                     <Plus className="h-4 w-4" />
                                     Ajouter un avis
                                 </button>
                             </div>
-                            <div className="space-y-4">
-                                {formData.reviews?.map((review, index) => (
-                                    <div key={review.id} className="border rounded-lg p-4">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h3 className="font-medium">Avis {index + 1}</h3>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setFormData(prev => ({
-                                                        ...prev,
-                                                        reviews: prev.reviews?.filter((_, i) => i !== index)
-                                                    }));
-                                                }}
-                                                className="text-red-500 hover:text-red-600"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Nom du client
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={review.client_name}
-                                                    onChange={(e) => {
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            reviews: prev.reviews?.map((r, i) =>
-                                                                i === index ? { ...r, client_name: e.target.value } : r
-                                                            )
-                                                        }));
-                                                    }}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Rôle du client
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={review.client_role || ''}
-                                                    onChange={(e) => {
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            reviews: prev.reviews?.map((r, i) =>
-                                                                i === index ? { ...r, client_role: e.target.value } : r
-                                                            )
-                                                        }));
-                                                    }}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Entreprise du client
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={review.client_company || ''}
-                                                    onChange={(e) => {
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            reviews: prev.reviews?.map((r, i) =>
-                                                                i === index ? { ...r, client_company: e.target.value } : r
-                                                            )
-                                                        }));
-                                                    }}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Note (1-5)
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    min="1"
-                                                    max="5"
-                                                    value={review.rating}
-                                                    onChange={(e) => {
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            reviews: prev.reviews?.map((r, i) =>
-                                                                i === index ? { ...r, rating: Number(e.target.value) } : r
-                                                            )
-                                                        }));
-                                                    }}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                                />
-                                            </div>
-                                            <div className="md:col-span-2">
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Texte de l'avis
-                                                </label>
-                                                <textarea
-                                                    value={review.review_text}
-                                                    onChange={(e) => {
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            reviews: prev.reviews?.map((r, i) =>
-                                                                i === index ? { ...r, review_text: e.target.value } : r
-                                                            )
-                                                        }));
-                                                    }}
-                                                    rows={3}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
 
                         {/* Missions Card */}
                         <div className="bg-white rounded-xl shadow-md p-6">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-semibold">Missions</h2>
+                            <h2 className="text-xl font-semibold mb-4">Missions</h2>
+                            <div className="space-y-4">
+                                {formData.missions?.map((mission, index) => (
+                                    <div key={index} className="border rounded-lg p-4">
+                                        {editingMissionIndex === index ? (
+                                            <div className="space-y-4">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <h3 className="font-medium">Mission {index + 1}</h3>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setDeleteConfirm({
+                                                            type: 'mission',
+                                                            index,
+                                                            isOpen: true
+                                                        })}
+                                                        className="text-red-500 hover:text-red-600"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Titre de la mission
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={mission.title}
+                                                            onChange={(e) => {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    missions: prev.missions?.map((m, i) =>
+                                                                        i === index ? { ...m, title: e.target.value } : m
+                                                                    )
+                                                                }));
+                                                            }}
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Entreprise
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={mission.company}
+                                                            onChange={(e) => {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    missions: prev.missions?.map((m, i) =>
+                                                                        i === index ? { ...m, company: e.target.value } : m
+                                                                    )
+                                                                }));
+                                                            }}
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Durée
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={mission.duration}
+                                                            onChange={(e) => {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    missions: prev.missions?.map((m, i) =>
+                                                                        i === index ? { ...m, duration: e.target.value } : m
+                                                                    )
+                                                                }));
+                                                            }}
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                            placeholder="Ex: 3 mois"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Date
+                                                        </label>
+                                                        <input
+                                                            type="date"
+                                                            value={mission.date.split('T')[0]}
+                                                            onChange={(e) => {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    missions: prev.missions?.map((m, i) =>
+                                                                        i === index ? { ...m, date: e.target.value } : m
+                                                                    )
+                                                                }));
+                                                            }}
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                        />
+                                                    </div>
+                                                    <div className="md:col-span-2">
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                            Description
+                                                        </label>
+                                                        <textarea
+                                                            value={mission.description}
+                                                            onChange={(e) => {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    missions: prev.missions?.map((m, i) =>
+                                                                        i === index ? { ...m, description: e.target.value } : m
+                                                                    )
+                                                                }));
+                                                            }}
+                                                            rows={3}
+                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div 
+                                                className="space-y-4 cursor-pointer hover:bg-gray-50 -m-4 p-4 rounded-lg transition-colors"
+                                                onClick={() => setEditingMissionIndex(index)}
+                                            >
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <h3 className="font-medium text-gray-900">{mission.title}</h3>
+                                                        <p className="text-sm text-gray-500">
+                                                            {mission.company} • {mission.duration}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            type="button"
+                                                            className="text-blue-600 hover:text-blue-700"
+                                                        >
+                                                            <Edit2 className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <p className="text-gray-600 text-sm">{mission.description}</p>
+                                                <p className="text-sm text-gray-500">
+                                                    {new Date(mission.date).toLocaleDateString('fr-FR', {
+                                                        year: 'numeric',
+                                                        month: 'long'
+                                                    })}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                                 <button
                                     type="button"
                                     onClick={() => {
+                                        const newMission = {
+                                            title: '',
+                                            company: '',
+                                            description: '',
+                                            duration: '',
+                                            date: new Date().toISOString().split('T')[0]
+                                        };
                                         setFormData(prev => ({
                                             ...prev,
-                                            missions: [...(prev.missions || []), {
-                                                title: '',
-                                                company: '',
-                                                description: '',
-                                                duration: '',
-                                                date: new Date().toISOString().split('T')[0]
-                                            }]
+                                            missions: [...(prev.missions || []), newMission]
                                         }));
+                                        setEditingMissionIndex((formData.missions?.length || 0));
                                     }}
-                                    className="flex items-center gap-2 px-3 py-1 text-sm text-blue-600 hover:text-blue-700"
+                                    className="w-full flex items-center justify-center gap-2 p-4 text-blue-600 hover:text-blue-700 border-2 border-dashed border-gray-200 hover:border-blue-200 rounded-lg transition-colors"
                                 >
                                     <Plus className="h-4 w-4" />
                                     Ajouter une mission
                                 </button>
-                            </div>
-                            <div className="space-y-4">
-                                {formData.missions?.map((mission, index) => (
-                                    <div key={index} className="border rounded-lg p-4">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h3 className="font-medium">Mission {index + 1}</h3>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setFormData(prev => ({
-                                                        ...prev,
-                                                        missions: prev.missions?.filter((_, i) => i !== index)
-                                                    }));
-                                                }}
-                                                className="text-red-500 hover:text-red-600"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Titre de la mission
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={mission.title}
-                                                    onChange={(e) => {
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            missions: prev.missions?.map((m, i) =>
-                                                                i === index ? { ...m, title: e.target.value } : m
-                                                            )
-                                                        }));
-                                                    }}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Entreprise
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={mission.company}
-                                                    onChange={(e) => {
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            missions: prev.missions?.map((m, i) =>
-                                                                i === index ? { ...m, company: e.target.value } : m
-                                                            )
-                                                        }));
-                                                    }}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Durée
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={mission.duration}
-                                                    onChange={(e) => {
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            missions: prev.missions?.map((m, i) =>
-                                                                i === index ? { ...m, duration: e.target.value } : m
-                                                            )
-                                                        }));
-                                                    }}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                                    placeholder="Ex: 3 mois"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Date
-                                                </label>
-                                                <input
-                                                    type="date"
-                                                    value={mission.date.split('T')[0]}
-                                                    onChange={(e) => {
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            missions: prev.missions?.map((m, i) =>
-                                                                i === index ? { ...m, date: e.target.value } : m
-                                                            )
-                                                        }));
-                                                    }}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                                />
-                                            </div>
-                                            <div className="md:col-span-2">
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                    Description
-                                                </label>
-                                                <textarea
-                                                    value={mission.description}
-                                                    onChange={(e) => {
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            missions: prev.missions?.map((m, i) =>
-                                                                i === index ? { ...m, description: e.target.value } : m
-                                                            )
-                                                        }));
-                                                    }}
-                                                    rows={3}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
                             </div>
                         </div>
 
@@ -682,6 +756,31 @@ export default function ConsultantProfileEditPage() {
                     </form>
                 </motion.div>
             </div>
+
+            <ConfirmDialog
+                isOpen={!!deleteConfirm}
+                title={`Supprimer ${deleteConfirm?.type === 'review' ? 'l\'avis' : 'la mission'}`}
+                message={`Êtes-vous sûr de vouloir supprimer ${deleteConfirm?.type === 'review' ? 'cet avis' : 'cette mission'} ? Cette action est irréversible.`}
+                confirmLabel="Supprimer"
+                cancelLabel="Annuler"
+                onConfirm={() => {
+                    if (deleteConfirm) {
+                        const { type, index } = deleteConfirm;
+                        setFormData(prev => ({
+                            ...prev,
+                            [type === 'review' ? 'reviews' : 'missions']: prev[type === 'review' ? 'reviews' : 'missions']?.filter((_, i) => i !== index)
+                        }));
+                        if (type === 'review') {
+                            setEditingReviewIndex(null);
+                        } else {
+                            setEditingMissionIndex(null);
+                        }
+                        setDeleteConfirm(null);
+                    }
+                }}
+                onCancel={() => setDeleteConfirm(null)}
+                variant="danger"
+            />
         </div>
     );
 } 
