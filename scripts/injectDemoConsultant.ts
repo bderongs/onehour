@@ -102,8 +102,7 @@ const missionsData = [
         company: 'TotalEnergies',
         description: 'Accompagnement de la transformation agile à l\'échelle pour une business unit de 400 personnes. Mise en place du framework SAFe, formation des équipes et du management, et création d\'un centre d\'excellence agile.',
         duration: '6 mois',
-        year: 2023,
-        is_highlighted: true
+        start_date: '2023-06-01T00:00:00Z'
     },
     {
         consultant_id: demoConsultantId,
@@ -111,8 +110,7 @@ const missionsData = [
         company: 'Decathlon',
         description: 'Refonte du processus d\'innovation produit et mise en place d\'une approche design thinking. Animation d\'ateliers d\'idéation et accompagnement des équipes dans le développement de nouveaux produits connectés.',
         duration: '8 mois',
-        year: 2022,
-        is_highlighted: true
+        start_date: '2022-09-01T00:00:00Z'
     },
     {
         consultant_id: demoConsultantId,
@@ -120,8 +118,7 @@ const missionsData = [
         company: 'La Poste',
         description: 'Définition et déploiement de la stratégie de transformation digitale. Création d\'une feuille de route sur 3 ans et accompagnement dans la mise en place des premiers projets structurants.',
         duration: '4 mois',
-        year: 2022,
-        is_highlighted: true
+        start_date: '2022-04-01T00:00:00Z'
     }
 ];
 

@@ -30,6 +30,10 @@ export interface ConsultantProfile {
     is_verified?: boolean;
     verification_date?: string;
     
+    // Reviews and missions
+    reviews?: ConsultantReview[];
+    missions?: ConsultantMission[];
+    
     // Timestamps
     created_at: string;
     updated_at: string;

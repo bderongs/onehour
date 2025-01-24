@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import type { ConsultantProfile } from '../types/consultant';
-import { getConsultantProfile, updateConsultantProfile } from '../services/consultants';
+import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '../types/consultant';
+import { getConsultantProfile, updateConsultantProfile, getConsultantReviews, getConsultantMissions, updateConsultantReviews, updateConsultantMissions } from '../services/consultants';
 import { Notification } from '../components/Notification';
 
 export default function ConsultantProfileEditPage() {
@@ -16,7 +16,9 @@ export default function ConsultantProfileEditPage() {
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [formData, setFormData] = useState<Partial<ConsultantProfile> & {
         languagesInput?: string,
-        keyCompetenciesInput?: string
+        keyCompetenciesInput?: string,
+        reviews?: ConsultantReview[],
+        missions?: ConsultantMission[]
     }>({});
 
     // Fetch consultant data when component mounts
@@ -29,7 +31,12 @@ export default function ConsultantProfileEditPage() {
             }
 
             try {
-                const consultantData = await getConsultantProfile(id);
+                const [consultantData, reviews, missions] = await Promise.all([
+                    getConsultantProfile(id),
+                    getConsultantReviews(id),
+                    getConsultantMissions(id)
+                ]);
+
                 if (!consultantData) {
                     setError('Consultant not found');
                     setLoading(false);
@@ -40,7 +47,9 @@ export default function ConsultantProfileEditPage() {
                 setFormData({
                     ...consultantData,
                     languagesInput: consultantData.languages?.join(', ') || '',
-                    keyCompetenciesInput: consultantData.key_competencies?.join(', ') || ''
+                    keyCompetenciesInput: consultantData.key_competencies?.join(', ') || '',
+                    reviews: reviews,
+                    missions: missions
                 });
                 setLoading(false);
             } catch (err) {
@@ -73,14 +82,22 @@ export default function ConsultantProfileEditPage() {
             key_competencies: formData.keyCompetenciesInput?.split(',').map(item => item.trim()).filter(Boolean) || []
         };
 
-        // Remove temporary input fields
+        // Remove temporary input fields and arrays that are stored in separate tables
         delete submissionData.languagesInput;
         delete submissionData.keyCompetenciesInput;
+        delete submissionData.reviews;
+        delete submissionData.missions;
 
         setSaving(true);
         try {
-            const updatedProfile = await updateConsultantProfile(id, submissionData);
-            if (updatedProfile) {
+            // Update profile, reviews, and missions in parallel
+            const [updatedProfile, reviewsUpdated, missionsUpdated] = await Promise.all([
+                updateConsultantProfile(id, submissionData),
+                updateConsultantReviews(id, formData.reviews || []),
+                updateConsultantMissions(id, formData.missions || [])
+            ]);
+
+            if (updatedProfile && reviewsUpdated && missionsUpdated) {
                 setNotification({ type: 'success', message: 'Profil mis à jour avec succès' });
                 // Wait a bit to show the success message before redirecting
                 setTimeout(() => {
@@ -351,6 +368,290 @@ export default function ConsultantProfileEditPage() {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
                                     />
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Reviews Card */}
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-semibold">Avis clients</h2>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            reviews: [...(prev.reviews || []), {
+                                                id: `temp-${Date.now()}`,
+                                                consultant_id: id || '',
+                                                client_name: '',
+                                                client_role: '',
+                                                client_company: '',
+                                                review_text: '',
+                                                rating: 5,
+                                                created_at: new Date().toISOString()
+                                            }]
+                                        }));
+                                    }}
+                                    className="flex items-center gap-2 px-3 py-1 text-sm text-blue-600 hover:text-blue-700"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    Ajouter un avis
+                                </button>
+                            </div>
+                            <div className="space-y-4">
+                                {formData.reviews?.map((review, index) => (
+                                    <div key={review.id} className="border rounded-lg p-4">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h3 className="font-medium">Avis {index + 1}</h3>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        reviews: prev.reviews?.filter((_, i) => i !== index)
+                                                    }));
+                                                }}
+                                                className="text-red-500 hover:text-red-600"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Nom du client
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={review.client_name}
+                                                    onChange={(e) => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            reviews: prev.reviews?.map((r, i) =>
+                                                                i === index ? { ...r, client_name: e.target.value } : r
+                                                            )
+                                                        }));
+                                                    }}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Rôle du client
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={review.client_role || ''}
+                                                    onChange={(e) => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            reviews: prev.reviews?.map((r, i) =>
+                                                                i === index ? { ...r, client_role: e.target.value } : r
+                                                            )
+                                                        }));
+                                                    }}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Entreprise du client
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={review.client_company || ''}
+                                                    onChange={(e) => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            reviews: prev.reviews?.map((r, i) =>
+                                                                i === index ? { ...r, client_company: e.target.value } : r
+                                                            )
+                                                        }));
+                                                    }}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Note (1-5)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="5"
+                                                    value={review.rating}
+                                                    onChange={(e) => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            reviews: prev.reviews?.map((r, i) =>
+                                                                i === index ? { ...r, rating: Number(e.target.value) } : r
+                                                            )
+                                                        }));
+                                                    }}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Texte de l'avis
+                                                </label>
+                                                <textarea
+                                                    value={review.review_text}
+                                                    onChange={(e) => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            reviews: prev.reviews?.map((r, i) =>
+                                                                i === index ? { ...r, review_text: e.target.value } : r
+                                                            )
+                                                        }));
+                                                    }}
+                                                    rows={3}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Missions Card */}
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-semibold">Missions</h2>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            missions: [...(prev.missions || []), {
+                                                title: '',
+                                                company: '',
+                                                description: '',
+                                                duration: '',
+                                                date: new Date().toISOString().split('T')[0]
+                                            }]
+                                        }));
+                                    }}
+                                    className="flex items-center gap-2 px-3 py-1 text-sm text-blue-600 hover:text-blue-700"
+                                >
+                                    <Plus className="h-4 w-4" />
+                                    Ajouter une mission
+                                </button>
+                            </div>
+                            <div className="space-y-4">
+                                {formData.missions?.map((mission, index) => (
+                                    <div key={index} className="border rounded-lg p-4">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h3 className="font-medium">Mission {index + 1}</h3>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        missions: prev.missions?.filter((_, i) => i !== index)
+                                                    }));
+                                                }}
+                                                className="text-red-500 hover:text-red-600"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Titre de la mission
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={mission.title}
+                                                    onChange={(e) => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            missions: prev.missions?.map((m, i) =>
+                                                                i === index ? { ...m, title: e.target.value } : m
+                                                            )
+                                                        }));
+                                                    }}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Entreprise
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={mission.company}
+                                                    onChange={(e) => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            missions: prev.missions?.map((m, i) =>
+                                                                i === index ? { ...m, company: e.target.value } : m
+                                                            )
+                                                        }));
+                                                    }}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Durée
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={mission.duration}
+                                                    onChange={(e) => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            missions: prev.missions?.map((m, i) =>
+                                                                i === index ? { ...m, duration: e.target.value } : m
+                                                            )
+                                                        }));
+                                                    }}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                    placeholder="Ex: 3 mois"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Date
+                                                </label>
+                                                <input
+                                                    type="date"
+                                                    value={mission.date.split('T')[0]}
+                                                    onChange={(e) => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            missions: prev.missions?.map((m, i) =>
+                                                                i === index ? { ...m, date: e.target.value } : m
+                                                            )
+                                                        }));
+                                                    }}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Description
+                                                </label>
+                                                <textarea
+                                                    value={mission.description}
+                                                    onChange={(e) => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            missions: prev.missions?.map((m, i) =>
+                                                                i === index ? { ...m, description: e.target.value } : m
+                                                            )
+                                                        }));
+                                                    }}
+                                                    rows={3}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 

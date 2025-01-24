@@ -7,10 +7,11 @@ import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
 import { CHAT_CONFIGS } from '../data/chatConfigs';
 import type { DocumentSummary } from '../types/chat';
 import type { Spark } from '../types/spark';
-import type { ConsultantProfile, ConsultantReview } from '../types/consultant';
-import { getConsultantProfile, getConsultantReviews, getConsultantSparks } from '../services/consultants';
+import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '../types/consultant';
+import { getConsultantProfile, getConsultantReviews, getConsultantSparks, getConsultantMissions } from '../services/consultants';
 import { formatDuration, formatPrice } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
+import { getCurrentUser } from '../services/auth';
 
 export default function ConsultantProfilePage() {
     const { id } = useParams<{ id: string }>();
@@ -24,6 +25,7 @@ export default function ConsultantProfilePage() {
     const [reviews, setReviews] = useState<ConsultantReview[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
     const [documentSummary, setDocumentSummary] = useState<DocumentSummary>({
         challenge: '',
         currentSituation: '',
@@ -33,6 +35,16 @@ export default function ConsultantProfilePage() {
         previousAttempts: '',
         hasEnoughData: false
     });
+    const [missions, setMissions] = useState<ConsultantMission[]>([]);
+
+    // Fetch current user when component mounts
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            const user = await getCurrentUser();
+            setCurrentUser(user);
+        };
+        fetchCurrentUser();
+    }, []);
 
     // Fetch consultant data when component mounts
     useEffect(() => {
@@ -47,10 +59,11 @@ export default function ConsultantProfilePage() {
 
             try {
                 console.log('ConsultantProfilePage - Starting data fetch');
-                const [consultantData, reviewsData, sparksData] = await Promise.all([
+                const [consultantData, reviewsData, sparksData, missionsData] = await Promise.all([
                     getConsultantProfile(id),
                     getConsultantReviews(id),
-                    getConsultantSparks(id)
+                    getConsultantSparks(id),
+                    getConsultantMissions(id)
                 ]);
 
                 if (!consultantData) {
@@ -63,12 +76,14 @@ export default function ConsultantProfilePage() {
                 console.log('ConsultantProfilePage - Data fetched successfully:', { 
                     consultant: consultantData,
                     reviews: reviewsData.length,
-                    sparks: sparksData.length
+                    sparks: sparksData.length,
+                    missions: missionsData.length
                 });
 
                 setConsultant(consultantData);
                 setReviews(reviewsData);
                 setSparks(sparksData);
+                setMissions(missionsData);
                 setLoading(false);
             } catch (err) {
                 console.error('ConsultantProfilePage - Error fetching data:', err);
@@ -87,6 +102,7 @@ export default function ConsultantProfilePage() {
             setConsultant(null);
             setReviews([]);
             setSparks([]);
+            setMissions([]);
         };
     }, [id]);
 
@@ -262,6 +278,20 @@ export default function ConsultantProfilePage() {
                 />
             </div>
 
+            {/* Sticky Edit Button */}
+            {currentUser?.id === consultant.id && (
+                <div className="fixed right-4 top-4 z-50">
+                    <button
+                        onClick={() => navigate(`/consultants/${id}/edit`)}
+                        className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-lg hover:shadow-xl border border-gray-200 text-gray-700 hover:text-blue-600 transition-all duration-200"
+                        title="Modifier mon profil"
+                    >
+                        <PenSquare className="h-5 w-5" />
+                        <span className="font-medium">Modifier</span>
+                    </button>
+                </div>
+            )}
+
             {/* Content */}
             <main className="flex-grow relative">
                 {/* Cover Section - Full Width */}
@@ -310,12 +340,6 @@ export default function ConsultantProfilePage() {
                                                 {consultant.first_name} {consultant.last_name}
                                             </h2>
                                             <div className="flex gap-3 justify-center md:justify-start">
-                                                <button
-                                                    onClick={() => navigate(`/consultants/${id}/edit`)}
-                                                    className="text-gray-400 hover:text-blue-600 transition-colors"
-                                                >
-                                                    <PenSquare className="h-5 w-5" />
-                                                </button>
                                                 {consultant.linkedin && (
                                                     <a href={consultant.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600 transition-colors">
                                                         <Linkedin className="h-5 w-5" />
@@ -548,6 +572,22 @@ export default function ConsultantProfilePage() {
                                     </li>
                                 ))}
                             </ul>
+                        </div>
+                    )}
+
+                    {/* Past Experiences Section */}
+                    {missions.length > 0 && (
+                        <div className="bg-white p-6 rounded-lg shadow-md mb-16 animate-fade-in-up">
+                            <h3 className="text-xl font-semibold mb-4">Mes dernières missions</h3>
+                            <div className="space-y-6">
+                                {missions.map((mission, index) => (
+                                    <div key={index} className="border-l-4 border-blue-600 pl-4">
+                                        <h4 className="font-semibold text-lg text-gray-900">{mission.title}</h4>
+                                        <p className="text-gray-600 mt-1">{mission.description}</p>
+                                        <div className="text-sm text-gray-500 mt-2">{mission.date} - {mission.duration}</div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>

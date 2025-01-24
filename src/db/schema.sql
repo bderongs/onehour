@@ -291,7 +291,7 @@ create table if not exists consultant_reviews (
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- Create a table for consultant past missions if it doesn't exist
+-- Create a table for consultant missions if it doesn't exist
 create table if not exists consultant_missions (
     id uuid default uuid_generate_v4() primary key,
     consultant_id uuid references profiles(id) not null,
@@ -299,15 +299,44 @@ create table if not exists consultant_missions (
     company text not null,
     description text not null,
     duration text not null,
-    year integer not null,
-    is_highlighted boolean default false,
+    start_date timestamp with time zone not null,
     created_at timestamp with time zone default timezone('utc'::text, now()) not null,
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Add start_date column if it doesn't exist
+do $$
+begin
+    if not exists (
+        select 1 from information_schema.columns 
+        where table_name = 'consultant_missions' 
+        and column_name = 'start_date'
+    ) then
+        alter table consultant_missions add column start_date timestamp with time zone not null default now();
+    end if;
+end $$;
+
 -- Enable RLS on new tables
-alter table consultant_reviews enable row level security;
-alter table consultant_missions enable row level security;
+do $$
+begin
+    -- Enable RLS for consultant_reviews if not already enabled
+    if not exists (
+        select 1 from pg_tables 
+        where tablename = 'consultant_reviews' 
+        and rowsecurity = true
+    ) then
+        alter table consultant_reviews enable row level security;
+    end if;
+
+    -- Enable RLS for consultant_missions if not already enabled
+    if not exists (
+        select 1 from pg_tables 
+        where tablename = 'consultant_missions' 
+        and rowsecurity = true
+    ) then
+        alter table consultant_missions enable row level security;
+    end if;
+end $$;
 
 -- Create policies for consultant_reviews
 do $$ 
@@ -336,30 +365,77 @@ end $$;
 -- Create policies for consultant_missions
 do $$
 begin
+    -- Viewing policy
     if not exists (
         select 1 from pg_policies 
         where tablename = 'consultant_missions' 
-        and policyname = 'Public missions are viewable by everyone'
+        and policyname = 'Consultant missions are viewable by everyone'
     ) then
-        create policy "Public missions are viewable by everyone"
+        create policy "Consultant missions are viewable by everyone"
             on consultant_missions for select
             using ( true );
     end if;
 
+    -- Insert/Update/Delete policy
     if not exists (
         select 1 from pg_policies 
         where tablename = 'consultant_missions' 
-        and policyname = 'Consultants can manage their own missions'
+        and policyname = 'Consultants can manage their own missions and admins can manage any mission'
     ) then
-        create policy "Consultants can manage their own missions"
+        create policy "Consultants can manage their own missions and admins can manage any mission"
             on consultant_missions for all
-            using ( auth.uid() = consultant_id );
+            using (
+                (exists (
+                    select 1 from profiles
+                    where id = auth.uid()
+                    and role = 'consultant'
+                )
+                and consultant_id = auth.uid())
+                or
+                (exists (
+                    select 1 from profiles
+                    where id = auth.uid()
+                    and role = 'admin'
+                ))
+            );
     end if;
 end $$;
 
--- Create indexes for new tables
-create index if not exists consultant_reviews_consultant_id_idx on consultant_reviews (consultant_id);
-create index if not exists consultant_missions_consultant_id_idx on consultant_missions (consultant_id);
+-- Create indexes for consultant_reviews if they don't exist
+do $$
+begin
+    if not exists (
+        select 1 from pg_indexes 
+        where tablename = 'consultant_reviews' 
+        and indexname = 'consultant_reviews_consultant_id_idx'
+    ) then
+        create index consultant_reviews_consultant_id_idx on consultant_reviews (consultant_id);
+    end if;
+end $$;
+
+-- Create indexes for consultant_missions if they don't exist
+do $$
+begin
+    if not exists (
+        select 1 from pg_indexes 
+        where tablename = 'consultant_missions' 
+        and indexname = 'consultant_missions_consultant_id_idx'
+    ) then
+        create index consultant_missions_consultant_id_idx on consultant_missions (consultant_id);
+    end if;
+
+    if not exists (
+        select 1 from pg_indexes 
+        where tablename = 'consultant_missions' 
+        and indexname = 'consultant_missions_start_date_idx'
+    ) and exists (
+        select 1 from information_schema.columns 
+        where table_name = 'consultant_missions' 
+        and column_name = 'start_date'
+    ) then
+        create index consultant_missions_start_date_idx on consultant_missions (start_date);
+    end if;
+end $$;
 
 -- Set up triggers for updated_at (moved to end after all tables exist)
 do $$
