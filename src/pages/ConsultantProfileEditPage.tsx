@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { ConsultantProfile } from '../types/consultant';
 import { getConsultantProfile, updateConsultantProfile } from '../services/consultants';
@@ -61,14 +61,6 @@ export default function ConsultantProfileEditPage() {
         }));
     };
 
-    const handleArrayInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        // Store the raw input value in the form data
-        setFormData(prev => ({
-            ...prev,
-            [name]: value.split(',').map(item => item.trim()).filter(Boolean)
-        }));
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "migrate-sparks": "NODE_ENV=development tsx scripts/migrate-sparks.ts"
+    "migrate-sparks": "NODE_ENV=development tsx scripts/migrate-sparks.ts",
+    "inject-demo-consultant": "NODE_ENV=development tsx scripts/injectDemoConsultant.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
