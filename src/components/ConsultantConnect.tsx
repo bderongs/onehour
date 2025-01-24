@@ -35,17 +35,6 @@ export function ConsultantConnect({
         preferredContact: 'email'
     });
 
-    console.log('ConsultantConnect - Received documentSummary:', documentSummary);
-    console.log('ConsultantConnect - Summary values:', {
-        challenge: documentSummary.challenge || 'missing',
-        currentSituation: documentSummary.currentSituation || 'missing',
-        desiredOutcome: documentSummary.desiredOutcome || 'missing',
-        constraints: documentSummary.constraints || 'missing',
-        stakeholders: documentSummary.stakeholders || 'missing',
-        previousAttempts: documentSummary.previousAttempts || 'missing',
-        hasEnoughData: documentSummary.hasEnoughData
-    });
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 

@@ -2,7 +2,36 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      keyframes: {
+        'fade-in-up': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(30px)'
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          }
+        },
+        'slide-down': {
+          '0%': {
+            opacity: '0',
+            maxHeight: '0',
+            transform: 'translateY(-20px)'
+          },
+          '100%': {
+            opacity: '1',
+            maxHeight: '2000px',
+            transform: 'translateY(0)'
+          }
+        }
+      },
+      animation: {
+        'fade-in-up': 'fade-in-up 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+        'slide-down': 'slide-down 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+      }
+    },
   },
   safelist: [
     'text-indigo-50',
@@ -17,7 +46,9 @@ export default {
     'text-indigo-900',
     'text-indigo-950',
     'text-white',
-    'text-black'
+    'text-black',
+    'animate-fade-in-up',
+    'animate-slide-down'
   ],
   plugins: [],
 };

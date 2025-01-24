@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { LandingClients } from './pages/LandingClients';
 import LandingConsultants from './pages/LandingConsultants';
 import ConsultantProfilePage from './pages/ConsultantProfilePage';
+import DemoConsultantProfilePage from './pages/DemoConsultantProfilePage';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Terms } from './pages/Terms';
@@ -98,6 +99,14 @@ function App() {
             </>
           } />
           <Route path="/profile" element={
+            <>
+              <main className="flex-grow">
+                <DemoConsultantProfilePage />
+              </main>
+              <Footer />
+            </>
+          } />
+          <Route path="/consultants/:id" element={
             <>
               <main className="flex-grow">
                 <ConsultantProfilePage />
