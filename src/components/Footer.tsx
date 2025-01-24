@@ -17,7 +17,7 @@ export function Footer() {
   const navigate = useNavigate();
   const isConsultantsPage = location.pathname === '/consultants';
   const isPricingPage = location.pathname === '/pricing';
-  const isProfilePage = location.pathname === '/profile';
+  const isProfilePage = location.pathname === '/profile' || /^\/consultants\/[^/]+$/.test(location.pathname);
   const isConsultantSection = isConsultantsPage || isPricingPage;
 
   return (

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 import { SparkForm } from '../components/SparkForm';
 import { getSparkByUrl, updateSpark } from '../services/sparks';
 import type { Spark } from '../types/spark';
@@ -57,7 +58,7 @@ export function SparkEditPage() {
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading spark...</p>
+                    <p className="mt-4 text-gray-600">Chargement du spark...</p>
                 </div>
             </div>
         );
@@ -67,12 +68,12 @@ export function SparkEditPage() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
                 <div className="text-center">
-                    <p className="text-red-600">{error || 'Spark not found'}</p>
+                    <p className="text-red-600">{error || 'Spark introuvable'}</p>
                     <button
                         onClick={() => navigate('/sparks/manage')}
                         className="mt-4 text-blue-600 hover:text-blue-700"
                     >
-                        Return to sparks
+                        Retour aux sparks
                     </button>
                 </div>
             </div>
@@ -81,13 +82,21 @@ export function SparkEditPage() {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            <div className="max-w-4xl mx-auto px-4 py-8">
+            <div className="max-w-4xl mx-auto px-4 py-6 lg:py-12">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <h1 className="text-3xl font-bold text-gray-900 mb-8">Modifier le Spark</h1>
+                    <div className="flex items-center gap-4 mb-8">
+                        <button
+                            onClick={() => navigate('/sparks/manage')}
+                            className="text-gray-500 hover:text-gray-700 transition-colors"
+                        >
+                            <ArrowLeft className="h-6 w-6" />
+                        </button>
+                        <h1 className="text-3xl font-bold text-gray-900">Modifier le Spark</h1>
+                    </div>
                     <SparkForm
                         initialData={spark}
                         onSubmit={handleSubmit}

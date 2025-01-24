@@ -57,3 +57,23 @@ export async function getConsultantSparks(consultantId: string): Promise<Spark[]
 
     return data as Spark[];
 }
+
+export async function updateConsultantProfile(id: string, profile: Partial<ConsultantProfile>): Promise<ConsultantProfile | null> {
+    const { data, error } = await supabase
+        .from('profiles')
+        .update({
+            ...profile,
+            updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .eq('role', 'consultant')
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error updating consultant profile:', error);
+        return null;
+    }
+
+    return data as ConsultantProfile;
+}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CheckCircle, Star, Linkedin, Twitter, Globe, X, BadgeCheck, Sparkles } from 'lucide-react';
+import { CheckCircle, Star, Linkedin, Twitter, Globe, X, BadgeCheck, Sparkles, PenSquare } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
@@ -310,6 +310,12 @@ export default function ConsultantProfilePage() {
                                                 {consultant.first_name} {consultant.last_name}
                                             </h2>
                                             <div className="flex gap-3 justify-center md:justify-start">
+                                                <button
+                                                    onClick={() => navigate(`/consultants/${id}/edit`)}
+                                                    className="text-gray-400 hover:text-blue-600 transition-colors"
+                                                >
+                                                    <PenSquare className="h-5 w-5" />
+                                                </button>
                                                 {consultant.linkedin && (
                                                     <a href={consultant.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600 transition-colors">
                                                         <Linkedin className="h-5 w-5" />

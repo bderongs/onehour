@@ -145,7 +145,7 @@ export function SparkAIEditPage() {
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading spark...</p>
+                    <p className="mt-4 text-gray-600">Chargement du spark...</p>
                 </div>
             </div>
         );
@@ -155,12 +155,12 @@ export function SparkAIEditPage() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
                 <div className="text-center">
-                    <p className="text-red-600">{error || 'Spark not found'}</p>
+                    <p className="text-red-600">{error || 'Spark introuvable'}</p>
                     <button
                         onClick={() => navigate('/sparks/manage')}
                         className="mt-4 text-blue-600 hover:text-blue-700"
                     >
-                        Return to sparks
+                        Retour aux sparks
                     </button>
                 </div>
             </div>
@@ -213,7 +213,7 @@ export function SparkAIEditPage() {
                     <div className="lg:w-1/2">
                         {/* Hero Section */}
                         <motion.div
-                            className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 lg:mb-8"
+                            className="bg-white rounded-2xl shadow-md p-4 sm:p-6 lg:p-8 mb-6 lg:mb-8"
                             variants={fadeInUp}
                             initial="initial"
                             animate="animate"
@@ -353,12 +353,10 @@ export function SparkAIEditPage() {
                                 <button
                                     onClick={handleSave}
                                     disabled={isSaving}
-                                    className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg font-semibold 
-                                            hover:bg-blue-700 transition-colors flex items-center justify-center gap-2
-                                            disabled:bg-blue-400 disabled:cursor-not-allowed"
+                                    className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 flex items-center justify-center gap-2"
                                 >
                                     {isSaving ? 'Enregistrement...' : 'Enregistrer les modifications'}
-                                    <ArrowRight className="h-5 w-5" />
+                                    <ArrowRight className="h-4 w-4" />
                                 </button>
                             </motion.div>
                         </div>
