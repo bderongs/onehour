@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { UserProfile, getCurrentUser } from '../services/auth';
 import { supabase } from '../lib/supabase';
-import { User, LogOut, Settings, UserCircle, Sparkles } from 'lucide-react';
+import { User, LogOut, Settings, UserCircle, Sparkles, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function ProfileMenu() {
@@ -58,14 +58,25 @@ export function ProfileMenu() {
                         <p className="text-sm text-gray-500 truncate">{user.email}</p>
                     </div>
                     <div className="py-1">
-                        <button
-                            onClick={() => {
-                                setIsOpen(false);
-                                navigate(`/consultants/${user.id}`);
-                            }}
+                        <a
+                            href={`/consultants/${user.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setIsOpen(false)}
                             className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                         >
                             <UserCircle className="w-4 h-4 mr-2" />
+                            <span className="flex-1">Page Sparkier</span>
+                            <ExternalLink className="w-3 h-3 text-gray-400" />
+                        </a>
+                        <button
+                            onClick={() => {
+                                setIsOpen(false);
+                                navigate(`/consultants/${user.id}/edit`);
+                            }}
+                            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                            <Settings className="w-4 h-4 mr-2" />
                             Mon profil
                         </button>
                         <button
@@ -77,16 +88,6 @@ export function ProfileMenu() {
                         >
                             <Sparkles className="w-4 h-4 mr-2" />
                             Mes Sparks
-                        </button>
-                        <button
-                            onClick={() => {
-                                setIsOpen(false);
-                                navigate('/profile');
-                            }}
-                            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                            <Settings className="w-4 h-4 mr-2" />
-                            Paramètres
                         </button>
                         <button
                             onClick={handleLogout}
