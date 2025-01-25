@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { UserProfile, getCurrentUser } from '../services/auth';
 import { supabase } from '../lib/supabase';
-import { User, LogOut, Settings } from 'lucide-react';
+import { User, LogOut, Settings, UserCircle, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function ProfileMenu() {
@@ -52,25 +52,45 @@ export function ProfileMenu() {
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50 md:right-0 md:left-auto left-auto -right-2 sm:w-56 max-w-[calc(100vw-1rem)] border border-gray-100">
                     <div className="px-4 py-2 border-b">
-                        <p className="text-sm font-medium text-gray-900">{user.firstName} {user.lastName}</p>
-                        <p className="text-sm text-gray-500">{user.email}</p>
+                        <p className="text-sm font-medium text-gray-900 truncate">{user.firstName} {user.lastName}</p>
+                        <p className="text-sm text-gray-500 truncate">{user.email}</p>
                     </div>
                     <div className="py-1">
                         <button
                             onClick={() => {
                                 setIsOpen(false);
+                                navigate(`/consultants/${user.id}`);
+                            }}
+                            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                            <UserCircle className="w-4 h-4 mr-2" />
+                            Mon profil
+                        </button>
+                        <button
+                            onClick={() => {
+                                setIsOpen(false);
+                                navigate('/sparks/manage');
+                            }}
+                            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Mes Sparks
+                        </button>
+                        <button
+                            onClick={() => {
+                                setIsOpen(false);
                                 navigate('/profile');
                             }}
-                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                         >
                             <Settings className="w-4 h-4 mr-2" />
                             Paramètres
                         </button>
                         <button
                             onClick={handleLogout}
-                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                         >
                             <LogOut className="w-4 h-4 mr-2" />
                             Déconnexion
