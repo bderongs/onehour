@@ -99,12 +99,20 @@ export function Header() {
                   {isAuthenticated ? (
                     <ProfileMenu />
                   ) : !isAuthPage && (
-                    <Link
-                      to="/signin"
-                      className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      Se connecter
-                    </Link>
+                    <>
+                      <Link
+                        to="/signin"
+                        className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      >
+                        Se connecter
+                      </Link>
+                      <Link
+                        to="/signup"
+                        className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ml-4"
+                      >
+                        Créer un compte
+                      </Link>
+                    </>
                   )}
                 </div>
               </div>
@@ -113,12 +121,20 @@ export function Header() {
               <div className="flex items-center md:hidden">
                 {isAuthenticated && <ProfileMenu />}
                 {!isAuthenticated && !isAuthPage && (
-                  <Link
-                    to="/signin"
-                    className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2"
-                  >
-                    Se connecter
-                  </Link>
+                  <>
+                    <Link
+                      to="/signup"
+                      className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2"
+                    >
+                      Créer un compte
+                    </Link>
+                    <Link
+                      to="/signin"
+                      className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2"
+                    >
+                      Se connecter
+                    </Link>
+                  </>
                 )}
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}

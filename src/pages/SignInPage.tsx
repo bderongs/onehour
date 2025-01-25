@@ -314,6 +314,9 @@ export function SignInPage() {
                                         placeholder="Mot de passe"
                                     />
                                 </div>
+                                <p className="mt-1 text-sm text-gray-500">
+                                    Le mot de passe doit contenir au moins 8 caractères et inclure des lettres et des chiffres.
+                                </p>
                             </div>
                         </div>
 
