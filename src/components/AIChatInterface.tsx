@@ -177,13 +177,6 @@ export function AIChatInterface({
         }
     }, [messages]);
 
-    // Scroll to top when component changes
-    useEffect(() => {
-        if (componentRef.current) {
-            window.scrollTo({ top: componentRef.current.offsetTop, behavior: 'smooth' });
-        }
-    }, []);
-
     const updateMessages = (newMessages: Message[]) => {
         setMessages(newMessages);
         onMessagesUpdate?.(newMessages);

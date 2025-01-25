@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { BrandName } from './BrandName';
-import { ArrowLeft, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { ProfileMenu } from './ProfileMenu';
 import { supabase } from '../lib/supabase';
 
@@ -9,15 +9,10 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
-  const { sparkUrl } = useParams();
   const isConsultantPage = location.pathname === '/consultants';
   const isPricingPage = location.pathname === '/pricing';
   const isBrandPage = location.pathname === '/brand';
   const isLandingClientsPage = location.pathname === '/';
-  const isPrivacyPage = location.pathname === '/privacy';
-  const isTermsPage = location.pathname === '/terms';
-  const isSparkProductPage = location.pathname.startsWith('/sparks/') && sparkUrl && !location.pathname.includes('/edit') && !location.pathname.includes('/ai-edit');
   const isAuthPage = location.pathname === '/signin';
 
   useEffect(() => {
@@ -27,10 +22,6 @@ export function Header() {
 
     return () => subscription.unsubscribe();
   }, []);
-
-  const handleBackClick = () => {
-    navigate(-1);
-  };
 
   const navigation = [
     { name: 'Le Spark', href: '#spark' },
@@ -81,15 +72,6 @@ export function Header() {
                 )}
 
                 <div className="hidden md:flex items-center space-x-4">
-                  {(isPrivacyPage || isTermsPage || isSparkProductPage) && (
-                    <button
-                      onClick={handleBackClick}
-                      className="flex items-center text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-                    >
-                      <ArrowLeft className="w-4 h-4 mr-1" />
-                      Retour
-                    </button>
-                  )}
                   {isConsultantPage && (
                     <Link
                       to="/pricing"
@@ -167,17 +149,6 @@ export function Header() {
                   {item.name}
                 </button>
               ))}
-              {(isPrivacyPage || isTermsPage || isSparkProductPage) && (
-                <button
-                  onClick={handleBackClick}
-                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                >
-                  <div className="flex items-center">
-                    <ArrowLeft className="w-4 h-4 mr-1" />
-                    Retour
-                  </div>
-                </button>
-              )}
               {isConsultantPage && (
                 <Link
                   to="/pricing"

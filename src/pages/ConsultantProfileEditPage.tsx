@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, ArrowLeft, Plus, Trash2, Edit2, Star } from 'lucide-react';
+import { Loader2, Plus, Trash2, Edit2, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '../types/consultant';
 import { getConsultantProfile, updateConsultantProfile, getConsultantReviews, getConsultantMissions, updateConsultantReviews, updateConsultantMissions } from '../services/consultants';
@@ -161,7 +161,7 @@ export default function ConsultantProfileEditPage() {
                 />
             )}
 
-            <div className="max-w-4xl mx-auto px-4 py-6 lg:py-12">
+            <div className="max-w-7xl mx-auto px-4 py-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}

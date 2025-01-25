@@ -1,16 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ChevronDown, ChevronUp, ArrowLeft, AlertCircle } from 'lucide-react';
 import { getSparkByUrl } from '../services/sparks';
 import type { Spark } from '../types/spark';
 import { formatDuration, formatPrice } from '../utils/format';
+import { DashboardLayout } from '../layouts/DashboardLayout';
+import { supabase } from '../lib/supabase';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.5 }
 };
+
+// Context types for the page
+type PageContext = 'consultant_marketing' | 'client_purchase' | 'consultant_preview';
 
 export function SparkProductPage() {
     const { sparkUrl } = useParams();
@@ -19,39 +24,85 @@ export function SparkProductPage() {
     const [spark, setSpark] = useState<Spark | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [pageContext, setPageContext] = useState<PageContext | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [userRole, setUserRole] = useState<string | null>(null);
+
+    const DEMO_CONSULTANT_ID = import.meta.env.DEV 
+        ? import.meta.env.VITE_DEMO_CONSULTANT_ID_DEV 
+        : import.meta.env.VITE_DEMO_CONSULTANT_ID;
 
     useEffect(() => {
-        const fetchSpark = async () => {
+        const checkAuthAndFetchSpark = async () => {
             if (!sparkUrl) {
                 navigate('/');
                 return;
             }
 
             try {
+                // Check authentication and user role
+                const { data: { user } } = await supabase.auth.getUser();
+                setIsAuthenticated(!!user);
+
+                if (user) {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', user.id)
+                        .single();
+                    
+                    setUserRole(profile?.role || null);
+                }
+
+                // Fetch spark
                 const fetchedSpark = await getSparkByUrl(sparkUrl);
                 if (!fetchedSpark) {
                     navigate('/');
                     return;
                 }
                 setSpark(fetchedSpark);
+
+                // Determine page context
+                if (fetchedSpark.consultant === DEMO_CONSULTANT_ID) {
+                    setPageContext('consultant_marketing');
+                } else if (isAuthenticated && userRole === 'consultant') {
+                    setPageContext('consultant_preview');
+                } else {
+                    setPageContext('client_purchase');
+                }
+
                 setLoading(false);
             } catch (err) {
-                console.error('Error fetching spark:', err);
+                console.error('Error fetching data:', err);
                 setError('Failed to load spark details. Please try again later.');
                 setLoading(false);
             }
         };
 
-        fetchSpark();
-    }, [sparkUrl, navigate]);
+        checkAuthAndFetchSpark();
+    }, [sparkUrl, navigate, DEMO_CONSULTANT_ID]);
 
-    const handleBooking = () => {
-        // Navigate to LandingConsultants page with hash
-        navigate('/consultants#signup-form');
+    const handleAction = () => {
+        switch (pageContext) {
+            case 'consultant_marketing':
+                navigate('/consultants#signup-form');
+                break;
+            case 'client_purchase':
+                // TODO: Implement booking flow
+                console.log('Implement booking flow');
+                break;
+            case 'consultant_preview':
+                navigate('/sparks/manage');
+                break;
+        }
     };
 
     const handleBack = () => {
-        navigate(-1);
+        if (pageContext === 'consultant_preview') {
+            navigate('/sparks/manage');
+        } else {
+            navigate(-1);
+        }
     };
 
     if (loading) {
@@ -81,20 +132,38 @@ export function SparkProductPage() {
         );
     }
 
-    return (
+    const MainContent = () => (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            {/* Mobile Back Button */}
-            <div className="lg:hidden sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b border-gray-100">
-                <button
-                    onClick={handleBack}
-                    className="flex items-center gap-2 p-4 text-gray-600 hover:text-gray-900"
-                >
-                    <ArrowLeft className="h-5 w-5" />
-                    <span>Retour</span>
-                </button>
-            </div>
+            {/* Demo Warning Banner */}
+            {pageContext === 'consultant_marketing' && (
+                <div className="bg-amber-50 border-b border-amber-200">
+                    <div className="max-w-7xl mx-auto px-4 py-2.5 sm:py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                        <div className="flex items-center gap-2 text-amber-800">
+                            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                            <p className="text-xs sm:text-sm">Ceci est un exemple de Spark. Créez le vôtre en quelques minutes !</p>
+                        </div>
+                        <button 
+                            onClick={() => navigate('/consultants#signup-form')}
+                            className="text-xs sm:text-sm font-medium text-amber-800 hover:text-amber-900 flex items-center gap-1 whitespace-nowrap"
+                        >
+                            Créer mon Spark
+                            <ArrowRight className="h-4 w-4" />
+                        </button>
+                    </div>
+                </div>
+            )}
 
-            <div className="max-w-5xl mx-auto px-4 py-6 lg:py-12">
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                {/* Back Button - Consistent with edit pages */}
+                <div className="mb-8">
+                    <button
+                        onClick={handleBack}
+                        className="text-gray-500 hover:text-gray-700 transition-colors"
+                    >
+                        <ArrowLeft className="h-6 w-6" />
+                    </button>
+                </div>
+
                 {/* Hero Section */}
                 <motion.div
                     className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 lg:mb-8"
@@ -124,23 +193,55 @@ export function SparkProductPage() {
                         {/* Desktop Booking Button */}
                         <div className="hidden lg:flex justify-end">
                             <button
-                                onClick={handleBooking}
+                                onClick={handleAction}
                                 className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 
                                         transition-colors flex items-center gap-2 whitespace-nowrap"
                             >
-                                Créer mon premier Spark
-                                <ArrowRight className="h-5 w-5" />
+                                {pageContext === 'consultant_marketing' && (
+                                    <>
+                                        Créer mon premier Spark
+                                        <ArrowRight className="h-5 w-5" />
+                                    </>
+                                )}
+                                {pageContext === 'client_purchase' && (
+                                    <>
+                                        Réserver maintenant
+                                        <ArrowRight className="h-5 w-5" />
+                                    </>
+                                )}
+                                {pageContext === 'consultant_preview' && (
+                                    <>
+                                        Retour à mes Sparks
+                                        <ArrowRight className="h-5 w-5" />
+                                    </>
+                                )}
                             </button>
                         </div>
                         {/* Mobile Booking Button */}
                         <div className="lg:hidden w-full">
                             <button
-                                onClick={handleBooking}
+                                onClick={handleAction}
                                 className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold 
                                         hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                             >
-                                Créer mon premier Spark
-                                <ArrowRight className="h-5 w-5" />
+                                {pageContext === 'consultant_marketing' && (
+                                    <>
+                                        Créer mon premier Spark
+                                        <ArrowRight className="h-5 w-5" />
+                                    </>
+                                )}
+                                {pageContext === 'client_purchase' && (
+                                    <>
+                                        Réserver maintenant
+                                        <ArrowRight className="h-5 w-5" />
+                                    </>
+                                )}
+                                {pageContext === 'consultant_preview' && (
+                                    <>
+                                        Retour à mes Sparks
+                                        <ArrowRight className="h-5 w-5" />
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
@@ -341,23 +442,48 @@ export function SparkProductPage() {
                             </motion.section>
                         )}
 
-                        {/* Desktop Booking CTA - Sticky */}
+                        {/* Action Button */}
                         <motion.div
                             className="hidden lg:block sticky top-8"
                             variants={fadeInUp}
                         >
                             <button
-                                onClick={handleBooking}
+                                onClick={handleAction}
                                 className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg font-semibold 
                                         hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                             >
-                                Créer mon premier Spark
-                                <ArrowRight className="h-5 w-5" />
+                                {pageContext === 'consultant_marketing' && (
+                                    <>
+                                        Créer mon premier Spark
+                                        <ArrowRight className="h-5 w-5" />
+                                    </>
+                                )}
+                                {pageContext === 'client_purchase' && (
+                                    <>
+                                        Réserver maintenant
+                                        <ArrowRight className="h-5 w-5" />
+                                    </>
+                                )}
+                                {pageContext === 'consultant_preview' && (
+                                    <>
+                                        Retour à mes Sparks
+                                        <ArrowRight className="h-5 w-5" />
+                                    </>
+                                )}
                             </button>
                         </motion.div>
                     </div>
                 </div>
             </div>
         </div>
+    );
+
+    // Wrap in DashboardLayout for consultant preview
+    return pageContext === 'consultant_preview' ? (
+        <DashboardLayout>
+            <MainContent />
+        </DashboardLayout>
+    ) : (
+        <MainContent />
     );
 } 

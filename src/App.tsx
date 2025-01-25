@@ -66,7 +66,6 @@ function App() {
           <Route path="/brand" element={<MarketingLayout withTopPadding={false}><BrandPage /></MarketingLayout>} />
           <Route path="/signin" element={<MarketingLayout><SignInPage /></MarketingLayout>} />
           <Route path="/signup" element={<MarketingLayout><SignUpPage /></MarketingLayout>} />
-          <Route path="/demospark" element={<MarketingLayout><SparkProductPage /></MarketingLayout>} />
           <Route path="/sparks/:sparkUrl" element={<MarketingLayout><SparkProductPage /></MarketingLayout>} />
           
           {/* Consultant profile routes with no header */}
