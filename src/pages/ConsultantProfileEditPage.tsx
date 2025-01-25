@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, ArrowLeft, Plus, Trash2, X, Edit2, Star } from 'lucide-react';
+import { Loader2, ArrowLeft, Plus, Trash2, Edit2, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '../types/consultant';
 import { getConsultantProfile, updateConsultantProfile, getConsultantReviews, getConsultantMissions, updateConsultantReviews, updateConsultantMissions } from '../services/consultants';
