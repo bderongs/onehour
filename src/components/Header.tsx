@@ -139,24 +139,6 @@ export function Header() {
               {/* Mobile menu button */}
               <div className="flex items-center md:hidden">
                 {isAuthenticated && <ProfileMenu />}
-                {!isAuthenticated && !isAuthPage && (
-                  <>
-                    {showSignUpButton && (
-                      <button
-                        onClick={handleSignUpClick}
-                        className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2"
-                      >
-                        Créer un compte
-                      </button>
-                    )}
-                    <Link
-                      to="/signin"
-                      className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2"
-                    >
-                      Se connecter
-                    </Link>
-                  </>
-                )}
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 ml-2"
@@ -209,6 +191,24 @@ export function Header() {
                 >
                   Voir un exemple de profil
                 </Link>
+              )}
+              {!isAuthenticated && (
+                <div className="pt-2 space-y-1 border-t border-gray-200">
+                  <Link
+                    to="/signin"
+                    className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  >
+                    Se connecter
+                  </Link>
+                  {showSignUpButton && (
+                    <button
+                      onClick={handleSignUpClick}
+                      className="block w-full text-left px-3 py-2 text-base font-medium text-blue-600 hover:text-blue-900 hover:bg-gray-50"
+                    >
+                      Créer un compte
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </div>
