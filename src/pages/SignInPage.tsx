@@ -8,9 +8,8 @@ export function SignInPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [isPasswordResetMode, setIsPasswordResetMode] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-    const [errorType, setErrorType] = useState<string | null>(null);
+    const [_errorType, setErrorType] = useState<string | null>(null);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
@@ -87,71 +86,7 @@ export function SignInPage() {
     };
 
     const handleForgotPassword = async () => {
-        if (!isPasswordResetMode) {
-            setIsPasswordResetMode(true);
-            return;
-        }
-
-        if (!email) {
-            setNotification({
-                type: 'error',
-                message: 'Veuillez entrer votre adresse email pour réinitialiser votre mot de passe.'
-            });
-            return;
-        }
-
-        try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/auth/callback`,
-            });
-
-            if (error) throw error;
-
-            setNotification({
-                type: 'success',
-                message: 'Un email de réinitialisation de mot de passe vous a été envoyé.'
-            });
-            setIsPasswordResetMode(false);
-        } catch (error: any) {
-            setNotification({
-                type: 'error',
-                message: error.message || 'Une erreur est survenue lors de la réinitialisation du mot de passe.'
-            });
-        }
-    };
-
-    const handleResendConfirmation = async () => {
-        if (!email) {
-            setNotification({
-                type: 'error',
-                message: 'Veuillez entrer votre adresse email pour recevoir un nouveau lien de confirmation.'
-            });
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const { error } = await supabase.auth.signInWithOtp({
-                email,
-                options: {
-                    emailRedirectTo: `${window.location.origin}/auth/callback`
-                }
-            });
-
-            if (error) throw error;
-
-            setNotification({
-                type: 'success',
-                message: 'Un nouveau lien de confirmation vous a été envoyé par email.'
-            });
-        } catch (error: any) {
-            setNotification({
-                type: 'error',
-                message: error.message || 'Une erreur est survenue lors de l\'envoi du lien de confirmation.'
-            });
-        } finally {
-            setLoading(false);
-        }
+        navigate('/reset-password');
     };
 
     return (
@@ -229,11 +164,11 @@ export function SignInPage() {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-end">
                             <div className="text-sm">
                                 <button
                                     type="button"
-                                    onClick={() => setIsPasswordResetMode(true)}
+                                    onClick={handleForgotPassword}
                                     className="font-medium text-blue-600 hover:text-blue-500"
                                 >
                                     Mot de passe oublié ?

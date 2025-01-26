@@ -1,40 +1,64 @@
-import React from 'react';
-
-interface PasswordValidations {
-    isLongEnough: boolean;
-    hasLower: boolean;
-    hasUpper: boolean;
-    hasNumber: boolean;
-    passwordsMatch: boolean;
-}
+import { Check, X } from 'lucide-react';
 
 interface PasswordRequirementsProps {
-    validations: PasswordValidations;
+    password: string;
+    confirmPassword?: string;
 }
 
-export const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({ validations }) => {
+export function PasswordRequirements({ password, confirmPassword }: PasswordRequirementsProps) {
+    const requirements = [
+        {
+            label: 'Au moins 8 caractères',
+            isValid: password.length >= 8
+        },
+        {
+            label: 'Au moins une lettre',
+            isValid: /[a-zA-Z]/.test(password)
+        },
+        {
+            label: 'Au moins un chiffre',
+            isValid: /[0-9]/.test(password)
+        },
+        ...(confirmPassword ? [{
+            label: 'Les mots de passe correspondent',
+            isValid: password === confirmPassword && password !== ''
+        }] : [])
+    ];
+
     return (
-        <div className="p-4 bg-gray-50 rounded-md">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">
-                Exigences du mot de passe:
-            </h3>
-            <ul className="space-y-1 text-sm">
-                <li className={`flex items-center ${validations.isLongEnough ? 'text-green-600' : 'text-gray-500'}`}>
-                    {validations.isLongEnough ? '✓' : '○'} Au moins 8 caractères
-                </li>
-                <li className={`flex items-center ${validations.hasLower ? 'text-green-600' : 'text-gray-500'}`}>
-                    {validations.hasLower ? '✓' : '○'} Au moins une lettre minuscule
-                </li>
-                <li className={`flex items-center ${validations.hasUpper ? 'text-green-600' : 'text-gray-500'}`}>
-                    {validations.hasUpper ? '✓' : '○'} Au moins une lettre majuscule
-                </li>
-                <li className={`flex items-center ${validations.hasNumber ? 'text-green-600' : 'text-gray-500'}`}>
-                    {validations.hasNumber ? '✓' : '○'} Au moins un chiffre
-                </li>
-                <li className={`flex items-center ${validations.passwordsMatch ? 'text-green-600' : 'text-gray-500'}`}>
-                    {validations.passwordsMatch ? '✓' : '○'} Les mots de passe correspondent
-                </li>
+        <div className="space-y-1">
+            <p className="text-sm font-medium text-gray-700">
+                Exigences du mot de passe :
+            </p>
+            <ul className="space-y-1">
+                {requirements.map((req, index) => (
+                    <li
+                        key={index}
+                        className={`text-sm flex items-center space-x-2 ${
+                            req.isValid ? 'text-green-600' : 'text-gray-500'
+                        }`}
+                    >
+                        {req.isValid ? (
+                            <Check className="h-4 w-4" />
+                        ) : (
+                            <X className="h-4 w-4" />
+                        )}
+                        <span>{req.label}</span>
+                    </li>
+                ))}
             </ul>
         </div>
     );
+}
+
+// Export the validation function to be used by other components
+export const isPasswordValid = (password: string) => {
+    return password.length >= 8 &&
+           /[a-zA-Z]/.test(password) &&
+           /[0-9]/.test(password);
+};
+
+// Export password matching validation
+export const doPasswordsMatch = (password: string, confirmPassword: string) => {
+    return password === confirmPassword && password !== '';
 }; 

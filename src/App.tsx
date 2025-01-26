@@ -17,6 +17,8 @@ import { SparkAICreatePage } from './pages/SparkAICreatePage';
 import AuthCallback from './pages/AuthCallback';
 import { SignInPage } from './pages/SignInPage';
 import { SignUpPage } from './pages/SignUpPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { PasswordSetupPage } from './pages/PasswordSetupPage';
 import { useEffect } from 'react';
 import { initializeGoatCounter } from './utils/analytics';
 import { AdminDashboard } from './pages/AdminDashboard';
@@ -56,6 +58,8 @@ function App() {
         <Routes>
           {/* Auth routes */}
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/reset-password" element={<MarketingLayout><ResetPasswordPage /></MarketingLayout>} />
+          <Route path="/setup-password" element={<MarketingLayout><PasswordSetupPage /></MarketingLayout>} />
           
           {/* Marketing routes with standard header/footer */}
           <Route path="/" element={<MarketingLayout><LandingClients /></MarketingLayout>} />

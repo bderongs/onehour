@@ -13,3 +13,5 @@ The brand is Sparkier, the site domain name is sparkier.io
 The database schema should always be fully idempotent. Beware of the order of the SQL statements. Keep all table creations together at the top, followed by RLS, policies, and then indexes.
 
 When you remove a lucide-react icon, also remove the import statement from the file.
+
+Routes are managed in the app.tsx file.

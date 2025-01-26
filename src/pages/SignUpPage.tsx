@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Notification } from '../components/Notification';
-import { Mail } from 'lucide-react';
 import { signUpClientWithEmail, signUpConsultantWithEmail } from '../services/auth';
 
 type UserType = 'client' | 'consultant' | null;
@@ -57,6 +56,7 @@ export function SignUpPage() {
                 type: 'success',
                 message: 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.'
             });
+            navigate('/signin');
         } catch (error) {
             console.error('Error submitting form:', error);
             setNotification({
@@ -77,6 +77,7 @@ export function SignUpPage() {
                 type: 'success',
                 message: 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.'
             });
+            navigate('/signin');
         } catch (error) {
             console.error('Error submitting form:', error);
             setNotification({
