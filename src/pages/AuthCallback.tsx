@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Notification } from '../components/Notification';
+import { PasswordSetupForm } from '../components/PasswordSetupForm';
+
+// Password validation helper functions
+const hasLowerCase = (str: string) => /[a-z]/.test(str);
+const hasUpperCase = (str: string) => /[A-Z]/.test(str);
+const hasNumber = (str: string) => /[0-9]/.test(str);
+const isLongEnough = (str: string) => str.length >= 8;
 
 export default function AuthCallback() {
     const [error, setError] = useState<string | null>(null);
@@ -10,6 +17,29 @@ export default function AuthCallback() {
     const [loading, setLoading] = useState(true);
     const [showPasswordForm, setShowPasswordForm] = useState(false);
     const navigate = useNavigate();
+
+    // Password validation states
+    const [validations, setValidations] = useState({
+        hasLower: false,
+        hasUpper: false,
+        hasNumber: false,
+        isLongEnough: false,
+        passwordsMatch: false
+    });
+
+    // Update validations on password change
+    useEffect(() => {
+        setValidations({
+            hasLower: hasLowerCase(password),
+            hasUpper: hasUpperCase(password),
+            hasNumber: hasNumber(password),
+            isLongEnough: isLongEnough(password),
+            passwordsMatch: password === confirmPassword && password !== ''
+        });
+    }, [password, confirmPassword]);
+
+    // Check if all validations pass
+    const isPasswordValid = Object.values(validations).every(v => v);
 
     useEffect(() => {
         const handleEmailConfirmation = async () => {
@@ -25,14 +55,21 @@ export default function AuthCallback() {
                 // Verify the OTP
                 const { data, error: verifyError } = await supabase.auth.verifyOtp({
                     token_hash: tokenHash,
-                    type: type as any, // 'signup' | 'invite' | etc
+                    type: type as any,
                 });
 
                 if (verifyError) throw verifyError;
-                
-                if (data?.session) {
+
+                // For both signup and recovery, we want to show the password form
+                if (type === 'signup' || type === 'recovery') {
                     setShowPasswordForm(true);
                     setLoading(false);
+                    return;
+                }
+
+                // For other types, redirect to home if verification successful
+                if (data?.session) {
+                    navigate('/');
                     return;
                 }
 
@@ -54,13 +91,8 @@ export default function AuthCallback() {
     const handleSetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        if (password !== confirmPassword) {
-            setError('Les mots de passe ne correspondent pas');
-            return;
-        }
-
-        if (password.length < 8) {
-            setError('Le mot de passe doit contenir au moins 8 caractères');
+        if (!isPasswordValid) {
+            setError('Veuillez respecter toutes les exigences du mot de passe');
             return;
         }
 
@@ -129,54 +161,16 @@ export default function AuthCallback() {
                 )}
 
                 {showPasswordForm ? (
-                    <div>
-                        <h2 className="text-center text-3xl font-extrabold text-gray-900">
-                            Définissez votre mot de passe
-                        </h2>
-                        <p className="mt-2 text-center text-sm text-gray-600">
-                            Veuillez définir un mot de passe sécurisé pour votre compte
-                        </p>
-                        <form className="mt-8 space-y-6" onSubmit={handleSetPassword}>
-                            <div className="rounded-md shadow-sm -space-y-px">
-                                <div>
-                                    <label htmlFor="password" className="sr-only">Mot de passe</label>
-                                    <input
-                                        id="password"
-                                        name="password"
-                                        type="password"
-                                        required
-                                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                        placeholder="Mot de passe"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="confirm-password" className="sr-only">Confirmer le mot de passe</label>
-                                    <input
-                                        id="confirm-password"
-                                        name="confirm-password"
-                                        type="password"
-                                        required
-                                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                        placeholder="Confirmer le mot de passe"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                >
-                                    {loading ? 'Configuration en cours...' : 'Définir le mot de passe'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                    <PasswordSetupForm
+                        password={password}
+                        confirmPassword={confirmPassword}
+                        validations={validations}
+                        loading={loading}
+                        isPasswordValid={isPasswordValid}
+                        onPasswordChange={setPassword}
+                        onConfirmPasswordChange={setConfirmPassword}
+                        onSubmit={handleSetPassword}
+                    />
                 ) : (
                     <div className="text-center">
                         <h2 className="text-2xl font-bold text-red-600">Erreur d'authentification</h2>

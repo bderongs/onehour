@@ -44,6 +44,23 @@ export function Header() {
     setIsMenuOpen(false);
   };
 
+  const handleSignUpClick = () => {
+    const element = document.getElementById('signup-form');
+    if (element) {
+      const headerOffset = 120;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+    setIsMenuOpen(false);
+  };
+
+  const showSignUpButton = isLandingClientsPage || isConsultantPage;
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 shadow-sm bg-white">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -106,12 +123,14 @@ export function Header() {
                       >
                         Se connecter
                       </Link>
-                      <Link
-                        to="/signup"
-                        className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ml-4"
-                      >
-                        Créer un compte
-                      </Link>
+                      {showSignUpButton && (
+                        <button
+                          onClick={handleSignUpClick}
+                          className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                          Créer un compte
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
@@ -122,12 +141,14 @@ export function Header() {
                 {isAuthenticated && <ProfileMenu />}
                 {!isAuthenticated && !isAuthPage && (
                   <>
-                    <Link
-                      to="/signup"
-                      className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2"
-                    >
-                      Créer un compte
-                    </Link>
+                    {showSignUpButton && (
+                      <button
+                        onClick={handleSignUpClick}
+                        className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2"
+                      >
+                        Créer un compte
+                      </button>
+                    )}
                     <Link
                       to="/signin"
                       className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-2"

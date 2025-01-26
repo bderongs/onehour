@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Notification } from '../components/Notification';
 import { Mail, Lock } from 'lucide-react';
@@ -163,115 +163,24 @@ export function SignInPage() {
                     onClose={() => setNotification(null)}
                 />
             )}
-            <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md space-y-6">
-                <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                        {isPasswordResetMode
-                            ? 'Réinitialisation du mot de passe'
-                            : (errorType === 'expired_confirmation' || errorType === 'invalid_token')
-                                ? 'Renvoyer le lien de confirmation'
-                                : 'Connectez-vous à votre compte'
-                        }
-                    </h2>
-                    {(errorType !== 'expired_confirmation' && errorType !== 'invalid_token' && !isPasswordResetMode) && (
+            <div className="max-w-md w-full">
+                <div className="bg-white p-8 rounded-lg shadow-md space-y-6">
+                    <div>
+                        <h2 className="text-center text-3xl font-extrabold text-gray-900">
+                            Connectez-vous à votre compte
+                        </h2>
                         <p className="mt-2 text-center text-sm text-gray-600">
                             Vous n'avez pas encore de compte ?{' '}
-                            <button
-                                onClick={() => navigate('/signup')}
+                            <Link
+                                to="/signup"
                                 className="font-medium text-blue-600 hover:text-blue-500"
                             >
-                                Inscrivez-vous
-                            </button>
+                                Créer un compte
+                            </Link>
                         </p>
-                    )}
-                    {isPasswordResetMode && (
-                        <p className="mt-2 text-center text-sm text-gray-600">
-                            Nous vous enverrons un email avec les instructions pour réinitialiser votre mot de passe.
-                        </p>
-                    )}
-                </div>
-                {(errorType === 'expired_confirmation' || errorType === 'invalid_token') ? (
-                    <form onSubmit={(e) => { e.preventDefault(); handleResendConfirmation(); }} className="mt-8 space-y-6">
-                        <div className="rounded-md">
-                            <div>
-                                <label htmlFor="email-address" className="sr-only">
-                                    Adresse email
-                                </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <Mail className="h-5 w-5 text-gray-400" />
-                                    </div>
-                                    <input
-                                        id="email-address"
-                                        name="email"
-                                        type="email"
-                                        autoComplete="email"
-                                        required
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className="appearance-none rounded-md relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                        placeholder="Adresse email"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                        >
-                            {loading ? (
-                                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                                    <div className="h-5 w-5 border-t-2 border-white border-solid rounded-full animate-spin"></div>
-                                </span>
-                            ) : null}
-                            {loading ? 'Envoi en cours...' : 'Renvoyer le lien de confirmation'}
-                        </button>
-                    </form>
-                ) : isPasswordResetMode ? (
-                    <form onSubmit={(e) => { e.preventDefault(); handleForgotPassword(); }} className="mt-8 space-y-6">
-                        <div className="rounded-md">
-                            <div>
-                                <label htmlFor="email-address" className="sr-only">
-                                    Adresse email
-                                </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <Mail className="h-5 w-5 text-gray-400" />
-                                    </div>
-                                    <input
-                                        id="email-address"
-                                        name="email"
-                                        type="email"
-                                        autoComplete="email"
-                                        required
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className="appearance-none rounded-md relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                        placeholder="Adresse email"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-between space-x-4">
-                            <button
-                                type="button"
-                                onClick={() => setIsPasswordResetMode(false)}
-                                className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                            >
-                                Retour
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                            >
-                                {loading ? 'Envoi...' : 'Envoyer'}
-                            </button>
-                        </div>
-                    </form>
-                ) : (
-                    <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="rounded-md shadow-sm -space-y-px">
                             <div>
                                 <label htmlFor="email-address" className="sr-only">
@@ -347,7 +256,7 @@ export function SignInPage() {
                             </button>
                         </div>
                     </form>
-                )}
+                </div>
             </div>
         </div>
     );
