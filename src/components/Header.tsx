@@ -13,7 +13,7 @@ export function Header() {
   const isPricingPage = location.pathname === '/pricing';
   const isBrandPage = location.pathname === '/brand';
   const isLandingClientsPage = location.pathname === '/';
-  const isAuthPage = location.pathname === '/signin';
+  const isAuthPage = location.pathname === '/signin' || location.pathname === '/signup';
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -71,7 +71,7 @@ export function Header() {
             </Link>
           </div>
 
-          {!isBrandPage && (
+          {!isBrandPage && !isAuthPage && (
             <>
               <div className="flex items-center space-x-8">
                 {isLandingClientsPage && (
@@ -174,7 +174,7 @@ export function Header() {
         </div>
 
         {/* Mobile menu */}
-        {!isBrandPage && isMenuOpen && (
+        {!isBrandPage && !isAuthPage && isMenuOpen && (
           <div className="md:hidden">
             <div className="pt-2 pb-3 space-y-1">
               {isLandingClientsPage && navigation.map((item) => (
