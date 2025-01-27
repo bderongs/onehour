@@ -12,8 +12,7 @@ import { SparkProductPage } from './pages/SparkProductPage';
 import { SparkManagementPage } from './pages/SparkManagementPage';
 import { SparkCreatePage } from './pages/SparkCreatePage';
 import { SparkEditPage } from './pages/SparkEditPage';
-import { SparkAIEditPage } from './pages/SparkAIEditPage';
-import { SparkAICreatePage } from './pages/SparkAICreatePage';
+import { SparkAIPage } from './pages/SparkAIPage';
 import AuthCallback from './pages/AuthCallback';
 import { SignInPage } from './pages/SignInPage';
 import { SignUpPage } from './pages/SignUpPage';
@@ -80,8 +79,8 @@ function App() {
           <Route path="/sparks/manage" element={<DashboardLayout><SparkManagementPage /></DashboardLayout>} />
           <Route path="/sparks/create" element={<DashboardLayout><SparkCreatePage /></DashboardLayout>} />
           <Route path="/sparks/edit/:sparkUrl" element={<DashboardLayout><SparkEditPage /></DashboardLayout>} />
-          <Route path="/sparks/ai-edit/:sparkUrl" element={<DashboardLayout><SparkAIEditPage /></DashboardLayout>} />
-          <Route path="/sparks/ai-create" element={<DashboardLayout><SparkAICreatePage /></DashboardLayout>} />
+          <Route path="/sparks/ai-edit/:sparkUrl" element={<DashboardLayout><SparkAIPage /></DashboardLayout>} />
+          <Route path="/sparks/ai-create" element={<DashboardLayout><SparkAIPage /></DashboardLayout>} />
           <Route path="/consultants/:id/edit" element={<DashboardLayout><ConsultantProfileEditPage /></DashboardLayout>} />
           <Route path="/admin/dashboard" element={<DashboardLayout><AdminDashboard /></DashboardLayout>} />
           <Route path="/admin/consultants" element={<DashboardLayout><div>Consultant management coming soon</div></DashboardLayout>} />

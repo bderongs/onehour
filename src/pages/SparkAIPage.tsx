@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ArrowLeft, Sparkles } from 'lucide-react';
 import type { Spark } from '../types/spark';
@@ -7,9 +7,9 @@ import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
 import { CHAT_CONFIGS } from '../data/chatConfigs';
 import { formatDuration, formatPrice } from '../utils/format';
-import { generateSparkCreatePrompt } from '../services/promptGenerators';
+import { generateSparkCreatePrompt, generateSparkEditPrompt } from '../services/promptGenerators';
 import { editSparkWithAI } from '../services/openai';
-import { createSpark } from '../services/sparks';
+import { createSpark, getSparkByUrl, updateSpark } from '../services/sparks';
 import { supabase } from '../lib/supabase';
 
 // Animation variants
@@ -65,9 +65,14 @@ const useAuthenticatedUser = () => {
 };
 
 // Custom hook for AI interaction
-const useSparkAI = (initialSpark: Omit<Spark, 'id'>) => {
+const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>) => {
     const [spark, setSpark] = useState<Omit<Spark, 'id'>>(initialSpark);
     const [messages, setMessages] = useState<Message[]>([CHAT_CONFIGS.spark_content_assistant.initialMessage]);
+
+    // Update spark when initialSpark changes
+    useEffect(() => {
+        setSpark(initialSpark);
+    }, [initialSpark]);
 
     // Update spark when userId changes
     useEffect(() => {
@@ -84,28 +89,53 @@ const useSparkAI = (initialSpark: Omit<Spark, 'id'>) => {
         setMessages(prev => [...prev, { role: 'assistant', content: '⋯', isLoading: true }]);
 
         try {
-            const response = await editSparkWithAI([
-                { role: 'system', content: generateSparkCreatePrompt() },
-                ...newMessages.map(msg => ({ role: msg.role, content: msg.content }))
-            ]);
+            const systemPrompt = mode === 'create' 
+                ? generateSparkCreatePrompt(spark as Spark)
+                : generateSparkEditPrompt(spark as Spark);
 
+            const aiMessages: { role: 'user' | 'assistant' | 'system'; content: string; }[] = [
+                { role: 'system', content: systemPrompt },
+                ...newMessages.map(msg => ({ role: msg.role, content: msg.content }))
+            ];
+
+            // Log the complete conversation being sent to the AI
+            console.group('AI Interaction');
+            console.log('Mode:', mode);
+            console.log('Current Spark State:', spark);
+            console.log('Messages being sent to AI:');
+            aiMessages.forEach((msg, i) => {
+                console.log(`${i + 1}. ${msg.role.toUpperCase()}:\n${msg.content}`);
+            });
+
+            const response = await editSparkWithAI(aiMessages);
+
+            // Log the AI's response
+            console.log('\nAI Response:');
+            console.log('Reply:', response.reply);
+            console.log('Document Updates:', response.document);
+
+            // Create updated messages before updating the spark state
             const updatedMessages: Message[] = [
                 ...newMessages,
                 { role: 'assistant', content: response.reply, summary: response.document }
             ];
-            setMessages(updatedMessages);
 
-            // Exclude id field from the response document and ensure type safety
-            const { id: _id, ...documentWithoutId } = response.document as Partial<Spark>;
+            // Process the document updates
+            const documentUpdates = response.document as Partial<Spark>;
+            console.log('Processing document updates:', documentUpdates);
+
+            // Create the updated spark state
             const updatedSpark = {
                 ...spark,
-                ...Object.fromEntries(
-                    Object.entries(documentWithoutId).map(([key, value]) => [
-                        key,
-                        value === "Non défini" ? null : value
-                    ])
-                )
+                ...documentUpdates
             };
+
+            // Log the final state update
+            console.log('Updated Spark State:', updatedSpark);
+            console.groupEnd();
+
+            // Update state
+            setMessages(updatedMessages);
             setSpark(updatedSpark);
         } catch (error) {
             console.error('Error getting AI response:', error);
@@ -119,7 +149,7 @@ const useSparkAI = (initialSpark: Omit<Spark, 'id'>) => {
     return { spark, messages, handleMessagesUpdate };
 };
 
-// Preview section components
+// Preview section component
 const SparkPreviewSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <motion.section className="bg-white rounded-xl shadow-md p-4 sm:p-6" variants={fadeInUp}>
         <h2 className="text-lg lg:text-xl font-semibold mb-4">{title}</h2>
@@ -127,33 +157,63 @@ const SparkPreviewSection = ({ title, children }: { title: string; children: Rea
     </motion.section>
 );
 
-export function SparkAICreatePage() {
+export function SparkAIPage() {
     const navigate = useNavigate();
+    const { sparkUrl } = useParams();
+    const mode = sparkUrl ? 'edit' : 'create';
     const { userId, error: authError } = useAuthenticatedUser();
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [initialSpark, setInitialSpark] = useState<Omit<Spark, 'id'>>(DEFAULT_SPARK);
 
-    const { spark, messages, handleMessagesUpdate } = useSparkAI({
-        ...DEFAULT_SPARK,
-        consultant: userId // This will be null initially and updated when userId is set
-    });
+    useEffect(() => {
+        const fetchSpark = async () => {
+            if (!sparkUrl) {
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const fetchedSpark = await getSparkByUrl(sparkUrl);
+                if (!fetchedSpark) {
+                    navigate('/sparks/manage');
+                    return;
+                }
+                setInitialSpark(fetchedSpark);
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching spark:', err);
+                setError('Failed to load spark. Please try again later.');
+                setLoading(false);
+            }
+        };
+
+        fetchSpark();
+    }, [sparkUrl, navigate]);
+
+    const { spark, messages, handleMessagesUpdate } = useSparkAI(mode, initialSpark);
 
     const handleSave = async () => {
         if (!userId) {
-            setError('You must be logged in to create a spark');
+            setError('You must be logged in to save a spark');
             return;
         }
         
         setIsSaving(true);
         try {
-            await createSpark({
-                ...spark,
-                consultant: userId // Ensure we have the latest userId when saving
-            });
+            if (mode === 'create') {
+                await createSpark({
+                    ...spark,
+                    consultant: userId
+                });
+            } else {
+                await updateSpark(sparkUrl!, spark);
+            }
             navigate('/sparks/manage');
         } catch (error) {
-            console.error('Error creating spark:', error);
-            setError('Failed to create spark. Please try again later.');
+            console.error('Error saving spark:', error);
+            setError(`Failed to ${mode} spark. Please try again later.`);
             setIsSaving(false);
         }
     };
@@ -166,16 +226,36 @@ export function SparkAICreatePage() {
         setError(authError);
     }
 
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Chargement du spark...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-red-600">{error}</p>
+                    <button
+                        onClick={() => navigate('/sparks/manage')}
+                        className="mt-4 text-blue-600 hover:text-blue-700"
+                    >
+                        Retour aux sparks
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            {/* Remove mobile-specific header */}
             <div className="max-w-7xl mx-auto px-4 py-8">
-                {error && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-                        {error}
-                    </div>
-                )}
-                
                 <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
                     {/* Left Column - Chat Interface */}
                     <div className="lg:w-1/2">
@@ -187,7 +267,9 @@ export function SparkAICreatePage() {
                                 >
                                     <ArrowLeft className="h-6 w-6" />
                                 </button>
-                                <h1 className="text-3xl font-bold text-gray-900">Créer un Spark avec l'IA</h1>
+                                <h1 className="text-3xl font-bold text-gray-900">
+                                    {mode === 'create' ? 'Créer un Spark avec l\'IA' : 'Modifier le Spark avec l\'IA'}
+                                </h1>
                             </div>
                             <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
                                 <div className="p-4 border-b border-gray-200">
@@ -213,8 +295,10 @@ export function SparkAICreatePage() {
                     <div className="lg:w-1/2">
                         {/* Hero Section */}
                         <motion.div
-                            className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 lg:mb-8"
+                            className="bg-white rounded-2xl shadow-md p-4 sm:p-6 lg:p-8 mb-6 lg:mb-8"
                             variants={fadeInUp}
+                            initial="initial"
+                            animate="animate"
                         >
                             <div className="flex flex-col gap-6 lg:gap-8">
                                 <div>
@@ -339,7 +423,10 @@ export function SparkAICreatePage() {
                                             hover:bg-blue-700 transition-colors flex items-center justify-center gap-2
                                             disabled:bg-blue-400 disabled:cursor-not-allowed"
                                 >
-                                    {isSaving ? 'Création...' : 'Créer le Spark'}
+                                    {isSaving ? 
+                                        (mode === 'create' ? 'Création...' : 'Enregistrement...') : 
+                                        (mode === 'create' ? 'Créer le Spark' : 'Enregistrer les modifications')
+                                    }
                                     <ArrowRight className="h-5 w-5" />
                                 </button>
                             </motion.div>

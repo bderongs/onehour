@@ -66,13 +66,13 @@ export function generateSystemPrompt(template: DocumentTemplate, roleDescription
 Voici les champs à remplir :
 ${fieldDescriptions}`;
 
-    if (currentSpark) {
-        const editableFields = getEditableFields();
-        const currentContent = editableFields
-            .map(field => `${template.fields.find(f => f.key === field)?.label}: ${formatFieldValue(currentSpark[field])}`)
-            .join('\n');
+    // Always include current spark content, even if it's empty
+    const editableFields = getEditableFields();
+    const currentContent = editableFields
+        .map(field => `${template.fields.find(f => f.key === field)?.label}: ${formatFieldValue(currentSpark?.[field])}`)
+        .join('\n');
 
-        prompt += `
+    prompt += `
 
 Voici le contenu actuel du Spark :
 
@@ -84,7 +84,6 @@ Aidez le consultant à améliorer ce contenu en :
 3. Affinant le ciblage et les prérequis
 4. Enrichissant les livrables et les prochaines étapes
 5. Gardant une cohérence globale dans la proposition`;
-    }
 
     prompt += `
 
@@ -146,6 +145,6 @@ export function generateSparkEditPrompt(spark: Spark): string {
     return generateSystemPrompt(DOCUMENT_TEMPLATES.spark_content_assistant, CHAT_CONFIGS.spark_content_assistant.roleDescription, spark);
 }
 
-export function generateSparkCreatePrompt(): string {
-    return generateSystemPrompt(DOCUMENT_TEMPLATES.spark_content_assistant, CHAT_CONFIGS.spark_content_assistant.roleDescription);
+export function generateSparkCreatePrompt(spark?: Spark): string {
+    return generateSystemPrompt(DOCUMENT_TEMPLATES.spark_content_assistant, CHAT_CONFIGS.spark_content_assistant.roleDescription, spark);
 } 

@@ -49,7 +49,7 @@ Inutile de faire un résumé de la conversation, il est proposé à l'utilisateu
         },
         title: "Assistant Spark",
         subtitle: "Notre assistant IA vous aide à créer et améliorer votre Spark",
-        roleDescription: `Vous êtes un assistant spécialisé dans la création et l'édition de Sparks.
+        roleDescription: `Vous êtes un assistant spécialisé dans la création et l'édition de Sparks. Un Spark est une offre de conseil courte et ciblée.
 Votre rôle est d'aider les consultants à créer ou améliorer leur Spark en fonction de leur expertise et de leurs besoins.
 Vous pouvez modifier tous les aspects du Spark : titre, description, prix, durée, méthodologie, etc. séparément, ou plusieurs à la fois.
 Écoutez attentivement les demandes et n'effectuez que les changements demandés.
