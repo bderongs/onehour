@@ -1,21 +1,13 @@
-import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
+/// <reference types="vite/client" />
 
-// Load environment variables
-dotenv.config();
+import { createClient } from '@supabase/supabase-js';
 
 const isDev = process.env.NODE_ENV === 'development';
 
 // Initialize Supabase client with service role key
-const supabaseUrl = isDev 
-    ? process.env.VITE_SUPABASE_URL_DEV 
-    : process.env.VITE_SUPABASE_URL;
-const supabaseServiceKey = isDev 
-    ? process.env.SUPABASE_SERVICE_KEY_DEV 
-    : process.env.SUPABASE_SERVICE_KEY;
-const demoConsultantId = isDev 
-    ? process.env.VITE_DEMO_CONSULTANT_ID_DEV 
-    : process.env.VITE_DEMO_CONSULTANT_ID;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_KEY;
+const demoConsultantId = import.meta.env.VITE_DEMO_CONSULTANT_ID;
 
 if (!supabaseUrl || !supabaseServiceKey || !demoConsultantId) {
     console.error('Missing required environment variables');

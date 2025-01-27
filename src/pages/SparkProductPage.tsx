@@ -28,9 +28,7 @@ export function SparkProductPage() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userRole, setUserRole] = useState<string | null>(null);
 
-    const DEMO_CONSULTANT_ID = import.meta.env.DEV 
-        ? import.meta.env.VITE_DEMO_CONSULTANT_ID_DEV 
-        : import.meta.env.VITE_DEMO_CONSULTANT_ID;
+    const DEMO_CONSULTANT_ID = import.meta.env.VITE_DEMO_CONSULTANT_ID;
 
     useEffect(() => {
         const checkAuthAndFetchSpark = async () => {

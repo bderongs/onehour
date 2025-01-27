@@ -120,9 +120,7 @@ export default function ConsultantProfilePage() {
         }
     ];
 
-    const DEMO_CONSULTANT_ID = import.meta.env.DEV 
-        ? import.meta.env.VITE_DEMO_CONSULTANT_ID_DEV 
-        : import.meta.env.VITE_DEMO_CONSULTANT_ID;
+    const DEMO_CONSULTANT_ID = import.meta.env.VITE_DEMO_CONSULTANT_ID;
 
     // Add function to handle navigation to spark product page
     const handleSparkClick = (pkg: Spark) => {
