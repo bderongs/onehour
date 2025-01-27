@@ -124,10 +124,13 @@ const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>) =>
             const documentUpdates = response.document as Partial<Spark>;
             console.log('Processing document updates:', documentUpdates);
 
-            // Create the updated spark state
+            // Create the updated spark state by only applying defined fields
             const updatedSpark = {
                 ...spark,
-                ...documentUpdates
+                ...Object.fromEntries(
+                    Object.entries(documentUpdates)
+                        .filter(([_, value]) => value !== undefined)
+                )
             };
 
             // Log the final state update

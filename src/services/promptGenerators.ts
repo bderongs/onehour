@@ -31,6 +31,7 @@ function formatFieldValue(value: any): string {
     return value.toString();
 }
 
+
 // Helper function to get editable fields from a Spark
 function getEditableFields(): (keyof Spark)[] {
     return [
@@ -90,7 +91,7 @@ Aidez le consultant à améliorer ce contenu en :
 Instructions importantes :
 1. Écoutez attentivement la demande du consultant
 2. Ne modifiez que les champs concernés par la demande
-3. Conservez les valeurs existantes pour tous les autres champs
+3. Ne retournez pas les champs non modifiés
 4. Assurez-vous que les modifications restent cohérentes avec l'ensemble du Spark
 5. Respectez le format et la structure des données existantes
 6. Le champ "highlight" (tag) ne doit JAMAIS dépasser 2 mots. Si l'utilisateur demande plus de 2 mots, expliquez-lui la limitation et suggérez une version courte en 2 mots maximum
