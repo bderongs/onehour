@@ -3,7 +3,7 @@ import { LandingClients } from './pages/LandingClients';
 import LandingConsultants from './pages/LandingConsultants';
 import ConsultantProfilePage from './pages/ConsultantProfilePage';
 import ConsultantProfileEditPage from './pages/ConsultantProfileEditPage';
-import DemoConsultantProfilePage from './pages/DemoConsultantProfilePage';
+import { DemoProfileWrapper } from './components/DemoProfileWrapper';
 import { Terms } from './pages/Terms';
 import { Privacy } from './pages/Privacy';
 import { PricingPage } from './pages/PricingPage';
@@ -73,7 +73,7 @@ function App() {
           <Route path="/sparks/:sparkUrl" element={<MarketingLayout><SparkProductPage /></MarketingLayout>} />
           
           {/* Consultant profile routes with no header */}
-          <Route path="/profile" element={<ConsultantProfileLayout><DemoConsultantProfilePage /></ConsultantProfileLayout>} />
+          <Route path="/profile" element={<ConsultantProfileLayout><DemoProfileWrapper /></ConsultantProfileLayout>} />
           <Route path="/consultants/:id" element={<ConsultantProfileLayout><ConsultantProfilePage /></ConsultantProfileLayout>} />
           
           {/* Dashboard routes with dashboard header */}

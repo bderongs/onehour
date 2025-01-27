@@ -13,8 +13,8 @@ import { formatDuration, formatPrice } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../services/auth';
 
-export default function ConsultantProfilePage() {
-    const { id } = useParams<{ id: string }>();
+export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
+    const { id: urlId } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [showChat, setShowChat] = useState(false);
     const [showConnect, setShowConnect] = useState(false);
@@ -37,6 +37,9 @@ export default function ConsultantProfilePage() {
     });
     const [missions, setMissions] = useState<ConsultantMission[]>([]);
 
+    // Use propId if provided, otherwise use urlId
+    const consultantId = propId || urlId;
+
     // Fetch current user when component mounts
     useEffect(() => {
         const fetchCurrentUser = async () => {
@@ -48,9 +51,9 @@ export default function ConsultantProfilePage() {
 
     // Fetch consultant data when component mounts
     useEffect(() => {
-        console.log('ConsultantProfilePage - Fetching data, id:', id);
+        console.log('ConsultantProfilePage - Fetching data, id:', consultantId);
         const fetchData = async () => {
-            if (!id) {
+            if (!consultantId) {
                 console.log('ConsultantProfilePage - No ID provided');
                 setError('Consultant ID is required');
                 setLoading(false);
@@ -60,10 +63,10 @@ export default function ConsultantProfilePage() {
             try {
                 console.log('ConsultantProfilePage - Starting data fetch');
                 const [consultantData, reviewsData, sparksData, missionsData] = await Promise.all([
-                    getConsultantProfile(id),
-                    getConsultantReviews(id),
-                    getConsultantSparks(id),
-                    getConsultantMissions(id)
+                    getConsultantProfile(consultantId),
+                    getConsultantReviews(consultantId),
+                    getConsultantSparks(consultantId),
+                    getConsultantMissions(consultantId)
                 ]);
 
                 if (!consultantData) {
@@ -104,7 +107,7 @@ export default function ConsultantProfilePage() {
             setSparks([]);
             setMissions([]);
         };
-    }, [id]);
+    }, [consultantId]);
 
     // Log state changes
     useEffect(() => {
@@ -177,29 +180,6 @@ export default function ConsultantProfilePage() {
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col">
-                {/* Animated Background */}
-                <div className="fixed inset-0 pointer-events-none">
-                    <div 
-                        className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50"
-                        style={{
-                            backgroundImage: `
-                                radial-gradient(circle at 20% 35%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
-                                radial-gradient(circle at 75% 44%, rgba(165, 180, 252, 0.15) 0%, transparent 50%),
-                                radial-gradient(circle at 5% 75%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
-                                radial-gradient(circle at 80% 95%, rgba(165, 180, 252, 0.15) 0%, transparent 50%)
-                            `
-                        }}
-                    />
-                    <div 
-                        className="absolute inset-0 opacity-30"
-                        style={{
-                            backgroundImage: `
-                                radial-gradient(circle at 50% 30%, rgba(147, 197, 253, 0.2) 0%, transparent 40%),
-                                radial-gradient(circle at 70% 60%, rgba(165, 180, 252, 0.2) 0%, transparent 40%)
-                            `
-                        }}
-                    />
-                </div>
                 <main className="flex-grow flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg shadow-md p-8">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -214,35 +194,12 @@ export default function ConsultantProfilePage() {
     if (error || !consultant) {
         return (
             <div className="min-h-screen flex flex-col">
-                {/* Animated Background */}
-                <div className="fixed inset-0 pointer-events-none">
-                    <div 
-                        className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50"
-                        style={{
-                            backgroundImage: `
-                                radial-gradient(circle at 20% 35%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
-                                radial-gradient(circle at 75% 44%, rgba(165, 180, 252, 0.15) 0%, transparent 50%),
-                                radial-gradient(circle at 5% 75%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
-                                radial-gradient(circle at 80% 95%, rgba(165, 180, 252, 0.15) 0%, transparent 50%)
-                            `
-                        }}
-                    />
-                    <div 
-                        className="absolute inset-0 opacity-30"
-                        style={{
-                            backgroundImage: `
-                                radial-gradient(circle at 50% 30%, rgba(147, 197, 253, 0.2) 0%, transparent 40%),
-                                radial-gradient(circle at 70% 60%, rgba(165, 180, 252, 0.2) 0%, transparent 40%)
-                            `
-                        }}
-                    />
-                </div>
                 <main className="flex-grow flex items-center justify-center p-4">
                     <div className="bg-white rounded-lg shadow-md p-8">
-                        <div className="text-red-500 mb-4">{error || 'Une erreur est survenue'}</div>
+                        <p className="text-red-600">{error || 'Profil introuvable'}</p>
                         <button 
                             onClick={() => window.location.reload()} 
-                            className="text-blue-600 hover:text-blue-700"
+                            className="mt-4 text-blue-600 hover:text-blue-700"
                         >
                             Réessayer
                         </button>
@@ -254,35 +211,11 @@ export default function ConsultantProfilePage() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            {/* Animated Background */}
-            <div className="fixed inset-0 pointer-events-none">
-                <div 
-                    className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50"
-                    style={{
-                        backgroundImage: `
-                            radial-gradient(circle at 20% 35%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
-                            radial-gradient(circle at 75% 44%, rgba(165, 180, 252, 0.15) 0%, transparent 50%),
-                            radial-gradient(circle at 5% 75%, rgba(147, 197, 253, 0.15) 0%, transparent 50%),
-                            radial-gradient(circle at 80% 95%, rgba(165, 180, 252, 0.15) 0%, transparent 50%)
-                        `
-                    }}
-                />
-                <div 
-                    className="absolute inset-0 opacity-30"
-                    style={{
-                        backgroundImage: `
-                            radial-gradient(circle at 50% 30%, rgba(147, 197, 253, 0.2) 0%, transparent 40%),
-                            radial-gradient(circle at 70% 60%, rgba(165, 180, 252, 0.2) 0%, transparent 40%)
-                        `
-                    }}
-                />
-            </div>
-
             {/* Sticky Edit Button */}
             {currentUser?.id === consultant.id && (
                 <div className="fixed right-4 top-4 z-50">
                     <button
-                        onClick={() => navigate(`/consultants/${id}/edit`)}
+                        onClick={() => navigate(`/consultants/${consultantId}/edit`)}
                         className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-lg hover:shadow-xl border border-gray-200 text-gray-700 hover:text-blue-600 transition-all duration-200"
                         title="Modifier mon profil"
                     >
@@ -292,7 +225,6 @@ export default function ConsultantProfilePage() {
                 </div>
             )}
 
-            {/* Content */}
             <main className="flex-grow relative">
                 {/* Cover Section - Full Width */}
                 <div className="w-full bg-white shadow-md mb-8 animate-fade-in-up">
@@ -458,7 +390,11 @@ export default function ConsultantProfilePage() {
                 <div className="overflow-hidden mb-8 animate-fade-in-up">
                     <div className="flex overflow-x-auto pb-6 scrollbar-hide">
                         <div className="flex gap-4 mx-auto px-4 py-2">
-                            {sparks.map((pkg, index) => (
+                            {sparks.sort((a, b) => {
+                                const priceA = !a.price || a.price === '' ? 0 : parseFloat(a.price);
+                                const priceB = !b.price || b.price === '' ? 0 : parseFloat(b.price);
+                                return priceA - priceB;
+                            }).map((pkg) => (
                                 <div 
                                     key={pkg.id}
                                     className="flex flex-col bg-white rounded-xl shadow-md w-80 flex-shrink-0 
@@ -497,12 +433,12 @@ export default function ConsultantProfilePage() {
                                         <button 
                                             onClick={() => navigate(`/sparks/${pkg.url}`)}
                                             className={`w-full font-medium px-4 py-2 rounded-lg transition-colors ${
-                                                index === 0 
+                                                (!pkg.price || parseFloat(pkg.price) === 0)
                                                 ? "bg-blue-600 hover:bg-blue-700 text-white" 
                                                 : "bg-gray-50 hover:bg-gray-100 text-gray-900"
                                             }`}
                                         >
-                                            {index === 0 ? "Prendre RDV" : "En savoir plus"}
+                                            {(!pkg.price || parseFloat(pkg.price) === 0) ? "Prendre RDV" : "En savoir plus"}
                                         </button>
                                     </div>
                                 </div>
@@ -584,7 +520,9 @@ export default function ConsultantProfilePage() {
                                     <div key={index} className="border-l-4 border-blue-600 pl-4">
                                         <h4 className="font-semibold text-lg text-gray-900">{mission.title}</h4>
                                         <p className="text-gray-600 mt-1">{mission.description}</p>
-                                        <div className="text-sm text-gray-500 mt-2">{mission.date} - {mission.duration}</div>
+                                        <div className="text-sm text-gray-500 mt-2">
+                                            {new Date(mission.date).getFullYear()} - {mission.duration}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
