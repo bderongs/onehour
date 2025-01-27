@@ -41,9 +41,11 @@ const transformSparkToDB = (spark: Partial<Spark>): Record<string, any> => {
         if (key === 'price' && value) {
             transformed[snakeKey] = value.toString().replace(/[^0-9]/g, '');
         } else if (key === 'duration') {
-            // Always provide a valid interval value, default to 60 minutes
+            // Convert duration to proper interval format
             const minutes = value ? parseInt(value.toString().replace(/[^0-9]/g, ''), 10) : 60;
-            transformed[snakeKey] = `${minutes} minutes`;
+            const hours = Math.floor(minutes / 60);
+            const remainingMinutes = minutes % 60;
+            transformed[snakeKey] = `${hours}:${remainingMinutes.toString().padStart(2, '0')}:00`;
         }
         // Special handling for nested objects
         else if (key === 'expertProfile' && value) {
