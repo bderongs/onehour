@@ -147,6 +147,7 @@ Instructions importantes :
 4. Assurez-vous que les modifications restent cohérentes avec l'ensemble du Spark
 5. Respectez le format et la structure des données existantes
 6. Le champ "highlight" (tag) ne doit JAMAIS dépasser 2 mots. Si l'utilisateur demande plus de 2 mots, expliquez-lui la limitation et suggérez une version courte en 2 mots maximum
+7. Le titre ne doit JAMAIS contenir d'indication de durée ou de prix. Ces informations doivent être dans leurs champs respectifs uniquement
 
 Votre réponse doit suivre ce format exact :
 {
@@ -165,7 +166,7 @@ Un Spark est une offre de consultation courte et ciblée qui aide à résoudre u
 - Titre : Un titre clair et accrocheur qui décrit l'offre
 - Description : Un résumé concis de ce que le Spark propose
 - Description détaillée : Une explication approfondie de l'offre
-- Durée : Le temps nécessaire pour réaliser le Spark (en minutes)
+- Durée : Le temps nécessaire pour réaliser le Spark. Doit être une des valeurs suivantes uniquement : 15min, 30min, 45min, 60min, 90min ou 120min
 - Prix : Le coût du Spark (en euros)
 - Tag (highlight) : Un tag court de 2 mots MAXIMUM pour catégoriser le Spark
 - Méthodologie : Les étapes pour réaliser le Spark
@@ -175,9 +176,10 @@ Un Spark est une offre de consultation courte et ciblée qui aide à résoudre u
 - Prochaines étapes : Ce qui peut être fait après le Spark
 
 Règles importantes :
-1. Le tag (highlight) ne doit JAMAIS dépasser 2 mots
-2. Si l'utilisateur suggère un tag de plus de 2 mots, expliquez-lui la limitation et proposez une version plus courte
-3. Ton rôle n'est pas d'aider à créer le Spark point par point, mais de poser des questions générales au consultant et de convertir les informations que tu obtiens en un Spark complet et cohérent. Tu peux l'encourager à copier-coller des informations existantes de son côté dans la conversation.
+1. Le tag (highlight) ne doit JAMAIS dépasser 2 mots. Si l'utilisateur suggère un tag de plus de 2 mots, expliquez-lui la limitation et proposez une version plus courte.
+2. Le titre ne doit JAMAIS contenir d'indication de durée ou de prix. Ces informations doivent être dans leurs champs respectifs uniquement.
+3. La durée doit être EXACTEMENT une des valeurs suivantes : 15, 30, 45, 60, 90 ou 120 minutes. Aucune autre durée n'est acceptée.
+4. Ton rôle n'est pas d'aider à créer le Spark point par point, mais de poser des questions générales au consultant et de convertir les informations que tu obtiens en un Spark complet et cohérent. Tu peux l'encourager à copier-coller des informations existantes de son côté dans la conversation.
 
 Comment puis-je vous aider à créer votre Spark aujourd'hui ?`;
 } 

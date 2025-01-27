@@ -10,8 +10,32 @@ interface SparkFormProps {
 }
 
 export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
-    const [formData, setFormData] = useState<Partial<Spark>>(
-        initialData || {
+    console.log('Initial duration:', initialData?.duration, typeof initialData?.duration);
+
+    // Convert duration from HH:MM:SS format to minutes
+    const convertDurationToMinutes = (duration: string): string => {
+        if (!duration) return '';
+        
+        // If it's already in minutes format, return as is
+        if (!duration.includes(':')) {
+            return duration;
+        }
+
+        // Parse HH:MM:SS format
+        const [hours, minutes] = duration.split(':');
+        return ((parseInt(hours) * 60) + parseInt(minutes)).toString();
+    };
+
+    const [formData, setFormData] = useState<Partial<Spark>>(() => {
+        if (initialData) {
+            // Convert duration from HH:MM:SS to minutes
+            const duration = initialData.duration ? convertDurationToMinutes(initialData.duration) : '';
+            return {
+                ...initialData,
+                duration
+            };
+        }
+        return {
             title: '',
             duration: '',
             price: '',
@@ -31,10 +55,19 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
             faq: [],
             testimonials: [],
             nextSteps: []
-        }
-    );
+        };
+    });
 
     const [highlightError, setHighlightError] = useState<string | null>(null);
+
+    const DURATION_OPTIONS = [
+        { value: '15', label: '15 minutes' },
+        { value: '30', label: '30 minutes' },
+        { value: '45', label: '45 minutes' },
+        { value: '60', label: '1 heure' },
+        { value: '90', label: '1h30' },
+        { value: '120', label: '2 heures' },
+    ];
 
     const handleChange = (field: keyof Spark, value: any) => {
         if (field === 'highlight') {
@@ -98,24 +131,6 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
         onSubmit(data);
     };
 
-    // Add helper functions to parse inputs
-    const parseDuration = (value: string): string => {
-        // If it's already in ISO format, return as is
-        if (value.includes('PT') || value.includes(':')) {
-            return value;
-        }
-        
-        // Try to parse as minutes first
-        const minutes = parseInt(value);
-        if (!isNaN(minutes)) {
-            const hours = Math.floor(minutes / 60);
-            const mins = minutes % 60;
-            return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:00`;
-        }
-        
-        return value;
-    };
-
     const parsePrice = (value: string): number | null => {
         // Remove currency symbol, spaces, and convert comma to dot
         const cleanValue = value.replace(/[€\s]/g, '').replace(',', '.');
@@ -155,16 +170,21 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Durée (en minutes)
+                            Durée
                         </label>
-                        <input
-                            type="text"
+                        <select
                             value={formData.duration || ''}
-                            onChange={(e) => handleChange('duration', parseDuration(e.target.value))}
+                            onChange={(e) => handleChange('duration', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                            placeholder="ex: 90 (pour 1h30)"
                             required
-                        />
+                        >
+                            <option value="">Sélectionner une durée</option>
+                            {DURATION_OPTIONS.map(option => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
                         {formData.duration && (
                             <div className="mt-1 text-sm text-gray-500">
                                 {formatDuration(formData.duration)}

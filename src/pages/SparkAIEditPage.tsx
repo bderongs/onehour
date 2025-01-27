@@ -352,10 +352,12 @@ export function SparkAIEditPage() {
                                 <button
                                     onClick={handleSave}
                                     disabled={isSaving}
-                                    className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 flex items-center justify-center gap-2"
+                                    className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg font-semibold 
+                                            hover:bg-blue-700 transition-colors flex items-center justify-center gap-2
+                                            disabled:bg-blue-400 disabled:cursor-not-allowed"
                                 >
                                     {isSaving ? 'Enregistrement...' : 'Enregistrer les modifications'}
-                                    <ArrowRight className="h-4 w-4" />
+                                    <ArrowRight className="h-5 w-5" />
                                 </button>
                             </motion.div>
                         </div>

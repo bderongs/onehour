@@ -29,65 +29,73 @@ export async function editSparkWithAI(
             functions: [
                 {
                     name: 'edit_spark',
-                    description: 'Edit a Spark based on user request',
+                    description: 'Modifier un Spark selon la demande de l\'utilisateur',
                     parameters: {
                         type: 'object',
                         properties: {
                             reply: {
                                 type: 'string',
-                                description: 'The conversational response to the user explaining the changes'
+                                description: 'La réponse conversationnelle à l\'utilisateur expliquant les modifications'
                             },
                             document: {
                                 type: 'object',
-                                description: 'The updated Spark fields',
+                                description: 'Les champs mis à jour du Spark',
                                 properties: {
-                                    title: { type: 'string', description: 'Title of the Spark' },
-                                    description: { type: 'string', description: 'Short description of the Spark' },
-                                    duration: { type: 'string', description: 'Duration of the Spark (e.g., "01:00:00")' },
-                                    price: { type: 'string', description: 'Price of the Spark' },
+                                    title: { 
+                                        type: 'string', 
+                                        description: 'Titre du Spark',
+                                        pattern: '^(?!.*(?:\\d+\\s*(?:min|minute|heure|h|hr)s?|\\d+\\s*(?:€|euro|eur)s?|gratuit|offert)).*$'
+                                    },
+                                    description: { type: 'string', description: 'Description courte du Spark' },
+                                    duration: { 
+                                        type: 'string', 
+                                        description: 'Durée du Spark en minutes. Doit être une des valeurs suivantes : 15, 30, 45, 60, 90, ou 120',
+                                        enum: ['15', '30', '45', '60', '90', '120']
+                                    },
+                                    price: { type: 'string', description: 'Prix du Spark' },
                                     benefits: { 
                                         type: 'array', 
                                         items: { type: 'string' },
-                                        description: 'List of benefits'
+                                        description: 'Liste des bénéfices'
                                     },
                                     highlight: { 
                                         type: 'string', 
-                                        description: 'Highlight tag for the Spark (maximum 2 words)',
+                                        description: 'Tag de mise en avant du Spark (maximum 2 mots)',
                                         pattern: '^(?:\\S+\\s?){1,2}$'
                                     },
-                                    detailedDescription: { type: 'string', description: 'Detailed description of the Spark' },
+                                    detailedDescription: { type: 'string', description: 'Description détaillée du Spark' },
                                     methodology: {
                                         type: 'array',
                                         items: { type: 'string' },
-                                        description: 'List of methodology steps'
+                                        description: 'Liste des étapes de la méthodologie'
                                     },
                                     targetAudience: {
                                         type: 'array',
                                         items: { type: 'string' },
-                                        description: 'List of target audience profiles'
+                                        description: 'Liste des profils cibles'
                                     },
                                     prerequisites: {
                                         type: 'array',
                                         items: { type: 'string' },
-                                        description: 'List of prerequisites'
+                                        description: 'Liste des prérequis'
                                     },
                                     deliverables: {
                                         type: 'array',
                                         items: { type: 'string' },
-                                        description: 'List of deliverables'
+                                        description: 'Liste des livrables'
                                     },
                                     expertProfile: {
                                         type: 'object',
-                                        description: 'Expert profile information',
+                                        description: 'Informations sur le profil expert',
                                         properties: {
                                             expertise: {
                                                 type: 'array',
                                                 items: { type: 'string' },
-                                                description: 'List of expertise areas'
+                                                description: 'Liste des domaines d\'expertise'
                                             },
                                             experience: {
                                                 type: 'string',
-                                                description: 'Experience description'
+                                                description: 'Description de l\'expérience'
                                             }
                                         },
                                         required: ['expertise', 'experience']
@@ -102,7 +110,7 @@ export async function editSparkWithAI(
                                             },
                                             required: ['question', 'answer']
                                         },
-                                        description: 'List of FAQ items'
+                                        description: 'Liste des questions fréquentes'
                                     },
                                     testimonials: {
                                         type: 'array',
@@ -116,12 +124,12 @@ export async function editSparkWithAI(
                                             },
                                             required: ['text', 'author']
                                         },
-                                        description: 'List of testimonials'
+                                        description: 'Liste des témoignages'
                                     },
                                     nextSteps: {
                                         type: 'array',
                                         items: { type: 'string' },
-                                        description: 'List of next steps'
+                                        description: 'Liste des prochaines étapes'
                                     }
                                 }
                             }
@@ -139,6 +147,19 @@ export async function editSparkWithAI(
 
         // Parse the response and ensure it matches our type
         const response: SparkEditResponse = JSON.parse(functionCall.arguments);
+        
+        // Additional validation for title
+        if (response.document.title) {
+            const durationPattern = /\b(\d+\s*(min|minute|heure|h|hr)s?\b)|(\b(une|deux|trois|quatre)\s*(min|minute|heure|h|hr)s?\b)/i;
+            const pricePattern = /\b(\d+\s*(€|euro|eur)s?\b)|(\b(gratuit|offert)\b)/i;
+            
+            if (durationPattern.test(response.document.title) || pricePattern.test(response.document.title)) {
+                // If title contains duration or price, remove it from the document to prevent the update
+                delete response.document.title;
+                // Update the reply to explain why the title wasn't updated
+                response.reply = `${response.reply}\n\nNote : Le titre proposé contenait des indications de durée ou de prix, il n'a donc pas été mis à jour. Ces informations doivent être dans leurs champs respectifs.`;
+            }
+        }
         
         console.log('AI Edit Response:', response);
         

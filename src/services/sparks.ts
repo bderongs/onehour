@@ -41,11 +41,30 @@ const transformSparkToDB = (spark: Partial<Spark>): Record<string, any> => {
         if (key === 'price' && value) {
             transformed[snakeKey] = value.toString().replace(/[^0-9]/g, '');
         } else if (key === 'duration') {
-            // Convert duration to proper interval format
-            const minutes = value ? parseInt(value.toString().replace(/[^0-9]/g, ''), 10) : 60;
+            // Define allowed durations
+            const ALLOWED_DURATIONS = [15, 30, 45, 60, 90, 120];
+            
+            // Parse the input value to get minutes, handling various formats
+            let minutes: number;
+            const value_str = value?.toString().toLowerCase() || '60';
+            
+            // Remove any text and extract the number
+            const numberMatch = value_str.match(/\d+/);
+            if (!numberMatch) {
+                minutes = 60; // Default to 60 if no number found
+            } else {
+                minutes = parseInt(numberMatch[0], 10);
+            }
+            
+            // Find the closest allowed duration
+            if (!ALLOWED_DURATIONS.includes(minutes)) {
+                minutes = 60; // Default to 60 if not in allowed values
+            }
+            
+            // Convert to proper HH:MM:SS format
             const hours = Math.floor(minutes / 60);
             const remainingMinutes = minutes % 60;
-            transformed[snakeKey] = `${hours}:${remainingMinutes.toString().padStart(2, '0')}:00`;
+            transformed[snakeKey] = `${hours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}:00`;
         }
         // Special handling for nested objects
         else if (key === 'expertProfile' && value) {
