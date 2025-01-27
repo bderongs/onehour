@@ -84,9 +84,8 @@ const useSparkAI = (initialSpark: Omit<Spark, 'id'>) => {
         setMessages(prev => [...prev, { role: 'assistant', content: '⋯', isLoading: true }]);
 
         try {
-            const createPrompt = generateSparkCreatePrompt();
             const response = await editSparkWithAI([
-                { role: 'system', content: createPrompt },
+                { role: 'system', content: generateSparkCreatePrompt() },
                 ...newMessages.map(msg => ({ role: msg.role, content: msg.content }))
             ]);
 

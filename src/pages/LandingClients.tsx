@@ -293,7 +293,7 @@ export function LandingClients() {
                             </div>
                         ) : (
                             <SparksGrid
-                                sparks={sparks.filter(spark => !spark.consultant)}
+                                sparks={sparks.filter(spark => !spark.consultant && spark.consultant !== undefined)}
                                 expandedCallIndex={expandedCallIndex}
                                 setExpandedCallIndex={setExpandedCallIndex}
                                 onCallClick={handleUseCaseClick}

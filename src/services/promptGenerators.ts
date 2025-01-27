@@ -1,5 +1,7 @@
 import { DocumentTemplate } from '../types/chat';
 import { Spark } from '../types/spark';
+import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
+import { CHAT_CONFIGS } from '../data/chatConfigs';
 
 // Helper function to format a field value for display
 function formatFieldValue(value: any): string {
@@ -61,7 +63,7 @@ export function generateSystemPrompt(template: DocumentTemplate, roleDescription
 
     let prompt = `${roleDescription}
 
-Posez des questions pertinentes pour comprendre :
+Voici les champs à remplir :
 ${fieldDescriptions}`;
 
     if (currentSpark) {
@@ -72,7 +74,7 @@ ${fieldDescriptions}`;
 
         prompt += `
 
-Voici le contenu actuel du Spark que nous allons améliorer :
+Voici le contenu actuel du Spark :
 
 ${currentContent}
 
@@ -81,10 +83,20 @@ Aidez le consultant à améliorer ce contenu en :
 2. Structurant mieux la méthodologie pour la rendre plus claire
 3. Affinant le ciblage et les prérequis
 4. Enrichissant les livrables et les prochaines étapes
-5. Gardant une cohérence globale dans la proposition
-
-Commencez par analyser le contenu actuel et suggérer des améliorations.`;
+5. Gardant une cohérence globale dans la proposition`;
     }
+
+    prompt += `
+
+Instructions importantes :
+1. Écoutez attentivement la demande du consultant
+2. Ne modifiez que les champs concernés par la demande
+3. Conservez les valeurs existantes pour tous les autres champs
+4. Assurez-vous que les modifications restent cohérentes avec l'ensemble du Spark
+5. Respectez le format et la structure des données existantes
+6. Le champ "highlight" (tag) ne doit JAMAIS dépasser 2 mots. Si l'utilisateur demande plus de 2 mots, expliquez-lui la limitation et suggérez une version courte en 2 mots maximum
+7. Le titre ne doit JAMAIS contenir d'indication de durée ou de prix. Ces informations doivent être dans leurs champs respectifs uniquement
+8. La durée doit être EXACTEMENT une des valeurs suivantes : 15, 30, 45, 60, 90 ou 120 minutes. Aucune autre durée n'est acceptée.`;
 
     return prompt;
 }
@@ -131,55 +143,9 @@ ${JSON.stringify(currentValues, null, 4)}`;
  * This prompt is focused on making precise updates to the Spark content.
  */
 export function generateSparkEditPrompt(spark: Spark): string {
-    return `Vous êtes un assistant spécialisé dans l'édition de Sparks.
-Votre rôle est d'aider les consultants à améliorer leur Spark en fonction de leurs demandes.
-
-Voici le contenu actuel du Spark :
-${Object.entries(spark)
-    .filter(([key]) => key !== 'id' && key !== 'url' && key !== 'consultant' && key !== 'prefillText')
-    .map(([key, value]) => `${key}: ${formatFieldValue(value)}`)
-    .join('\n')}
-
-Instructions importantes :
-1. Écoutez attentivement la demande de modification du consultant
-2. Ne modifiez que les champs concernés par la demande
-3. Conservez les valeurs existantes pour tous les autres champs
-4. Assurez-vous que les modifications restent cohérentes avec l'ensemble du Spark
-5. Respectez le format et la structure des données existantes
-6. Le champ "highlight" (tag) ne doit JAMAIS dépasser 2 mots. Si l'utilisateur demande plus de 2 mots, expliquez-lui la limitation et suggérez une version courte en 2 mots maximum
-7. Le titre ne doit JAMAIS contenir d'indication de durée ou de prix. Ces informations doivent être dans leurs champs respectifs uniquement
-
-Votre réponse doit suivre ce format exact :
-{
-    "reply": "Votre réponse conversationnelle expliquant les modifications apportées",
-    "document": {
-        // Le Spark mis à jour avec uniquement les champs modifiés
-    }
-}`;
+    return generateSystemPrompt(DOCUMENT_TEMPLATES.spark_content_assistant, CHAT_CONFIGS.spark_content_assistant.roleDescription, spark);
 }
 
 export function generateSparkCreatePrompt(): string {
-    return `Je suis un assistant spécialisé dans la création de Sparks. Je vais vous aider à créer un nouveau Spark en vous posant des questions pertinentes et en structurant vos réponses.
-
-Un Spark est une offre de consultation courte et ciblée qui aide à résoudre un problème spécifique. Voici les éléments clés d'un Spark :
-
-- Titre : Un titre clair et accrocheur qui décrit l'offre
-- Description : Un résumé concis de ce que le Spark propose
-- Description détaillée : Une explication approfondie de l'offre
-- Durée : Le temps nécessaire pour réaliser le Spark. Doit être une des valeurs suivantes uniquement : 15min, 30min, 45min, 60min, 90min ou 120min
-- Prix : Le coût du Spark (en euros)
-- Tag (highlight) : Un tag court de 2 mots MAXIMUM pour catégoriser le Spark
-- Méthodologie : Les étapes pour réaliser le Spark
-- Public cible : À qui s'adresse ce Spark
-- Prérequis : Ce qui est nécessaire avant de commencer
-- Livrables : Ce que le client obtient
-- Prochaines étapes : Ce qui peut être fait après le Spark
-
-Règles importantes :
-1. Le tag (highlight) ne doit JAMAIS dépasser 2 mots. Si l'utilisateur suggère un tag de plus de 2 mots, expliquez-lui la limitation et proposez une version plus courte.
-2. Le titre ne doit JAMAIS contenir d'indication de durée ou de prix. Ces informations doivent être dans leurs champs respectifs uniquement.
-3. La durée doit être EXACTEMENT une des valeurs suivantes : 15, 30, 45, 60, 90 ou 120 minutes. Aucune autre durée n'est acceptée.
-4. Ton rôle n'est pas d'aider à créer le Spark point par point, mais de poser des questions générales au consultant et de convertir les informations que tu obtiens en un Spark complet et cohérent. Tu peux l'encourager à copier-coller des informations existantes de son côté dans la conversation.
-
-Comment puis-je vous aider à créer votre Spark aujourd'hui ?`;
+    return generateSystemPrompt(DOCUMENT_TEMPLATES.spark_content_assistant, CHAT_CONFIGS.spark_content_assistant.roleDescription);
 } 

@@ -198,10 +198,6 @@ export function SparkAIEditPage() {
                                         messages={messages}
                                         onMessagesUpdate={handleMessagesUpdate}
                                         hideSummary={true}
-                                        systemPrompt="dummy"
-                                        shouldReset={false}
-                                        onConnect={() => {}}
-                                        shouldHandleAICall={false}
                                     />
                                 </div>
                             </div>
