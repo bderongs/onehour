@@ -6,6 +6,25 @@ import type { DocumentTemplate, DocumentSummary as DocumentSummaryType } from '.
 import type { Spark } from '../types/spark';
 import logger from '../utils/logger';
 
+// Loading animations components
+const LoadingDonut = () => (
+    <div className="flex items-center gap-2">
+        <div className="relative w-4 h-4">
+            <div className="absolute top-0 left-0 w-full h-full border-2 border-blue-100 rounded-full"></div>
+            <div className="absolute top-0 left-0 w-full h-full border-2 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+        </div>
+        <p className="text-gray-600 text-sm">Configuration du Spark...</p>
+    </div>
+);
+
+const LoadingDots = () => (
+    <div className="flex space-x-2">
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+    </div>
+);
+
 export type Message = {
     role: 'user' | 'assistant';
     content: string;
@@ -23,6 +42,7 @@ interface AIChatInterfaceProps {
     summaryInstructions?: string;
     hideSummary?: boolean;
     shouldHandleAICall?: boolean;
+    isSparkConfig?: boolean;
 }
 
 export function AIChatInterface({ 
@@ -34,7 +54,8 @@ export function AIChatInterface({
     systemPrompt,
     summaryInstructions,
     hideSummary = false,
-    shouldHandleAICall = true
+    shouldHandleAICall = true,
+    isSparkConfig = false
 }: AIChatInterfaceProps) {
     logger.debug('AIChatInterface props:', {
         templateId: template?.id,
@@ -318,11 +339,7 @@ export function AIChatInterface({
                                 style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
                             >
                                 {message.isLoading ? (
-                                    <div className="flex space-x-2">
-                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
-                                    </div>
+                                    isSparkConfig ? <LoadingDonut /> : <LoadingDots />
                                 ) : (
                                     formatMessage(message.content)
                                 )}
@@ -331,12 +348,8 @@ export function AIChatInterface({
                     ))}
                     {isLoading && !messages.some(m => m.isLoading) && (
                         <div className="flex justify-start">
-                            <div className="bg-gray-100 text-gray-800 p-3 rounded-lg">
-                                <div className="flex space-x-2">
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
-                                </div>
+                            <div className={`${isSparkConfig ? 'bg-indigo-100' : 'bg-gray-100'} text-gray-800 p-3 rounded-lg`}>
+                                {isSparkConfig ? <LoadingDonut /> : <LoadingDots />}
                             </div>
                         </div>
                     )}

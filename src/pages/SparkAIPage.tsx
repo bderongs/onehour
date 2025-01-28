@@ -277,6 +277,7 @@ export function SparkAIPage() {
                                         messages={messages}
                                         onMessagesUpdate={handleMessagesUpdate}
                                         hideSummary={true}
+                                        isSparkConfig={true}
                                     />
                                 </div>
                             </div>
