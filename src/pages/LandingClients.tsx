@@ -633,6 +633,7 @@ export function LandingClients() {
                                 template={DOCUMENT_TEMPLATES.spark_finder}
                                 confirmationMessage={CHAT_CONFIGS.spark_finder.confirmationMessage}
                                 submitMessage={CHAT_CONFIGS.spark_finder.submitMessage}
+                                messages={messages}
                             />
                         </div>
                     </div>
