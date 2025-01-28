@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Bot, Users, Briefcase, MessageSquare, Calendar, Zap, Shield, Sparkles, ArrowRight, FileText} from 'lucide-react';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
@@ -7,7 +7,7 @@ import { SparksGrid } from '../components/SparksGrid';
 import { getSparks } from '../services/sparks';
 import type { Spark } from '../types/spark';
 import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
-import { CHAT_CONFIGS } from '../data/chatConfigs';
+import { createChatConfigs } from '../data/chatConfigs';
 import type { DocumentSummary } from '../types/chat';
 import { signUpClientWithEmail, type ClientSignUpData } from '../services/auth';
 import { Notification } from '../components/Notification';
@@ -47,6 +47,9 @@ export function LandingClients() {
     });
     const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
     const [isChatExpanded, setIsChatExpanded] = useState(false);
+
+    // Memoize chat configs to prevent unnecessary recreations
+    const chatConfigs = useMemo(() => createChatConfigs(), []);
 
     useEffect(() => {
         const fetchSparks = async () => {
@@ -355,8 +358,8 @@ export function LandingClients() {
                                                         messages={messages}
                                                         onMessagesUpdate={handleMessagesUpdate}
                                                         template={DOCUMENT_TEMPLATES.spark_finder}
-                                                        systemPrompt={CHAT_CONFIGS.spark_finder.systemPrompt}
-                                                        summaryInstructions={CHAT_CONFIGS.spark_finder.summaryInstructions}
+                                                        systemPrompt={chatConfigs.spark_finder.systemPrompt}
+                                                        summaryInstructions={chatConfigs.spark_finder.summaryInstructions}
                                                         onConnect={handleConnect}
                                                         shouldReset={shouldReset}
                                                     />
@@ -368,8 +371,8 @@ export function LandingClients() {
                                                         onBack={handleBack}
                                                         documentSummary={documentSummary}
                                                         template={DOCUMENT_TEMPLATES.consultant_qualification}
-                                                        confirmationMessage={CHAT_CONFIGS.consultant_qualification.confirmationMessage}
-                                                        submitMessage={CHAT_CONFIGS.consultant_qualification.submitMessage}
+                                                        confirmationMessage={chatConfigs.consultant_qualification.confirmationMessage}
+                                                        submitMessage={chatConfigs.consultant_qualification.submitMessage}
                                                         messages={messages}
                                                     />
                                                 </div>
@@ -631,8 +634,8 @@ export function LandingClients() {
                                 onBack={handleBack}
                                 documentSummary={documentSummary}
                                 template={DOCUMENT_TEMPLATES.spark_finder}
-                                confirmationMessage={CHAT_CONFIGS.spark_finder.confirmationMessage}
-                                submitMessage={CHAT_CONFIGS.spark_finder.submitMessage}
+                                confirmationMessage={chatConfigs.spark_finder.confirmationMessage}
+                                submitMessage={chatConfigs.spark_finder.submitMessage}
                                 messages={messages}
                             />
                         </div>

@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { CheckCircle, Star, Linkedin, Twitter, Globe, X, BadgeCheck, Sparkles, PenSquare } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
 import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
-import { CHAT_CONFIGS } from '../data/chatConfigs';
+import { createChatConfigs } from '../data/chatConfigs';
 import type { DocumentSummary } from '../types/chat';
 import type { Spark } from '../types/spark';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '../types/consultant';
@@ -18,7 +18,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
     const navigate = useNavigate();
     const [showChat, setShowChat] = useState(false);
     const [showConnect, setShowConnect] = useState(false);
-    const [messages, setMessages] = useState<Message[]>([CHAT_CONFIGS.consultant_qualification.initialMessage]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [shouldReset, setShouldReset] = useState(false);
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [consultant, setConsultant] = useState<ConsultantProfile | null>(null);
@@ -96,6 +96,19 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
         };
     }, [consultantId]);
 
+    // Memoize chat configs based on consultant's firstname
+    const chatConfigs = useMemo(
+        () => createChatConfigs(consultant?.first_name),
+        [consultant?.first_name]
+    );
+
+    // Update messages when consultant changes
+    useEffect(() => {
+        if (consultant) {
+            setMessages([chatConfigs.consultant_qualification.initialMessage]);
+        }
+    }, [consultant, chatConfigs]);
+
     // Log state changes
     useEffect(() => {
     }, [loading, error, consultant, reviews, sparks]);
@@ -131,7 +144,9 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
         setShowConnect(false);
         setShowChat(false);
         setShouldReset(true);
-        setMessages([CHAT_CONFIGS.consultant_qualification.initialMessage]);
+        if (consultant) {
+            setMessages([chatConfigs.consultant_qualification.initialMessage]);
+        }
         setDocumentSummary({
             challenge: '',
             currentSituation: '',
@@ -328,7 +343,9 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Sparkles className="h-5 w-5 text-blue-600" />
-                                    <h2 className="text-xl font-semibold text-gray-900">{CHAT_CONFIGS.consultant_qualification.title}</h2>
+                                    <h2 className="text-xl font-semibold text-gray-900">
+                                        {consultant && chatConfigs.consultant_qualification.title}
+                                    </h2>
                                 </div>
                                 <button 
                                     onClick={() => setShowChat(false)}
@@ -337,20 +354,24 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                                     <X className="h-6 w-6" />
                                 </button>
                             </div>
-                            <p className="text-sm text-gray-600 mt-1">{CHAT_CONFIGS.consultant_qualification.subtitle}</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                                {chatConfigs.consultant_qualification.subtitle}
+                            </p>
                         </div>
                         <div className="p-4">
-                            <AIChatInterface
-                                template={DOCUMENT_TEMPLATES.consultant_qualification}
-                                messages={messages}
-                                onMessagesUpdate={handleMessagesUpdate}
-                                shouldReset={shouldReset}
-                                onConnect={handleConnect}
-                                systemPrompt={CHAT_CONFIGS.consultant_qualification.systemPrompt}
-                                summaryInstructions={CHAT_CONFIGS.consultant_qualification.summaryInstructions}
-                                hideSummary={false}
-                                shouldHandleAICall={true}
-                            />
+                            {consultant && chatConfigs && chatConfigs.consultant_qualification && (
+                                <AIChatInterface
+                                    template={DOCUMENT_TEMPLATES.consultant_qualification}
+                                    messages={messages}
+                                    onMessagesUpdate={handleMessagesUpdate}
+                                    shouldReset={shouldReset}
+                                    onConnect={handleConnect}
+                                    systemPrompt={chatConfigs.consultant_qualification.systemPrompt}
+                                    summaryInstructions={chatConfigs.consultant_qualification.summaryInstructions}
+                                    hideSummary={false}
+                                    shouldHandleAICall={true}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -358,14 +379,16 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                 {/* Connect Form */}
                 <div className={`max-w-4xl mx-auto px-4 mb-8 ${showConnect ? 'animate-slide-down' : 'hidden'}`}>
                     <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                        <ConsultantConnect 
-                            onBack={handleBack}
-                            documentSummary={documentSummary}
-                            template={DOCUMENT_TEMPLATES.consultant_qualification}
-                            confirmationMessage={CHAT_CONFIGS.consultant_qualification.confirmationMessage}
-                            submitMessage={CHAT_CONFIGS.consultant_qualification.submitMessage}
-                            messages={messages}
-                        />
+                        {consultant && (
+                            <ConsultantConnect 
+                                onBack={handleBack}
+                                documentSummary={documentSummary}
+                                template={DOCUMENT_TEMPLATES.consultant_qualification}
+                                confirmationMessage={chatConfigs.consultant_qualification.confirmationMessage}
+                                submitMessage={chatConfigs.consultant_qualification.submitMessage}
+                                messages={messages}
+                            />
+                        )}
                     </div>
                 </div>
 

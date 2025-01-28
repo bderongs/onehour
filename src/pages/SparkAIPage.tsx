@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ArrowLeft, Sparkles } from 'lucide-react';
 import type { Spark } from '../types/spark';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
-import { CHAT_CONFIGS } from '../data/chatConfigs';
+import { createChatConfigs } from '../data/chatConfigs';
 import { formatDuration, formatPrice } from '../utils/format';
 import { generateSparkCreatePrompt, generateSparkEditPrompt } from '../services/promptGenerators';
 import { editSparkWithAI } from '../services/openai';
@@ -67,7 +67,14 @@ const useAuthenticatedUser = () => {
 // Custom hook for AI interaction
 const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>) => {
     const [spark, setSpark] = useState<Omit<Spark, 'id'>>(initialSpark);
-    const chatConfig = mode === 'create' ? CHAT_CONFIGS.spark_content_creator : CHAT_CONFIGS.spark_content_editor;
+    
+    // Memoize chat configs to prevent unnecessary recreations
+    const chatConfigs = useMemo(() => createChatConfigs(), []);
+    const chatConfig = useMemo(
+        () => mode === 'create' ? chatConfigs.spark_content_creator : chatConfigs.spark_content_editor,
+        [mode, chatConfigs]
+    );
+    
     const [messages, setMessages] = useState<Message[]>([chatConfig.initialMessage]);
 
     // Update spark when initialSpark changes

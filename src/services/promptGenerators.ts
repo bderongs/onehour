@@ -1,7 +1,7 @@
 import { DocumentTemplate } from '../types/chat';
 import { Spark } from '../types/spark';
 import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
-import { CHAT_CONFIGS } from '../data/chatConfigs';
+import { createChatConfigs } from '../data/chatConfigs';
 
 // Helper function to format a field value for display
 function formatFieldValue(value: any): string {
@@ -148,10 +148,20 @@ ${JSON.stringify(currentValues, null, 4)}`;
  * Generates a prompt specifically for editing a Spark based on user input.
  * This prompt is focused on making precise updates to the Spark content.
  */
-export function generateSparkEditPrompt(spark: Spark): string {
-    return generateSystemPrompt(DOCUMENT_TEMPLATES.spark_content_editor, CHAT_CONFIGS.spark_content_editor.roleDescription, spark);
+export function generateSparkEditPrompt(spark: Spark, consultantFirstname?: string): string {
+    const chatConfigs = createChatConfigs(consultantFirstname);
+    return generateSystemPrompt(
+        DOCUMENT_TEMPLATES.spark_content_editor, 
+        chatConfigs.spark_content_editor.roleDescription, 
+        spark
+    );
 }
 
-export function generateSparkCreatePrompt(spark?: Spark): string {
-    return generateSystemPrompt(DOCUMENT_TEMPLATES.spark_content_creator, CHAT_CONFIGS.spark_content_creator.roleDescription, spark);
+export function generateSparkCreatePrompt(spark?: Spark, consultantFirstname?: string): string {
+    const chatConfigs = createChatConfigs(consultantFirstname);
+    return generateSystemPrompt(
+        DOCUMENT_TEMPLATES.spark_content_creator, 
+        chatConfigs.spark_content_creator.roleDescription, 
+        spark
+    );
 } 
