@@ -108,8 +108,8 @@ export const DOCUMENT_TEMPLATES: Record<string, DocumentTemplate> = {
         id: 'consultant_qualification',
         name: 'Brief de projet',
         placeholderMessage: "Expliquez votre projet à l'assistant pour voir apparaître un résumé de votre besoin ici.",
-        continueConversationMessage: "Continuez à me décrire votre projet pour qu'Arnaud puisse préparer au mieux votre consultation",
-        documentCompleteMessage: "Excellent ! J'ai tous les détails nécessaires pour préparer votre consultation avec Arnaud",
+        continueConversationMessage: "Continuez à me décrire votre projet pour que le consultant puisse préparer au mieux votre consultation.",
+        documentCompleteMessage: "Excellent ! J'ai tous les détails nécessaires pour préparer votre consultation.",
         fields: [
             {
                 key: 'challenge',

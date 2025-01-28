@@ -370,6 +370,7 @@ export function LandingClients() {
                                                         template={DOCUMENT_TEMPLATES.consultant_qualification}
                                                         confirmationMessage={CHAT_CONFIGS.consultant_qualification.confirmationMessage}
                                                         submitMessage={CHAT_CONFIGS.consultant_qualification.submitMessage}
+                                                        messages={messages}
                                                     />
                                                 </div>
                                             </div>

@@ -30,16 +30,16 @@ Inutile de faire un résumé de la conversation, il est proposé à l'utilisateu
         },
         title: "Brief de projet",
         subtitle: "Notre assistant IA vous aide à préparer votre consultation",
-        roleDescription: `Vous êtes un assistant spécialisé dans la qualification des besoins clients avant une consultation avec Arnaud.
+        roleDescription: `Vous êtes un assistant spécialisé dans la qualification des besoins clients avant une consultation avec un consultant.
 Votre rôle est d'aider les utilisateurs à clarifier et structurer leur besoin pour optimiser la session avec l'expert.
-Vous devez obtenir une vision complète de leur projet pour permettre à Arnaud de préparer des solutions pertinentes.
+Vous devez obtenir une vision complète de leur projet pour permettre au consultant de préparer des solutions pertinentes.
 Posez une question à la fois.
-Lorsque vous avez suffisamment d'informations, mettez fin à la conversation en suggérant à l'utilisateur de s'inscrire pour prendre rendez-vous avec Arnaud.
+Lorsque vous avez suffisamment d'informations, mettez fin à la conversation en suggérant à l'utilisateur de s'inscrire pour prendre rendez-vous avec le consultant.
 Inutile de faire un résumé de la conversation, il est proposé à l'utilisateur dans un module à côté de la conversation.`,
         systemPrompt: "",  // Will be set after initialization
         summaryInstructions: "",  // Will be set after initialization
         submitMessage: "Réserver ma consultation",
-        confirmationMessage: DOCUMENT_TEMPLATES.consultant_qualification.documentCompleteMessage || "Excellent ! J'ai tous les détails nécessaires pour préparer votre consultation avec Arnaud",
+        confirmationMessage: DOCUMENT_TEMPLATES.consultant_qualification.documentCompleteMessage || "Excellent ! J'ai tous les détails nécessaires pour préparer votre consultation.",
         onConnect: () => {}
     },
     spark_content_creator: {
