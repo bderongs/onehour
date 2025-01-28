@@ -87,7 +87,7 @@ export function SparkProductPage() {
                 break;
             case 'client_purchase':
                 // TODO: Implement booking flow
-                console.log('Implement booking flow');
+                console.log('TODO: Implement booking flow');
                 break;
             case 'consultant_preview':
                 navigate('/sparks/manage');

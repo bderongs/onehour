@@ -51,17 +51,14 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
 
     // Fetch consultant data when component mounts
     useEffect(() => {
-        console.log('ConsultantProfilePage - Fetching data, id:', consultantId);
         const fetchData = async () => {
             if (!consultantId) {
-                console.log('ConsultantProfilePage - No ID provided');
                 setError('Consultant ID is required');
                 setLoading(false);
                 return;
             }
 
             try {
-                console.log('ConsultantProfilePage - Starting data fetch');
                 const [consultantData, reviewsData, sparksData, missionsData] = await Promise.all([
                     getConsultantProfile(consultantId),
                     getConsultantReviews(consultantId),
@@ -70,18 +67,10 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                 ]);
 
                 if (!consultantData) {
-                    console.log('ConsultantProfilePage - Consultant not found');
                     setError('Consultant not found');
                     setLoading(false);
                     return;
                 }
-
-                console.log('ConsultantProfilePage - Data fetched successfully:', { 
-                    consultant: consultantData,
-                    reviews: reviewsData.length,
-                    sparks: sparksData.length,
-                    missions: missionsData.length
-                });
 
                 setConsultant(consultantData);
                 setReviews(reviewsData);
@@ -89,7 +78,6 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                 setMissions(missionsData);
                 setLoading(false);
             } catch (err) {
-                console.error('ConsultantProfilePage - Error fetching data:', err);
                 setError('Failed to load consultant data');
                 setLoading(false);
             }
@@ -99,7 +87,6 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
         
         // Cleanup function
         return () => {
-            console.log('ConsultantProfilePage - Component cleanup');
             setLoading(true);
             setError(null);
             setConsultant(null);
@@ -111,13 +98,6 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
 
     // Log state changes
     useEffect(() => {
-        console.log('ConsultantProfilePage - State update:', {
-            loading,
-            error,
-            hasConsultant: !!consultant,
-            reviewsCount: reviews.length,
-            sparksCount: sparks.length
-        });
     }, [loading, error, consultant, reviews, sparks]);
 
     // Reset shouldReset after it's been consumed

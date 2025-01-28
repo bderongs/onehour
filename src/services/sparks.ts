@@ -143,8 +143,6 @@ export const createSpark = async (spark: Omit<Spark, 'id'>): Promise<Spark> => {
         url
     };
 
-    console.log('Spark data:', transformSparkToDB(sparkData));
-
     const { data, error } = await supabase
         .from('sparks')
         .insert([transformSparkToDB(sparkData)])
@@ -166,8 +164,6 @@ export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<S
         .select('*')
         .eq('url', url)
         .single();
-
-    console.log('Existing spark:', existingSpark);
 
     if (fetchError) {
         console.error('Error fetching spark:', fetchError);
@@ -202,11 +198,6 @@ export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<S
     // Remove id and transform using the same function as create
     const { id, ...updateFields } = updatedSpark;
     const transformedUpdate = transformSparkToDB(updateFields);
-
-    // Enhanced debugging logs
-    console.log('Original update fields:', updateFields);
-    console.log('Transformed update fields:', transformedUpdate);
-    console.log('Updating spark with URL:', url);
 
     // First update the spark - try without select first
     const { error: updateError } = await supabase

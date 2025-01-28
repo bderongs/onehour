@@ -161,8 +161,6 @@ export async function editSparkWithAI(
             }
         }
         
-        console.log('AI Edit Response:', response);
-        
         return response;
     } catch (error) {
         console.error('OpenAI API Error:', error);

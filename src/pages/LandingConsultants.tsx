@@ -122,8 +122,6 @@ const LandingConsultants = () => {
                 });
             }, 100);
         }
-
-        console.log('Selected spark:', prefillText);
     };
 
     return (

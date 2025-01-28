@@ -99,21 +99,7 @@ const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>) =>
                 ...newMessages.map(msg => ({ role: msg.role, content: msg.content }))
             ];
 
-            // Log the complete conversation being sent to the AI
-            console.group('AI Interaction');
-            console.log('Mode:', mode);
-            console.log('Current Spark State:', spark);
-            console.log('Messages being sent to AI:');
-            aiMessages.forEach((msg, i) => {
-                console.log(`${i + 1}. ${msg.role.toUpperCase()}:\n${msg.content}`);
-            });
-
             const response = await editSparkWithAI(aiMessages);
-
-            // Log the AI's response
-            console.log('\nAI Response:');
-            console.log('Reply:', response.reply);
-            console.log('Document Updates:', response.document);
 
             // Create updated messages before updating the spark state
             const updatedMessages: Message[] = [
@@ -123,7 +109,6 @@ const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>) =>
 
             // Process the document updates
             const documentUpdates = response.document as Partial<Spark>;
-            console.log('Processing document updates:', documentUpdates);
 
             // Create the updated spark state by only applying defined fields
             const updatedSpark = {
@@ -133,10 +118,6 @@ const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>) =>
                         .filter(([_, value]) => value !== undefined)
                 )
             };
-
-            // Log the final state update
-            console.log('Updated Spark State:', updatedSpark);
-            console.groupEnd();
 
             // Update state
             setMessages(updatedMessages);

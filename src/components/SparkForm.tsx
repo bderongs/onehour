@@ -10,7 +10,6 @@ interface SparkFormProps {
 }
 
 export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
-    console.log('Initial duration:', initialData?.duration, typeof initialData?.duration);
 
     // Convert duration from HH:MM:SS format to minutes
     const convertDurationToMinutes = (duration: string): string => {

@@ -111,7 +111,6 @@ export function LandingClients() {
     };
 
     const handleConnect = () => {
-        console.log('LandingClients - handleConnect called, current summary:', documentSummary);
         // Scroll to the sign-up form with smooth behavior
         const element = document.getElementById('signup-form');
         if (element) {
@@ -155,7 +154,6 @@ export function LandingClients() {
         for (let i = newMessages.length - 1; i >= 0; i--) {
             const msg = newMessages[i];
             if (msg.role === 'assistant' && msg.summary) {
-                console.log('LandingClients - Found summary in message:', msg.summary);
                 // Check if the summary is a DocumentSummary by checking for hasEnoughData property
                 if ('hasEnoughData' in msg.summary) {
                     setDocumentSummary(msg.summary as DocumentSummary);
