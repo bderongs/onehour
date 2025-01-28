@@ -7,6 +7,7 @@ import type { Spark } from '../types/spark';
 import { formatDuration, formatPrice } from '../utils/format';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { supabase } from '../lib/supabase';
+import logger from '../utils/logger';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -86,8 +87,7 @@ export function SparkProductPage() {
                 navigate('/consultants#signup-form');
                 break;
             case 'client_purchase':
-                // TODO: Implement booking flow
-                console.log('TODO: Implement booking flow');
+                logger.debug('TODO: Implement booking flow');
                 break;
             case 'consultant_preview':
                 navigate('/sparks/manage');

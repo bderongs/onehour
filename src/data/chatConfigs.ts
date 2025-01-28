@@ -1,6 +1,7 @@
 import { ChatConfig } from '../types/chat';
 import { DOCUMENT_TEMPLATES } from './documentTemplates';
 import { generateSystemPrompt, generateSummaryInstructions } from '../services/promptGenerators';
+import logger from '../utils/logger';
 
 export const createChatConfigs = (consultantFirstname?: string): Record<string, ChatConfig> => {
     const configs = {
@@ -94,12 +95,12 @@ Assurez-vous que les modifications restent cohérentes avec l'ensemble du Spark 
 };
 
 // Initialize dynamic fields
-console.log('Available templates:', Object.keys(DOCUMENT_TEMPLATES));
-console.log('Chat configs to initialize:', Object.keys(createChatConfigs()));
+logger.debug('Available templates:', Object.keys(DOCUMENT_TEMPLATES));
+logger.debug('Chat configs to initialize:', Object.keys(createChatConfigs()));
 
 // Log final state of chat configs
 Object.entries(createChatConfigs()).forEach(([key, config]) => {
-    console.log(`Final state of ${key}:`, {
+    logger.debug(`Final state of ${key}:`, {
         hasSystemPrompt: !!config.systemPrompt,
         hasSummaryInstructions: !!config.summaryInstructions,
     });

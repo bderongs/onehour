@@ -4,6 +4,7 @@ import { analyzeWithOpenAI } from '../services/openai';
 import { DocumentSummary } from './DocumentSummary';
 import type { DocumentTemplate, DocumentSummary as DocumentSummaryType } from '../types/chat';
 import type { Spark } from '../types/spark';
+import logger from '../utils/logger';
 
 export type Message = {
     role: 'user' | 'assistant';
@@ -35,7 +36,7 @@ export function AIChatInterface({
     hideSummary = false,
     shouldHandleAICall = true
 }: AIChatInterfaceProps) {
-    console.log('AIChatInterface props:', {
+    logger.debug('AIChatInterface props:', {
         templateId: template?.id,
         hasMessages: initialMessages.length > 0,
         hasSystemPrompt: !!systemPrompt,
@@ -136,7 +137,7 @@ export function AIChatInterface({
     // Function to get summary if needed
     const updateSummaryIfNeeded = async (messagesForSummary: Message[]) => {
         if (!shouldHandleAICall || !summaryInstructions || !messagesForSummary.some(m => m.role === 'user')) {
-            console.log('Skipping summary generation:', {
+            logger.debug('Skipping summary generation:', {
                 reason: !shouldHandleAICall ? 'shouldHandleAICall is false' : 
                         !summaryInstructions ? 'No summary instructions' : 
                         'No user messages'
@@ -144,8 +145,8 @@ export function AIChatInterface({
             return;
         }
 
-        console.log('Starting summary generation with instructions:', summaryInstructions);
-        console.log('Messages for summary:', messagesForSummary);
+        logger.debug('Starting summary generation with instructions:', summaryInstructions);
+        logger.debug('Messages for summary:', messagesForSummary);
 
         setIsSummaryLoading(true);
 
@@ -165,19 +166,19 @@ export function AIChatInterface({
                 true
             );
 
-            console.log('Raw summary response:', summaryResponse);
+            logger.debug('Raw summary response:', summaryResponse);
 
             if (summaryResponse) {
                 let jsonStr: string;
                 try {
                     const jsonMatch = summaryResponse.match(/\{[\s\S]*\}/);
-                    console.log('JSON match result:', jsonMatch);
+                    logger.debug('JSON match result:', jsonMatch);
                     
                     jsonStr = jsonMatch ? jsonMatch[0] : summaryResponse;
-                    console.log('JSON string to parse:', jsonStr);
+                    logger.debug('JSON string to parse:', jsonStr);
                     
                     const parsedSummary = JSON.parse(jsonStr);
-                    console.log('Parsed summary:', parsedSummary);
+                    logger.debug('Parsed summary:', parsedSummary);
                     
                     setDocumentSummary(parsedSummary);
                     if (onMessagesUpdate) {
@@ -213,7 +214,7 @@ export function AIChatInterface({
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-        console.log('handleSubmit called');
+        logger.debug('handleSubmit called');
         e.preventDefault();
         if (!inputValue.trim()) return;
 
@@ -232,7 +233,7 @@ export function AIChatInterface({
 
         // Only make AI call if shouldHandleAICall is true
         if (shouldHandleAICall && systemPrompt) {
-            console.log('Making AI call with system prompt:', systemPrompt);
+            logger.debug('Making AI call with system prompt:', systemPrompt);
             try {
                 setIsLoading(true);
                 const aiResponse = await analyzeWithOpenAI(

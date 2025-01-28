@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 import type { Spark } from '../types/spark';
+import logger from '../utils/logger';
 
 const openai = new OpenAI({
     apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -176,7 +177,7 @@ export async function analyzeWithOpenAI(
     messages: { role: 'user' | 'assistant' | 'system', content: string }[], 
     isSummaryMode: boolean = false
 ) {
-    console.log('analyzeWithOpenAI called with messages:', messages);
+    logger.debug('analyzeWithOpenAI called with messages:', messages);
     try {
         const formattedMessages: ChatCompletionMessageParam[] = messages;
 
@@ -189,7 +190,7 @@ export async function analyzeWithOpenAI(
         let response = completion.choices[0].message.content || '';
 
         // Log the AI response to the console
-        console.log('AI Response:', response);
+        logger.debug('AI Response:', response);
 
         return response;
     } catch (error) {

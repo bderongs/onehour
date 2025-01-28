@@ -2,6 +2,7 @@ import { DocumentTemplate } from '../types/chat';
 import { Spark } from '../types/spark';
 import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
 import { createChatConfigs } from '../data/chatConfigs';
+import logger from '../utils/logger';
 
 // Helper function to format a field value for display
 function formatFieldValue(value: any): string {
@@ -107,7 +108,7 @@ Instructions importantes :
  * The instructions include the exact format the JSON should follow, using the template's fields.
  */
 export function generateSummaryInstructions(template: DocumentTemplate, currentSpark?: Spark): string {
-    console.log('Generating summary instructions for template:', template);
+    logger.debug('Generating summary instructions for template:', template);
     
     const jsonFormat = template.fields.reduce((acc, field) => {
         acc[field.key] = field.description || field.label;
@@ -115,7 +116,7 @@ export function generateSummaryInstructions(template: DocumentTemplate, currentS
     }, {} as Record<string, string>);
     jsonFormat.hasEnoughData = "boolean indiquant si nous avons suffisamment d'informations";
 
-    console.log('Generated JSON format:', jsonFormat);
+    logger.debug('Generated JSON format:', jsonFormat);
 
     let instructions = `Analysez la conversation et créez un résumé JSON des informations, dans la langue de la conversation.
 Le JSON doit suivre exactement ce format:
@@ -140,7 +141,7 @@ Contenu actuel :
 ${JSON.stringify(currentValues, null, 4)}`;
     }
 
-    console.log('Final instructions:', instructions);
+    logger.debug('Final instructions:', instructions);
     return instructions;
 }
 
