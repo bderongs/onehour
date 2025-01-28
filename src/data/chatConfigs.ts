@@ -42,23 +42,41 @@ Inutile de faire un résumé de la conversation, il est proposé à l'utilisateu
         confirmationMessage: DOCUMENT_TEMPLATES.consultant_qualification.documentCompleteMessage || "Excellent ! J'ai tous les détails nécessaires pour préparer votre consultation avec Arnaud",
         onConnect: () => {}
     },
-    spark_content_assistant: {
+    spark_content_creator: {
         initialMessage: {
             role: 'assistant',
-            content: "Bonjour ! Je suis votre assistant Spark. Je peux vous aider à créer ou améliorer votre Spark. Parlez-moi d'une expertise précise que vous souhaitez mettre en avant, ou copiez-collez un texte qui la décrit. Je me chargerai de la mettre en forme pour créer une offre claire et attractive. Vous pouvez également me demander des ajustements spécifiques à tout moment !"
+            content: "Bonjour ! Je suis votre assistant Spark, spécialisé dans la création d'offres de conseil courtes et ciblées. Quelle expertise souhaitez-vous mettre en avant aujourd'hui ?"
         },
         title: "Assistant Spark",
-        subtitle: "Notre assistant IA vous aide à créer et améliorer votre Spark",
-        roleDescription: `Vous êtes un assistant spécialisé dans la création et l'édition de Sparks. Un Spark est une offre de conseil courte et ciblée.
-Votre rôle est d'aider les consultants à créer ou améliorer leur Spark en fonction de leur expertise et de leurs besoins.
-Vous pouvez modifier tous les aspects du Spark : titre, description, prix, durée, méthodologie, etc. séparément, ou plusieurs à la fois.
-Écoutez attentivement les demandes et n'effectuez que les changements demandés.
-Assurez-vous que les modifications restent cohérentes avec l'ensemble du Spark et que l'offre est claire et attractive.
-Si vous créez un nouveau Spark, guidez le consultant en posant des questions pertinentes pour comprendre son expertise et structurer son offre.`,
+        subtitle: "Notre assistant IA vous aide à créer votre Spark",
+        roleDescription: `Vous êtes un assistant spécialisé dans la création de Sparks. Un Spark est une offre de conseil courte et ciblée.
+Votre rôle est d'aider les consultants à créer leur Spark en fonction de leur expertise.
+Vous pouvez définir tous les aspects du Spark : titre, description, prix, durée, méthodologie, etc.
+Guidez le consultant en posant des questions pertinentes pour comprendre son expertise et structurer son offre.
+Assurez-vous que l'offre est claire, attractive et cohérente.
+Après avoir généré le Spark, indiquez à l'utilisateur que vous pouvez le modifier pour améliorer son contenu, point par point ou dans son ensemble.`,
         systemPrompt: "",  // Will be set after initialization
         summaryInstructions: "",  // Will be set after initialization
-        submitMessage: "Enregistrer le Spark",
-        confirmationMessage: "Parfait ! Votre Spark a été enregistré.",
+        submitMessage: "Créer le Spark",
+        confirmationMessage: "Parfait ! Votre Spark a été créé.",
+        onConnect: () => {}
+    },
+    spark_content_editor: {
+        initialMessage: {
+            role: 'assistant',
+            content: "Bonjour ! Je suis votre assistant Spark. Je vois le contenu de votre Spark. Que souhaitez-vous améliorer ?"
+        },
+        title: "Assistant Spark",
+        subtitle: "Notre assistant IA vous aide à améliorer votre Spark",
+        roleDescription: `Vous êtes un assistant spécialisé dans l'édition de Sparks. Un Spark est une offre de conseil courte et ciblée.
+Votre rôle est d'aider les consultants à améliorer leur Spark existant.
+Vous pouvez modifier tous les aspects du Spark : titre, description, prix, durée, méthodologie, etc. séparément, ou plusieurs à la fois.
+Écoutez attentivement les demandes et n'effectuez que les changements demandés.
+Assurez-vous que les modifications restent cohérentes avec l'ensemble du Spark et que l'offre est claire et attractive.`,
+        systemPrompt: "",  // Will be set after initialization
+        summaryInstructions: "",  // Will be set after initialization
+        submitMessage: "Enregistrer les modifications",
+        confirmationMessage: "Parfait ! Vos modifications ont été enregistrées.",
         onConnect: () => {}
     }
 };

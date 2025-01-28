@@ -67,7 +67,8 @@ const useAuthenticatedUser = () => {
 // Custom hook for AI interaction
 const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>) => {
     const [spark, setSpark] = useState<Omit<Spark, 'id'>>(initialSpark);
-    const [messages, setMessages] = useState<Message[]>([CHAT_CONFIGS.spark_content_assistant.initialMessage]);
+    const chatConfig = mode === 'create' ? CHAT_CONFIGS.spark_content_creator : CHAT_CONFIGS.spark_content_editor;
+    const [messages, setMessages] = useState<Message[]>([chatConfig.initialMessage]);
 
     // Update spark when initialSpark changes
     useEffect(() => {
@@ -149,7 +150,7 @@ const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>) =>
         }
     };
 
-    return { spark, messages, handleMessagesUpdate };
+    return { spark, messages, handleMessagesUpdate, chatConfig };
 };
 
 // Preview section component
@@ -195,7 +196,7 @@ export function SparkAIPage() {
         fetchSpark();
     }, [sparkUrl, navigate]);
 
-    const { spark, messages, handleMessagesUpdate } = useSparkAI(mode, initialSpark);
+    const { spark, messages, handleMessagesUpdate, chatConfig } = useSparkAI(mode, initialSpark);
 
     const handleSave = async () => {
         if (!userId) {
@@ -278,9 +279,9 @@ export function SparkAIPage() {
                                 <div className="p-4 border-b border-gray-200">
                                     <div className="flex items-center gap-2">
                                         <Sparkles className="h-5 w-5 text-blue-600" />
-                                        <h2 className="text-xl font-semibold text-gray-900">{CHAT_CONFIGS.spark_content_assistant.title}</h2>
+                                        <h2 className="text-xl font-semibold text-gray-900">{chatConfig.title}</h2>
                                     </div>
-                                    <p className="text-sm text-gray-600 mt-1">{CHAT_CONFIGS.spark_content_assistant.subtitle}</p>
+                                    <p className="text-sm text-gray-600 mt-1">{chatConfig.subtitle}</p>
                                 </div>
                                 <div className="p-4">
                                     <AIChatInterface
