@@ -39,11 +39,8 @@ export function ConsultantConnect({
         e.preventDefault();
 
         try {
-            await submitToGoogleForm({
-                name: form.name,
-                email: form.email,
-                phone: form.phone || '',
-                preferredContact: form.preferredContact,
+            // Format the document summary as a single string
+            const formattedSummary = JSON.stringify({
                 challenge: documentSummary.challenge || 'missing',
                 currentSituation: documentSummary.currentSituation || 'missing',
                 desiredOutcome: documentSummary.desiredOutcome || 'missing',
@@ -51,6 +48,14 @@ export function ConsultantConnect({
                 stakeholders: documentSummary.stakeholders || 'missing',
                 previousAttempts: documentSummary.previousAttempts || 'missing',
                 hasEnoughData: documentSummary.hasEnoughData
+            });
+
+            await submitToGoogleForm({
+                name: form.name,
+                email: form.email,
+                phone: form.phone || '',
+                preferredContact: form.preferredContact,
+                documentSummary: formattedSummary
             });
 
             setIsSubmitted(true);
