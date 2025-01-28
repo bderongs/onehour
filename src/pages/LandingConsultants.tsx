@@ -106,7 +106,7 @@ const LandingConsultants = () => {
         });
     };
 
-    const handleSparkCreation = (prefillText: string) => {
+    const handleSparkCreation = () => {
         const element = document.getElementById('signup-form');
         const headerOffset = 120; // Increased offset to show more of the form header
 
