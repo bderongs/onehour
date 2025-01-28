@@ -1,7 +1,5 @@
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-type LogLevel = 'log' | 'info' | 'warn' | 'error' | 'debug';
-
 const logger = {
   log: (...args: any[]) => {
     if (isDevelopment) {
