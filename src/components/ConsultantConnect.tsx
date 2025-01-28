@@ -3,6 +3,7 @@ import { ArrowLeft, CheckCircle, X } from 'lucide-react';
 import { submitToGoogleForm } from '../services/formSubmission';
 import type { DocumentTemplate, DocumentSummary } from '../types/chat';
 import { Notification } from '../components/Notification';
+import type { Message } from '../components/AIChatInterface';
 
 interface ContactForm {
     name: string;
@@ -17,6 +18,7 @@ interface ConsultantConnectProps {
     template: DocumentTemplate;
     confirmationMessage: string;
     submitMessage: string;
+    messages: Message[];
 }
 
 export function ConsultantConnect({ 
@@ -24,7 +26,8 @@ export function ConsultantConnect({
     documentSummary, 
     template,
     confirmationMessage,
-    submitMessage
+    submitMessage,
+    messages
 }: ConsultantConnectProps) {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
@@ -50,12 +53,19 @@ export function ConsultantConnect({
                 hasEnoughData: documentSummary.hasEnoughData
             });
 
+            // Format chat history
+            const chatHistory = messages.map(msg => ({
+                role: msg.role,
+                content: msg.content
+            }));
+
             await submitToGoogleForm({
                 name: form.name,
                 email: form.email,
                 phone: form.phone || '',
                 preferredContact: form.preferredContact,
-                documentSummary: formattedSummary
+                documentSummary: formattedSummary,
+                chatHistory: JSON.stringify(chatHistory)
             });
 
             setIsSubmitted(true);
