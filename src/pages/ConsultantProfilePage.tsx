@@ -348,6 +348,8 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                                 onConnect={handleConnect}
                                 systemPrompt={CHAT_CONFIGS.consultant_qualification.systemPrompt}
                                 summaryInstructions={CHAT_CONFIGS.consultant_qualification.summaryInstructions}
+                                hideSummary={false}
+                                shouldHandleAICall={true}
                             />
                         </div>
                     </div>

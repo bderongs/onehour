@@ -176,6 +176,7 @@ export async function analyzeWithOpenAI(
     messages: { role: 'user' | 'assistant' | 'system', content: string }[], 
     isSummaryMode: boolean = false
 ) {
+    console.log('analyzeWithOpenAI called with messages:', messages);
     try {
         const formattedMessages: ChatCompletionMessageParam[] = messages;
 

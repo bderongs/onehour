@@ -266,7 +266,7 @@ export function SparkAIPage() {
                                 </div>
                                 <div className="p-4">
                                     <AIChatInterface
-                                        template={DOCUMENT_TEMPLATES.spark_content_assistant}
+                                        template={mode === 'create' ? DOCUMENT_TEMPLATES.spark_content_creator : DOCUMENT_TEMPLATES.spark_content_editor}
                                         messages={messages}
                                         onMessagesUpdate={handleMessagesUpdate}
                                         hideSummary={true}

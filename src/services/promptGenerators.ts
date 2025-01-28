@@ -107,11 +107,15 @@ Instructions importantes :
  * The instructions include the exact format the JSON should follow, using the template's fields.
  */
 export function generateSummaryInstructions(template: DocumentTemplate, currentSpark?: Spark): string {
+    console.log('Generating summary instructions for template:', template);
+    
     const jsonFormat = template.fields.reduce((acc, field) => {
         acc[field.key] = field.description || field.label;
         return acc;
     }, {} as Record<string, string>);
     jsonFormat.hasEnoughData = "boolean indiquant si nous avons suffisamment d'informations";
+
+    console.log('Generated JSON format:', jsonFormat);
 
     let instructions = `Analysez la conversation et créez un résumé JSON des informations, dans la langue de la conversation.
 Le JSON doit suivre exactement ce format:
@@ -136,6 +140,7 @@ Contenu actuel :
 ${JSON.stringify(currentValues, null, 4)}`;
     }
 
+    console.log('Final instructions:', instructions);
     return instructions;
 }
 
@@ -144,9 +149,9 @@ ${JSON.stringify(currentValues, null, 4)}`;
  * This prompt is focused on making precise updates to the Spark content.
  */
 export function generateSparkEditPrompt(spark: Spark): string {
-    return generateSystemPrompt(DOCUMENT_TEMPLATES.spark_content_assistant, CHAT_CONFIGS.spark_content_editor.roleDescription, spark);
+    return generateSystemPrompt(DOCUMENT_TEMPLATES.spark_content_editor, CHAT_CONFIGS.spark_content_editor.roleDescription, spark);
 }
 
 export function generateSparkCreatePrompt(spark?: Spark): string {
-    return generateSystemPrompt(DOCUMENT_TEMPLATES.spark_content_assistant, CHAT_CONFIGS.spark_content_creator.roleDescription, spark);
+    return generateSystemPrompt(DOCUMENT_TEMPLATES.spark_content_creator, CHAT_CONFIGS.spark_content_creator.roleDescription, spark);
 } 

@@ -35,6 +35,14 @@ export function AIChatInterface({
     hideSummary = false,
     shouldHandleAICall = true
 }: AIChatInterfaceProps) {
+    console.log('AIChatInterface props:', {
+        templateId: template?.id,
+        hasMessages: initialMessages.length > 0,
+        hasSystemPrompt: !!systemPrompt,
+        hasSummaryInstructions: !!summaryInstructions,
+        summaryInstructions: summaryInstructions?.substring(0, 100) + '...'
+    });
+
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [inputValue, setInputValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +78,10 @@ export function AIChatInterface({
     // Handle initial AI response when external messages are provided
     useEffect(() => {
         const getInitialResponse = async () => {
-            if (!initialMessages || initialMessages.length === 0 || isInitialized || !systemPrompt) return;
+            if (!initialMessages || initialMessages.length === 0 || isInitialized || !systemPrompt || !shouldHandleAICall) {
+                setIsInitialized(true);
+                return;
+            }
             
             // Don't respond if the last message is from the assistant
             if (initialMessages[initialMessages.length - 1].role === 'assistant') {
@@ -97,6 +108,7 @@ export function AIChatInterface({
                         { role: 'assistant', content: aiResponse }
                     ];
                     updateMessages(updatedMessages);
+                    // Call updateSummaryIfNeeded after the initial response
                     await updateSummaryIfNeeded(updatedMessages);
                 }
             } catch (error) {
@@ -112,7 +124,7 @@ export function AIChatInterface({
         };
 
         getInitialResponse();
-    }, [initialMessages, systemPrompt, isInitialized]);
+    }, [initialMessages, systemPrompt, isInitialized, shouldHandleAICall]);
 
     // Keep focus on textarea after sending message
     useEffect(() => {
@@ -123,7 +135,17 @@ export function AIChatInterface({
 
     // Function to get summary if needed
     const updateSummaryIfNeeded = async (messagesForSummary: Message[]) => {
-        if (!summaryInstructions || !messagesForSummary.some(m => m.role === 'user')) return;
+        if (!shouldHandleAICall || !summaryInstructions || !messagesForSummary.some(m => m.role === 'user')) {
+            console.log('Skipping summary generation:', {
+                reason: !shouldHandleAICall ? 'shouldHandleAICall is false' : 
+                        !summaryInstructions ? 'No summary instructions' : 
+                        'No user messages'
+            });
+            return;
+        }
+
+        console.log('Starting summary generation with instructions:', summaryInstructions);
+        console.log('Messages for summary:', messagesForSummary);
 
         setIsSummaryLoading(true);
 
@@ -143,12 +165,19 @@ export function AIChatInterface({
                 true
             );
 
+            console.log('Raw summary response:', summaryResponse);
+
             if (summaryResponse) {
+                let jsonStr: string;
                 try {
                     const jsonMatch = summaryResponse.match(/\{[\s\S]*\}/);
-                    const jsonStr = jsonMatch ? jsonMatch[0] : summaryResponse;
+                    console.log('JSON match result:', jsonMatch);
+                    
+                    jsonStr = jsonMatch ? jsonMatch[0] : summaryResponse;
+                    console.log('JSON string to parse:', jsonStr);
                     
                     const parsedSummary = JSON.parse(jsonStr);
+                    console.log('Parsed summary:', parsedSummary);
                     
                     setDocumentSummary(parsedSummary);
                     if (onMessagesUpdate) {
@@ -161,6 +190,7 @@ export function AIChatInterface({
                     }
                 } catch (e) {
                     console.error('Failed to parse summary JSON:', e);
+                    console.error('Failed JSON string:', jsonStr!);
                 }
             }
         } catch (error) {
@@ -183,6 +213,7 @@ export function AIChatInterface({
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
+        console.log('handleSubmit called');
         e.preventDefault();
         if (!inputValue.trim()) return;
 
@@ -201,6 +232,7 @@ export function AIChatInterface({
 
         // Only make AI call if shouldHandleAICall is true
         if (shouldHandleAICall && systemPrompt) {
+            console.log('Making AI call with system prompt:', systemPrompt);
             try {
                 setIsLoading(true);
                 const aiResponse = await analyzeWithOpenAI(
@@ -224,6 +256,8 @@ export function AIChatInterface({
                     if (onMessagesUpdate) {
                         onMessagesUpdate(newMessages);
                     }
+                    // Call updateSummaryIfNeeded after we get the AI response
+                    await updateSummaryIfNeeded(newMessages);
                 }
             } catch (error) {
                 console.error('Error getting AI response:', error);

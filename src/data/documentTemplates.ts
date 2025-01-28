@@ -209,8 +209,16 @@ export const DOCUMENT_TEMPLATES: Record<string, DocumentTemplate> = {
             }
         ]
     },
-    spark_content_assistant: {
-        id: 'spark_content_assistant',
+    spark_content_creator: {
+        id: 'spark_content_creator',
+        name: 'Contenu du Spark',
+        placeholderMessage: "Commencez la conversation pour générer le contenu de votre Spark.",
+        continueConversationMessage: "Continuez à me décrire votre Spark pour que je puisse vous aider à créer un contenu pertinent",
+        documentCompleteMessage: "J'ai toutes les informations pour votre Spark !",
+        fields: generateSparkFields()
+    },
+    spark_content_editor: {
+        id: 'spark_content_editor',
         name: 'Contenu du Spark',
         placeholderMessage: "Commencez la conversation pour générer le contenu de votre Spark.",
         continueConversationMessage: "Continuez à me décrire votre Spark pour que je puisse vous aider à créer un contenu pertinent",

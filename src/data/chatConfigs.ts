@@ -82,10 +82,30 @@ Assurez-vous que les modifications restent cohérentes avec l'ensemble du Spark 
 };
 
 // Initialize dynamic fields
+console.log('Available templates:', Object.keys(DOCUMENT_TEMPLATES));
+console.log('Chat configs to initialize:', Object.keys(CHAT_CONFIGS));
+
 Object.entries(CHAT_CONFIGS).forEach(([key, config]) => {
+    console.log(`Processing chat config: ${key}`);
     const template = DOCUMENT_TEMPLATES[key as keyof typeof DOCUMENT_TEMPLATES];
+    console.log(`Found template for ${key}:`, template ? 'yes' : 'no');
     if (template) {
+        console.log(`Generating prompts for ${key} with template:`, template);
         config.systemPrompt = generateSystemPrompt(template, config.roleDescription);
         config.summaryInstructions = generateSummaryInstructions(template);
+        console.log(`Generated instructions for ${key}:`, {
+            systemPrompt: config.systemPrompt?.substring(0, 100) + '...',
+            summaryInstructions: config.summaryInstructions?.substring(0, 100) + '...'
+        });
+    } else {
+        console.warn(`No template found for chat config: ${key}`);
     }
+});
+
+// Log final state of chat configs
+Object.entries(CHAT_CONFIGS).forEach(([key, config]) => {
+    console.log(`Final state of ${key}:`, {
+        hasSystemPrompt: !!config.systemPrompt,
+        hasSummaryInstructions: !!config.summaryInstructions,
+    });
 }); 
