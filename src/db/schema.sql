@@ -29,7 +29,7 @@ create table if not exists profiles (
     email text unique not null,
     first_name text not null,
     last_name text not null,
-    role user_role not null default 'client',
+    roles user_role[] not null default '{client}',
     
     -- Basic profile info
     title text, -- e.g. "Expert en Transformation Digitale & Innovation"
@@ -154,7 +154,7 @@ end $$;
 
 -- Create indexes
 create index if not exists profiles_email_idx on profiles (email);
-create index if not exists profiles_role_idx on profiles (role);
+create index if not exists profiles_role_idx on profiles (roles);
 
 -- Create a table for sparks if it doesn't exist
 create table if not exists sparks (
@@ -210,14 +210,14 @@ begin
                 exists (
                     select 1 from profiles
                     where id = auth.uid()
-                    and (role = 'consultant' or role = 'admin')
+                    and (roles @> array['consultant'] or roles @> array['admin'])
                 )
                 and (
                     auth.uid() = consultant
                     or exists (
                         select 1 from profiles
                         where id = auth.uid()
-                        and role = 'admin'
+                        and roles @> array['admin']
                     )
                 )
             );
@@ -235,14 +235,14 @@ begin
                 (exists (
                     select 1 from profiles
                     where id = auth.uid()
-                    and role = 'consultant'
+                    and roles @> array['consultant']
                 )
                 and auth.uid() = consultant)
                 or
                 (exists (
                     select 1 from profiles
                     where id = auth.uid()
-                    and role = 'admin'
+                    and roles @> array['admin']
                 ))
             );
     end if;
@@ -259,14 +259,14 @@ begin
                 (exists (
                     select 1 from profiles
                     where id = auth.uid()
-                    and role = 'consultant'
+                    and roles @> array['consultant']
                 )
                 and auth.uid() = consultant)
                 or
                 (exists (
                     select 1 from profiles
                     where id = auth.uid()
-                    and role = 'admin'
+                    and roles @> array['admin']
                 ))
             );
     end if;
@@ -388,14 +388,14 @@ begin
                 (exists (
                     select 1 from profiles
                     where id = auth.uid()
-                    and role = 'consultant'
+                    and roles @> array['consultant']
                 )
                 and consultant_id = auth.uid())
                 or
                 (exists (
                     select 1 from profiles
                     where id = auth.uid()
-                    and role = 'admin'
+                    and roles @> array['admin']
                 ))
             );
     end if;

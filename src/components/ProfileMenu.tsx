@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { UserProfile, getCurrentUser } from '../services/auth';
 import { supabase } from '../lib/supabase';
-import { User, LogOut, Settings, UserCircle, Sparkles, ExternalLink } from 'lucide-react';
+import { User, LogOut, Settings, UserCircle, Sparkles, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function ProfileMenu() {
@@ -69,6 +69,18 @@ export function ProfileMenu() {
                             <span className="flex-1">Page Sparkier</span>
                             <ExternalLink className="w-3 h-3 text-gray-400" />
                         </a>
+                        {user.roles.includes('admin') && (
+                            <button
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    navigate('/admin');
+                                }}
+                                className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                <ShieldCheck className="w-4 h-4 mr-2" />
+                                Administration
+                            </button>
+                        )}
                         <button
                             onClick={() => {
                                 setIsOpen(false);

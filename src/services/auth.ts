@@ -77,7 +77,7 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
                 linkedin: data.linkedin,
                 expertise: data.expertise,
                 experience: data.experience,
-                role: 'consultant',
+                roles: ['consultant'],
                 created_at: new Date().toISOString()
             }
         ])
@@ -115,7 +115,7 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
                 first_name: data.firstName,
                 last_name: data.lastName,
                 company: data.company,
-                role: 'client',
+                roles: ['client'],
                 expertise: data.industry, // Using industry as expertise for clients
                 experience: data.role, // Using role as experience for clients
                 created_at: new Date().toISOString()
@@ -137,7 +137,7 @@ export interface UserProfile {
     linkedin?: string;
     expertise: string;
     experience: string;
-    role: UserRole;
+    roles: UserRole[];
 }
 
 // Transform database snake_case to camelCase
@@ -149,7 +149,7 @@ const transformProfileFromDB = (profile: any): UserProfile => ({
     linkedin: profile.linkedin,
     expertise: profile.expertise,
     experience: profile.experience,
-    role: profile.role,
+    roles: profile.roles,
 });
 
 export const getCurrentUser = async (): Promise<UserProfile | null> => {
@@ -176,33 +176,33 @@ export const getCurrentUser = async (): Promise<UserProfile | null> => {
 
 export const isConsultant = async (): Promise<boolean> => {
     const user = await getCurrentUser();
-    return user?.role === 'consultant';
+    return user?.roles.includes('consultant') ?? false;
 };
 
 export const isAdmin = async (): Promise<boolean> => {
     const user = await getCurrentUser();
-    return user?.role === 'admin';
+    return user?.roles.includes('admin') ?? false;
 };
 
 export const isClient = async (): Promise<boolean> => {
     const user = await getCurrentUser();
-    return user?.role === 'client';
+    return user?.roles.includes('client') ?? false;
 };
 
-export const updateUserRole = async (userId: string, role: UserRole): Promise<void> => {
+export const updateUserRoles = async (userId: string, roles: UserRole[]): Promise<void> => {
     // Only admins can update roles
     const currentUser = await getCurrentUser();
-    if (currentUser?.role !== 'admin') {
+    if (!currentUser?.roles.includes('admin')) {
         throw new Error('Only administrators can update user roles');
     }
 
     const { error } = await supabase
         .from('profiles')
-        .update({ role })
+        .update({ roles })
         .eq('id', userId);
 
     if (error) {
-        console.error('Error updating user role:', error);
+        console.error('Error updating user roles:', error);
         throw error;
     }
 };

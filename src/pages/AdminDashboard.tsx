@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Users, Briefcase, Settings } from 'lucide-react';
+import { Users, Briefcase, Settings, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function AdminDashboard() {
@@ -13,6 +13,13 @@ export function AdminDashboard() {
             onClick: () => navigate('/admin/consultants'),
             cta: 'Gérer les consultants',
             highlight: true
+        },
+        {
+            title: 'Gestion des sparks',
+            description: 'Gérez les sparks et leurs configurations',
+            icon: <Zap className="h-8 w-8 text-blue-500" />,
+            onClick: () => navigate('/admin/sparks'),
+            cta: 'Gérer les sparks'
         },
         {
             title: 'Gestion des clients',
