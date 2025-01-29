@@ -266,7 +266,9 @@ export function AdminConsultantsPage() {
                     <EmptyState />
                 ) : (
                     <div className="space-y-2">
-                        {consultants.map((consultant) => (
+                        {consultants
+                            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                            .map((consultant) => (
                             <ConsultantRow
                                 key={consultant.id}
                                 consultant={consultant}
