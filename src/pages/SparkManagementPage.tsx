@@ -94,10 +94,8 @@ export function SparkManagementPage() {
                     return;
                 }
 
-                // Fetch sparks based on roles
-                const fetchedSparks = profile.roles.includes('admin')
-                    ? await getSparks()
-                    : await getSparksByConsultant(user.id);
+                // Fetch only sparks belonging to the current user
+                const fetchedSparks = await getSparksByConsultant(user.id);
 
                 setSparks(fetchedSparks);
                 setLoading(false);
