@@ -73,7 +73,7 @@ export function ProfileMenu() {
                             <button
                                 onClick={() => {
                                     setIsOpen(false);
-                                    navigate('/admin');
+                                    navigate('/admin/dashboard');
                                 }}
                                 className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                             >

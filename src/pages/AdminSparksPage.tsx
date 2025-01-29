@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Eye, Sparkles, Rocket } from 'lucide-react';
+import { Plus, Rocket } from 'lucide-react';
 import type { Spark } from '../types/spark';
 import { supabase } from '../lib/supabase';
-import { getSparksByConsultant, deleteSpark } from '../services/sparks';
+import { getSparks, deleteSpark } from '../services/sparks';
 import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DashboardSparksGrid } from '../components/DashboardSparksGrid';
-
 
 const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -20,10 +19,10 @@ const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
         >
             <Rocket className="h-20 w-20 text-blue-500" />
         </motion.div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">Lancez votre premier Spark !</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">Aucun Spark disponible</h2>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl">
-            Créez votre premier Spark en quelques minutes grâce à notre assistant IA.
-            Partagez votre expertise et développez une nouvelle source de revenus avec des appels optimisés et semi-automatisés.
+            Il n'y a actuellement aucun Spark dans la base de données.
+            Vous pouvez en créer un nouveau ou attendre que les consultants en créent.
         </p>
         <motion.div
             whileHover={{ scale: 1.05 }}
@@ -34,30 +33,13 @@ const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg flex items-center gap-2 transition-colors"
             >
                 <Plus className="h-6 w-6" />
-                Créer mon premier Spark
+                Créer un Spark
             </button>
         </motion.div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-4xl mx-auto">
-            <div className="bg-white p-6 rounded-xl shadow-md">
-                <Sparkles className="h-8 w-8 text-blue-500 mb-4" />
-                <h3 className="font-semibold text-lg mb-2">Création rapide avec l'assistant IA</h3>
-                <p className="text-gray-600">Notre assistant vous guide pour créer un Spark professionnel en quelques minutes</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md">
-                <Eye className="h-8 w-8 text-blue-500 mb-4" />
-                <h3 className="font-semibold text-lg mb-2">Attirez des clients</h3>
-                <p className="text-gray-600">Augmentez votre visibilité et trouvez de nouveaux clients qualifiés</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md">
-                <Rocket className="h-8 w-8 text-blue-500 mb-4" />
-                <h3 className="font-semibold text-lg mb-2">Optimisez vos revenus</h3>
-                <p className="text-gray-600">Maximisez l'impact de vos appels grâce à un processus semi-automatisé</p>
-            </div>
-        </div>
     </div>
 );
 
-export function SparkManagementPage() {
+export function AdminSparksPage() {
     const navigate = useNavigate();
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
@@ -71,7 +53,7 @@ export function SparkManagementPage() {
     useEffect(() => {
         const fetchUserAndSparks = async () => {
             try {
-                // Get current user and their role
+                // Get current user and verify admin role
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) {
                     navigate('/signin');
@@ -84,19 +66,13 @@ export function SparkManagementPage() {
                     .eq('id', user.id)
                     .single();
 
-                if (!profile) {
-                    throw new Error('Profile not found');
-                }
-
-                // Only allow consultants and admins to access this page
-                if (!profile.roles.includes('consultant') && !profile.roles.includes('admin')) {
+                if (!profile || !profile.roles.includes('admin')) {
                     navigate('/');
                     return;
                 }
 
-                // Fetch only sparks belonging to the current user
-                const fetchedSparks = await getSparksByConsultant(user.id);
-
+                // Fetch all sparks for admin
+                const fetchedSparks = await getSparks();
                 setSparks(fetchedSparks);
                 setLoading(false);
             } catch (err) {
@@ -159,7 +135,7 @@ export function SparkManagementPage() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
                 <div className="text-center">
-                    <p className="text-red-600">Impossible de charger les Sparks. Veuillez réessayer plus tard.</p>
+                    <p className="text-red-600">{error}</p>
                     <button
                         onClick={() => window.location.reload()}
                         className="mt-4 text-blue-600 hover:text-blue-700"
@@ -192,7 +168,8 @@ export function SparkManagementPage() {
             />
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Mes Sparks</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Gestion des Sparks</h1>
+                    <p className="text-gray-600 mt-2">Gérez tous les Sparks de la plateforme</p>
                 </div>
 
                 {sparks.length === 0 ? (
@@ -210,4 +187,4 @@ export function SparkManagementPage() {
             </div>
         </div>
     );
-}
+} 
