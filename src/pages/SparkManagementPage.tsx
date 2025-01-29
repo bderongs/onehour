@@ -1,20 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Eye, Sparkles, Rocket } from 'lucide-react';
+import { Plus, Eye, Sparkles, Rocket } from 'lucide-react';
 import type { Spark } from '../types/spark';
-import { formatDuration, formatPrice } from '../utils/format';
 import { supabase } from '../lib/supabase';
 import { getSparks, getSparksByConsultant, deleteSpark } from '../services/sparks';
 import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DashboardSparksGrid } from '../components/DashboardSparksGrid';
 
-const fadeInUp = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5 }
-};
 
 const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
