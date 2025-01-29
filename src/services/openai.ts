@@ -36,7 +36,7 @@ export async function editSparkWithAI(
                         properties: {
                             reply: {
                                 type: 'string',
-                                description: 'La réponse conversationnelle à l\'utilisateur expliquant les modifications'
+                                description: 'La réponse conversationnelle à l\'utilisateur'
                             },
                             document: {
                                 type: 'object',
@@ -58,11 +58,6 @@ export async function editSparkWithAI(
                                         type: 'array', 
                                         items: { type: 'string' },
                                         description: 'Liste des bénéfices'
-                                    },
-                                    highlight: { 
-                                        type: 'string', 
-                                        description: 'Tag de mise en avant du Spark (maximum 2 mots)',
-                                        pattern: '^(?:\\S+\\s?){1,2}$'
                                     },
                                     detailedDescription: { type: 'string', description: 'Description détaillée du Spark' },
                                     methodology: {

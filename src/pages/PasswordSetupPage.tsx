@@ -8,6 +8,7 @@ import { PasswordRequirements, isPasswordValid, doPasswordsMatch } from '../comp
 export function PasswordSetupPage() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [userEmail, setUserEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const navigate = useNavigate();
@@ -18,7 +19,20 @@ export function PasswordSetupPage() {
         const token = searchParams.get('token');
         if (!token) {
             navigate('/signin');
+            return;
         }
+
+        // Get the email from the authenticated session
+        const getEmail = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user?.email) {
+                navigate('/signin');
+                return;
+            }
+            setUserEmail(user.email);
+        };
+
+        getEmail();
     }, [searchParams, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -112,6 +126,16 @@ export function PasswordSetupPage() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Hidden email field for password managers */}
+                        <input
+                            type="email"
+                            name="username"
+                            autoComplete="username"
+                            value={userEmail}
+                            readOnly
+                            className="hidden"
+                        />
+
                         <div>
                             <label htmlFor="password" className="sr-only">
                                 Mot de passe
@@ -129,6 +153,7 @@ export function PasswordSetupPage() {
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                                     placeholder="Nouveau mot de passe"
+                                    autoComplete="new-password"
                                 />
                             </div>
                         </div>
@@ -150,6 +175,7 @@ export function PasswordSetupPage() {
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                                     placeholder="Confirmer le mot de passe"
+                                    autoComplete="new-password"
                                 />
                             </div>
                         </div>

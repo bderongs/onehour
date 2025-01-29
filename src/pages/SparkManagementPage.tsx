@@ -27,7 +27,7 @@ const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
         </motion.div>
         <h2 className="text-3xl font-bold text-gray-900 mb-4">Lancez votre premier Spark !</h2>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl">
-            Créez votre premier Spark en quelques minutes grâce à notre IA dédiée.
+            Créez votre premier Spark en quelques minutes grâce à notre assistant IA.
             Partagez votre expertise et développez une nouvelle source de revenus avec des appels optimisés et semi-automatisés.
         </p>
         <motion.div
@@ -45,8 +45,8 @@ const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 max-w-4xl mx-auto">
             <div className="bg-white p-6 rounded-xl shadow-md">
                 <Sparkles className="h-8 w-8 text-blue-500 mb-4" />
-                <h3 className="font-semibold text-lg mb-2">Création rapide avec l'IA</h3>
-                <p className="text-gray-600">Notre IA vous guide pour créer un Spark professionnel en quelques minutes</p>
+                <h3 className="font-semibold text-lg mb-2">Création rapide avec l'assistant IA</h3>
+                <p className="text-gray-600">Notre assistant vous guide pour créer un Spark professionnel en quelques minutes</p>
             </div>
             <div className="bg-white p-6 rounded-xl shadow-md">
                 <Eye className="h-8 w-8 text-blue-500 mb-4" />

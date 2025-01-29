@@ -95,7 +95,7 @@ Instructions importantes :
 3. Ne retournez pas les champs non modifiés
 4. Assurez-vous que les modifications restent cohérentes avec l'ensemble du Spark
 5. Respectez le format et la structure des données existantes
-6. Le champ "highlight" (tag) ne doit JAMAIS dépasser 2 mots. Si l'utilisateur demande plus de 2 mots, expliquez-lui la limitation et suggérez une version courte en 2 mots maximum.
+6. Le champ "highlight" (tag) ne doit JAMAIS dépasser 2 mots. Si l'utilisateur demande plus de 2 mots, expliquez-lui la limitation et suggérez une version courte en 2 mots maximum. Si l'utilisateur ne demande pas spécifiquement de tag, laissez le champ vide.
 7. Le titre ne doit JAMAIS contenir d'indication de durée ou de prix. Ces informations doivent être dans leurs champs respectifs uniquement.
 8. La durée doit être EXACTEMENT une des valeurs suivantes : 15, 30, 45, 60, 90 ou 120 minutes. Aucune autre durée n'est acceptée.
 9. La méthodologie doit être une liste de 2 à 4 étapes maximum. Propose une méthodologie en 3 étapes, sauf demande de l'utilisateur pour une étape supplémentaire.`;
