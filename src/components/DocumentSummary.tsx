@@ -77,7 +77,6 @@ export function DocumentSummary({ template, summary, onConnect, hasUserMessage, 
                     </div>
                 ) : (
                     <div className="flex items-center gap-3 text-gray-500 py-8 justify-center">
-                        <FileText className="h-5 w-5" />
                         <span className="text-sm">
                             {template.placeholderMessage || "Commencez la conversation pour générer le document."}
                         </span>
