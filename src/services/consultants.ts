@@ -263,7 +263,7 @@ export async function updateConsultantMissions(consultantId: string, missions: C
     }
 }
 
-export async function getAllConsultants(): Promise<ConsultantProfile[]> {
+export async function getAllConsultants(includeSparkierEmails: boolean = false): Promise<ConsultantProfile[]> {
     const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -274,5 +274,11 @@ export async function getAllConsultants(): Promise<ConsultantProfile[]> {
         return [];
     }
 
-    return data as ConsultantProfile[];
+    const consultants = data as ConsultantProfile[];
+    
+    if (!includeSparkierEmails) {
+        return consultants.filter(c => !c.email.endsWith('@sparkier.io'));
+    }
+
+    return consultants;
 }
