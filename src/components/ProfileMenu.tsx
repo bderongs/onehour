@@ -58,17 +58,41 @@ export function ProfileMenu() {
                         <p className="text-sm text-gray-500 truncate">{user.email}</p>
                     </div>
                     <div className="py-1">
-                        <a
-                            href={`/consultants/${user.id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={() => setIsOpen(false)}
-                            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                            <UserCircle className="w-4 h-4 mr-2" />
-                            <span className="flex-1">Page Sparkier</span>
-                            <ExternalLink className="w-3 h-3 text-gray-400" />
-                        </a>
+                        {user.roles.includes('consultant') && (
+                            <>
+                                <a
+                                    href={`/consultants/${user.id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={() => setIsOpen(false)}
+                                    className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
+                                >
+                                    <UserCircle className="w-4 h-4 mr-2" />
+                                    <span className="flex-1">Page Sparkier</span>
+                                    <ExternalLink className="w-3 h-3 text-gray-400" />
+                                </a>
+                                <button
+                                    onClick={() => {
+                                        setIsOpen(false);
+                                        navigate(`/consultants/${user.id}/edit`);
+                                    }}
+                                    className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
+                                >
+                                    <Settings className="w-4 h-4 mr-2" />
+                                    Mon profil
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setIsOpen(false);
+                                        navigate('/sparks/manage');
+                                    }}
+                                    className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
+                                >
+                                    <Sparkles className="w-4 h-4 mr-2" />
+                                    Mes Sparks
+                                </button>
+                            </>
+                        )}
                         {user.roles.includes('admin') && (
                             <button
                                 onClick={() => {
@@ -81,26 +105,6 @@ export function ProfileMenu() {
                                 Administration
                             </button>
                         )}
-                        <button
-                            onClick={() => {
-                                setIsOpen(false);
-                                navigate(`/consultants/${user.id}/edit`);
-                            }}
-                            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                            <Settings className="w-4 h-4 mr-2" />
-                            Mon profil
-                        </button>
-                        <button
-                            onClick={() => {
-                                setIsOpen(false);
-                                navigate('/sparks/manage');
-                            }}
-                            className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            Mes Sparks
-                        </button>
                         <button
                             onClick={handleLogout}
                             className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
