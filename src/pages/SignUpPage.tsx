@@ -10,7 +10,7 @@ interface ClientFormData {
     lastName: string;
     company: string;
     email: string;
-    role: string;
+    companyRole: string;
     industry: string;
 }
 
@@ -34,7 +34,7 @@ export function SignUpPage() {
         lastName: '',
         company: '',
         email: '',
-        role: '',
+        companyRole: '',
         industry: ''
     });
 
@@ -197,8 +197,8 @@ export function SignUpPage() {
                 </label>
                 <input
                     type="text"
-                    name="role"
-                    value={clientFormData.role}
+                    name="companyRole"
+                    value={clientFormData.companyRole}
                     onChange={handleClientFormChange}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"

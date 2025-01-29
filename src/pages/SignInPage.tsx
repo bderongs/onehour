@@ -55,25 +55,19 @@ export function SignInPage() {
 
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('role')
+                .select('roles')
                 .eq('id', user.id)
                 .single();
 
             if (!profile) throw new Error('Profil non trouvé');
 
-            // Redirect based on role
-            switch (profile.role) {
-                case 'consultant':
-                    navigate('/sparks/manage');
-                    break;
-                case 'admin':
-                    navigate('/sparks/manage');
-                    break;
-                case 'client':
-                    navigate('/client/dashboard');
-                    break;
-                default:
-                    throw new Error('Rôle non reconnu');
+            // Redirect based on roles
+            if (profile.roles.includes('consultant') || profile.roles.includes('admin')) {
+                navigate('/sparks/manage');
+            } else if (profile.roles.includes('client')) {
+                navigate('/client/dashboard');
+            } else {
+                throw new Error('Rôle non reconnu');
             }
         } catch (error: any) {
             setNotification({

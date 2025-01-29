@@ -85,7 +85,7 @@ export function SparkManagementPage() {
 
                 const { data: profile } = await supabase
                     .from('profiles')
-                    .select('role')
+                    .select('roles')
                     .eq('id', user.id)
                     .single();
 
@@ -94,15 +94,15 @@ export function SparkManagementPage() {
                 }
 
                 // Only allow consultants and admins to access this page
-                if (profile.role !== 'consultant' && profile.role !== 'admin') {
+                if (!profile.roles.includes('consultant') && !profile.roles.includes('admin')) {
                     navigate('/');
                     return;
                 }
 
-                // Fetch sparks based on role
-                const fetchedSparks = profile.role === 'consultant' 
-                    ? await getSparksByConsultant(user.id)
-                    : await getSparks();
+                // Fetch sparks based on roles
+                const fetchedSparks = profile.roles.includes('admin')
+                    ? await getSparks()
+                    : await getSparksByConsultant(user.id);
 
                 setSparks(fetchedSparks);
                 setLoading(false);

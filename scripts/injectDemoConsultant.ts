@@ -27,7 +27,7 @@ const profileData = {
     email: 'arnaud.lacaze@example.com',
     first_name: 'Arnaud',
     last_name: 'Lacaze',
-    role: 'consultant',
+    roles: ['consultant'],
     title: 'Expert en Transformation Digitale & Innovation',
     bio: 'Passionné par l\'innovation et la transformation digitale, j\'accompagne les entreprises dans leur évolution technologique depuis plus de 15 ans. Mon approche combine expertise technique et vision stratégique pour des résultats concrets et durables.',
     location: 'Paris, France',

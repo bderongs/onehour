@@ -27,7 +27,7 @@ export function SparkProductPage() {
     const [error, setError] = useState<string | null>(null);
     const [pageContext, setPageContext] = useState<PageContext | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [userRole, setUserRole] = useState<string | null>(null);
+    const [userRoles, setUserRoles] = useState<string[]>([]);
 
     const DEMO_CONSULTANT_ID = import.meta.env.VITE_DEMO_CONSULTANT_ID;
 
@@ -39,18 +39,18 @@ export function SparkProductPage() {
             }
 
             try {
-                // Check authentication and user role
+                // Check authentication and user roles
                 const { data: { user } } = await supabase.auth.getUser();
                 setIsAuthenticated(!!user);
 
                 if (user) {
                     const { data: profile } = await supabase
                         .from('profiles')
-                        .select('role')
+                        .select('roles')
                         .eq('id', user.id)
                         .single();
                     
-                    setUserRole(profile?.role || null);
+                    setUserRoles(profile?.roles || []);
                 }
 
                 // Fetch spark
@@ -64,7 +64,7 @@ export function SparkProductPage() {
                 // Determine page context
                 if (fetchedSpark.consultant === DEMO_CONSULTANT_ID) {
                     setPageContext('consultant_marketing');
-                } else if (isAuthenticated && userRole === 'consultant') {
+                } else if (isAuthenticated && userRoles.includes('consultant')) {
                     setPageContext('consultant_preview');
                 } else {
                     setPageContext('client_purchase');

@@ -3,7 +3,7 @@ export interface ConsultantProfile {
     email: string;
     first_name: string;
     last_name: string;
-    role: 'consultant';
+    roles: string[];
     
     // Basic profile info
     title?: string;

@@ -33,7 +33,7 @@ export function LandingClients() {
         lastName: '',
         company: '',
         email: '',
-        role: '',
+        companyRole: '',
         industry: ''
     });
     const [documentSummary, setDocumentSummary] = useState<DocumentSummary>({
@@ -175,7 +175,7 @@ export function LandingClients() {
                 lastName: '',
                 company: '',
                 email: '',
-                role: '',
+                companyRole: '',
                 industry: ''
             });
             setNotification({
@@ -581,8 +581,8 @@ export function LandingClients() {
                                 </label>
                                 <input
                                     type="text"
-                                    name="role"
-                                    value={formData.role}
+                                    name="companyRole"
+                                    value={formData.companyRole}
                                     onChange={handleFormChange}
                                     required
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"

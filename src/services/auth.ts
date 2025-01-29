@@ -14,7 +14,7 @@ export interface ClientSignUpData {
     firstName: string;
     lastName: string;
     company: string;
-    role: string;
+    companyRole: string;
     industry: string;
 }
 
@@ -117,7 +117,7 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
                 company: data.company,
                 roles: ['client'],
                 expertise: data.industry, // Using industry as expertise for clients
-                experience: data.role, // Using role as experience for clients
+                experience: data.companyRole, // Using companyRole as experience for clients
                 created_at: new Date().toISOString()
             }
         ])

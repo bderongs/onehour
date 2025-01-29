@@ -69,7 +69,7 @@ export function PasswordSetupPage() {
 
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('role')
+                .select('roles')
                 .eq('id', user.id)
                 .single();
 
@@ -80,18 +80,14 @@ export function PasswordSetupPage() {
                 message: 'Votre mot de passe a été configuré avec succès.'
             });
 
-            // Redirect based on role
+            // Redirect based on roles
             setTimeout(() => {
-                switch (profile.role) {
-                    case 'consultant':
-                    case 'admin':
-                        navigate('/sparks/manage');
-                        break;
-                    case 'client':
-                        navigate('/client/dashboard');
-                        break;
-                    default:
-                        throw new Error('Rôle non reconnu');
+                if (profile.roles.includes('consultant') || profile.roles.includes('admin')) {
+                    navigate('/sparks/manage');
+                } else if (profile.roles.includes('client')) {
+                    navigate('/client/dashboard');
+                } else {
+                    throw new Error('Rôle non reconnu');
                 }
             }, 1000); // Short delay to show success message
 

@@ -8,7 +8,7 @@ export async function getConsultantProfile(id: string): Promise<ConsultantProfil
         .from('profiles')
         .select('*')
         .eq('id', id)
-        .eq('role', 'consultant')
+        .contains('roles', ['consultant'])
         .single();
 
     if (error) {
@@ -67,7 +67,7 @@ export async function updateConsultantProfile(id: string, profile: Partial<Consu
             updated_at: new Date().toISOString()
         })
         .eq('id', id)
-        .eq('role', 'consultant')
+        .contains('roles', ['consultant'])
         .select()
         .single();
 
