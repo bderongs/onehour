@@ -262,3 +262,17 @@ export async function updateConsultantMissions(consultantId: string, missions: C
         return false;
     }
 }
+
+export async function getAllConsultants(): Promise<ConsultantProfile[]> {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .contains('roles', ['consultant']);
+
+    if (error) {
+        console.error('Error fetching all consultants:', error);
+        return [];
+    }
+
+    return data as ConsultantProfile[];
+}

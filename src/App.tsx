@@ -22,6 +22,7 @@ import { useEffect } from 'react';
 import { initializeGoatCounter } from './utils/analytics';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { AdminSparksPage } from './pages/AdminSparksPage';
+import { AdminConsultantsPage } from './pages/AdminConsultantsPage';
 import { ClientDashboard } from './pages/ClientDashboard';
 import { MarketingLayout } from './layouts/MarketingLayout';
 import { ConsultantProfileLayout } from './layouts/ConsultantProfileLayout';
@@ -85,7 +86,7 @@ function App() {
           <Route path="/consultants/:id/edit" element={<DashboardLayout><ConsultantProfileEditPage /></DashboardLayout>} />
           <Route path="/admin/dashboard" element={<DashboardLayout><AdminDashboard /></DashboardLayout>} />
           <Route path="/admin/sparks" element={<DashboardLayout><AdminSparksPage /></DashboardLayout>} />
-          <Route path="/admin/consultants" element={<DashboardLayout><div>Consultant management coming soon</div></DashboardLayout>} />
+          <Route path="/admin/consultants" element={<DashboardLayout><AdminConsultantsPage /></DashboardLayout>} />
           <Route path="/admin/clients" element={<DashboardLayout><div>Client management coming soon</div></DashboardLayout>} />
           <Route path="/admin/settings" element={<DashboardLayout><div>Settings coming soon</div></DashboardLayout>} />
           <Route path="/client/dashboard" element={<DashboardLayout><ClientDashboard /></DashboardLayout>} />
