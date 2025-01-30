@@ -1,4 +1,4 @@
-export interface ConsultantProfile {
+export type ConsultantProfile = {
     id: string;
     email: string;
     first_name: string;
@@ -13,16 +13,19 @@ export interface ConsultantProfile {
     company_title?: string;
     location?: string;
     languages?: string[];
+    profile_image_url?: string;
     
     // Social and web presence
     linkedin?: string;
     twitter?: string;
+    instagram?: string;
+    facebook?: string;
+    youtube?: string;
+    medium?: string;
+    substack?: string;
     website?: string;
-    profile_image_url?: string;
     
     // Professional details
-    expertise: string;
-    experience: string;
     key_competencies?: string[];
     
     // Rating and verification
@@ -38,7 +41,7 @@ export interface ConsultantProfile {
     // Timestamps
     created_at: string;
     updated_at: string;
-}
+};
 
 export interface ConsultantReview {
     id: string;

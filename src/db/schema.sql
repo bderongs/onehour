@@ -43,12 +43,15 @@ create table if not exists profiles (
     -- Social and web presence
     linkedin text,
     twitter text,
+    instagram text,
+    facebook text,
+    youtube text,
+    medium text,
+    substack text,
     website text,
     profile_image_url text,
     
     -- Professional details
-    expertise text not null, -- Main area of expertise
-    experience text not null, -- Years/description of experience
     key_competencies text[], -- Array of key skills/competencies
     
     -- Rating and verification
@@ -88,6 +91,21 @@ begin
     -- Social and web presence
     if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'twitter') then
         alter table profiles add column twitter text;
+    end if;
+    if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'instagram') then
+        alter table profiles add column instagram text;
+    end if;
+    if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'facebook') then
+        alter table profiles add column facebook text;
+    end if;
+    if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'youtube') then
+        alter table profiles add column youtube text;
+    end if;
+    if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'medium') then
+        alter table profiles add column medium text;
+    end if;
+    if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'substack') then
+        alter table profiles add column substack text;
     end if;
     if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'website') then
         alter table profiles add column website text;

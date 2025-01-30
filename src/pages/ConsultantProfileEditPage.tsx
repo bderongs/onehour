@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, Plus, Trash2, Edit2, Star } from 'lucide-react';
+import { Loader2, Plus, Trash2, Edit2, Star, HelpCircle, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '../types/consultant';
 import { getConsultantProfile, updateConsultantProfile, getConsultantReviews, getConsultantMissions, updateConsultantReviews, updateConsultantMissions } from '../services/consultants';
 import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { Modal } from '../components/Modal';
 
 export default function ConsultantProfileEditPage() {
     const { id } = useParams<{ id: string }>();
@@ -28,6 +29,8 @@ export default function ConsultantProfileEditPage() {
         index: number;
         isOpen: boolean;
     } | null>(null);
+    const [showLinkedInHelp, setShowLinkedInHelp] = useState(false);
+    const [newCompetency, setNewCompetency] = useState('');
 
     // Fetch consultant data when component mounts
     useEffect(() => {
@@ -78,6 +81,29 @@ export default function ConsultantProfileEditPage() {
         }));
     };
 
+    // Fonction pour ajouter une compétence
+    const handleAddCompetency = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && newCompetency.trim()) {
+            e.preventDefault();
+            const competencies = formData.keyCompetenciesInput?.split(',').map(c => c.trim()).filter(Boolean) || [];
+            if (!competencies.includes(newCompetency.trim())) {
+                setFormData(prev => ({
+                    ...prev,
+                    keyCompetenciesInput: [...competencies, newCompetency.trim()].join(',')
+                }));
+            }
+            setNewCompetency('');
+        }
+    };
+
+    // Fonction pour supprimer une compétence
+    const handleRemoveCompetency = (competencyToRemove: string) => {
+        const competencies = formData.keyCompetenciesInput?.split(',').map(c => c.trim()).filter(Boolean) || [];
+        setFormData(prev => ({
+            ...prev,
+            keyCompetenciesInput: competencies.filter(c => c !== competencyToRemove).join(',')
+        }));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -109,7 +135,7 @@ export default function ConsultantProfileEditPage() {
                 setNotification({ type: 'success', message: 'Profil mis à jour avec succès' });
                 // Wait a bit to show the success message before redirecting
                 setTimeout(() => {
-                    navigate(`/consultants/${id}`);
+                    navigate(`/${consultant!.slug}`);
                 }, 1500);
             } else {
                 setError('Failed to update profile');
@@ -169,7 +195,7 @@ export default function ConsultantProfileEditPage() {
                 >
                     <div className="flex items-center gap-4 mb-8">
                         <button
-                            onClick={() => navigate(`/consultants/${id}`)}
+                            onClick={() => navigate(`/${consultant.slug}`)}
                             className="text-gray-500 hover:text-gray-700 transition-colors"
                         >
                         </button>
@@ -180,6 +206,9 @@ export default function ConsultantProfileEditPage() {
                         {/* Basic Information Card */}
                         <div className="bg-white rounded-xl shadow-md p-6">
                             <h2 className="text-xl font-semibold mb-4">Informations de base</h2>
+                            <p className="text-sm text-gray-500 mb-4">
+                                Ces informations constituent l'en-tête de votre profil et sont essentielles pour vous présenter aux clients potentiels.
+                            </p>
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -193,6 +222,7 @@ export default function ConsultantProfileEditPage() {
                                             value={formData.title || ''}
                                             onChange={handleInputChange}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                            placeholder="Ex: Consultant en Stratégie Digitale"
                                         />
                                     </div>
                                     <div>
@@ -206,6 +236,7 @@ export default function ConsultantProfileEditPage() {
                                             value={formData.location || ''}
                                             onChange={handleInputChange}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                            placeholder="Ex: Paris, France"
                                         />
                                     </div>
                                 </div>
@@ -220,6 +251,7 @@ export default function ConsultantProfileEditPage() {
                                         onChange={handleInputChange}
                                         rows={4}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="Ex: Fort de 10 ans d'expérience dans la transformation digitale, j'accompagne les entreprises dans leur évolution technologique et organisationnelle..."
                                     />
                                 </div>
                                 <div>
@@ -236,16 +268,44 @@ export default function ConsultantProfileEditPage() {
                                         placeholder="Ex: Français, Anglais, Espagnol"
                                     />
                                 </div>
+                                <div>
+                                    <label htmlFor="profile_image_url" className="block text-sm font-medium text-gray-700 mb-1">
+                                        URL de la photo de profil
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="url"
+                                            id="profile_image_url"
+                                            name="profile_image_url"
+                                            value={formData.profile_image_url || ''}
+                                            onChange={handleInputChange}
+                                            className="flex-grow px-3 py-2 border border-gray-300 rounded-md"
+                                            placeholder="https://example.com/votre-photo.jpg"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowLinkedInHelp(true)}
+                                            className="flex items-center gap-2 px-3 py-2 text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-300 rounded-md transition-colors"
+                                            title="Comment récupérer ma photo LinkedIn ?"
+                                        >
+                                            <HelpCircle className="h-5 w-5" />
+                                            <span>LinkedIn</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         {/* Company Information Card */}
                         <div className="bg-white rounded-xl shadow-md p-6">
-                            <h2 className="text-xl font-semibold mb-4">Informations entreprise</h2>
+                            <h2 className="text-xl font-semibold mb-4">Structure professionnelle (optionnel)</h2>
+                            <p className="text-sm text-gray-500 mb-4">
+                                Si vous exercez au sein d'une structure (entreprise, cabinet, etc.), vous pouvez renseigner ces informations qui apparaîtront sur votre profil.
+                            </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Entreprise
+                                        Nom de la structure
                                     </label>
                                     <input
                                         type="text"
@@ -254,11 +314,12 @@ export default function ConsultantProfileEditPage() {
                                         value={formData.company || ''}
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="Ex: Cabinet Dupont Conseil"
                                     />
                                 </div>
                                 <div>
                                     <label htmlFor="company_title" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Titre dans l'entreprise
+                                        Votre fonction
                                     </label>
                                     <input
                                         type="text"
@@ -267,54 +328,55 @@ export default function ConsultantProfileEditPage() {
                                         value={formData.company_title || ''}
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="Ex: Directeur Associé"
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Professional Details Card */}
+                        {/* Competencies Card */}
                         <div className="bg-white rounded-xl shadow-md p-6">
-                            <h2 className="text-xl font-semibold mb-4">Détails professionnels</h2>
+                            <h2 className="text-xl font-semibold mb-4">Compétences clés</h2>
+                            <p className="text-sm text-gray-500 mb-4">
+                                Ajoutez vos principales compétences qui seront affichées sous forme de badges sur votre profil.
+                            </p>
                             <div className="space-y-4">
                                 <div>
-                                    <label htmlFor="expertise" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Expertise
-                                    </label>
-                                    <textarea
-                                        id="expertise"
-                                        name="expertise"
-                                        value={formData.expertise || ''}
-                                        onChange={handleInputChange}
-                                        rows={3}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="experience" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Expérience
-                                    </label>
-                                    <textarea
-                                        id="experience"
-                                        name="experience"
-                                        value={formData.experience || ''}
-                                        onChange={handleInputChange}
-                                        rows={3}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="key_competencies" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Compétences clés (séparées par des virgules)
-                                    </label>
                                     <input
                                         type="text"
-                                        id="keyCompetenciesInput"
-                                        name="keyCompetenciesInput"
-                                        value={formData.keyCompetenciesInput || ''}
-                                        onChange={handleInputChange}
+                                        id="key_competencies"
+                                        value={newCompetency}
+                                        onChange={(e) => setNewCompetency(e.target.value)}
+                                        onKeyDown={handleAddCompetency}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                        placeholder="Ex: Stratégie, Marketing Digital, Management"
+                                        placeholder="Ex: Stratégie Digitale"
                                     />
+                                    <p className="text-sm text-gray-500 mt-2">
+                                        Appuyez sur Entrée pour ajouter chaque compétence.
+                                    </p>
+                                </div>
+                                
+                                {/* Competencies Tags */}
+                                <div className="flex flex-wrap gap-2 mt-4">
+                                    {formData.keyCompetenciesInput?.split(',')
+                                        .map(competency => competency.trim())
+                                        .filter(Boolean)
+                                        .map((competency, index) => (
+                                            <div
+                                                key={index}
+                                                className="group flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                                            >
+                                                {competency}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveCompetency(competency)}
+                                                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    title="Supprimer cette compétence"
+                                                >
+                                                    <X className="h-4 w-4 hover:text-blue-600" />
+                                                </button>
+                                            </div>
+                                        ))}
                                 </div>
                             </div>
                         </div>
@@ -322,6 +384,9 @@ export default function ConsultantProfileEditPage() {
                         {/* Social Links Card */}
                         <div className="bg-white rounded-xl shadow-md p-6">
                             <h2 className="text-xl font-semibold mb-4">Liens sociaux</h2>
+                            <p className="text-sm text-gray-500 mb-4">
+                                Ajoutez vos liens professionnels pour permettre aux clients de mieux vous connaître et de vous contacter facilement.
+                            </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label htmlFor="linkedin" className="block text-sm font-medium text-gray-700 mb-1">
@@ -334,6 +399,7 @@ export default function ConsultantProfileEditPage() {
                                         value={formData.linkedin || ''}
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="https://www.linkedin.com/in/votre-profil"
                                     />
                                 </div>
                                 <div>
@@ -347,6 +413,77 @@ export default function ConsultantProfileEditPage() {
                                         value={formData.twitter || ''}
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="https://twitter.com/votre-compte"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="instagram" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Instagram
+                                    </label>
+                                    <input
+                                        type="url"
+                                        id="instagram"
+                                        name="instagram"
+                                        value={formData.instagram || ''}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="https://www.instagram.com/votre-compte"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="facebook" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Facebook
+                                    </label>
+                                    <input
+                                        type="url"
+                                        id="facebook"
+                                        name="facebook"
+                                        value={formData.facebook || ''}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="https://www.facebook.com/votre-page"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="youtube" className="block text-sm font-medium text-gray-700 mb-1">
+                                        YouTube
+                                    </label>
+                                    <input
+                                        type="url"
+                                        id="youtube"
+                                        name="youtube"
+                                        value={formData.youtube || ''}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="https://www.youtube.com/c/votre-chaine"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="medium" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Medium
+                                    </label>
+                                    <input
+                                        type="url"
+                                        id="medium"
+                                        name="medium"
+                                        value={formData.medium || ''}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="https://medium.com/@votre-compte"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="substack" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Substack
+                                    </label>
+                                    <input
+                                        type="url"
+                                        id="substack"
+                                        name="substack"
+                                        value={formData.substack || ''}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="https://votre-newsletter.substack.com"
                                     />
                                 </div>
                                 <div>
@@ -360,19 +497,7 @@ export default function ConsultantProfileEditPage() {
                                         value={formData.website || ''}
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="profile_image_url" className="block text-sm font-medium text-gray-700 mb-1">
-                                        URL de la photo de profil
-                                    </label>
-                                    <input
-                                        type="url"
-                                        id="profile_image_url"
-                                        name="profile_image_url"
-                                        value={formData.profile_image_url || ''}
-                                        onChange={handleInputChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="https://www.votresite.com"
                                     />
                                 </div>
                             </div>
@@ -381,6 +506,9 @@ export default function ConsultantProfileEditPage() {
                         {/* Reviews Card */}
                         <div className="bg-white rounded-xl shadow-md p-6">
                             <h2 className="text-xl font-semibold mb-4">Avis clients</h2>
+                            <p className="text-sm text-gray-500 mb-4">
+                                Les avis de vos clients sont essentiels pour établir votre crédibilité. Ajoutez des témoignages pertinents qui mettent en valeur vos compétences et votre impact.
+                            </p>
                             <div className="space-y-4">
                                 {formData.reviews?.map((review, index) => (
                                     <div key={review.id} className="border rounded-lg p-4">
@@ -559,6 +687,9 @@ export default function ConsultantProfileEditPage() {
                         {/* Missions Card */}
                         <div className="bg-white rounded-xl shadow-md p-6">
                             <h2 className="text-xl font-semibold mb-4">Missions</h2>
+                            <p className="text-sm text-gray-500 mb-4">
+                                Présentez vos missions les plus significatives pour démontrer votre expertise et votre expérience. Privilégiez la qualité à la quantité en mettant en avant les missions les plus pertinentes.
+                            </p>
                             <div className="space-y-4">
                                 {formData.missions?.map((mission, index) => (
                                     <div key={index} className="border rounded-lg p-4">
@@ -732,7 +863,7 @@ export default function ConsultantProfileEditPage() {
                         <div className="flex justify-end gap-4">
                             <button
                                 type="button"
-                                onClick={() => navigate(`/consultants/${id}`)}
+                                onClick={() => navigate(`/${consultant!.slug}`)}
                                 className="px-4 py-2 text-gray-600 hover:text-gray-900"
                             >
                                 Annuler
@@ -780,6 +911,29 @@ export default function ConsultantProfileEditPage() {
                 onCancel={() => setDeleteConfirm(null)}
                 variant="danger"
             />
+
+            {/* LinkedIn Help Modal */}
+            <Modal
+                isOpen={showLinkedInHelp}
+                onClose={() => setShowLinkedInHelp(false)}
+                title="Récupérer votre photo depuis LinkedIn"
+            >
+                <div className="space-y-4 text-gray-600">
+                    <p>Pour récupérer l'URL de votre photo de profil LinkedIn :</p>
+                    <ol className="list-decimal list-inside space-y-2">
+                        <li>Connectez-vous à votre compte LinkedIn</li>
+                        <li>Accédez à votre profil</li>
+                        <li>Faites un clic droit sur votre photo de profil</li>
+                        <li>Sélectionnez "Copier l'adresse de l'image" ou "Copy image address"</li>
+                        <li>Collez l'URL dans le champ ci-dessus</li>
+                    </ol>
+                    <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                        <p className="text-sm text-blue-700">
+                            <strong>Note :</strong> Assurez-vous que votre photo de profil LinkedIn est publique pour qu'elle soit accessible sur votre profil Sparkier.
+                        </p>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 } 

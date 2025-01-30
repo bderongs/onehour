@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { CheckCircle, Star, Linkedin, Twitter, Globe, X, BadgeCheck, Sparkles, PenSquare } from 'lucide-react';
+import { CheckCircle, Star, Linkedin, Twitter, Globe, X, BadgeCheck, Sparkles, PenSquare, Instagram, Facebook, Youtube, FileText, BookOpen } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { AIChatInterface, Message } from '../components/AIChatInterface';
 import { ConsultantConnect } from '../components/ConsultantConnect';
@@ -214,7 +214,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
             {currentUser?.id === consultant.id && (
                 <div className="fixed right-4 top-4 z-50">
                     <button
-                        onClick={() => navigate(`/consultants/${consultantIdentifier}/edit`)}
+                        onClick={() => navigate(`/consultants/${consultant.id}/edit`)}
                         className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-lg hover:shadow-xl border border-gray-200 text-gray-700 hover:text-blue-600 transition-all duration-200"
                         title="Modifier mon profil"
                     >
@@ -279,6 +279,31 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                                                 {consultant.twitter && (
                                                     <a href={consultant.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors">
                                                         <Twitter className="h-5 w-5" />
+                                                    </a>
+                                                )}
+                                                {consultant.instagram && (
+                                                    <a href={consultant.instagram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-pink-600 transition-colors">
+                                                        <Instagram className="h-5 w-5" />
+                                                    </a>
+                                                )}
+                                                {consultant.facebook && (
+                                                    <a href={consultant.facebook} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-500 transition-colors">
+                                                        <Facebook className="h-5 w-5" />
+                                                    </a>
+                                                )}
+                                                {consultant.youtube && (
+                                                    <a href={consultant.youtube} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-600 transition-colors">
+                                                        <Youtube className="h-5 w-5" />
+                                                    </a>
+                                                )}
+                                                {consultant.medium && (
+                                                    <a href={consultant.medium} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-900 transition-colors">
+                                                        <FileText className="h-5 w-5" />
+                                                    </a>
+                                                )}
+                                                {consultant.substack && (
+                                                    <a href={consultant.substack} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-orange-500 transition-colors">
+                                                        <BookOpen className="h-5 w-5" />
                                                     </a>
                                                 )}
                                                 {consultant.website && (

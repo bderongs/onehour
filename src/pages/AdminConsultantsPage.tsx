@@ -80,7 +80,7 @@ const ConsultantRow = ({
             {/* Actions */}
             <div className="flex items-center gap-3 ml-4">
                 <a
-                    href={`/consultants/${consultant.id}`}
+                    href={`/${consultant.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-400 hover:text-gray-600 transition-colors"
