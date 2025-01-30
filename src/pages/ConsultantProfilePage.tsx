@@ -432,9 +432,10 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                             }).map((pkg) => (
                                 <div 
                                     key={pkg.id}
+                                    onClick={() => navigate(`/sparks/${pkg.url}`)}
                                     className="flex flex-col bg-white rounded-xl shadow-md w-80 flex-shrink-0 
                                     hover:shadow-lg transition-all duration-200 ease-out hover:scale-[1.02]
-                                    transform-gpu"
+                                    transform-gpu cursor-pointer"
                                 >
                                     <div className="p-6 flex flex-col h-full">
                                         <div className="flex justify-between items-start mb-4">
@@ -466,7 +467,10 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                                     </div>
                                     <div className="p-6 pt-0">
                                         <button 
-                                            onClick={() => navigate(`/sparks/${pkg.url}`)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigate(`/sparks/${pkg.url}`);
+                                            }}
                                             className={`w-full font-medium px-4 py-2 rounded-lg transition-colors ${
                                                 (!pkg.price || parseFloat(pkg.price) === 0)
                                                 ? "bg-blue-600 hover:bg-blue-700 text-white" 

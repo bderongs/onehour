@@ -166,7 +166,7 @@ export function SparkProductPage() {
                 <motion.div
                     className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 lg:mb-8"
                     variants={fadeInUp}
-                    initial="initial"
+                    initial={false}
                     animate="animate"
                 >
                     <div className="flex flex-col gap-6 lg:gap-8">
@@ -439,37 +439,6 @@ export function SparkProductPage() {
                                 </div>
                             </motion.section>
                         )}
-
-                        {/* Action Button */}
-                        <motion.div
-                            className="hidden lg:block sticky top-8"
-                            variants={fadeInUp}
-                        >
-                            <button
-                                onClick={handleAction}
-                                className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg font-semibold 
-                                        hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-                            >
-                                {pageContext === 'consultant_marketing' && (
-                                    <>
-                                        Créer mon premier Spark
-                                        <ArrowRight className="h-5 w-5" />
-                                    </>
-                                )}
-                                {pageContext === 'client_purchase' && (
-                                    <>
-                                        Réserver maintenant
-                                        <ArrowRight className="h-5 w-5" />
-                                    </>
-                                )}
-                                {pageContext === 'consultant_preview' && (
-                                    <>
-                                        Retour à mes Sparks
-                                        <ArrowRight className="h-5 w-5" />
-                                    </>
-                                )}
-                            </button>
-                        </motion.div>
                     </div>
                 </div>
             </div>
