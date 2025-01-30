@@ -249,6 +249,11 @@ export function AIChatInterface({
         const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
         setInputValue('');
+        
+        // Réinitialiser la hauteur du champ de saisie
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+        }
 
         if (onMessagesUpdate) {
             onMessagesUpdate(updatedMessages);
@@ -302,8 +307,17 @@ export function AIChatInterface({
 
     const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInputValue(e.target.value);
-        e.target.style.height = 'auto';
-        e.target.style.height = `${e.target.scrollHeight}px`;
+        
+        // Ajuster la hauteur avec une hauteur minimale
+        const textarea = e.target;
+        const minHeight = 50; // hauteur minimale en pixels
+        
+        // Réinitialiser la hauteur pour obtenir la hauteur du contenu
+        textarea.style.height = 'auto';
+        
+        // Définir la nouvelle hauteur en respectant la hauteur minimale
+        const newHeight = Math.max(textarea.scrollHeight, minHeight);
+        textarea.style.height = `${newHeight}px`;
     };
 
     const formatMessage = (content: any): React.ReactNode => {
