@@ -26,7 +26,10 @@ export function SparkEditPage() {
                     navigate('/sparks/manage');
                     return;
                 }
-                setSpark(fetchedSpark);
+                setSpark({
+                    ...fetchedSpark,
+                    price: fetchedSpark.price || '0'
+                });
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching spark:', err);
@@ -41,8 +44,12 @@ export function SparkEditPage() {
     const handleSubmit = async (data: Spark) => {
         try {
             if (!sparkUrl) return;
-            await updateSpark(sparkUrl, data);
-            navigate('/sparks/manage');
+            const updatedData = {
+                ...data,
+                price: data.price || '0'
+            };
+            await updateSpark(sparkUrl, updatedData);
+            navigate(-1);
         } catch (error) {
             console.error('Error updating spark:', error);
             setError('Failed to update spark. Please try again later.');
@@ -50,7 +57,7 @@ export function SparkEditPage() {
     };
 
     const handleCancel = () => {
-        navigate('/sparks/manage');
+        navigate(-1);
     };
 
     if (loading) {
@@ -90,7 +97,7 @@ export function SparkEditPage() {
                 >
                     <div className="flex items-center gap-4 mb-8">
                         <button
-                            onClick={() => navigate('/sparks/manage')}
+                            onClick={() => navigate(-1)}
                             className="text-gray-500 hover:text-gray-700 transition-colors"
                         >
                             <ArrowLeft className="h-6 w-6" />

@@ -202,7 +202,7 @@ export function SparkAIPage() {
             } else {
                 await updateSpark(sparkUrl!, spark);
             }
-            navigate('/sparks/manage');
+            navigate(-1);
         } catch (error) {
             console.error('Error saving spark:', error);
             setError(`Failed to ${mode} spark. Please try again later.`);
@@ -211,7 +211,7 @@ export function SparkAIPage() {
     };
 
     const handleBack = () => {
-        navigate('/sparks/manage');
+        navigate(-1);
     };
 
     if (authError) {
