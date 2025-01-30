@@ -30,6 +30,7 @@ create table if not exists profiles (
     first_name text not null,
     last_name text not null,
     roles user_role[] not null default '{client}',
+    slug text unique,
     
     -- Basic profile info
     title text, -- e.g. "Expert en Transformation Digitale & Innovation"
@@ -65,6 +66,9 @@ create table if not exists profiles (
 do $$
 begin
     -- Basic profile info
+    if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'slug') then
+        alter table profiles add column slug text unique;
+    end if;
     if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'title') then
         alter table profiles add column title text;
     end if;

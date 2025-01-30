@@ -75,7 +75,7 @@ function App() {
           
           {/* Consultant profile routes with no header */}
           <Route path="/profile" element={<ConsultantProfileLayout><DemoProfileWrapper /></ConsultantProfileLayout>} />
-          <Route path="/consultants/:id" element={<ConsultantProfileLayout><ConsultantProfilePage /></ConsultantProfileLayout>} />
+          <Route path="/:slug" element={<ConsultantProfileLayout><ConsultantProfilePage /></ConsultantProfileLayout>} />
           
           {/* Dashboard routes with dashboard header */}
           <Route path="/sparks/manage" element={<DashboardLayout><SparkManagementPage /></DashboardLayout>} />

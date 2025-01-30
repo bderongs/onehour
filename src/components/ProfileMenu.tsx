@@ -61,7 +61,7 @@ export function ProfileMenu() {
                         {user.roles.includes('consultant') && (
                             <>
                                 <a
-                                    href={`/consultants/${user.id}`}
+                                    href={`/${user.slug}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={() => setIsOpen(false)}

@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase';
 import type { ConsultantProfile, ConsultantReview } from '../types/consultant';
 import type { Spark } from '../types/spark';
 import type { ConsultantMission } from '../types/consultant';
+import { generateSlug, ensureUniqueSlug } from '../utils/url';
 
 export async function getConsultantProfile(id: string): Promise<ConsultantProfile | null> {
     const { data, error } = await supabase
@@ -59,11 +60,43 @@ export async function getConsultantSparks(consultantId: string): Promise<Spark[]
     return data as Spark[];
 }
 
+export async function getConsultantBySlug(slug: string): Promise<ConsultantProfile | null> {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('slug', slug)
+        .contains('roles', ['consultant'])
+        .single();
+
+    if (error) {
+        console.error('Error fetching consultant profile:', error);
+        return null;
+    }
+
+    return data as ConsultantProfile;
+}
+
 export async function updateConsultantProfile(id: string, profile: Partial<ConsultantProfile>): Promise<ConsultantProfile | null> {
+    let updatedProfile: Partial<ConsultantProfile> = { ...profile };
+    
+    // If name is being updated, generate new slug
+    if (profile.first_name || profile.last_name) {
+        const { data: currentProfile } = await supabase
+            .from('profiles')
+            .select('first_name, last_name, slug')
+            .eq('id', id)
+            .single();
+            
+        const firstName = profile.first_name || currentProfile?.first_name || '';
+        const lastName = profile.last_name || currentProfile?.last_name || '';
+        const baseSlug = generateSlug(`${firstName} ${lastName}`);
+        updatedProfile.slug = await ensureUniqueSlug(baseSlug, currentProfile?.slug);
+    }
+
     const { data, error } = await supabase
         .from('profiles')
         .update({
-            ...profile,
+            ...updatedProfile,
             updated_at: new Date().toISOString()
         })
         .eq('id', id)

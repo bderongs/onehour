@@ -8,13 +8,13 @@ import { createChatConfigs } from '../data/chatConfigs';
 import type { DocumentSummary } from '../types/chat';
 import type { Spark } from '../types/spark';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '../types/consultant';
-import { getConsultantProfile, getConsultantReviews, getConsultantSparks, getConsultantMissions } from '../services/consultants';
+import { getConsultantProfile, getConsultantBySlug, getConsultantReviews, getConsultantSparks, getConsultantMissions } from '../services/consultants';
 import { formatDuration, formatPrice } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../services/auth';
 
 export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
-    const { id: urlId } = useParams<{ id: string }>();
+    const { slug: urlSlug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
     const [showChat, setShowChat] = useState(false);
     const [showConnect, setShowConnect] = useState(false);
@@ -37,8 +37,8 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
     });
     const [missions, setMissions] = useState<ConsultantMission[]>([]);
 
-    // Use propId if provided, otherwise use urlId
-    const consultantId = propId || urlId;
+    // Use propId if provided, otherwise use urlSlug
+    const consultantIdentifier = propId || urlSlug;
 
     // Fetch current user when component mounts
     useEffect(() => {
@@ -52,25 +52,29 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
     // Fetch consultant data when component mounts
     useEffect(() => {
         const fetchData = async () => {
-            if (!consultantId) {
-                setError('Consultant ID is required');
+            if (!consultantIdentifier) {
+                setError('Consultant identifier is required');
                 setLoading(false);
                 return;
             }
 
             try {
-                const [consultantData, reviewsData, sparksData, missionsData] = await Promise.all([
-                    getConsultantProfile(consultantId),
-                    getConsultantReviews(consultantId),
-                    getConsultantSparks(consultantId),
-                    getConsultantMissions(consultantId)
-                ]);
+                // If we have a propId, use getConsultantProfile, otherwise use getConsultantBySlug
+                const consultantData = propId 
+                    ? await getConsultantProfile(propId)
+                    : await getConsultantBySlug(consultantIdentifier);
 
                 if (!consultantData) {
                     setError('Consultant not found');
                     setLoading(false);
                     return;
                 }
+
+                const [reviewsData, sparksData, missionsData] = await Promise.all([
+                    getConsultantReviews(consultantData.id),
+                    getConsultantSparks(consultantData.id),
+                    getConsultantMissions(consultantData.id)
+                ]);
 
                 setConsultant(consultantData);
                 setReviews(reviewsData);
@@ -94,7 +98,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
             setSparks([]);
             setMissions([]);
         };
-    }, [consultantId]);
+    }, [consultantIdentifier, propId]);
 
     // Memoize chat configs based on consultant's firstname
     const chatConfigs = useMemo(
@@ -210,7 +214,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
             {currentUser?.id === consultant.id && (
                 <div className="fixed right-4 top-4 z-50">
                     <button
-                        onClick={() => navigate(`/consultants/${consultantId}/edit`)}
+                        onClick={() => navigate(`/consultants/${consultantIdentifier}/edit`)}
                         className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-lg hover:shadow-xl border border-gray-200 text-gray-700 hover:text-blue-600 transition-all duration-200"
                         title="Modifier mon profil"
                     >

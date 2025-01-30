@@ -4,6 +4,7 @@ export interface ConsultantProfile {
     first_name: string;
     last_name: string;
     roles: string[];
+    slug: string;
     
     // Basic profile info
     title?: string;

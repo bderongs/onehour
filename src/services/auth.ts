@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase'
+import { generateSlug, ensureUniqueSlug } from '../utils/url';
 
 export interface ConsultantSignUpData {
     email: string;
@@ -65,6 +66,10 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
 
     if (authError) throw authError
 
+    // Generate the initial slug
+    const baseSlug = generateSlug(`${data.firstName} ${data.lastName}`);
+    const slug = await ensureUniqueSlug(baseSlug);
+
     // Then, store additional user data in a profiles table
     const { error: profileError } = await supabase
         .from('profiles')
@@ -78,6 +83,7 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
                 expertise: data.expertise,
                 experience: data.experience,
                 roles: ['consultant'],
+                slug: slug,
                 created_at: new Date().toISOString()
             }
         ])
@@ -138,6 +144,7 @@ export interface UserProfile {
     expertise: string;
     experience: string;
     roles: UserRole[];
+    slug?: string;
 }
 
 // Transform database snake_case to camelCase
@@ -150,6 +157,7 @@ const transformProfileFromDB = (profile: any): UserProfile => ({
     expertise: profile.expertise,
     experience: profile.experience,
     roles: profile.roles,
+    slug: profile.slug,
 });
 
 export const getCurrentUser = async (): Promise<UserProfile | null> => {
