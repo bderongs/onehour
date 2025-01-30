@@ -27,6 +27,8 @@ import { ClientDashboard } from './pages/ClientDashboard';
 import { MarketingLayout } from './layouts/MarketingLayout';
 import { ConsultantProfileLayout } from './layouts/ConsultantProfileLayout';
 import { DashboardLayout } from './layouts/DashboardLayout';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
   const location = useLocation();
@@ -55,56 +57,109 @@ function App() {
 
   try {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Routes>
-          {/* Auth routes */}
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route path="/reset-password" element={<MarketingLayout><ResetPasswordPage /></MarketingLayout>} />
-          <Route path="/setup-password" element={<MarketingLayout><PasswordSetupPage /></MarketingLayout>} />
-          
-          {/* Marketing routes with standard header/footer */}
-          <Route path="/" element={<MarketingLayout><LandingClients /></MarketingLayout>} />
-          <Route path="/consultants" element={<MarketingLayout><LandingConsultants /></MarketingLayout>} />
-          <Route path="/pricing" element={<MarketingLayout><PricingPage /></MarketingLayout>} />
-          <Route path="/terms" element={<MarketingLayout><Terms /></MarketingLayout>} />
-          <Route path="/privacy" element={<MarketingLayout><Privacy /></MarketingLayout>} />
-          <Route path="/brand" element={<MarketingLayout withTopPadding={false}><BrandPage /></MarketingLayout>} />
-          <Route path="/signin" element={<MarketingLayout><SignInPage /></MarketingLayout>} />
-          <Route path="/signup" element={<MarketingLayout><SignUpPage /></MarketingLayout>} />
-          <Route path="/sparks/:sparkUrl" element={<MarketingLayout><SparkProductPage /></MarketingLayout>} />
-          
-          {/* Consultant profile routes with no header */}
-          <Route path="/profile" element={<ConsultantProfileLayout><DemoProfileWrapper /></ConsultantProfileLayout>} />
-          <Route path="/:slug" element={<ConsultantProfileLayout><ConsultantProfilePage /></ConsultantProfileLayout>} />
-          
-          {/* Dashboard routes with dashboard header */}
-          <Route path="/sparks/manage" element={<DashboardLayout><SparkManagementPage /></DashboardLayout>} />
-          <Route path="/sparks/create" element={<DashboardLayout><SparkCreatePage /></DashboardLayout>} />
-          <Route path="/sparks/edit/:sparkUrl" element={<DashboardLayout><SparkEditPage /></DashboardLayout>} />
-          <Route path="/sparks/ai-edit/:sparkUrl" element={<DashboardLayout><SparkAIPage /></DashboardLayout>} />
-          <Route path="/sparks/ai-create" element={<DashboardLayout><SparkAIPage /></DashboardLayout>} />
-          <Route path="/consultants/:id/edit" element={<DashboardLayout><ConsultantProfileEditPage /></DashboardLayout>} />
-          <Route path="/admin/dashboard" element={<DashboardLayout><AdminDashboard /></DashboardLayout>} />
-          <Route path="/admin/sparks" element={<DashboardLayout><AdminSparksPage /></DashboardLayout>} />
-          <Route path="/admin/consultants" element={<DashboardLayout><AdminConsultantsPage /></DashboardLayout>} />
-          <Route path="/admin/clients" element={<DashboardLayout><div>Client management coming soon</div></DashboardLayout>} />
-          <Route path="/admin/settings" element={<DashboardLayout><div>Settings coming soon</div></DashboardLayout>} />
-          <Route path="/client/dashboard" element={<DashboardLayout><ClientDashboard /></DashboardLayout>} />
-          <Route path="/client/conversations" element={<DashboardLayout><div>Conversations coming soon</div></DashboardLayout>} />
-          <Route path="/client/documents" element={<DashboardLayout><div>Documents coming soon</div></DashboardLayout>} />
-          <Route path="/sparks/explore" element={<DashboardLayout><div>Spark exploration coming soon</div></DashboardLayout>} />
-          
-          {/* 404 route */}
-          <Route path="*" element={
-            <MarketingLayout>
-              <div className="text-center py-12">
-                <h2 className="text-2xl font-bold">Page not found</h2>
-                <p>The page you're looking for doesn't exist.</p>
-              </div>
-            </MarketingLayout>
-          } />
-        </Routes>
-      </div>
+      <AuthProvider>
+        <div className="min-h-screen flex flex-col">
+          <Routes>
+            {/* Public routes */}
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/reset-password" element={<MarketingLayout><ResetPasswordPage /></MarketingLayout>} />
+            <Route path="/setup-password" element={<MarketingLayout><PasswordSetupPage /></MarketingLayout>} />
+            <Route path="/" element={<MarketingLayout><LandingClients /></MarketingLayout>} />
+            <Route path="/consultants" element={<MarketingLayout><LandingConsultants /></MarketingLayout>} />
+            <Route path="/pricing" element={<MarketingLayout><PricingPage /></MarketingLayout>} />
+            <Route path="/terms" element={<MarketingLayout><Terms /></MarketingLayout>} />
+            <Route path="/privacy" element={<MarketingLayout><Privacy /></MarketingLayout>} />
+            <Route path="/brand" element={<MarketingLayout withTopPadding={false}><BrandPage /></MarketingLayout>} />
+            <Route path="/signin" element={<MarketingLayout><SignInPage /></MarketingLayout>} />
+            <Route path="/signup" element={<MarketingLayout><SignUpPage /></MarketingLayout>} />
+            <Route path="/sparks/:sparkUrl" element={<MarketingLayout><SparkProductPage /></MarketingLayout>} />
+            <Route path="/profile" element={<ConsultantProfileLayout><DemoProfileWrapper /></ConsultantProfileLayout>} />
+            <Route path="/:slug" element={<ConsultantProfileLayout><ConsultantProfilePage /></ConsultantProfileLayout>} />
+
+            {/* Protected consultant routes */}
+            <Route path="/sparks/manage" element={
+              <DashboardLayout>
+                <ProtectedRoute requiredRoles={['consultant', 'admin']}>
+                  <SparkManagementPage />
+                </ProtectedRoute>
+              </DashboardLayout>
+            } />
+            <Route path="/sparks/create" element={
+              <DashboardLayout>
+                <ProtectedRoute requiredRoles={['consultant', 'admin']}>
+                  <SparkCreatePage />
+                </ProtectedRoute>
+              </DashboardLayout>
+            } />
+            <Route path="/sparks/edit/:sparkUrl" element={
+              <DashboardLayout>
+                <ProtectedRoute requiredRoles={['consultant', 'admin']}>
+                  <SparkEditPage />
+                </ProtectedRoute>
+              </DashboardLayout>
+            } />
+            <Route path="/sparks/ai-edit/:sparkUrl" element={
+              <DashboardLayout>
+                <ProtectedRoute requiredRoles={['consultant', 'admin']}>
+                  <SparkAIPage />
+                </ProtectedRoute>
+              </DashboardLayout>
+            } />
+            <Route path="/sparks/ai-create" element={
+              <DashboardLayout>
+                <ProtectedRoute requiredRoles={['consultant', 'admin']}>
+                  <SparkAIPage />
+                </ProtectedRoute>
+              </DashboardLayout>
+            } />
+            <Route path="/consultants/:id/edit" element={
+              <DashboardLayout>
+                <ProtectedRoute requiredRoles={['consultant', 'admin']} consultantIdParam="id">
+                  <ConsultantProfileEditPage />
+                </ProtectedRoute>
+              </DashboardLayout>
+            } />
+
+            {/* Protected admin routes */}
+            <Route path="/admin/*" element={
+              <DashboardLayout>
+                <ProtectedRoute requiredRoles={['admin']}>
+                  <Routes>
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="sparks" element={<AdminSparksPage />} />
+                    <Route path="consultants" element={<AdminConsultantsPage />} />
+                    <Route path="clients" element={<div>Client management coming soon</div>} />
+                    <Route path="settings" element={<div>Settings coming soon</div>} />
+                  </Routes>
+                </ProtectedRoute>
+              </DashboardLayout>
+            } />
+
+            {/* Protected client routes */}
+            <Route path="/client/*" element={
+              <DashboardLayout>
+                <ProtectedRoute requiredRoles={['client']}>
+                  <Routes>
+                    <Route path="dashboard" element={<ClientDashboard />} />
+                    <Route path="conversations" element={<div>Conversations coming soon</div>} />
+                    <Route path="documents" element={<div>Documents coming soon</div>} />
+                  </Routes>
+                </ProtectedRoute>
+              </DashboardLayout>
+            } />
+
+            {/* 404 route */}
+            <Route path="*" element={
+              <MarketingLayout>
+                <div className="text-center py-12">
+                  <h2 className="text-2xl font-bold">Page not found</h2>
+                  <p>The page you're looking for doesn't exist.</p>
+                </div>
+              </MarketingLayout>
+            } />
+          </Routes>
+        </div>
+      </AuthProvider>
     );
   } catch (error) {
     console.error('App Error:', error);
