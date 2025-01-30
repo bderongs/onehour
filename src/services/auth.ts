@@ -144,7 +144,6 @@ export interface UserProfile {
     expertise: string;
     experience: string;
     roles: UserRole[];
-    slug?: string;
 }
 
 // Transform database snake_case to camelCase
@@ -157,7 +156,6 @@ const transformProfileFromDB = (profile: any): UserProfile => ({
     expertise: profile.expertise,
     experience: profile.experience,
     roles: profile.roles,
-    slug: profile.slug,
 });
 
 export const getCurrentUser = async (): Promise<UserProfile | null> => {

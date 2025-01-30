@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { UserProfile, getCurrentUser } from '../services/auth';
+import { getConsultantProfile } from '../services/consultants';
+import type { ConsultantProfile } from '../types/consultant';
 import { supabase } from '../lib/supabase';
 import { User, LogOut, Settings, UserCircle, Sparkles, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 export function ProfileMenu() {
     const [isOpen, setIsOpen] = useState(false);
     const [user, setUser] = useState<UserProfile | null>(null);
+    const [consultantProfile, setConsultantProfile] = useState<ConsultantProfile | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
@@ -14,6 +17,11 @@ export function ProfileMenu() {
         const fetchUser = async () => {
             const userProfile = await getCurrentUser();
             setUser(userProfile);
+            
+            if (userProfile?.roles.includes('consultant')) {
+                const consultantData = await getConsultantProfile(userProfile.id);
+                setConsultantProfile(consultantData);
+            }
         };
 
         fetchUser();
@@ -58,10 +66,10 @@ export function ProfileMenu() {
                         <p className="text-sm text-gray-500 truncate">{user.email}</p>
                     </div>
                     <div className="py-1">
-                        {user.roles.includes('consultant') && (
+                        {user.roles.includes('consultant') && consultantProfile?.slug && (
                             <>
                                 <a
-                                    href={`/${user.slug}`}
+                                    href={`/${consultantProfile.slug}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={() => setIsOpen(false)}
