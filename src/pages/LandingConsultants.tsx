@@ -32,9 +32,7 @@ const LandingConsultants = () => {
         firstName: '',
         lastName: '',
         linkedin: '',
-        email: '',
-        expertise: '',
-        experience: ''
+        email: ''
     });
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
@@ -85,7 +83,7 @@ const LandingConsultants = () => {
         try {
             await signUpConsultantWithEmail(formData);
             setIsSubmitted(true);
-            setFormData({ firstName: '', lastName: '', linkedin: '', email: '', expertise: '', experience: '' });
+            setFormData({ firstName: '', lastName: '', linkedin: '', email: '' });
             setNotification({
                 type: 'success',
                 message: 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.'
@@ -431,42 +429,16 @@ const LandingConsultants = () => {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Domaine d'expertise
+                                        Email professionnel
                                     </label>
-                                    <select
-                                        name="expertise"
-                                        value={formData.expertise}
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
                                         onChange={handleChange}
                                         required
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    >
-                                        <option value="">Sélectionnez votre domaine</option>
-                                        <option value="digital">Transformation Digitale</option>
-                                        <option value="strategy">Stratégie & Management</option>
-                                        <option value="marketing">Marketing & Communication</option>
-                                        <option value="hr">Ressources Humaines</option>
-                                        <option value="finance">Finance & Gestion</option>
-                                        <option value="tech">Technologies & IT</option>
-                                        <option value="other">Autre</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Années d'expérience
-                                    </label>
-                                    <select
-                                        name="experience"
-                                        value={formData.experience}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    >
-                                        <option value="">Sélectionnez votre expérience</option>
-                                        <option value="1-3">1-3 ans</option>
-                                        <option value="4-7">4-7 ans</option>
-                                        <option value="8-12">8-12 ans</option>
-                                        <option value="13+">13+ ans</option>
-                                    </select>
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -478,19 +450,6 @@ const LandingConsultants = () => {
                                         value={formData.linkedin}
                                         onChange={handleChange}
                                         placeholder="https://linkedin.com/in/votre-profil"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Email professionnel
-                                    </label>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>

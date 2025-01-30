@@ -6,8 +6,6 @@ export interface ConsultantSignUpData {
     firstName: string;
     lastName: string;
     linkedin?: string;
-    expertise: string;
-    experience: string;
 }
 
 export interface ClientSignUpData {
@@ -80,8 +78,6 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
                 first_name: data.firstName,
                 last_name: data.lastName,
                 linkedin: data.linkedin,
-                expertise: data.expertise,
-                experience: data.experience,
                 roles: ['consultant'],
                 slug: slug,
                 created_at: new Date().toISOString()
