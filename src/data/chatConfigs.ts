@@ -27,10 +27,11 @@ Inutile de faire un résumé de la conversation, il est proposé à l'utilisateu
         consultant_qualification: {
             initialMessage: {
                 role: 'assistant' as const,
-                content: `Bonjour ! Je suis l'assistant virtuel ${consultantFirstname ? `de ${consultantFirstname}` : "du consultant"}. Mon rôle est de vous aider à clarifier votre brief avant votre échange avec ${consultantFirstname ? consultantFirstname : "le consultant"}. Plus je comprends précisément votre besoin, plus ${consultantFirstname ? consultantFirstname : "le consultant"} pourra préparer des solutions pertinentes. Pouvez-vous me parler de votre projet ?`
+                content: `Bonjour !
+Pouvez-vous me parler de votre projet ?`
             },
-            title: "Brief de projet",
-            subtitle: "Notre assistant IA vous aide à préparer votre consultation",
+            title: `Assistant virtuel ${consultantFirstname ? `de ${consultantFirstname}` : "du consultant"}`,
+            subtitle: "L'assistant IA vous aide à préciser votre demande",
             roleDescription: `Vous êtes un assistant spécialisé dans la qualification des besoins clients avant une consultation avec un consultant.
 Votre rôle est d'aider les utilisateurs à clarifier et structurer leur besoin pour optimiser la session avec l'expert.
 Vous devez obtenir une vision complète de leur projet pour permettre au consultant de préparer des solutions pertinentes.

@@ -130,8 +130,10 @@ export function AIChatInterface({
                         { role: 'assistant', content: aiResponse }
                     ];
                     updateMessages(updatedMessages);
-                    // Call updateSummaryIfNeeded after the initial response
-                    await updateSummaryIfNeeded(updatedMessages);
+                    // Lancer la mise à jour du résumé de manière indépendante
+                    updateSummaryIfNeeded(updatedMessages).catch(error => {
+                        console.error('Error updating initial summary:', error);
+                    });
                 }
             } catch (error) {
                 console.error('Error getting initial AI response:', error);
@@ -278,8 +280,10 @@ export function AIChatInterface({
                     if (onMessagesUpdate) {
                         onMessagesUpdate(newMessages);
                     }
-                    // Call updateSummaryIfNeeded after we get the AI response
-                    await updateSummaryIfNeeded(newMessages);
+                    // Lancer la mise à jour du résumé de manière indépendante
+                    updateSummaryIfNeeded(newMessages).catch(error => {
+                        console.error('Error updating summary:', error);
+                    });
                 }
             } catch (error) {
                 console.error('Error getting AI response:', error);

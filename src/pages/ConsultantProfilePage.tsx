@@ -355,7 +355,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                                                 className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 group"
                                             >
                                                 <Sparkles className="h-5 w-5 transition-transform group-hover:scale-110" />
-                                                Discutons de votre projet
+                                                Soumettre une demande
                                             </button>
                                         </div>
                                     </div>
