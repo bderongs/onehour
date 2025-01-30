@@ -38,8 +38,13 @@ const transformSparkToDB = (spark: Partial<Spark>): Record<string, any> => {
         const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
         
         // Clean up and transform specific fields
-        if (key === 'price' && value) {
-            transformed[snakeKey] = value.toString().replace(/[^0-9]/g, '');
+        if (key === 'price' && value !== undefined) {
+            // Handle empty string or falsy values as 0
+            if (!value) {
+                transformed[snakeKey] = '0';
+            } else {
+                transformed[snakeKey] = value.toString().replace(/[^0-9]/g, '');
+            }
         } else if (key === 'duration') {
             // Define allowed durations
             const ALLOWED_DURATIONS = [15, 30, 45, 60, 90, 120];
