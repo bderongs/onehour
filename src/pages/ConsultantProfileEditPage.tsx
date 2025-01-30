@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loader2, Plus, Trash2, Edit2, Star, HelpCircle, X } from 'lucide-react';
+import { Loader2, Plus, Trash2, Edit2, Star, X, Upload, Link } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '../types/consultant';
 import { getConsultantProfile, updateConsultantProfile, getConsultantReviews, getConsultantMissions, updateConsultantReviews, updateConsultantMissions } from '../services/consultants';
+import { uploadProfileImage, deleteProfileImage } from '../services/storage';
 import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { Modal } from '../components/Modal';
 
 export default function ConsultantProfileEditPage() {
     const { id } = useParams<{ id: string }>();
@@ -20,7 +20,8 @@ export default function ConsultantProfileEditPage() {
         languagesInput?: string,
         keyCompetenciesInput?: string,
         reviews?: ConsultantReview[],
-        missions?: ConsultantMission[]
+        missions?: ConsultantMission[],
+        profile_image_path?: string
     }>({});
     const [editingReviewIndex, setEditingReviewIndex] = useState<number | null>(null);
     const [editingMissionIndex, setEditingMissionIndex] = useState<number | null>(null);
@@ -29,8 +30,10 @@ export default function ConsultantProfileEditPage() {
         index: number;
         isOpen: boolean;
     } | null>(null);
-    const [showLinkedInHelp, setShowLinkedInHelp] = useState(false);
     const [newCompetency, setNewCompetency] = useState('');
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [showUrlInput, setShowUrlInput] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Fetch consultant data when component mounts
     useEffect(() => {
@@ -121,6 +124,7 @@ export default function ConsultantProfileEditPage() {
         delete submissionData.keyCompetenciesInput;
         delete submissionData.reviews;
         delete submissionData.missions;
+        delete submissionData.profile_image_path; // Remove profile_image_path before sending to database
 
         setSaving(true);
         try {
@@ -147,6 +151,52 @@ export default function ConsultantProfileEditPage() {
             setNotification({ type: 'error', message: 'Échec de la mise à jour du profil' });
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !id) return;
+
+        try {
+            setUploadingImage(true);
+            const { publicUrl } = await uploadProfileImage(file, id, formData.profile_image_url);
+            setFormData(prev => ({
+                ...prev,
+                profile_image_url: publicUrl
+            }));
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            setNotification({
+                type: 'error',
+                message: error instanceof Error ? error.message : 'Erreur lors de l\'upload de l\'image'
+            });
+        } finally {
+            setUploadingImage(false);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    };
+
+    const handleImageDelete = async () => {
+        if (formData.profile_image_url) {
+            try {
+                await deleteProfileImage(formData.profile_image_url);
+                setFormData(prev => ({ 
+                    ...prev, 
+                    profile_image_url: ''
+                }));
+            } catch (error) {
+                console.error('Error deleting image:', error);
+                setNotification({
+                    type: 'error',
+                    message: 'Erreur lors de la suppression de l\'image'
+                });
+            }
+        }
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
         }
     };
 
@@ -211,28 +261,71 @@ export default function ConsultantProfileEditPage() {
                             </p>
                             <div className="space-y-4">
                                 <div>
-                                    <label htmlFor="profile_image_url" className="block text-sm font-medium text-gray-700 mb-1">
-                                        URL de la photo de profil
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Photo de profil
                                     </label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="url"
-                                            id="profile_image_url"
-                                            name="profile_image_url"
-                                            value={formData.profile_image_url || ''}
-                                            onChange={handleInputChange}
-                                            className="flex-grow px-3 py-2 border border-gray-300 rounded-md"
-                                            placeholder="https://example.com/votre-photo.jpg"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowLinkedInHelp(true)}
-                                            className="flex items-center gap-2 px-3 py-2 text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-300 rounded-md transition-colors"
-                                            title="Comment récupérer ma photo LinkedIn ?"
-                                        >
-                                            <HelpCircle className="h-5 w-5" />
-                                            <span>LinkedIn</span>
-                                        </button>
+                                    <div className="space-y-4">
+                                        {formData.profile_image_url && (
+                                            <div className="relative w-40 h-40 md:w-72 md:h-96 bg-gray-400 rounded-2xl border-4 border-white overflow-hidden">
+                                                <img
+                                                    src={formData.profile_image_url}
+                                                    alt="Profile"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={handleImageDelete}
+                                                    className="absolute bottom-2 right-2 p-2 bg-black/50 backdrop-blur-sm text-white rounded-lg hover:bg-black/70 transition-colors"
+                                                    title="Supprimer la photo"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        )}
+                                        <div className="flex gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                className="flex items-center gap-2 px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+                                                disabled={uploadingImage}
+                                            >
+                                                {uploadingImage ? (
+                                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                                ) : (
+                                                    <Upload className="h-5 w-5" />
+                                                )}
+                                                <span>{uploadingImage ? 'Upload en cours...' : 'Uploader une photo'}</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowUrlInput(!showUrlInput)}
+                                                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-300 rounded-md transition-colors"
+                                            >
+                                                <Link className="h-5 w-5" />
+                                                <span>Utiliser une URL</span>
+                                            </button>
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                                className="hidden"
+                                            />
+                                        </div>
+                                        {showUrlInput && (
+                                            <input
+                                                type="url"
+                                                id="profile_image_url"
+                                                name="profile_image_url"
+                                                value={formData.profile_image_url || ''}
+                                                onChange={handleInputChange}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                                placeholder="https://example.com/votre-photo.jpg"
+                                            />
+                                        )}
+                                        <p className="text-sm text-gray-500">
+                                            Choisissez une photo professionnelle de bonne qualité. Format recommandé : JPEG ou PNG, ratio carré.
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -928,29 +1021,6 @@ export default function ConsultantProfileEditPage() {
                 onCancel={() => setDeleteConfirm(null)}
                 variant="danger"
             />
-
-            {/* LinkedIn Help Modal */}
-            <Modal
-                isOpen={showLinkedInHelp}
-                onClose={() => setShowLinkedInHelp(false)}
-                title="Récupérer votre photo depuis LinkedIn"
-            >
-                <div className="space-y-4 text-gray-600">
-                    <p>Pour récupérer l'URL de votre photo de profil LinkedIn :</p>
-                    <ol className="list-decimal list-inside space-y-2">
-                        <li>Connectez-vous à votre compte LinkedIn</li>
-                        <li>Accédez à votre profil</li>
-                        <li>Faites un clic droit sur votre photo de profil</li>
-                        <li>Sélectionnez "Copier l'adresse de l'image" ou "Copy image address"</li>
-                        <li>Collez l'URL dans le champ ci-dessus</li>
-                    </ol>
-                    <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                        <p className="text-sm text-blue-700">
-                            <strong>Note :</strong> Assurez-vous que votre photo de profil LinkedIn est publique pour qu'elle soit accessible sur votre profil Sparkier.
-                        </p>
-                    </div>
-                </div>
-            </Modal>
         </div>
     );
 } 
