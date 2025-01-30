@@ -118,8 +118,6 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
                 last_name: data.lastName,
                 company: data.company,
                 roles: ['client'],
-                expertise: data.industry, // Using industry as expertise for clients
-                experience: data.companyRole, // Using companyRole as experience for clients
                 created_at: new Date().toISOString()
             }
         ])
@@ -137,8 +135,6 @@ export interface UserProfile {
     firstName: string;
     lastName: string;
     linkedin?: string;
-    expertise: string;
-    experience: string;
     roles: UserRole[];
 }
 
@@ -149,8 +145,6 @@ const transformProfileFromDB = (profile: any): UserProfile => ({
     firstName: profile.first_name,
     lastName: profile.last_name,
     linkedin: profile.linkedin,
-    expertise: profile.expertise,
-    experience: profile.experience,
     roles: profile.roles,
 });
 

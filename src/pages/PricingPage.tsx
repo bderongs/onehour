@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Check, ArrowRight, CheckCircle } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
 import { submitConsultantForm } from '../services/consultantFormSubmission';
+import { SubmissionSuccess } from '../components/SubmissionSuccess';
 
 export function PricingPage() {
     const [formData, setFormData] = useState({
@@ -185,11 +186,9 @@ export function PricingPage() {
                     </div>
 
                     {isSubmitted ? (
-                        <div className="bg-green-50 text-green-800 p-6 rounded-xl text-center">
-                            <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-600" />
-                            <h3 className="text-xl font-semibold mb-2">Bienvenue chez Sparkier !</h3>
-                            <p>Notre équipe vous contactera dans les 24h pour finaliser votre profil et vous accompagner dans la prise en main de la plateforme.</p>
-                        </div>
+                        <SubmissionSuccess 
+                            message="Veuillez vérifier votre boîte mail pour confirmer votre adresse email. Une fois confirmée, vous pourrez accéder à la plateforme et commencer à créer vos Sparks et votre page de conversion."
+                        />
                     ) : (
                         <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-md">
                             <div className="space-y-6">

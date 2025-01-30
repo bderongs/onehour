@@ -7,6 +7,7 @@ import { SparksGrid } from '../components/SparksGrid';
 import { getSparks } from '../services/sparks';
 import type { Spark } from '../types/spark';
 import { Notification } from '../components/Notification';
+import { SubmissionSuccess } from '../components/SubmissionSuccess';
 import '../styles/highlight.css';
 
 const fadeInUp = {
@@ -391,11 +392,9 @@ const LandingConsultants = () => {
                     </div>
 
                     {isSubmitted ? (
-                        <div className="bg-green-50 text-green-800 p-6 rounded-xl text-center">
-                            <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-600" />
-                            <h3 className="text-xl font-semibold mb-2">Merci pour votre inscription !</h3>
-                            <p>Veuillez vérifier votre boîte mail pour confirmer votre adresse email. Une fois confirmée, vous pourrez accéder à la plateforme et commencer à créer vos Sparks et votre page de conversion.</p>
-                        </div>
+                        <SubmissionSuccess 
+                            message="Veuillez vérifier votre boîte mail pour confirmer votre adresse email. Une fois confirmée, vous pourrez accéder à la plateforme et commencer à créer vos Sparks et votre page de conversion."
+                        />
                     ) : (
                         <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-xl shadow-md">
                             <div className="space-y-6">
