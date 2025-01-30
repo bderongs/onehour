@@ -49,6 +49,7 @@ create table if not exists profiles (
     medium text,
     substack text,
     website text,
+    booking_url text,
     profile_image_url text,
     
     -- Professional details
@@ -109,6 +110,9 @@ begin
     end if;
     if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'website') then
         alter table profiles add column website text;
+    end if;
+    if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'booking_url') then
+        alter table profiles add column booking_url text;
     end if;
     if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'profile_image_url') then
         alter table profiles add column profile_image_url text;

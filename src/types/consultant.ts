@@ -24,6 +24,7 @@ export type ConsultantProfile = {
     medium?: string;
     substack?: string;
     website?: string;
+    booking_url?: string;
     
     // Professional details
     key_competencies?: string[];

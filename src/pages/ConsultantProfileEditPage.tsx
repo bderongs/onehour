@@ -210,6 +210,31 @@ export default function ConsultantProfileEditPage() {
                                 Ces informations constituent l'en-tête de votre profil et sont essentielles pour vous présenter aux clients potentiels.
                             </p>
                             <div className="space-y-4">
+                                <div>
+                                    <label htmlFor="profile_image_url" className="block text-sm font-medium text-gray-700 mb-1">
+                                        URL de la photo de profil
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="url"
+                                            id="profile_image_url"
+                                            name="profile_image_url"
+                                            value={formData.profile_image_url || ''}
+                                            onChange={handleInputChange}
+                                            className="flex-grow px-3 py-2 border border-gray-300 rounded-md"
+                                            placeholder="https://example.com/votre-photo.jpg"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowLinkedInHelp(true)}
+                                            className="flex items-center gap-2 px-3 py-2 text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-300 rounded-md transition-colors"
+                                            title="Comment récupérer ma photo LinkedIn ?"
+                                        >
+                                            <HelpCircle className="h-5 w-5" />
+                                            <span>LinkedIn</span>
+                                        </button>
+                                    </div>
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
@@ -269,29 +294,21 @@ export default function ConsultantProfileEditPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="profile_image_url" className="block text-sm font-medium text-gray-700 mb-1">
-                                        URL de la photo de profil
+                                    <label htmlFor="booking_url" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Lien de réservation
                                     </label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="url"
-                                            id="profile_image_url"
-                                            name="profile_image_url"
-                                            value={formData.profile_image_url || ''}
-                                            onChange={handleInputChange}
-                                            className="flex-grow px-3 py-2 border border-gray-300 rounded-md"
-                                            placeholder="https://example.com/votre-photo.jpg"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowLinkedInHelp(true)}
-                                            className="flex items-center gap-2 px-3 py-2 text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-300 rounded-md transition-colors"
-                                            title="Comment récupérer ma photo LinkedIn ?"
-                                        >
-                                            <HelpCircle className="h-5 w-5" />
-                                            <span>LinkedIn</span>
-                                        </button>
-                                    </div>
+                                    <input
+                                        type="url"
+                                        id="booking_url"
+                                        name="booking_url"
+                                        value={formData.booking_url || ''}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        placeholder="https://calendly.com/votre-compte ou https://zcal.co/votre-compte"
+                                    />
+                                    <p className="mt-2 text-sm text-gray-500">
+                                        Utilisez un service comme Calendly, Zcal ou tout autre outil de réservation en ligne pour générer votre lien.
+                                    </p>
                                 </div>
                             </div>
                         </div>
