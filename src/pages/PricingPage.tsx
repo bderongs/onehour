@@ -1,35 +1,7 @@
-import React, { useState } from 'react';
 import { Check, ArrowRight } from 'lucide-react';
-import { submitConsultantForm } from '../services/consultantFormSubmission';
-import { SubmissionSuccess } from '../components/SubmissionSuccess';
+import { ConsultantSignUpForm } from '../components/ConsultantSignUpForm';
 
 export function PricingPage() {
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        linkedin: '',
-        email: ''
-    });
-    const [isSubmitted, setIsSubmitted] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            await submitConsultantForm(formData);
-            setIsSubmitted(true);
-            setFormData({ firstName: '', lastName: '', linkedin: '', email: '' });
-        } catch (error) {
-            console.error('Error submitting form:', error);
-        }
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
-
     const scrollToSignup = () => {
         document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -185,80 +157,10 @@ export function PricingPage() {
                         </p>
                     </div>
 
-                    {isSubmitted ? (
-                        <SubmissionSuccess 
-                            message="Veuillez vérifier votre boîte mail pour confirmer votre adresse email. Une fois confirmée, vous pourrez accéder à la plateforme et commencer à créer vos Sparks et votre page de conversion."
-                        />
-                    ) : (
-                        <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-md">
-                            <div className="space-y-6">
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Prénom
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="firstName"
-                                            value={formData.firstName}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Nom
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="lastName"
-                                            value={formData.lastName}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Email professionnel
-                                    </label>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        LinkedIn (optionnel)
-                                    </label>
-                                    <input
-                                        type="url"
-                                        name="linkedin"
-                                        value={formData.linkedin}
-                                        onChange={handleChange}
-                                        placeholder="https://linkedin.com/in/votre-profil"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    className="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group"
-                                >
-                                    Créer mon profil gratuitement
-                                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                                </button>
-                            </div>
-                            <p className="mt-4 text-sm text-gray-500 text-center">
-                                En créant votre profil, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
-                            </p>
-                        </form>
-                    )}
+                    <ConsultantSignUpForm 
+                        className="bg-white p-8 rounded-xl shadow-md"
+                        buttonText="Créer mon profil gratuitement"
+                    />
                 </div>
             </div>
         </div>

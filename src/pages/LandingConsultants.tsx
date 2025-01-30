@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { signUpConsultantWithEmail } from '../services/auth';
-import { CheckCircle, ArrowRight, Sparkles, Package2, Clock, Store } from 'lucide-react';
+import { ArrowRight, Sparkles, Package2, Clock, Store } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { SparksGrid } from '../components/SparksGrid';
 import { getSparks } from '../services/sparks';
 import type { Spark } from '../types/spark';
-import { Notification } from '../components/Notification';
-import { SubmissionSuccess } from '../components/SubmissionSuccess';
+import { ConsultantSignUpForm } from '../components/ConsultantSignUpForm';
 import '../styles/highlight.css';
 
 const fadeInUp = {
@@ -29,14 +27,6 @@ const LandingConsultants = () => {
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        linkedin: '',
-        email: ''
-    });
-    const [isSubmitted, setIsSubmitted] = useState(false);
-    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
 
     useEffect(() => {
@@ -79,32 +69,6 @@ const LandingConsultants = () => {
         }
     }, []);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            await signUpConsultantWithEmail(formData);
-            setIsSubmitted(true);
-            setFormData({ firstName: '', lastName: '', linkedin: '', email: '' });
-            setNotification({
-                type: 'success',
-                message: 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.'
-            });
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            setNotification({
-                type: 'error',
-                message: 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.'
-            });
-        }
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
-
     const handleSparkCreation = () => {
         const element = document.getElementById('signup-form');
         const headerOffset = 120; // Increased offset to show more of the form header
@@ -125,14 +89,6 @@ const LandingConsultants = () => {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            {notification && (
-                <Notification
-                    type={notification.type}
-                    message={notification.message}
-                    onClose={() => setNotification(null)}
-                />
-            )}
-            
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* Hero Section */}
                 <motion.div
@@ -352,7 +308,9 @@ const LandingConsultants = () => {
                                 variants={fadeInUp}
                                 className="bg-white p-4 sm:p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow flex items-start gap-3"
                             >
-                                <CheckCircle className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
+                                <div className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1">
+                                    {/* Placeholder for the CheckCircle icon */}
+                                </div>
                                 <p className="text-gray-600">{advantage}</p>
                             </motion.div>
                         ))}
@@ -391,80 +349,7 @@ const LandingConsultants = () => {
                         </p>
                     </div>
 
-                    {isSubmitted ? (
-                        <SubmissionSuccess 
-                            message="Veuillez vérifier votre boîte mail pour confirmer votre adresse email. Une fois confirmée, vous pourrez accéder à la plateforme et commencer à créer vos Sparks et votre page de conversion."
-                        />
-                    ) : (
-                        <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-xl shadow-md">
-                            <div className="space-y-6">
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Prénom
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="firstName"
-                                            value={formData.firstName}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Nom
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="lastName"
-                                            value={formData.lastName}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Email professionnel
-                                    </label>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        LinkedIn (optionnel)
-                                    </label>
-                                    <input
-                                        type="url"
-                                        name="linkedin"
-                                        value={formData.linkedin}
-                                        onChange={handleChange}
-                                        placeholder="https://linkedin.com/in/votre-profil"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    className="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group"
-                                >
-                                    Créer mes premiers Sparks gratuitement
-                                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                                </button>
-                            </div>
-                            <p className="mt-4 text-sm text-gray-500 text-center">
-                                En créant votre profil, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
-                            </p>
-                        </form>
-                    )}
+                    <ConsultantSignUpForm />
                 </motion.div>
             </div>
         </div>
