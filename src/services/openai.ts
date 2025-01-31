@@ -22,6 +22,16 @@ export async function editSparkWithAI(
     messages: { role: 'user' | 'assistant' | 'system', content: string }[]
 ): Promise<SparkEditResponse> {
     try {
+        logger.info('Sending editSparkWithAI request to OpenAI:', {
+            messageCount: messages.length,
+            model: 'gpt-4',
+            functionCall: 'edit_spark',
+            messages: messages.map(m => ({
+                role: m.role,
+                content: m.content,
+            }))
+        });
+
         const completion = await openai.chat.completions.create({
             messages,
             model: 'gpt-4',
@@ -136,8 +146,17 @@ export async function editSparkWithAI(
             ]
         });
 
+        logger.info('Received editSparkWithAI response from OpenAI:', {
+            status: 'success',
+            functionCall: completion.choices[0].message.function_call?.name,
+            functionArguments: completion.choices[0].message.function_call?.arguments,
+            assistantMessage: completion.choices[0].message.content,
+            usage: completion.usage
+        });
+
         const functionCall = completion.choices[0].message.function_call;
         if (!functionCall || !functionCall.arguments) {
+            logger.error('No function call in OpenAI response');
             throw new Error('No function call in response');
         }
 
@@ -150,16 +169,20 @@ export async function editSparkWithAI(
             const pricePattern = /\b(\d+\s*(€|euro|eur)s?\b)|(\b(gratuit|offert)\b)/i;
             
             if (durationPattern.test(response.document.title) || pricePattern.test(response.document.title)) {
-                // If title contains duration or price, remove it from the document to prevent the update
+                logger.warn('Title contained duration or price information, removing title from update', {
+                    invalidTitle: response.document.title
+                });
                 delete response.document.title;
-                // Update the reply to explain why the title wasn't updated
                 response.reply = `${response.reply}\n\nNote : Le titre proposé contenait des indications de durée ou de prix, il n'a donc pas été mis à jour. Ces informations doivent être dans leurs champs respectifs.`;
             }
         }
         
         return response;
     } catch (error) {
-        console.error('OpenAI API Error:', error);
+        logger.error('OpenAI API Error in editSparkWithAI:', {
+            error: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined
+        });
         return {
             reply: "Je suis désolé, mais j'ai des difficultés à me connecter. Veuillez réessayer.",
             document: {}
@@ -172,24 +195,43 @@ export async function analyzeWithOpenAI(
     messages: { role: 'user' | 'assistant' | 'system', content: string }[], 
     isSummaryMode: boolean = false
 ) {
-    logger.debug('analyzeWithOpenAI called with messages:', messages);
     try {
+        logger.info('Sending analyzeWithOpenAI request to OpenAI:', {
+            messageCount: messages.length,
+            model: 'gpt-4',
+            temperature: isSummaryMode ? 0 : 0.7,
+            isSummaryMode,
+            messages: messages.map(m => ({
+                role: m.role,
+                content: m.content,
+            }))
+        });
+
         const formattedMessages: ChatCompletionMessageParam[] = messages;
 
         const completion = await openai.chat.completions.create({
             messages: formattedMessages,
             model: 'gpt-4',
-            temperature: isSummaryMode ? 0 : 0.7, // Use temperature 0 for more consistent JSON
+            temperature: isSummaryMode ? 0 : 0.7,
         });
 
         let response = completion.choices[0].message.content || '';
 
-        // Log the AI response to the console
-        logger.debug('AI Response:', response);
+        logger.info('Received analyzeWithOpenAI response from OpenAI:', {
+            status: 'success',
+            responseLength: response.length,
+            isSummaryMode,
+            response: response,
+            usage: completion.usage
+        });
 
         return response;
     } catch (error) {
-        console.error('OpenAI API Error:', error);
+        logger.error('OpenAI API Error in analyzeWithOpenAI:', {
+            error: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined,
+            isSummaryMode
+        });
         return isSummaryMode ? 
             JSON.stringify({}) : 
             "I apologize, but I'm having trouble connecting. Please try again.";
