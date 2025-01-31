@@ -389,6 +389,53 @@ export function SparkAIPage() {
                                 </div>
                             </SparkPreviewSection>
 
+                            {/* FAQ Section */}
+                            <SparkPreviewSection title="Questions fréquentes">
+                                <div className="space-y-3">
+                                    {spark.faq && spark.faq.length > 0 ? (
+                                        spark.faq.map((item, index) => (
+                                            <div key={index} className="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
+                                                <div className="font-medium text-gray-900 text-sm lg:text-base mb-2">
+                                                    {item.question}
+                                                </div>
+                                                <p className="text-gray-600 text-sm lg:text-base">{item.answer}</p>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-400">Ajoutez des questions fréquentes...</p>
+                                    )}
+                                </div>
+                            </SparkPreviewSection>
+
+                            {/* Expert Profile Section */}
+                            <SparkPreviewSection title="Profil de l'expert">
+                                <div className="space-y-4">
+                                    {spark.expertProfile ? (
+                                        <>
+                                            <div>
+                                                <h3 className="font-medium text-gray-900 mb-2">Expertise</h3>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {spark.expertProfile.expertise.map((exp, index) => (
+                                                        <span
+                                                            key={index}
+                                                            className="bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs lg:text-sm"
+                                                        >
+                                                            {exp}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 className="font-medium text-gray-900 mb-2">Expérience</h3>
+                                                <p className="text-gray-600 text-sm lg:text-base">{spark.expertProfile.experience}</p>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <p className="text-gray-400">Ajoutez votre profil d'expert...</p>
+                                    )}
+                                </div>
+                            </SparkPreviewSection>
+
                             <SparkPreviewSection title="Prochaines étapes">
                                 <div className="space-y-3">
                                     {spark.nextSteps && spark.nextSteps.length > 0 ? (

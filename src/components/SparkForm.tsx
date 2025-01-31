@@ -291,6 +291,134 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
                 </div>
             </div>
 
+            {/* Target Audience */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-semibold mb-4">Pour qui ?</h2>
+                <div className="space-y-2">
+                    {formData.targetAudience?.map((audience, index) => (
+                        <div key={index} className="flex gap-2">
+                            <input
+                                type="text"
+                                value={audience}
+                                onChange={(e) => handleArrayChange('targetAudience', index, e.target.value)}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => handleArrayRemove('targetAudience', index)}
+                                className="text-red-600 hover:text-red-700"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                    ))}
+                    <button
+                        type="button"
+                        onClick={() => handleArrayAdd('targetAudience')}
+                        className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Ajouter une cible
+                    </button>
+                </div>
+            </div>
+
+            {/* Prerequisites */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-semibold mb-4">Prérequis</h2>
+                <div className="space-y-2">
+                    {formData.prerequisites?.map((prerequisite, index) => (
+                        <div key={index} className="flex gap-2">
+                            <input
+                                type="text"
+                                value={prerequisite}
+                                onChange={(e) => handleArrayChange('prerequisites', index, e.target.value)}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => handleArrayRemove('prerequisites', index)}
+                                className="text-red-600 hover:text-red-700"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                    ))}
+                    <button
+                        type="button"
+                        onClick={() => handleArrayAdd('prerequisites')}
+                        className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Ajouter un prérequis
+                    </button>
+                </div>
+            </div>
+
+            {/* Deliverables */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-semibold mb-4">Ce que vous obtiendrez</h2>
+                <div className="space-y-2">
+                    {formData.deliverables?.map((deliverable, index) => (
+                        <div key={index} className="flex gap-2">
+                            <input
+                                type="text"
+                                value={deliverable}
+                                onChange={(e) => handleArrayChange('deliverables', index, e.target.value)}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => handleArrayRemove('deliverables', index)}
+                                className="text-red-600 hover:text-red-700"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                    ))}
+                    <button
+                        type="button"
+                        onClick={() => handleArrayAdd('deliverables')}
+                        className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Ajouter un livrable
+                    </button>
+                </div>
+            </div>
+
+            {/* Next Steps */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-semibold mb-4">Prochaines étapes</h2>
+                <div className="space-y-2">
+                    {formData.nextSteps?.map((step, index) => (
+                        <div key={index} className="flex gap-2">
+                            <input
+                                type="text"
+                                value={step}
+                                onChange={(e) => handleArrayChange('nextSteps', index, e.target.value)}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => handleArrayRemove('nextSteps', index)}
+                                className="text-red-600 hover:text-red-700"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                    ))}
+                    <button
+                        type="button"
+                        onClick={() => handleArrayAdd('nextSteps')}
+                        className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Ajouter une étape
+                    </button>
+                </div>
+            </div>
+
             {/* Methodology */}
             <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4">Méthodologie</h2>
