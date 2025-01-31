@@ -6,13 +6,15 @@ import { Notification } from './Notification';
 interface ClientSignUpFormProps {
     buttonText?: string;
     className?: string;
-    onSuccess?: () => void;
+    sparkId?: string;
+    onSuccess?: (data: { sparkId?: string }) => void;
     onError?: (error: any) => void;
 }
 
 export function ClientSignUpForm({ 
     buttonText = "Créer mon compte",
     className = "",
+    sparkId,
     onSuccess,
     onError
 }: ClientSignUpFormProps) {
@@ -22,7 +24,8 @@ export function ClientSignUpForm({
         company: '',
         email: '',
         companyRole: '',
-        industry: ''
+        industry: '',
+        sparkId
     });
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [loading, setLoading] = useState(false);
@@ -31,20 +34,21 @@ export function ClientSignUpForm({
         e.preventDefault();
         setLoading(true);
         try {
-            await signUpClientWithEmail(formData);
+            const result = await signUpClientWithEmail(formData);
             setFormData({
                 firstName: '',
                 lastName: '',
                 company: '',
                 email: '',
                 companyRole: '',
-                industry: ''
+                industry: '',
+                sparkId: undefined
             });
             setNotification({
                 type: 'success',
                 message: 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.'
             });
-            onSuccess?.();
+            onSuccess?.(result);
         } catch (error) {
             console.error('Error submitting form:', error);
             setNotification({

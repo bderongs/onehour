@@ -8,6 +8,8 @@ import { formatDuration, formatPrice } from '../utils/format';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { supabase } from '../lib/supabase';
 import logger from '../utils/logger';
+import { createClientRequest } from '../services/clientRequests';
+import { useClientSignUp } from '../contexts/ClientSignUpContext';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -29,6 +31,7 @@ export function SparkProductPage() {
     const [pageContext, setPageContext] = useState<PageContext | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userRoles, setUserRoles] = useState<string[]>([]);
+    const { setSparkId } = useClientSignUp();
 
     const DEMO_CONSULTANT_ID = import.meta.env.VITE_DEMO_CONSULTANT_ID;
 
@@ -83,12 +86,28 @@ export function SparkProductPage() {
     }, [sparkUrl, navigate, DEMO_CONSULTANT_ID]);
 
     const handleAction = () => {
+        if (!spark) return;
+
         switch (pageContext) {
             case 'consultant_marketing':
                 navigate('/consultants#signup-form');
                 break;
             case 'client_purchase':
-                logger.debug('TODO: Implement booking flow');
+                if (!isAuthenticated) {
+                    // Store sparkId in context and redirect to signup
+                    setSparkId(spark.id);
+                    navigate('/signup');
+                } else {
+                    // If authenticated, create a client request directly
+                    createClientRequest({ sparkId: spark.id })
+                        .then(request => {
+                            navigate(`/client/requests/${request.id}`);
+                        })
+                        .catch(error => {
+                            logger.error('Error creating client request:', error);
+                            // TODO: Show error notification
+                        });
+                }
                 break;
             case 'consultant_preview':
                 navigate('/sparks/manage');

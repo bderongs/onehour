@@ -463,6 +463,86 @@ begin
     end if;
 end $$;
 
+-- Create a table for client requests if it doesn't exist
+create table if not exists client_requests (
+    id uuid default uuid_generate_v4() primary key,
+    client_id uuid references profiles(id) not null,
+    spark_id uuid references sparks(id) not null,
+    status text not null default 'pending',
+    message text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS on client_requests
+alter table client_requests enable row level security;
+
+-- Create policies for client_requests
+do $$
+begin
+    -- Viewing policy for clients (their own requests) and consultants (requests for their sparks)
+    if not exists (
+        select 1 from pg_policies 
+        where tablename = 'client_requests' 
+        and policyname = 'Users can view their own requests'
+    ) then
+        create policy "Users can view their own requests"
+            on client_requests for select
+            using (
+                auth.uid() = client_id
+                or exists (
+                    select 1 from sparks
+                    where sparks.id = client_requests.spark_id
+                    and sparks.consultant = auth.uid()
+                )
+                or exists (
+                    select 1 from profiles
+                    where id = auth.uid()
+                    and roles @> array['admin']::user_role[]
+                )
+            );
+    end if;
+
+    -- Insert policy for authenticated users
+    if not exists (
+        select 1 from pg_policies 
+        where tablename = 'client_requests' 
+        and policyname = 'Authenticated users can create requests'
+    ) then
+        create policy "Authenticated users can create requests"
+            on client_requests for insert
+            with check (auth.uid() = client_id);
+    end if;
+
+    -- Update policy for clients (their own requests) and consultants (requests for their sparks)
+    if not exists (
+        select 1 from pg_policies 
+        where tablename = 'client_requests' 
+        and policyname = 'Users can update their own requests'
+    ) then
+        create policy "Users can update their own requests"
+            on client_requests for update
+            using (
+                auth.uid() = client_id
+                or exists (
+                    select 1 from sparks
+                    where sparks.id = client_requests.spark_id
+                    and sparks.consultant = auth.uid()
+                )
+                or exists (
+                    select 1 from profiles
+                    where id = auth.uid()
+                    and roles @> array['admin']::user_role[]
+                )
+            );
+    end if;
+end $$;
+
+-- Create indexes for client_requests
+create index if not exists client_requests_client_id_idx on client_requests (client_id);
+create index if not exists client_requests_spark_id_idx on client_requests (spark_id);
+create index if not exists client_requests_status_idx on client_requests (status);
+
 -- Set up triggers for updated_at (moved to end after all tables exist)
 do $$
 begin

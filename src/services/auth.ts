@@ -16,6 +16,7 @@ export interface ClientSignUpData {
     company: string;
     companyRole: string;
     industry: string;
+    sparkId?: string; // Optional sparkId for direct signup from SparkProductPage
 }
 
 // Get the site URL based on environment
@@ -125,7 +126,28 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
 
     if (profileError) throw profileError
 
-    return authData
+    // If sparkId is provided, create a client request
+    if (data.sparkId && authData.user) {
+        const { error: requestError } = await supabase
+            .from('client_requests')
+            .insert([
+                {
+                    client_id: authData.user.id,
+                    spark_id: data.sparkId,
+                    status: 'pending'
+                }
+            ])
+
+        if (requestError) {
+            logger.error('Error creating client request during signup:', requestError);
+            // Don't throw here, as the user account is already created
+        }
+    }
+
+    return {
+        ...authData,
+        sparkId: data.sparkId // Return sparkId if it was provided
+    }
 }
 
 export type UserRole = 'client' | 'consultant' | 'admin';

@@ -6,11 +6,15 @@ import { Notification } from './Notification';
 interface ConsultantSignUpFormProps {
     className?: string;
     buttonText?: string;
+    onSuccess?: () => void;
+    onError?: (error: any) => void;
 }
 
 export function ConsultantSignUpForm({ 
     className = "bg-white p-6 sm:p-8 rounded-xl shadow-md",
-    buttonText = "Créer mes premiers Sparks gratuitement"
+    buttonText = "Créer mes premiers Sparks gratuitement",
+    onSuccess,
+    onError
 }: ConsultantSignUpFormProps) {
     const [formData, setFormData] = useState({
         firstName: '',
@@ -31,12 +35,18 @@ export function ConsultantSignUpForm({
                 type: 'success',
                 message: 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.'
             });
+            if (onSuccess) {
+                onSuccess();
+            }
         } catch (error) {
             console.error('Error submitting form:', error);
             setNotification({
                 type: 'error',
                 message: 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.'
             });
+            if (onError) {
+                onError(error);
+            }
         }
     };
 

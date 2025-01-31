@@ -29,6 +29,8 @@ import { ConsultantProfileLayout } from './layouts/ConsultantProfileLayout';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import { ClientRequestPage } from './pages/ClientRequestPage';
+import { ClientSignUpProvider } from './contexts/ClientSignUpContext';
 
 function App() {
   const location = useLocation();
@@ -58,7 +60,8 @@ function App() {
   try {
     return (
       <AuthProvider>
-        <div className="min-h-screen flex flex-col">
+        <ClientSignUpProvider>
+          <div className="min-h-screen flex flex-col">
             <Routes>
               {/* Public routes */}
               <Route path="/auth/callback" element={<AuthCallback />} />
@@ -141,6 +144,7 @@ function App() {
                   <ProtectedRoute requiredRoles={['client']}>
                     <Routes>
                       <Route path="dashboard" element={<ClientDashboard />} />
+                      <Route path="requests/:requestId" element={<ClientRequestPage />} />
                       <Route path="conversations" element={<div>Conversations coming soon</div>} />
                       <Route path="documents" element={<div>Documents coming soon</div>} />
                     </Routes>
@@ -158,7 +162,8 @@ function App() {
                 </MarketingLayout>
               } />
             </Routes>
-        </div>
+          </div>
+        </ClientSignUpProvider>
       </AuthProvider>
     );
   } catch (error) {
