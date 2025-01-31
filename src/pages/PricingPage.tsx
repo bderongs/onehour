@@ -9,8 +9,9 @@ export function PricingPage() {
     const tiers = [
         {
             name: 'Lancement',
-            price: '0€',
-            period: '/mois',
+            price: '1€',
+            currentPrice: 'Gratuit',
+            period: 'par mois',
             description: 'Accélérez votre croissance avec Sparkier',
             features: [
                 'Page de profil professionnelle',
@@ -23,8 +24,8 @@ export function PricingPage() {
         },
         {
             name: 'Premium',
-            price: '49€',
-            period: '/mois',
+            price: '19€',
+            period: 'par mois',
             description: 'Des services premium bientôt disponibles',
             features: [
                 'Page de profil personnalisée',
@@ -76,7 +77,7 @@ export function PricingPage() {
 
                 {/* Pricing Grid */}
                 <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                    {tiers.map((tier) => (
+                    {tiers.map((tier, index) => (
                         <div 
                             key={tier.name}
                             className={`bg-white rounded-2xl shadow-xl p-8 relative flex flex-col ${
@@ -93,10 +94,25 @@ export function PricingPage() {
                             <div className="mb-6">
                                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{tier.name}</h3>
                                 <p className="text-gray-600 mb-4">{tier.description}</p>
-                                <div className="flex items-baseline">
-                                    <span className="text-4xl font-bold text-gray-900">{tier.price}</span>
-                                    <span className="text-gray-600 ml-1">{tier.period}</span>
-                                </div>
+                                {index === 0 ? (
+                                    <>
+                                        <div className="flex flex-col">
+                                            <div className="flex items-baseline">
+                                                <span className="text-4xl font-bold text-gray-900 line-through opacity-50">{tier.price}</span>
+                                                <span className="text-4xl font-bold text-gray-900 ml-2">{tier.currentPrice}</span>
+                                            </div>
+                                            <span className="text-gray-600 text-lg">{tier.period}</span>
+                                            <div className="bg-green-500 text-white text-sm font-medium px-3 py-1 rounded-full mt-2 w-fit">
+                                                Offre de lancement 🎉
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="flex flex-col">
+                                        <span className="text-4xl font-bold text-gray-900">{tier.price}</span>
+                                        <span className="text-gray-600 text-lg">{tier.period}</span>
+                                    </div>
+                                )}
                             </div>
                             <ul className="space-y-4 mb-8 flex-grow">
                                 {tier.features.map((feature) => (
