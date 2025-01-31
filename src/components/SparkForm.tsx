@@ -154,6 +154,9 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
             {/* Basic Information */}
             <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4">Informations de base</h2>
+                <p className="text-sm text-gray-500 mb-4">
+                    Ces informations constituent l'en-tête de votre Spark et sont les premières informations que vos clients potentiels verront.
+                </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -232,6 +235,9 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
             {/* Description */}
             <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4">Description</h2>
+                <p className="text-sm text-gray-500 mb-4">
+                    Une description claire et concise de votre Spark est essentielle. La description courte apparaît dans les aperçus, tandis que la description détaillée permet d'approfondir votre offre.
+                </p>
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -262,6 +268,9 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
             {/* Benefits */}
             <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4">Bénéfices</h2>
+                <p className="text-sm text-gray-500 mb-4">
+                    Listez les avantages concrets que vos clients obtiendront en choisissant ce Spark. Soyez spécifique et orienté résultats.
+                </p>
                 <div className="space-y-2">
                     {formData.benefits?.map((benefit, index) => (
                         <div key={index} className="flex gap-2">
@@ -294,6 +303,9 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
             {/* Target Audience */}
             <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4">Pour qui ?</h2>
+                <p className="text-sm text-gray-500 mb-4">
+                    Définissez clairement votre audience cible pour aider les clients à identifier si ce Spark leur correspond. Ciblez des profils ou des rôles spécifiques.
+                </p>
                 <div className="space-y-2">
                     {formData.targetAudience?.map((audience, index) => (
                         <div key={index} className="flex gap-2">
@@ -326,6 +338,9 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
             {/* Prerequisites */}
             <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4">Prérequis</h2>
+                <p className="text-sm text-gray-500 mb-4">
+                    Indiquez les conditions ou connaissances nécessaires pour tirer le meilleur parti de ce Spark. Cela aide à aligner les attentes dès le départ.
+                </p>
                 <div className="space-y-2">
                     {formData.prerequisites?.map((prerequisite, index) => (
                         <div key={index} className="flex gap-2">
@@ -358,6 +373,9 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
             {/* Deliverables */}
             <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4">Ce que vous obtiendrez</h2>
+                <p className="text-sm text-gray-500 mb-4">
+                    Détaillez les livrables concrets que vos clients recevront. Soyez précis sur le format et la nature des délivrables pour éviter toute ambiguïté.
+                </p>
                 <div className="space-y-2">
                     {formData.deliverables?.map((deliverable, index) => (
                         <div key={index} className="flex gap-2">
@@ -390,6 +408,9 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
             {/* Next Steps */}
             <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4">Prochaines étapes</h2>
+                <p className="text-sm text-gray-500 mb-4">
+                    Décrivez le processus qui suit la réservation du Spark. Cela aide les clients à se projeter et à comprendre le déroulement de la collaboration.
+                </p>
                 <div className="space-y-2">
                     {formData.nextSteps?.map((step, index) => (
                         <div key={index} className="flex gap-2">
@@ -422,6 +443,9 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
             {/* Methodology */}
             <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4">Méthodologie</h2>
+                <p className="text-sm text-gray-500 mb-4">
+                    Présentez votre approche étape par étape. Une méthodologie claire rassure vos clients sur votre professionnalisme et votre expertise.
+                </p>
                 <div className="space-y-2">
                     {formData.methodology?.map((step, index) => (
                         <div key={index} className="flex gap-2">
@@ -454,6 +478,9 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
             {/* Expert Profile */}
             <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4">Profil Expert</h2>
+                <p className="text-sm text-gray-500 mb-4">
+                    Mettez en avant votre expertise spécifique pour ce Spark. Concentrez-vous sur les compétences et l'expérience pertinentes pour cette offre en particulier.
+                </p>
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -514,6 +541,9 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
             {/* FAQ */}
             <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4">FAQ</h2>
+                <p className="text-sm text-gray-500 mb-4">
+                    Anticipez les questions fréquentes de vos clients. Une FAQ bien construite peut lever les derniers freins à la réservation de votre Spark.
+                </p>
                 <div className="space-y-4">
                     {formData.faq?.map((item, index) => (
                         <div key={index} className="space-y-2 pb-4 border-b border-gray-200 last:border-0">
