@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ChevronDown, ChevronUp, ArrowLeft, AlertCircle } from 'lucide-react';
 import { getSparkByUrl } from '../services/sparks';
@@ -21,6 +21,7 @@ type PageContext = 'consultant_marketing' | 'client_purchase' | 'consultant_prev
 export function SparkProductPage() {
     const { sparkUrl } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
     const [spark, setSpark] = useState<Spark | null>(null);
     const [loading, setLoading] = useState(true);
@@ -98,8 +99,10 @@ export function SparkProductPage() {
     const handleBack = () => {
         if (pageContext === 'consultant_preview') {
             navigate('/sparks/manage');
-        } else {
+        } else if (location.key) {
             navigate(-1);
+        } else {
+            navigate('/');
         }
     };
 
@@ -322,32 +325,6 @@ export function SparkProductPage() {
                                             {expandedFaq === index && (
                                                 <p className="mt-2 text-gray-600 text-sm lg:text-base">{item.answer}</p>
                                             )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </motion.section>
-                        )}
-
-                        {/* Testimonials */}
-                        {spark.testimonials && (
-                            <motion.section
-                                className="bg-white rounded-xl shadow-md p-4 sm:p-6"
-                                variants={fadeInUp}
-                            >
-                                <h2 className="text-lg lg:text-xl font-semibold mb-4">Ce qu'en disent nos clients</h2>
-                                <div className="space-y-6">
-                                    {spark.testimonials.map((testimonial, index) => (
-                                        <div key={index} className="border-l-4 border-blue-200 pl-4">
-                                            <p className="text-gray-600 italic mb-2 text-sm lg:text-base">{testimonial.text}</p>
-                                            <div className="text-xs lg:text-sm">
-                                                <span className="font-medium text-gray-900">{testimonial.author}</span>
-                                                {(testimonial.role || testimonial.company) && (
-                                                    <span className="text-gray-500">
-                                                        {testimonial.role && ` • ${testimonial.role}`}
-                                                        {testimonial.company && ` • ${testimonial.company}`}
-                                                    </span>
-                                                )}
-                                            </div>
                                         </div>
                                     ))}
                                 </div>

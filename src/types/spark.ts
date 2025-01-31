@@ -22,12 +22,6 @@ export interface Spark {
         question: string;
         answer: string;
     }>;
-    testimonials?: Array<{
-        text: string;
-        author: string;
-        company?: string;
-        role?: string;
-    }>;
     nextSteps?: string[];
     url: string;
 } 

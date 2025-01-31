@@ -52,7 +52,6 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
                 experience: ''
             },
             faq: [],
-            testimonials: [],
             nextSteps: []
         };
     });

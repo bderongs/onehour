@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase'
 import { generateSlug, ensureUniqueSlug } from '../utils/url';
+import logger from '../utils/logger';
 
 export interface ConsultantSignUpData {
     email: string;
@@ -152,7 +153,7 @@ export const getCurrentUser = async (): Promise<UserProfile | null> => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
     if (authError || !user) {
-        console.error('Error getting user:', authError);
+        logger.error('Error getting user:', authError);
         return null;
     }
 
@@ -163,7 +164,7 @@ export const getCurrentUser = async (): Promise<UserProfile | null> => {
         .single();
 
     if (profileError || !profile) {
-        console.error('Error getting profile:', profileError);
+        logger.error('Error getting profile:', profileError);
         return null;
     }
 
@@ -198,7 +199,7 @@ export const updateUserRoles = async (userId: string, roles: UserRole[]): Promis
         .eq('id', userId);
 
     if (error) {
-        console.error('Error updating user roles:', error);
+        logger.error('Error updating user roles:', error);
         throw error;
     }
 };
@@ -211,7 +212,7 @@ export const resendConfirmationEmail = async (email: string): Promise<void> => {
     });
 
     if (error) {
-        console.error('Error sending confirmation email:', error);
+        logger.error('Error sending confirmation email:', error);
         throw error;
     }
 }; 

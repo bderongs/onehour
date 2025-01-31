@@ -118,20 +118,6 @@ export async function editSparkWithAI(
                                         },
                                         description: 'Liste des questions fréquentes'
                                     },
-                                    testimonials: {
-                                        type: 'array',
-                                        items: {
-                                            type: 'object',
-                                            properties: {
-                                                text: { type: 'string' },
-                                                author: { type: 'string' },
-                                                company: { type: 'string' },
-                                                role: { type: 'string' }
-                                            },
-                                            required: ['text', 'author']
-                                        },
-                                        description: 'Liste des témoignages'
-                                    },
                                     nextSteps: {
                                         type: 'array',
                                         items: { type: 'string' },

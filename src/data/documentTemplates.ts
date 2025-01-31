@@ -19,7 +19,6 @@ function generateSparkFields(): DocumentField[] {
         deliverables: { label: 'Livrables', description: 'Liste des livrables fournis' },
         expertProfile: { label: 'Profil expert', description: 'Profil de l\'expert' },
         faq: { label: 'FAQ', description: 'Questions fréquemment posées' },
-        testimonials: { label: 'Témoignages', description: 'Témoignages des clients' },
         nextSteps: { label: 'Prochaines étapes', description: 'Liste des prochaines étapes après le Spark' },
         url: { label: 'URL', description: 'URL unique du Spark' },
         prefillText: { label: 'Texte prérempli', description: 'Texte de préparation pour le client' }
@@ -40,7 +39,6 @@ function generateSparkFields(): DocumentField[] {
         'deliverables',
         'expertProfile',
         'faq',
-        'testimonials',
         'nextSteps'
     ];
 

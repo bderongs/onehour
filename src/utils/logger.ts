@@ -1,9 +1,5 @@
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-// Log the environment state
-console.log('Current NODE_ENV:', process.env.NODE_ENV);
-console.log('isDevelopment:', isDevelopment);
-
 const logger = {
   log: (...args: any[]) => {
     if (isDevelopment) {
@@ -30,5 +26,9 @@ const logger = {
     }
   },
 };
+
+// Log the environment state at debug level
+logger.debug('Current NODE_ENV:', process.env.NODE_ENV);
+logger.debug('isDevelopment:', isDevelopment);
 
 export default logger; 

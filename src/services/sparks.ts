@@ -21,7 +21,6 @@ const transformSparkFromDB = (dbSpark: any): Spark => ({
     deliverables: dbSpark.deliverables,
     expertProfile: dbSpark.expert_profile,
     faq: dbSpark.faq,
-    testimonials: dbSpark.testimonials,
     nextSteps: dbSpark.next_steps,
 });
 

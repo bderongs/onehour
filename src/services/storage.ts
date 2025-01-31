@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import logger from '../utils/logger';
 
 const MAX_WIDTH = 800;  // Maximum width for profile pictures
 const MAX_HEIGHT = 1200; // Maximum height for profile pictures
@@ -12,7 +13,7 @@ const getFilePathFromUrl = (url: string): string | null => {
         const matches = url.match(/public\/profiles\/([^?#]+)/);
         return matches ? matches[1] : null;
     } catch (e) {
-        console.error('Failed to parse URL:', e);
+        logger.error('Failed to parse URL:', e);
         return null;
     }
 };
@@ -20,23 +21,23 @@ const getFilePathFromUrl = (url: string): string | null => {
 // Delete an image from storage using its file path
 const deleteImage = async (filePath: string): Promise<void> => {
     try {
-        console.log('Attempting to delete file:', filePath);
+        logger.debug('Attempting to delete file:', filePath);
         const { error } = await supabase.storage
             .from('profiles')
             .remove([filePath]);
 
         if (error) {
-            console.error('Error deleting image:', error);
-            console.error('Error details:', {
+            logger.error('Error deleting image:', error);
+            logger.error('Error details:', {
                 message: error.message,
                 name: error.name
             });
             throw new Error(`Erreur lors de la suppression de l'image: ${error.message}`);
         } else {
-            console.log('Successfully deleted file:', filePath);
+            logger.debug('Successfully deleted file:', filePath);
         }
     } catch (error) {
-        console.error('Failed to delete image:', error);
+        logger.error('Failed to delete image:', error);
         throw error;
     }
 };
@@ -75,7 +76,7 @@ const optimizeImage = async (file: File): Promise<Blob> => {
     // Check browser support
     const support = checkBrowserSupport();
     if (!support.canvas || !support.blobConstructor) {
-        console.warn('Browser does not support image optimization, uploading original file');
+        logger.warn('Browser does not support image optimization, uploading original file');
         return file;
     }
 
@@ -117,7 +118,7 @@ const optimizeImage = async (file: File): Promise<Blob> => {
                     ctx.imageSmoothingEnabled = true;
                     ctx.imageSmoothingQuality = 'high';
                 } catch (e) {
-                    console.warn('Advanced image smoothing not supported in this browser');
+                    logger.warn('Advanced image smoothing not supported in this browser');
                 }
                 
                 // Draw and compress image
@@ -130,7 +131,7 @@ const optimizeImage = async (file: File): Promise<Blob> => {
                             if (blob) {
                                 // Check if optimization actually reduced the size
                                 if (blob.size > file.size) {
-                                    console.warn('Optimized image is larger than original, using original file');
+                                    logger.warn('Optimized image is larger than original, using original file');
                                     resolve(file);
                                 } else {
                                     resolve(blob);
@@ -158,13 +159,13 @@ const optimizeImage = async (file: File): Promise<Blob> => {
                         const blob = new Blob([ab], { type: mimeString });
                         // Check if optimization actually reduced the size
                         if (blob.size > file.size) {
-                            console.warn('Optimized image is larger than original, using original file');
+                            logger.warn('Optimized image is larger than original, using original file');
                             resolve(file);
                         } else {
                             resolve(blob);
                         }
                     } catch (e) {
-                        console.warn('Fallback conversion failed, uploading original file');
+                        logger.warn('Fallback conversion failed, uploading original file');
                         resolve(file);
                     }
                 }
@@ -217,7 +218,7 @@ export const uploadProfileImage = async (file: File, userId: string, oldImageUrl
             if (oldPath) {
                 await deleteImage(oldPath);
             } else {
-                console.warn('Could not extract file path from URL:', oldImageUrl);
+                logger.warn('Could not extract file path from URL:', oldImageUrl);
             }
         }
 
@@ -253,7 +254,7 @@ export const deleteProfileImage = async (imageUrl: string): Promise<void> => {
     
     const filePath = getFilePathFromUrl(imageUrl);
     if (!filePath) {
-        console.warn('Could not extract file path from URL:', imageUrl);
+        logger.warn('Could not extract file path from URL:', imageUrl);
         return;
     }
     

@@ -49,7 +49,6 @@ function getEditableFields(): (keyof Spark)[] {
         'deliverables',
         'expertProfile',
         'faq',
-        'testimonials',
         'nextSteps'
     ];
 }
