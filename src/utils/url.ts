@@ -14,24 +14,44 @@ export const generateSlug = (text: string): string => {
         .substring(0, 100); // Limit length to 100 chars
 };
 
+type SlugContext = 'spark' | 'profile';
+
 /**
- * Ensures a unique URL by appending a number if necessary
+ * Ensures a unique URL by appending a number if necessary within a specific context
  * Example: If "my-title" exists, returns "my-title-2"
  */
-export const ensureUniqueSlug = async (baseSlug: string, currentUrl?: string): Promise<string> => {
+export const ensureUniqueSlug = async (
+    baseSlug: string, 
+    context: SlugContext,
+    currentSlug?: string
+): Promise<string> => {
     let slug = baseSlug;
     let counter = 1;
     let isUnique = false;
 
     while (!isUnique) {
-        const { data, error } = await supabase
-            .from('sparks')
-            .select('url')
-            .eq('url', slug)
-            .neq('url', currentUrl || '');
+        let data, error;
+
+        if (context === 'spark') {
+            const result = await supabase
+                .from('sparks')
+                .select('url')
+                .eq('url', slug)
+                .neq('url', currentSlug || '');
+            data = result.data;
+            error = result.error;
+        } else {
+            const result = await supabase
+                .from('profiles')
+                .select('slug')
+                .eq('slug', slug)
+                .neq('slug', currentSlug || '');
+            data = result.data;
+            error = result.error;
+        }
 
         if (error) {
-            console.error('Error checking URL uniqueness:', error);
+            console.error(`Error checking URL uniqueness for ${context}:`, error);
             throw error;
         }
 

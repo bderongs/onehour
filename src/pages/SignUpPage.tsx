@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ClientSignUpForm } from '../components/ClientSignUpForm';
 import { ConsultantSignUpForm } from '../components/ConsultantSignUpForm';
 import { useClientSignUp } from '../contexts/ClientSignUpContext';
 
+type UserType = 'client' | 'consultant' | null;
+
 export function SignUpPage() {
-    const [userType, setUserType] = useState<'client' | 'consultant'>('client');
+    const [selectedType, setSelectedType] = useState<UserType>(null);
     const navigate = useNavigate();
     const { sparkId, clearSignUpData } = useClientSignUp();
 
@@ -23,50 +25,77 @@ export function SignUpPage() {
         navigate('/auth/confirmation');
     };
 
-    return (
-        <div className="max-w-2xl mx-auto px-4 py-8 sm:py-12">
-            <h1 className="text-3xl font-bold text-gray-900 text-center mb-8">
-                Créer un compte
-            </h1>
-
-            {/* User Type Selection */}
-            <div className="flex justify-center mb-8">
-                <div className="inline-flex rounded-lg p-1 bg-gray-100">
-                    <button
-                        onClick={() => setUserType('client')}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                            userType === 'client'
-                                ? 'bg-white text-gray-900 shadow'
-                                : 'text-gray-500 hover:text-gray-900'
-                        }`}
-                    >
-                        Client
-                    </button>
-                    <button
-                        onClick={() => setUserType('consultant')}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                            userType === 'consultant'
-                                ? 'bg-white text-gray-900 shadow'
-                                : 'text-gray-500 hover:text-gray-900'
-                        }`}
-                    >
-                        Consultant
-                    </button>
+    const renderTypeSelection = () => (
+        <div className="space-y-4">
+            <button
+                onClick={() => setSelectedType('client')}
+                className="w-full flex items-center justify-between p-4 text-left border-2 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors group"
+            >
+                <div>
+                    <p className="font-medium text-gray-900 group-hover:text-blue-600">Je suis un client</p>
+                    <p className="text-sm text-gray-500">Je cherche un expert pour m'accompagner</p>
                 </div>
-            </div>
+                <span className="text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+            </button>
+            <button
+                onClick={() => setSelectedType('consultant')}
+                className="w-full flex items-center justify-between p-4 text-left border-2 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors group"
+            >
+                <div>
+                    <p className="font-medium text-gray-900 group-hover:text-blue-600">Je suis un consultant</p>
+                    <p className="text-sm text-gray-500">Je souhaite proposer mes services</p>
+                </div>
+                <span className="text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+            </button>
+        </div>
+    );
 
-            {/* Sign Up Forms */}
-            <div className="bg-white rounded-2xl shadow-sm border p-6 sm:p-8">
-                {userType === 'client' ? (
-                    <ClientSignUpForm
-                        sparkId={sparkId || undefined}
-                        onSuccess={handleClientSignUpSuccess}
-                    />
-                ) : (
-                    <ConsultantSignUpForm
-                        onSuccess={handleConsultantSignUpSuccess}
-                    />
-                )}
+    return (
+        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md w-full">
+                <div className="bg-white p-8 rounded-lg shadow-md space-y-6">
+                    <div className="text-center">
+                        <h2 className="text-3xl font-extrabold text-gray-900">
+                            Créer un compte
+                        </h2>
+                        {!selectedType ? (
+                            <p className="mt-2 text-sm text-gray-600">
+                                Choisissez votre profil pour commencer
+                            </p>
+                        ) : (
+                            <button
+                                onClick={() => setSelectedType(null)}
+                                className="mt-2 text-sm text-blue-600 hover:text-blue-500"
+                            >
+                                ← Changer de profil
+                            </button>
+                        )}
+                    </div>
+
+                    {!selectedType ? (
+                        renderTypeSelection()
+                    ) : selectedType === 'client' ? (
+                        <ClientSignUpForm 
+                            sparkId={sparkId || undefined}
+                            onSuccess={handleClientSignUpSuccess}
+                        />
+                    ) : (
+                        <ConsultantSignUpForm 
+                            onSuccess={handleConsultantSignUpSuccess}
+                            className=""
+                        />
+                    )}
+
+                    <p className="text-center text-sm text-gray-600">
+                        Vous avez déjà un compte ?{' '}
+                        <Link
+                            to="/signin"
+                            className="font-medium text-blue-600 hover:text-blue-500"
+                        >
+                            Se connecter
+                        </Link>
+                    </p>
+                </div>
             </div>
         </div>
     );

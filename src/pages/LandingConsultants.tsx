@@ -349,7 +349,9 @@ const LandingConsultants = () => {
                         </p>
                     </div>
 
-                    <ConsultantSignUpForm />
+                    <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md">
+                        <ConsultantSignUpForm />
+                    </div>
                 </motion.div>
             </div>
         </div>

@@ -68,7 +68,7 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
 
     // Generate the initial slug
     const baseSlug = generateSlug(`${data.firstName} ${data.lastName}`);
-    const slug = await ensureUniqueSlug(baseSlug);
+    const slug = await ensureUniqueSlug(baseSlug, 'profile');
 
     // Then, store additional user data in a profiles table
     const { error: profileError } = await supabase

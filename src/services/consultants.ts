@@ -90,7 +90,7 @@ export async function updateConsultantProfile(id: string, profile: Partial<Consu
         const firstName = profile.first_name || currentProfile?.first_name || '';
         const lastName = profile.last_name || currentProfile?.last_name || '';
         const baseSlug = generateSlug(`${firstName} ${lastName}`);
-        updatedProfile.slug = await ensureUniqueSlug(baseSlug, currentProfile?.slug);
+        updatedProfile.slug = await ensureUniqueSlug(baseSlug, 'profile', currentProfile?.slug);
     }
 
     const { data, error } = await supabase

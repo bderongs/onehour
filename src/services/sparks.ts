@@ -139,7 +139,7 @@ export const getSparksByConsultant = async (consultantId: string): Promise<Spark
 export const createSpark = async (spark: Omit<Spark, 'id'>): Promise<Spark> => {
     // Generate URL from title
     const baseSlug = generateSlug(spark.title);
-    const url = await ensureUniqueSlug(baseSlug);
+    const url = await ensureUniqueSlug(baseSlug, 'spark');
 
     // Create a new object without the id field and with the generated URL
     const sparkData = {
@@ -192,7 +192,7 @@ export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<S
 
             // If the URL is already taken, generate a unique one
             if (data) {
-                updatedSpark.url = await ensureUniqueSlug(baseSlug);
+                updatedSpark.url = await ensureUniqueSlug(baseSlug, 'spark');
             } else {
                 updatedSpark.url = baseSlug;
             }

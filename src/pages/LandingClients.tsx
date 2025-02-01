@@ -474,9 +474,6 @@ export function LandingClients() {
 
                     <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md">
                         <ClientSignUpForm />
-                        <p className="mt-4 text-sm text-gray-500 text-center">
-                            En créant votre compte, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
-                        </p>
                     </div>
                 </motion.div>
 

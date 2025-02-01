@@ -184,6 +184,9 @@ export function ClientSignUpForm({
                     {loading ? 'Inscription en cours...' : buttonText}
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </button>
+                <p className="text-center text-sm text-gray-500">
+                    En créant votre compte, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
+                </p>
             </form>
         </>
     );
