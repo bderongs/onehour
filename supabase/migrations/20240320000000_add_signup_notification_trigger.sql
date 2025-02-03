@@ -12,7 +12,7 @@ declare
 begin
   perform
     net.http_post(
-      url := 'http://' || coalesce(host, 'localhost:54321') || '/functions/v1/notify-signup',
+      url := 'https://' || coalesce(host, 'localhost:54321') || '/functions/v1/notify-signup',
       headers := jsonb_build_object(
         'Content-Type', 'application/json'
       ),

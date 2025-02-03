@@ -61,7 +61,7 @@ serve(async (req) => {
 
     // Prepare email content
     const emailContent = {
-      from: NOTIFICATION_EMAIL,
+      from: `Sparkier Notifications <${NOTIFICATION_EMAIL}>`,
       to: NOTIFICATION_EMAIL,
       subject: `New ${userType} Signup: ${record.first_name} ${record.last_name}`,
       html: `
@@ -89,6 +89,11 @@ serve(async (req) => {
 
     if (!response.ok) {
       const error = await response.text()
+      console.error('Resend API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error
+      })
       throw new Error(`Failed to send email: ${error}`)
     }
 
