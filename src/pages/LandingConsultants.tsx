@@ -98,14 +98,19 @@ const LandingConsultants = () => {
                 <meta property="og:title" content="Sparkier - Créez vos offres de conseil packagées" />
                 <meta property="og:description" content="Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre. Simplifiez votre activité de conseil avec Sparkier." />
                 <meta property="og:image" content="https://sparkier.io/images/og-consultant.png" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
                 <meta property="og:url" content="https://sparkier.io/consultants" />
                 <meta property="og:type" content="website" />
+                <meta property="og:site_name" content="Sparkier" />
                 
                 {/* Twitter Card Meta Tags */}
                 <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:site" content="@sparkier" />
                 <meta name="twitter:title" content="Sparkier - Créez vos offres de conseil packagées" />
                 <meta name="twitter:description" content="Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre. Simplifiez votre activité de conseil avec Sparkier." />
                 <meta name="twitter:image" content="https://sparkier.io/images/og-consultant.png" />
+                <meta name="twitter:image:alt" content="Sparkier - Créez vos offres de conseil packagées" />
             </Helmet>
 
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
