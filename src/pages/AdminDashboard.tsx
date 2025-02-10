@@ -12,35 +12,39 @@ export function AdminDashboard() {
             icon: <Briefcase className="h-8 w-8 text-blue-500" />,
             onClick: () => navigate('/admin/consultants'),
             cta: 'Gérer les consultants',
-            highlight: true
+            isImplemented: true
         },
         {
             title: 'Gestion des clients',
             description: 'Gérez les comptes et les accès des clients',
             icon: <Users className="h-8 w-8 text-blue-500" />,
             onClick: () => navigate('/admin/clients'),
-            cta: 'Gérer les clients'
+            cta: 'Gérer les clients',
+            isImplemented: false
         },
         {
             title: 'Gestion des sparks',
             description: 'Gérez les sparks et leurs configurations',
             icon: <Zap className="h-8 w-8 text-blue-500" />,
             onClick: () => navigate('/admin/sparks'),
-            cta: 'Gérer les sparks'
+            cta: 'Gérer les sparks',
+            isImplemented: true
         },
         {
             title: 'Gestion des rôles',
             description: 'Gérez les rôles des utilisateurs',
             icon: <UserCog className="h-8 w-8 text-blue-500" />,
             onClick: () => navigate('/admin/roles'),
-            cta: 'Gérer les rôles'
+            cta: 'Gérer les rôles',
+            isImplemented: true
         },
         {
             title: 'Paramètres',
             description: 'Configuration générale de la plateforme',
             icon: <Settings className="h-8 w-8 text-blue-500" />,
             onClick: () => navigate('/admin/settings'),
-            cta: 'Configurer'
+            cta: 'Configurer',
+            isImplemented: false
         }
     ];
 
@@ -64,9 +68,7 @@ export function AdminDashboard() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                                className={`bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow ${
-                                    item.highlight ? 'ring-2 ring-blue-500' : ''
-                                }`}
+                                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
                             >
                                 <div className="p-6">
                                     <div className="flex flex-col items-center text-center">
@@ -83,7 +85,7 @@ export function AdminDashboard() {
                                             <button
                                                 onClick={item.onClick}
                                                 className={`inline-flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${
-                                                    item.highlight
+                                                    item.isImplemented
                                                         ? 'bg-blue-600 text-white hover:bg-blue-700'
                                                         : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                                                 }`}
