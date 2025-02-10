@@ -49,10 +49,11 @@ const ConsultantRow = ({
         sparkUrl: null,
         sparkTitle: null
     });
+    const [showDeleteError, setShowDeleteError] = useState(false);
 
     useEffect(() => {
         const fetchSparks = async () => {
-            if (isExpanded && consultant.id) {
+            if ((isExpanded || showDeleteConfirm) && consultant.id) {
                 setLoadingSparks(true);
                 try {
                     const consultantSparks = await getConsultantSparks(consultant.id);
@@ -66,9 +67,23 @@ const ConsultantRow = ({
         };
 
         fetchSparks();
-    }, [isExpanded, consultant.id]);
+    }, [isExpanded, showDeleteConfirm, consultant.id]);
+
+    const handleDeleteAttempt = () => {
+        if (sparks.length > 0) {
+            setShowDeleteError(true);
+        } else {
+            setShowDeleteConfirm(true);
+        }
+    };
 
     const handleDelete = async () => {
+        if (sparks.length > 0) {
+            setShowDeleteError(true);
+            setShowDeleteConfirm(false);
+            return;
+        }
+
         setIsDeleting(true);
         const success = await deleteConsultant(consultant.id);
         setIsDeleting(false);
@@ -180,7 +195,7 @@ const ConsultantRow = ({
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setShowDeleteConfirm(true);
+                                    handleDeleteAttempt();
                                 }}
                                 disabled={isDeleting || isAdmin}
                                 className={`${
@@ -189,7 +204,7 @@ const ConsultantRow = ({
                                         : isDeleting 
                                             ? 'opacity-50 cursor-wait' 
                                             : 'hover:bg-red-50'
-                                } p-1.5 rounded-full transition-colors`}
+                                } p-1.5 rounded-full transition-colors group`}
                                 title={isAdmin ? "Les administrateurs ne peuvent pas être supprimés" : "Supprimer"}
                             >
                                 <Trash2 className={`h-5 w-5 ${
@@ -349,6 +364,22 @@ const ConsultantRow = ({
                 onConfirm={handleDelete}
                 onCancel={() => setShowDeleteConfirm(false)}
                 variant="danger"
+            />
+
+            <ConfirmDialog
+                isOpen={showDeleteError}
+                title="Impossible de supprimer le consultant"
+                message={`Le consultant ${consultant.first_name} ${consultant.last_name} possède ${sparks.length} spark${sparks.length > 1 ? 's' : ''}. Vous devez d'abord supprimer tous les sparks avant de pouvoir supprimer le consultant.`}
+                confirmLabel={isExpanded ? "Compris" : "Voir les sparks"}
+                cancelLabel={isExpanded ? undefined : "Annuler"}
+                onConfirm={() => {
+                    setShowDeleteError(false);
+                    if (!isExpanded) {
+                        onToggle();
+                    }
+                }}
+                onCancel={isExpanded ? () => {} : () => setShowDeleteError(false)}
+                variant="warning"
             />
 
             <ConfirmDialog

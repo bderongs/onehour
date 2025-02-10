@@ -16,7 +16,7 @@ export function ConfirmDialog({
     title,
     message,
     confirmLabel = 'Confirm',
-    cancelLabel = 'Cancel',
+    cancelLabel,
     onConfirm,
     onCancel,
     variant = 'danger'
@@ -67,13 +67,15 @@ export function ConfirmDialog({
                                 </p>
                             </div>
                             <div className="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end gap-3">
-                                <button
-                                    type="button"
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                    onClick={onCancel}
-                                >
-                                    {cancelLabel}
-                                </button>
+                                {cancelLabel && (
+                                    <button
+                                        type="button"
+                                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                        onClick={onCancel}
+                                    >
+                                        {cancelLabel}
+                                    </button>
+                                )}
                                 <button
                                     type="button"
                                     className={`px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${variantStyles.button}`}
