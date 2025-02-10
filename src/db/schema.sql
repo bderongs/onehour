@@ -176,6 +176,24 @@ begin
             on profiles for update
             using ( auth.uid() = id );
     end if;
+
+    -- Admin delete policy for consultants
+    if not exists (
+        select 1 from pg_policies 
+        where tablename = 'profiles' 
+        and policyname = 'Admins can delete consultant profiles'
+    ) then
+        create policy "Admins can delete consultant profiles"
+            on profiles for delete
+            using (
+                exists (
+                    select 1 from profiles
+                    where id = auth.uid()
+                    and roles @> array['admin']::user_role[]
+                )
+                and roles @> array['consultant']::user_role[]
+            );
+    end if;
 end $$;
 
 -- Create indexes

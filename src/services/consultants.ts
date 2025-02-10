@@ -315,3 +315,24 @@ export async function getAllConsultants(includeSparkierEmails: boolean = false):
 
     return consultants;
 }
+
+export async function deleteConsultant(consultantId: string): Promise<boolean> {
+    try {
+        // Delete consultant's profile
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', consultantId)
+            .contains('roles', ['consultant']);
+
+        if (profileError) {
+            console.error('Error deleting consultant profile:', profileError);
+            return false;
+        }
+
+        return true;
+    } catch (error) {
+        console.error('Error in deleteConsultant:', error);
+        return false;
+    }
+}
