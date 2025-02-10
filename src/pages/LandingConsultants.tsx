@@ -7,6 +7,7 @@ import { getSparks } from '../services/sparks';
 import type { Spark } from '../types/spark';
 import { ConsultantSignUpForm } from '../components/ConsultantSignUpForm';
 import '../styles/highlight.css';
+import { Helmet } from 'react-helmet-async';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -89,6 +90,24 @@ const LandingConsultants = () => {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+            <Helmet>
+                <title>Sparkier - Créez vos offres de conseil packagées</title>
+                <meta name="description" content="Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre. Simplifiez votre activité de conseil avec Sparkier." />
+                
+                {/* OpenGraph Meta Tags */}
+                <meta property="og:title" content="Sparkier - Créez vos offres de conseil packagées" />
+                <meta property="og:description" content="Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre. Simplifiez votre activité de conseil avec Sparkier." />
+                <meta property="og:image" content="https://sparkier.io/images/og-consultant.png" />
+                <meta property="og:url" content="https://sparkier.io/consultants" />
+                <meta property="og:type" content="website" />
+                
+                {/* Twitter Card Meta Tags */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Sparkier - Créez vos offres de conseil packagées" />
+                <meta name="twitter:description" content="Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre. Simplifiez votre activité de conseil avec Sparkier." />
+                <meta name="twitter:image" content="https://sparkier.io/images/og-consultant.png" />
+            </Helmet>
+
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* Hero Section */}
                 <motion.div
