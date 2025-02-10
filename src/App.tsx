@@ -24,6 +24,7 @@ import { initializeGoatCounter } from './utils/analytics';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { AdminSparksPage } from './pages/AdminSparksPage';
 import { AdminConsultantsPage } from './pages/AdminConsultantsPage';
+import { AdminRolesPage } from './pages/AdminRolesPage';
 import { ClientDashboard } from './pages/ClientDashboard';
 import { MarketingLayout } from './layouts/MarketingLayout';
 import { ConsultantProfileLayout } from './layouts/ConsultantProfileLayout';
@@ -133,6 +134,7 @@ function App() {
                         <Route path="dashboard" element={<AdminDashboard />} />
                         <Route path="sparks" element={<AdminSparksPage />} />
                         <Route path="consultants" element={<AdminConsultantsPage />} />
+                        <Route path="roles" element={<AdminRolesPage />} />
                         <Route path="clients" element={<div>Client management coming soon</div>} />
                         <Route path="settings" element={<div>Settings coming soon</div>} />
                       </Routes>

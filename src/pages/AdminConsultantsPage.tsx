@@ -50,6 +50,9 @@ const ConsultantRow = ({
         setShowDeleteConfirm(false);
     };
 
+    // Check if consultant is an admin
+    const isAdmin = consultant.roles?.includes('admin');
+
     return (
         <>
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -72,7 +75,7 @@ const ConsultantRow = ({
 
                         {/* Rôle admin */}
                         <div className="flex items-center gap-2">
-                            {consultant.roles?.includes('admin') && (
+                            {isAdmin && (
                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                     Admin
                                 </span>
@@ -98,42 +101,59 @@ const ConsultantRow = ({
 
                     {/* Actions */}
                     <div className="flex items-center gap-3 ml-4">
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/consultants/${consultant.id}/edit`);
-                            }}
-                            className="text-gray-400 hover:text-blue-600 transition-colors"
-                            title="Modifier"
-                        >
-                            <Edit className="h-5 w-5" />
-                        </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setShowDeleteConfirm(true);
-                            }}
-                            disabled={isDeleting}
-                            className={`text-gray-400 hover:text-red-600 transition-colors ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            title="Supprimer"
-                        >
-                            <Trash2 className="h-5 w-5" />
-                        </button>
-                        <a
-                            href={`/${consultant.slug}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-gray-400 hover:text-gray-600 transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                            title="Voir le profil"
-                        >
-                            <ExternalLink className="h-5 w-5" />
-                        </a>
-                        {isExpanded ? (
-                            <ChevronUp className="h-5 w-5 text-gray-400" />
-                        ) : (
-                            <ChevronDown className="h-5 w-5 text-gray-400" />
-                        )}
+                        {/* Primary Actions */}
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/consultants/${consultant.id}/edit`);
+                                }}
+                                className="text-gray-400 hover:text-blue-600 transition-colors"
+                                title="Modifier"
+                            >
+                                <Edit className="h-5 w-5" />
+                            </button>
+                            <a
+                                href={`/${consultant.slug}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-gray-400 hover:text-gray-600 transition-colors"
+                                onClick={(e) => e.stopPropagation()}
+                                title="Voir le profil"
+                            >
+                                <ExternalLink className="h-5 w-5" />
+                            </a>
+                            {isExpanded ? (
+                                <ChevronUp className="h-5 w-5 text-gray-400" />
+                            ) : (
+                                <ChevronDown className="h-5 w-5 text-gray-400" />
+                            )}
+                        </div>
+
+                        {/* Danger Zone - Separated */}
+                        <div className="ml-4 border-l pl-4 border-gray-200">
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowDeleteConfirm(true);
+                                }}
+                                disabled={isDeleting || isAdmin}
+                                className={`${
+                                    isAdmin 
+                                        ? 'opacity-50 cursor-not-allowed' 
+                                        : isDeleting 
+                                            ? 'opacity-50 cursor-wait' 
+                                            : 'hover:bg-red-50'
+                                } p-1.5 rounded-full transition-colors`}
+                                title={isAdmin ? "Les administrateurs ne peuvent pas être supprimés" : "Supprimer"}
+                            >
+                                <Trash2 className={`h-5 w-5 ${
+                                    isAdmin 
+                                        ? 'text-gray-400' 
+                                        : 'text-gray-400 group-hover:text-red-600 transition-colors'
+                                }`} />
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <AnimatePresence>
@@ -192,8 +212,8 @@ const ConsultantRow = ({
             <ConfirmDialog
                 isOpen={showDeleteConfirm}
                 title="Supprimer le consultant"
-                message={`Êtes-vous sûr de vouloir supprimer le consultant ${consultant.first_name} ${consultant.last_name} ? Cette action est irréversible.`}
-                confirmLabel="Supprimer"
+                message={`Êtes-vous sûr de vouloir supprimer le consultant ${consultant.first_name} ${consultant.last_name} ? Cette action supprimera définitivement toutes les données associées et est irréversible.`}
+                confirmLabel={isDeleting ? "Suppression..." : "Supprimer définitivement"}
                 cancelLabel="Annuler"
                 onConfirm={handleDelete}
                 onCancel={() => setShowDeleteConfirm(false)}

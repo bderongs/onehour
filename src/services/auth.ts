@@ -208,21 +208,52 @@ export const isClient = async (): Promise<boolean> => {
     return user?.roles.includes('client') ?? false;
 };
 
-export const updateUserRoles = async (userId: string, roles: UserRole[]): Promise<void> => {
+export const updateUserRoles = async (userId: string, roles: UserRole[], currentRoles: UserRole[] = []): Promise<void> => {
     // Only admins can update roles
     const currentUser = await getCurrentUser();
     if (!currentUser?.roles.includes('admin')) {
         throw new Error('Only administrators can update user roles');
     }
 
-    const { error } = await supabase
-        .from('profiles')
-        .update({ roles })
-        .eq('id', userId);
+    // If adding consultant role, we need to handle slug generation
+    if (roles.includes('consultant') && !currentRoles.includes('consultant')) {
+        // Get user info to generate slug
+        const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('first_name, last_name, slug')
+            .eq('id', userId)
+            .single();
 
-    if (error) {
-        logger.error('Error updating user roles:', error);
-        throw error;
+        if (profileError) {
+            logger.error('Error fetching profile for slug generation:', profileError);
+            throw profileError;
+        }
+
+        // Generate slug if needed
+        const baseSlug = generateSlug(`${profile.first_name} ${profile.last_name}`);
+        const slug = await ensureUniqueSlug(baseSlug, 'profile');
+
+        // Update both roles and slug
+        const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ roles, slug })
+            .eq('id', userId);
+
+        if (updateError) {
+            logger.error('Error updating user roles and slug:', updateError);
+            throw updateError;
+        }
+    } else {
+        // Just update roles
+        const { error } = await supabase
+            .from('profiles')
+            .update({ roles })
+            .eq('id', userId);
+
+        if (error) {
+            logger.error('Error updating user roles:', error);
+            throw error;
+        }
     }
 };
 
