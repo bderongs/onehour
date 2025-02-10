@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Mail, ExternalLink, ChevronDown, ChevronUp, Linkedin, Edit, Trash2 } from 'lucide-react';
+import { Users, Mail, ExternalLink, ChevronDown, ChevronUp, Linkedin, Edit, Trash2, Eye, Clock, Plus } from 'lucide-react';
 import type { ConsultantProfile } from '../types/consultant';
+import type { Spark } from '../types/spark';
 import { supabase } from '../lib/supabase';
-import { getAllConsultants, deleteConsultant } from '../services/consultants';
+import { getAllConsultants, deleteConsultant, getConsultantSparks } from '../services/consultants';
+import { deleteSpark } from '../services/sparks';
 import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { formatDuration, formatPrice } from '../utils/format';
 
 const EmptyState = () => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -39,6 +42,31 @@ const ConsultantRow = ({
     const navigate = useNavigate();
     const [isDeleting, setIsDeleting] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [sparks, setSparks] = useState<Spark[]>([]);
+    const [loadingSparks, setLoadingSparks] = useState(false);
+    const [showSparkDeleteConfirm, setShowSparkDeleteConfirm] = useState<{ isOpen: boolean; sparkUrl: string | null; sparkTitle: string | null }>({
+        isOpen: false,
+        sparkUrl: null,
+        sparkTitle: null
+    });
+
+    useEffect(() => {
+        const fetchSparks = async () => {
+            if (isExpanded && consultant.id) {
+                setLoadingSparks(true);
+                try {
+                    const consultantSparks = await getConsultantSparks(consultant.id);
+                    setSparks(consultantSparks);
+                } catch (error) {
+                    console.error('Error fetching sparks:', error);
+                } finally {
+                    setLoadingSparks(false);
+                }
+            }
+        };
+
+        fetchSparks();
+    }, [isExpanded, consultant.id]);
 
     const handleDelete = async () => {
         setIsDeleting(true);
@@ -48,6 +76,23 @@ const ConsultantRow = ({
             onDelete();
         }
         setShowDeleteConfirm(false);
+    };
+
+    const handleSparkDelete = async (sparkUrl: string, sparkTitle: string) => {
+        setShowSparkDeleteConfirm({ isOpen: true, sparkUrl, sparkTitle });
+    };
+
+    const handleConfirmSparkDelete = async () => {
+        if (!showSparkDeleteConfirm.sparkUrl) return;
+        
+        try {
+            await deleteSpark(showSparkDeleteConfirm.sparkUrl);
+            setSparks(sparks.filter(spark => spark.url !== showSparkDeleteConfirm.sparkUrl));
+        } catch (error) {
+            console.error('Error deleting spark:', error);
+        } finally {
+            setShowSparkDeleteConfirm({ isOpen: false, sparkUrl: null, sparkTitle: null });
+        }
     };
 
     // Check if consultant is an admin
@@ -203,6 +248,92 @@ const ConsultantRow = ({
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Sparks Section */}
+                                <div className="mt-6">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h4 className="font-medium text-gray-900">Sparks ({sparks.length})</h4>
+                                        <button
+                                            onClick={() => navigate(`/sparks/ai-create?consultant=${consultant.id}`)}
+                                            className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                                        >
+                                            <Plus className="h-4 w-4" />
+                                            Créer un spark
+                                        </button>
+                                    </div>
+                                    {loadingSparks ? (
+                                        <div className="text-center py-4">
+                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                                            <p className="mt-2 text-sm text-gray-600">Chargement des sparks...</p>
+                                        </div>
+                                    ) : sparks.length === 0 ? (
+                                        <div className="text-center py-8 px-4 bg-gray-50 rounded-lg border border-gray-200">
+                                            <p className="text-sm text-gray-500 mb-2">Aucun spark créé</p>
+                                            <p className="text-xs text-gray-400">Créez un spark pour ce consultant en cliquant sur le bouton ci-dessus</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                            {sparks.map((spark) => (
+                                                <div 
+                                                    key={spark.url}
+                                                    className="bg-white p-3 rounded-md border border-gray-100 flex items-center justify-between hover:border-blue-200 transition-colors"
+                                                >
+                                                    <div className="flex-1">
+                                                        <h5 className="font-medium text-gray-900 flex items-center gap-2">
+                                                            {spark.title}
+                                                            {spark.highlight && (
+                                                                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">
+                                                                    {spark.highlight}
+                                                                </span>
+                                                            )}
+                                                        </h5>
+                                                        <div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
+                                                            <span className="flex items-center gap-1">
+                                                                <Clock className="h-4 w-4" />
+                                                                {formatDuration(spark.duration)}
+                                                            </span>
+                                                            {spark.price && (
+                                                                <span className="font-medium text-gray-900">{formatPrice(spark.price)}</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                navigate(`/sparks/${spark.url}`);
+                                                            }}
+                                                            className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-50 rounded-full"
+                                                            title="Voir"
+                                                        >
+                                                            <Eye className="h-4 w-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                navigate(`/sparks/edit/${spark.url}`);
+                                                            }}
+                                                            className="text-gray-400 hover:text-blue-600 transition-colors p-2 hover:bg-blue-50 rounded-full"
+                                                            title="Modifier"
+                                                        >
+                                                            <Edit className="h-4 w-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleSparkDelete(spark.url, spark.title);
+                                                            }}
+                                                            className="text-gray-400 hover:text-red-600 transition-colors p-2 hover:bg-red-50 rounded-full"
+                                                            title="Supprimer"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </motion.div>
                     )}
@@ -217,6 +348,17 @@ const ConsultantRow = ({
                 cancelLabel="Annuler"
                 onConfirm={handleDelete}
                 onCancel={() => setShowDeleteConfirm(false)}
+                variant="danger"
+            />
+
+            <ConfirmDialog
+                isOpen={showSparkDeleteConfirm.isOpen}
+                title={`Supprimer le spark "${showSparkDeleteConfirm.sparkTitle}"`}
+                message={`Êtes-vous sûr de vouloir supprimer le spark "${showSparkDeleteConfirm.sparkTitle}" ? Cette action est irréversible.`}
+                confirmLabel="Supprimer"
+                cancelLabel="Annuler"
+                onConfirm={handleConfirmSparkDelete}
+                onCancel={() => setShowSparkDeleteConfirm({ isOpen: false, sparkUrl: null, sparkTitle: null })}
                 variant="danger"
             />
         </>
