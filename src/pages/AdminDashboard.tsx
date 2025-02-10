@@ -15,11 +15,11 @@ export function AdminDashboard() {
             highlight: true
         },
         {
-            title: 'Gestion des rôles',
-            description: 'Gérez les rôles des utilisateurs',
-            icon: <UserCog className="h-8 w-8 text-blue-500" />,
-            onClick: () => navigate('/admin/roles'),
-            cta: 'Gérer les rôles'
+            title: 'Gestion des clients',
+            description: 'Gérez les comptes et les accès des clients',
+            icon: <Users className="h-8 w-8 text-blue-500" />,
+            onClick: () => navigate('/admin/clients'),
+            cta: 'Gérer les clients'
         },
         {
             title: 'Gestion des sparks',
@@ -29,11 +29,11 @@ export function AdminDashboard() {
             cta: 'Gérer les sparks'
         },
         {
-            title: 'Gestion des clients',
-            description: 'Gérez les comptes et les accès des clients',
-            icon: <Users className="h-8 w-8 text-blue-500" />,
-            onClick: () => navigate('/admin/clients'),
-            cta: 'Gérer les clients'
+            title: 'Gestion des rôles',
+            description: 'Gérez les rôles des utilisateurs',
+            icon: <UserCog className="h-8 w-8 text-blue-500" />,
+            onClick: () => navigate('/admin/roles'),
+            cta: 'Gérer les rôles'
         },
         {
             title: 'Paramètres',
