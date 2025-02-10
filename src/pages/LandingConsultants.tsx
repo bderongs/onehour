@@ -95,14 +95,15 @@ const LandingConsultants = () => {
                 <meta name="description" content="Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre. Simplifiez votre activité de conseil avec Sparkier." />
                 
                 {/* OpenGraph Meta Tags */}
-                <meta property="og:title" content="Sparkier - Créez vos offres de conseil packagées" />
-                <meta property="og:description" content="Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre. Simplifiez votre activité de conseil avec Sparkier." />
-                <meta property="og:image" content="https://sparkier.io/images/og-consultant.png" />
-                <meta property="og:image:width" content="1200" />
-                <meta property="og:image:height" content="630" />
-                <meta property="og:url" content="https://sparkier.io/consultants" />
-                <meta property="og:type" content="website" />
-                <meta property="og:site_name" content="Sparkier" />
+                <meta name="title" property="og:title" content="Sparkier - Créez vos offres de conseil packagées" />
+                <meta name="description" property="og:description" content="Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre. Simplifiez votre activité de conseil avec Sparkier." />
+                <meta name="image" property="og:image" content="https://sparkier.io/images/og-consultant.png" />
+                <meta name="image:width" property="og:image:width" content="1200" />
+                <meta name="image:height" property="og:image:height" content="630" />
+                <meta name="logo" property="og:logo" content="https://sparkier.io/favicon.png" />
+                <meta name="url" property="og:url" content="https://sparkier.io/consultants" />
+                <meta name="type" property="og:type" content="website" />
+                <meta name="site_name" property="og:site_name" content="Sparkier" />
                 
                 {/* Twitter Card Meta Tags */}
                 <meta name="twitter:card" content="summary_large_image" />
