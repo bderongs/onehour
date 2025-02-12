@@ -4,7 +4,7 @@ By default, this app supports JSX syntax with Tailwind CSS classes, React hooks,
 
 Use stock photos from unsplash where appropriate, only valid URLs you know exist. Do not download the images, only link to them in image tags.
 
-Always follow best practices in code organisation, and check the codebase for relevant prior structuration when needed.
+Always follow best practices in code organisation, and check the codebase for relevant prior structuration when needed. Use the service layer for all database operations rather than making direct Supabase queries.
 
 When writing content in French, respect the French grammar and spelling usage, and the French way of writing. In particular, do not capitalize the first letter of each word in titles.
 
@@ -15,3 +15,4 @@ The database schema should always be fully idempotent. Beware of the order of th
 When you remove a lucide-react icon, also remove the import statement from the file.
 
 Routes are managed in the app.tsx file.
+

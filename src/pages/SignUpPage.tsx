@@ -9,20 +9,15 @@ type UserType = 'client' | 'consultant' | null;
 export function SignUpPage() {
     const [selectedType, setSelectedType] = useState<UserType>(null);
     const navigate = useNavigate();
-    const { sparkId, clearSignUpData } = useClientSignUp();
+    const { sparkUrlSlug, clearSignUpData } = useClientSignUp();
 
-    const handleClientSignUpSuccess = (data: { sparkId?: string }) => {
-        // If there was a sparkId, the user will be redirected to the request page after email confirmation
-        if (data.sparkId) {
-            navigate('/auth/confirmation?message=Veuillez vérifier votre email pour accéder à votre demande');
-        } else {
-            navigate('/auth/confirmation');
-        }
-        clearSignUpData(); // Clear the stored sparkId
+    const handleClientSignUpSuccess = () => {
+        navigate('/email-confirmation');
+        clearSignUpData();
     };
 
     const handleConsultantSignUpSuccess = () => {
-        navigate('/auth/confirmation');
+        navigate('/email-confirmation');
     };
 
     const renderTypeSelection = () => (
@@ -76,7 +71,7 @@ export function SignUpPage() {
                         renderTypeSelection()
                     ) : selectedType === 'client' ? (
                         <ClientSignUpForm 
-                            sparkId={sparkId || undefined}
+                            sparkUrlSlug={sparkUrlSlug || undefined}
                             onSuccess={handleClientSignUpSuccess}
                         />
                     ) : (

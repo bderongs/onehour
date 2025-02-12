@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import logger from '../utils/logger';
 import type { Spark } from '../types/spark';
 import { generateSlug, ensureUniqueSlug } from '../utils/url';
 
@@ -111,14 +112,11 @@ export const getSparkByUrl = async (url: string): Promise<Spark | null> => {
         .single();
 
     if (error) {
-        if (error.code === 'PGRST116') { // Record not found
-            return null;
-        }
-        console.error('Error fetching spark:', error);
-        throw error;
+        logger.error('Error fetching spark by URL:', error);
+        return null;
     }
 
-    return transformSparkFromDB(data);
+    return data ? transformSparkFromDB(data) : null;
 };
 
 export const getSparksByConsultant = async (consultantId: string): Promise<Spark[]> => {
@@ -243,4 +241,19 @@ export const deleteSpark = async (url: string): Promise<void> => {
         console.error('Error deleting spark:', error);
         throw error;
     }
+};
+
+export const getSparkById = async (id: string): Promise<Spark | null> => {
+    const { data, error } = await supabase
+        .from('sparks')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error) {
+        logger.error('Error fetching spark by ID:', error);
+        return null;
+    }
+
+    return data ? transformSparkFromDB(data) : null;
 }; 

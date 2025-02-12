@@ -498,62 +498,55 @@ alter table client_requests enable row level security;
 -- Create policies for client_requests
 do $$
 begin
-    -- Viewing policy for clients (their own requests) and consultants (requests for their sparks)
-    if not exists (
-        select 1 from pg_policies 
-        where tablename = 'client_requests' 
-        and policyname = 'Users can view their own requests'
-    ) then
-        create policy "Users can view their own requests"
-            on client_requests for select
-            using (
-                auth.uid() = client_id
-                or exists (
-                    select 1 from sparks
-                    where sparks.id = client_requests.spark_id
-                    and sparks.consultant = auth.uid()
-                )
-                or exists (
-                    select 1 from profiles
-                    where id = auth.uid()
-                    and roles @> array['admin']::user_role[]
-                )
-            );
-    end if;
+    -- Drop existing policies if they exist
+    drop policy if exists "Users can view their own requests" on client_requests;
+    drop policy if exists "Users can create requests" on client_requests;
+    drop policy if exists "Users can update their own requests" on client_requests;
+    drop policy if exists "Authenticated users can create requests" on client_requests;
 
-    -- Insert policy for authenticated users
-    if not exists (
-        select 1 from pg_policies 
-        where tablename = 'client_requests' 
-        and policyname = 'Authenticated users can create requests'
-    ) then
-        create policy "Authenticated users can create requests"
-            on client_requests for insert
-            with check (auth.uid() = client_id);
-    end if;
+    -- Viewing policy for clients (their own requests) and consultants (requests for their sparks)
+    create policy "Users can view their own requests"
+        on client_requests for select
+        using (
+            auth.uid() = client_id
+            or exists (
+                select 1 from sparks
+                where sparks.id = client_requests.spark_id
+                and sparks.consultant = auth.uid()
+            )
+            or exists (
+                select 1 from profiles
+                where id = auth.uid()
+                and roles @> array['admin']::user_role[]
+            )
+        );
+
+    -- Insert policy for authenticated users and during signup
+    create policy "Users can create requests"
+        on client_requests for insert
+        with check (
+            -- Allow inserts during signup (when client_id matches the inserting user)
+            client_id = auth.uid()
+            -- Also allow inserts from the service role during signup
+            or auth.role() = 'service_role'
+        );
 
     -- Update policy for clients (their own requests) and consultants (requests for their sparks)
-    if not exists (
-        select 1 from pg_policies 
-        where tablename = 'client_requests' 
-        and policyname = 'Users can update their own requests'
-    ) then
-        create policy "Users can update their own requests"
-            on client_requests for update
-            using (
-                auth.uid() = client_id
-                or exists (
-                    select 1 from sparks
-                    where sparks.id = client_requests.spark_id
-                    and sparks.consultant = auth.uid()
-                )
-                or exists (
-                    select 1 from profiles
-                    where id = auth.uid()
-                    and roles @> array['admin']::user_role[]
-                )
-            );
-    end if;
+    create policy "Users can update their own requests"
+        on client_requests for update
+        using (
+            auth.uid() = client_id
+            or exists (
+                select 1 from sparks
+                where sparks.id = client_requests.spark_id
+                and sparks.consultant = auth.uid()
+            )
+            or exists (
+                select 1 from profiles
+                where id = auth.uid()
+                and roles @> array['admin']::user_role[]
+            )
+        );
 end $$;
 
 -- Create indexes for client_requests

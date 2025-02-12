@@ -30,8 +30,7 @@ export function SparkProductPage() {
     const [error, setError] = useState<string | null>(null);
     const [pageContext, setPageContext] = useState<PageContext | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [userRoles, setUserRoles] = useState<string[]>([]);
-    const { setSparkId } = useClientSignUp();
+    const { setSparkUrlSlug } = useClientSignUp();
 
     const DEMO_CONSULTANT_ID = import.meta.env.VITE_DEMO_CONSULTANT_ID;
 
@@ -44,18 +43,8 @@ export function SparkProductPage() {
 
             try {
                 // Check authentication and user roles
-                const { data: { user } } = await supabase.auth.getUser();
-                setIsAuthenticated(!!user);
-
-                if (user) {
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('roles')
-                        .eq('id', user.id)
-                        .single();
-                    
-                    setUserRoles(profile?.roles || []);
-                }
+                const { data: { session } } = await supabase.auth.getSession();
+                setIsAuthenticated(!!session);
 
                 // Fetch spark
                 const fetchedSpark = await getSparkByUrl(sparkUrl);
@@ -68,8 +57,18 @@ export function SparkProductPage() {
                 // Determine page context
                 if (fetchedSpark.consultant === DEMO_CONSULTANT_ID) {
                     setPageContext('consultant_marketing');
-                } else if (isAuthenticated && userRoles.includes('consultant')) {
-                    setPageContext('consultant_preview');
+                } else if (session?.user) {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('roles')
+                        .eq('id', session.user.id)
+                        .single();
+                    
+                    if (profile?.roles?.includes('consultant')) {
+                        setPageContext('consultant_preview');
+                    } else {
+                        setPageContext('client_purchase');
+                    }
                 } else {
                     setPageContext('client_purchase');
                 }
@@ -83,7 +82,7 @@ export function SparkProductPage() {
         };
 
         checkAuthAndFetchSpark();
-    }, [sparkUrl, navigate, DEMO_CONSULTANT_ID]);
+    }, [sparkUrl, navigate, DEMO_CONSULTANT_ID, isAuthenticated]);
 
     const handleAction = () => {
         if (!spark) return;
@@ -94,13 +93,26 @@ export function SparkProductPage() {
                 break;
             case 'client_purchase':
                 if (!isAuthenticated) {
-                    // Store sparkId in context and redirect to signup
-                    setSparkId(spark.id);
-                    navigate('/signup');
+                    logger.info('User not authenticated, redirecting to signup', { sparkUrl });
+                    // Store sparkUrlSlug in context and redirect to dedicated signup page
+                    setSparkUrlSlug(sparkUrl || null);
+                    navigate('/spark-signup');
                 } else {
                     // If authenticated, create a client request directly
-                    createClientRequest({ sparkId: spark.id })
+                    if (!sparkUrl) return;
+                    logger.info('Creating client request for authenticated user', { sparkUrl });
+                    // Get the spark by URL first to ensure we have the correct data
+                    getSparkByUrl(sparkUrl)
+                        .then(spark => {
+                            if (!spark) {
+                                logger.error('Spark not found when creating request', { sparkUrl });
+                                throw new Error('Spark not found');
+                            }
+                            logger.info('Found spark, creating client request', { sparkId: spark.id });
+                            return createClientRequest({ sparkId: spark.id });
+                        })
                         .then(request => {
+                            logger.info('Client request created successfully', { requestId: request.id });
                             navigate(`/client/requests/${request.id}`);
                         })
                         .catch(error => {

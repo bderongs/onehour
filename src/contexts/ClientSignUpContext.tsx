@@ -1,22 +1,36 @@
 import React, { createContext, useContext, useState } from 'react';
 
 interface ClientSignUpContextType {
-    sparkId: string | null;
-    setSparkId: (id: string | null) => void;
+    sparkUrlSlug: string | null;
+    setSparkUrlSlug: (slug: string | null) => void;
     clearSignUpData: () => void;
 }
 
 const ClientSignUpContext = createContext<ClientSignUpContextType | undefined>(undefined);
 
 export function ClientSignUpProvider({ children }: { children: React.ReactNode }) {
-    const [sparkId, setSparkId] = useState<string | null>(null);
+    // Initialize from localStorage if available
+    const [sparkUrlSlug, setSparkUrlSlugState] = useState<string | null>(() => {
+        const stored = localStorage.getItem('sparkSignUpUrlSlug');
+        return stored ? stored : null;
+    });
+
+    const setSparkUrlSlug = (slug: string | null) => {
+        setSparkUrlSlugState(slug);
+        if (slug) {
+            localStorage.setItem('sparkSignUpUrlSlug', slug);
+        } else {
+            localStorage.removeItem('sparkSignUpUrlSlug');
+        }
+    };
 
     const clearSignUpData = () => {
-        setSparkId(null);
+        setSparkUrlSlugState(null);
+        localStorage.removeItem('sparkSignUpUrlSlug');
     };
 
     return (
-        <ClientSignUpContext.Provider value={{ sparkId, setSparkId, clearSignUpData }}>
+        <ClientSignUpContext.Provider value={{ sparkUrlSlug, setSparkUrlSlug, clearSignUpData }}>
             {children}
         </ClientSignUpContext.Provider>
     );

@@ -207,7 +207,7 @@ export function LandingClients() {
     const about_content = [
         {
             title: "Sparkier encadre la prestation",
-            description: "Sparkier va au-delà de la mise en relation, et structure les prestations proposées par nos consultants pour en garantir la pertinence et la qualité. Nos experts ne peuvent proposer que 10 Spark chacun au maximum, ce qui les force à ne proposer des prestations sur lesquelles ils sont réellement experts.",
+            description: "Sparkier va au-delà de la mise en relation, et structure les prestations proposées par nos consultants pour en garantir la pertinence et la qualité. Nos experts ne peuvent proposer que 10 Sparks chacun au maximum, ce qui les force à ne proposer des prestations sur lesquelles ils sont réellement experts.",
             icon: <Shield className="h-6 w-6" />
         },
         {

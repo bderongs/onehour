@@ -6,15 +6,15 @@ import { Notification } from './Notification';
 interface ClientSignUpFormProps {
     buttonText?: string;
     className?: string;
-    sparkId?: string;
-    onSuccess?: (data: { sparkId?: string }) => void;
+    sparkUrlSlug?: string;
+    onSuccess?: (data: { sparkUrlSlug?: string }) => void;
     onError?: (error: any) => void;
 }
 
 export function ClientSignUpForm({ 
     buttonText = "Créer mon compte",
     className = "",
-    sparkId,
+    sparkUrlSlug,
     onSuccess,
     onError
 }: ClientSignUpFormProps) {
@@ -25,7 +25,7 @@ export function ClientSignUpForm({
         email: '',
         companyRole: '',
         industry: '',
-        sparkId
+        sparkUrlSlug
     });
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [loading, setLoading] = useState(false);
@@ -42,7 +42,7 @@ export function ClientSignUpForm({
                 email: '',
                 companyRole: '',
                 industry: '',
-                sparkId: undefined
+                sparkUrlSlug: undefined
             });
             setNotification({
                 type: 'success',

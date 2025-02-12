@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Notification } from '../components/Notification';
 import { Lock } from 'lucide-react';
 import { PasswordRequirements, isPasswordValid, doPasswordsMatch } from '../components/PasswordRequirements';
+import { createClientRequest, getClientRequestsByClientId } from '../services/clientRequests';
+import { getSparkByUrl } from '../services/sparks';
+import logger from '../utils/logger';
 
 export function PasswordSetupPage() {
     const [password, setPassword] = useState('');
@@ -12,12 +15,13 @@ export function PasswordSetupPage() {
     const [loading, setLoading] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+    const location = useLocation();
 
     useEffect(() => {
         // Check if we have a valid token in the URL
-        const token = searchParams.get('token');
+        const token = new URLSearchParams(location.search).get('token');
         if (!token) {
+            logger.error('No token found in URL, redirecting to signin');
             navigate('/signin');
             return;
         }
@@ -26,23 +30,28 @@ export function PasswordSetupPage() {
         const getEmail = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user?.email) {
+                logger.error('No user email found, redirecting to signin');
                 navigate('/signin');
                 return;
             }
+            logger.info('Found user email for password setup', { email: user.email });
             setUserEmail(user.email);
         };
 
         getEmail();
-    }, [searchParams, navigate]);
+    }, [location.search, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+        setLoading(true);
+        setNotification(null);
+
         if (!isPasswordValid(password)) {
             setNotification({
                 type: 'error',
                 message: 'Le mot de passe ne respecte pas les critères de sécurité.'
             });
+            setLoading(false);
             return;
         }
 
@@ -51,50 +60,125 @@ export function PasswordSetupPage() {
                 type: 'error',
                 message: 'Les mots de passe ne correspondent pas.'
             });
+            setLoading(false);
             return;
         }
 
-        setLoading(true);
-
         try {
-            const { error } = await supabase.auth.updateUser({
+            const urlParams = new URLSearchParams(location.search);
+            const token = urlParams.get('token');
+            const sparkUrlSlug = urlParams.get('spark_url');
+
+            if (!token) {
+                throw new Error('Token manquant');
+            }
+
+            logger.info('Updating user password');
+            const { error: updateError } = await supabase.auth.updateUser({
                 password: password
             });
 
-            if (error) throw error;
+            if (updateError) throw updateError;
 
-            // Get user role and redirect accordingly
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) throw new Error('Utilisateur non trouvé');
+            // Sign in with the new password to get a fresh session
+            logger.info('Signing in with new password', { email: userEmail });
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                email: userEmail,
+                password: password
+            });
+
+            if (signInError) throw signInError;
+            if (!signInData.user) throw new Error('Utilisateur non trouvé');
+
+            logger.info('Successfully signed in, waiting for session');
+            // Wait for session to be established
+            let session = null;
+            for (let i = 0; i < 5; i++) {
+                const { data: { session: currentSession } } = await supabase.auth.getSession();
+                if (currentSession) {
+                    session = currentSession;
+                    logger.info('Session established');
+                    break;
+                }
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            if (!session) {
+                throw new Error('Session non établie après plusieurs tentatives');
+            }
 
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('roles')
-                .eq('id', user.id)
+                .eq('id', signInData.user.id)
                 .single();
 
             if (!profile) throw new Error('Profil non trouvé');
+            logger.info('Found user profile', { roles: profile.roles });
 
             setNotification({
                 type: 'success',
                 message: 'Votre mot de passe a été configuré avec succès.'
             });
 
-            // Redirect based on roles
-            setTimeout(() => {
-                if (profile.roles.includes('consultant') || profile.roles.includes('admin')) {
-                    navigate('/sparks/manage');
-                } else if (profile.roles.includes('client')) {
-                    navigate('/client/dashboard');
-                } else {
-                    throw new Error('Rôle non reconnu');
-                }
-            }, 1000); // Short delay to show success message
+            // For clients with sparkUrlSlug, redirect to request
+            if (profile.roles.includes('client') && sparkUrlSlug) {
+                logger.info('Client with sparkUrlSlug, checking for existing request');
+                try {
+                    // Get the spark by URL first
+                    const spark = await getSparkByUrl(decodeURIComponent(sparkUrlSlug));
+                    if (!spark) {
+                        throw new Error('Spark non trouvé');
+                    }
 
-        } catch (error: any) {
+                    // Get existing requests for this client
+                    const requests = await getClientRequestsByClientId(signInData.user.id);
+                    const existingRequest = requests.find(request => request.sparkId === spark.id);
+
+                    if (existingRequest) {
+                        logger.info('Found existing request, redirecting', { requestId: existingRequest.id });
+                        navigate(`/client/requests/${existingRequest.id}`);
+                        return;
+                    }
+
+                    // If no existing request, create one
+                    logger.info('No existing request found, creating new one');
+                    const request = await createClientRequest({ 
+                        sparkId: spark.id
+                    });
+                    
+                    logger.info('Created new request, redirecting', { requestId: request.id });
+                    navigate(`/client/requests/${request.id}`);
+                    return;
+                } catch (err) {
+                    logger.error('Error during request lookup/creation:', err);
+                    // If there's an error, continue with normal role-based redirection
+                }
+            }
+
+            // Ensure we still have a valid session before redirecting
+            const { data: { session: finalSession } } = await supabase.auth.getSession();
+            if (!finalSession) {
+                logger.error('Session lost before redirection');
+                throw new Error('Session perdue avant la redirection');
+            }
+
+            // Redirect based on roles
+            if (profile.roles.includes('consultant') || profile.roles.includes('admin')) {
+                logger.info('Redirecting consultant/admin to sparks/manage');
+                navigate('/sparks/manage');
+            } else if (profile.roles.includes('client')) {
+                logger.info('Redirecting client to dashboard');
+                navigate('/client/dashboard');
+            } else {
+                throw new Error('Rôle non reconnu');
+            }
+        } catch (err: any) {
+            console.error('Error setting password:', err);
+            logger.error('Error in password setup:', err);
             setNotification({
                 type: 'error',
-                message: error.message || 'Une erreur est survenue lors de la configuration du mot de passe.'
+                message: err.message || 'Une erreur est survenue'
             });
         } finally {
             setLoading(false);

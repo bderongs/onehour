@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Clock, ArrowLeft, CheckCircle, XCircle, Loader2, MessageSquare } from 'lucide-react';
-import { getClientRequestById } from '../services/clientRequests';
-import { getSparkByUrl } from '../services/sparks';
+import { Clock, ArrowLeft, CheckCircle, XCircle, Loader2, MessageSquare, ArrowRight } from 'lucide-react';
+import { getClientRequestById, updateClientRequestMessage } from '../services/clientRequests';
+import { getSparkById } from '../services/sparks';
 import type { ClientRequest } from '../services/clientRequests';
 import type { Spark } from '../types/spark';
 import { formatDuration, formatPrice } from '../utils/format';
@@ -57,35 +57,44 @@ export function ClientRequestPage() {
     const [spark, setSpark] = useState<Spark | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [message, setMessage] = useState(request?.message || '');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         const fetchRequestAndSpark = async () => {
             if (!requestId) {
+                logger.info('No requestId provided, redirecting to dashboard');
                 navigate('/client/dashboard');
                 return;
             }
 
             try {
+                logger.info('Fetching client request', { requestId });
                 const requestData = await getClientRequestById(requestId);
                 if (!requestData) {
+                    logger.error('Request not found', { requestId });
                     setError('Demande introuvable');
                     setLoading(false);
                     return;
                 }
+                logger.info('Client request found', { requestData });
                 setRequest(requestData);
 
                 // Fetch associated spark
-                const sparkData = await getSparkByUrl(requestData.sparkId);
+                logger.info('Fetching associated spark', { sparkId: requestData.sparkId });
+                const sparkData = await getSparkById(requestData.sparkId);
                 if (!sparkData) {
+                    logger.error('Associated spark not found', { sparkId: requestData.sparkId });
                     setError('Spark associé introuvable');
                     setLoading(false);
                     return;
                 }
+                logger.info('Associated spark found', { sparkData });
                 setSpark(sparkData);
 
                 setLoading(false);
             } catch (err) {
-                logger.error('Error fetching request details:', err);
+                logger.error('Error in fetchRequestAndSpark:', err);
                 setError('Une erreur est survenue lors du chargement des détails');
                 setLoading(false);
             }
@@ -93,6 +102,26 @@ export function ClientRequestPage() {
 
         fetchRequestAndSpark();
     }, [requestId, navigate]);
+
+    const handleSubmitContext = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!request) return;
+
+        setIsSubmitting(true);
+        try {
+            const updatedRequest = await updateClientRequestMessage(request.id, message);
+            if (updatedRequest) {
+                setRequest(updatedRequest);
+                // TODO: Redirect to booking page when ready
+                // navigate(`/client/booking/${request.id}`);
+            }
+        } catch (err) {
+            logger.error('Error updating request message:', err);
+            // TODO: Show error notification
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -122,6 +151,41 @@ export function ClientRequestPage() {
     }
 
     const status = statusConfig[request.status];
+
+    const renderContextForm = () => (
+        <motion.section
+            className="bg-white rounded-xl shadow-md p-6"
+            variants={fadeInUp}
+        >
+            <h2 className="text-xl font-semibold mb-4">Contexte de votre demande</h2>
+            <form onSubmit={handleSubmitContext} className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Décrivez votre besoin
+                    </label>
+                    <textarea
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        required
+                        rows={4}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Expliquez votre contexte et vos attentes pour cette mission..."
+                    />
+                </div>
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 
+                                transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isSubmitting ? 'Enregistrement...' : 'Continuer vers la réservation'}
+                        <ArrowRight className="h-5 w-5" />
+                    </button>
+                </div>
+            </form>
+        </motion.section>
+    );
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
@@ -180,7 +244,8 @@ export function ClientRequestPage() {
                             </div>
                         </motion.section>
 
-                        {request.message && (
+                        {/* Context Form or Message Display */}
+                        {!request.message ? renderContextForm() : (
                             <motion.section
                                 className="bg-white rounded-xl shadow-md p-6"
                                 variants={fadeInUp}

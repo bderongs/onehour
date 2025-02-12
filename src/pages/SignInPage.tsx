@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Notification } from '../components/Notification';
 import { Mail, Lock } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export function SignInPage() {
     const [email, setEmail] = useState('');
@@ -12,6 +13,21 @@ export function SignInPage() {
     const [_errorType, setErrorType] = useState<string | null>(null);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const { user, loading: authLoading } = useAuth();
+
+    useEffect(() => {
+        // If user is already authenticated, redirect them
+        if (user && !authLoading) {
+            const returnUrl = searchParams.get('returnUrl');
+            if (returnUrl) {
+                navigate(returnUrl);
+            } else if (user.roles.includes('consultant') || user.roles.includes('admin')) {
+                navigate('/sparks/manage');
+            } else if (user.roles.includes('client')) {
+                navigate('/client/dashboard');
+            }
+        }
+    }, [user, authLoading, navigate, searchParams]);
 
     useEffect(() => {
         // Check for error messages in URL

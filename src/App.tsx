@@ -33,6 +33,8 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import { ClientRequestPage } from './pages/ClientRequestPage';
 import { ClientSignUpProvider } from './contexts/ClientSignUpContext';
+import { SparkSignUpPage } from './pages/SparkSignUpPage';
+import { EmailConfirmationPage } from './pages/EmailConfirmationPage';
 
 function App() {
   const location = useLocation();
@@ -70,6 +72,7 @@ function App() {
                 <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/reset-password" element={<MarketingLayout><ResetPasswordPage /></MarketingLayout>} />
                 <Route path="/setup-password" element={<MarketingLayout><PasswordSetupPage /></MarketingLayout>} />
+                <Route path="/email-confirmation" element={<MarketingLayout><EmailConfirmationPage /></MarketingLayout>} />
                 <Route path="/" element={<MarketingLayout><LandingClients /></MarketingLayout>} />
                 <Route path="/consultants" element={<MarketingLayout><LandingConsultants /></MarketingLayout>} />
                 <Route path="/pricing" element={<MarketingLayout><PricingPage /></MarketingLayout>} />
@@ -78,6 +81,7 @@ function App() {
                 <Route path="/brand" element={<MarketingLayout withTopPadding={false}><BrandPage /></MarketingLayout>} />
                 <Route path="/signin" element={<MarketingLayout><SignInPage /></MarketingLayout>} />
                 <Route path="/signup" element={<MarketingLayout><SignUpPage /></MarketingLayout>} />
+                <Route path="/spark-signup" element={<MarketingLayout><SparkSignUpPage /></MarketingLayout>} />
                 <Route path="/sparks/:sparkUrl" element={<MarketingLayout><SparkProductPage /></MarketingLayout>} />
                 <Route path="/profile" element={<ConsultantProfileLayout><DemoProfileWrapper /></ConsultantProfileLayout>} />
                 <Route path="/:slug" element={<ConsultantProfileLayout><ConsultantProfilePage /></ConsultantProfileLayout>} />

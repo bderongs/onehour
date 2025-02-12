@@ -16,7 +16,7 @@ export interface ClientSignUpData {
     company: string;
     companyRole: string;
     industry: string;
-    sparkId?: string; // Optional sparkId for direct signup from SparkProductPage
+    sparkUrlSlug?: string; // Optional sparkUrlSlug for direct signup from SparkProductPage
 }
 
 // Get the site URL based on environment
@@ -99,7 +99,9 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
         email: data.email,
         password: generateTempPassword(),
         options: {
-            emailRedirectTo: `${siteUrl}/auth/callback`,
+            emailRedirectTo: data.sparkUrlSlug 
+                ? `${siteUrl}/auth/callback?spark_url=${encodeURIComponent(data.sparkUrlSlug)}`
+                : `${siteUrl}/auth/callback`,
             data: {
                 first_name: data.firstName,
                 last_name: data.lastName,
@@ -126,27 +128,10 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
 
     if (profileError) throw profileError
 
-    // If sparkId is provided, create a client request
-    if (data.sparkId && authData.user) {
-        const { error: requestError } = await supabase
-            .from('client_requests')
-            .insert([
-                {
-                    client_id: authData.user.id,
-                    spark_id: data.sparkId,
-                    status: 'pending'
-                }
-            ])
-
-        if (requestError) {
-            logger.error('Error creating client request during signup:', requestError);
-            // Don't throw here, as the user account is already created
-        }
-    }
-
+    // Return the auth data and sparkUrlSlug
     return {
         ...authData,
-        sparkId: data.sparkId // Return sparkId if it was provided
+        sparkUrlSlug: data.sparkUrlSlug // Return sparkUrlSlug if it was provided
     }
 }
 
@@ -172,17 +157,19 @@ const transformProfileFromDB = (profile: any): UserProfile => ({
 });
 
 export const getCurrentUser = async (): Promise<UserProfile | null> => {
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { session }, error: authError } = await supabase.auth.getSession();
     
-    if (authError || !user) {
-        logger.error('Error getting user:', authError);
+    if (authError || !session?.user) {
+        if (authError) {
+            logger.error('Error getting session:', authError);
+        }
         return null;
     }
 
     const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', session.user.id)
         .single();
 
     if (profileError || !profile) {
