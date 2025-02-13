@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
-import { signUpClientWithEmail, type ClientSignUpData } from '../services/auth';
+import { ArrowRight, Beaker } from 'lucide-react';
+import { signUpClientWithEmail, type ClientSignUpData, checkEmailExists } from '../services/auth';
 import { Notification } from './Notification';
 
 interface ClientSignUpFormProps {
     buttonText?: string;
     className?: string;
     sparkUrlSlug?: string;
+    initialEmail?: string;
     onSuccess?: (data: { sparkUrlSlug?: string }) => void;
     onError?: (error: any) => void;
 }
@@ -15,6 +16,7 @@ export function ClientSignUpForm({
     buttonText = "Créer mon compte",
     className = "",
     sparkUrlSlug,
+    initialEmail = '',
     onSuccess,
     onError
 }: ClientSignUpFormProps) {
@@ -22,7 +24,7 @@ export function ClientSignUpForm({
         firstName: '',
         lastName: '',
         company: '',
-        email: '',
+        email: initialEmail,
         companyRole: '',
         industry: '',
         sparkUrlSlug
@@ -30,11 +32,37 @@ export function ClientSignUpForm({
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const generateTestData = () => {
+        const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
+        return {
+            firstName: 'Test',
+            lastName: 'User',
+            company: '[TEST] Test Company',
+            email: `matthieu+test${timestamp}@sparkier.io`,
+            companyRole: 'Test Role',
+            industry: 'tech',
+            sparkUrlSlug
+        };
+    };
+
+    const handleTestSignup = async (e: React.MouseEvent) => {
         e.preventDefault();
+        if (loading) return;
         setLoading(true);
+        setNotification(null);
+
+        const testData = generateTestData();
+        
         try {
-            const result = await signUpClientWithEmail(formData);
+            // Check if email is already registered
+            const emailExists = await checkEmailExists(testData.email);
+            if (emailExists) {
+                throw new Error('Cette adresse email est déjà utilisée.');
+            }
+
+            const result = await signUpClientWithEmail(testData);
+            
+            // Update form data after successful submission
             setFormData({
                 firstName: '',
                 lastName: '',
@@ -44,19 +72,97 @@ export function ClientSignUpForm({
                 industry: '',
                 sparkUrlSlug: undefined
             });
+
             setNotification({
                 type: 'success',
                 message: 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.'
             });
-            onSuccess?.(result);
-        } catch (error) {
-            console.error('Error submitting form:', error);
+
+            onSuccess?.({ sparkUrlSlug: result?.sparkUrlSlug });
+        } catch (error: any) {
+            console.error('Error submitting test form:', error);
+            let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
+            
+            if (error.message?.includes('timeout') || error.message?.includes('network')) {
+                errorMessage = 'Problème de connexion. Veuillez vérifier votre connexion internet et réessayer.';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
             setNotification({
                 type: 'error',
-                message: 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.'
+                message: errorMessage
             });
             onError?.(error);
         } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (loading) return; // Prevent multiple submissions while loading
+        setLoading(true);
+        setNotification(null); // Clear any previous notifications
+
+        // Add a timeout to reset loading state if it takes too long
+        const timeoutId = setTimeout(() => {
+            setLoading(false);
+            setNotification({
+                type: 'error',
+                message: 'La requête a pris trop de temps. Veuillez réessayer.'
+            });
+        }, 30000); // 30 seconds timeout
+
+        try {
+            // Add validation before submission
+            if (!formData.email || !formData.firstName || !formData.lastName || !formData.company || !formData.companyRole || !formData.industry) {
+                throw new Error('Veuillez remplir tous les champs obligatoires.');
+            }
+
+            // Check if email is already registered
+            const emailExists = await checkEmailExists(formData.email);
+            if (emailExists) {
+                throw new Error('Cette adresse email est déjà utilisée.');
+            }
+
+            const result = await signUpClientWithEmail(formData);
+            
+            // Clear form data only after successful submission
+            setFormData({
+                firstName: '',
+                lastName: '',
+                company: '',
+                email: '',
+                companyRole: '',
+                industry: '',
+                sparkUrlSlug: undefined
+            });
+
+            setNotification({
+                type: 'success',
+                message: 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.'
+            });
+
+            // Extract only the sparkUrlSlug for the onSuccess callback
+            onSuccess?.({ sparkUrlSlug: result?.sparkUrlSlug });
+        } catch (error: any) {
+            console.error('Error submitting form:', error);
+            let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
+            
+            if (error.message?.includes('timeout') || error.message?.includes('network')) {
+                errorMessage = 'Problème de connexion. Veuillez vérifier votre connexion internet et réessayer.';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            setNotification({
+                type: 'error',
+                message: errorMessage
+            });
+            onError?.(error);
+        } finally {
+            clearTimeout(timeoutId);
             setLoading(false);
         }
     };
@@ -176,14 +282,38 @@ export function ClientSignUpForm({
                     </select>
                 </div>
 
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {loading ? 'Inscription en cours...' : buttonText}
-                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </button>
+                <div className="flex flex-col gap-4">
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading ? (
+                            <>
+                                <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></span>
+                                <span className="ml-2">Inscription en cours...</span>
+                            </>
+                        ) : (
+                            <>
+                                {buttonText}
+                                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                            </>
+                        )}
+                    </button>
+
+                    {import.meta.env.DEV && (
+                        <button
+                            type="button"
+                            onClick={handleTestSignup}
+                            disabled={loading}
+                            className="w-full bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Beaker className="h-5 w-5" />
+                            <span>Test Signup</span>
+                        </button>
+                    )}
+                </div>
+
                 <p className="text-center text-sm text-gray-500">
                     En créant votre compte, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
                 </p>

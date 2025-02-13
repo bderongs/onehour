@@ -66,4 +66,19 @@ export function formatPrice(price: string | number | null | undefined): string {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
     }).format(numericPrice);
+}
+
+/**
+ * Format a date in French locale
+ * @param date Date string or Date object
+ */
+export function formatDate(date: string | Date): string {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return new Intl.DateTimeFormat('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }).format(d);
 } 

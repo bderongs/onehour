@@ -15,6 +15,7 @@ import { SparkCreatePage } from './pages/SparkCreatePage';
 import { SparkEditPage } from './pages/SparkEditPage';
 import { SparkAIPage } from './pages/SparkAIPage';
 import AuthCallback from './pages/AuthCallback';
+import SparkRequestHandler from './pages/client/SparkRequestHandler';
 import { SignInPage } from './pages/SignInPage';
 import { SignUpPage } from './pages/SignUpPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
@@ -153,6 +154,7 @@ function App() {
                       <Routes>
                         <Route path="dashboard" element={<ClientDashboard />} />
                         <Route path="requests/:requestId" element={<ClientRequestPage />} />
+                        <Route path="spark-request-handler" element={<SparkRequestHandler />} />
                         <Route path="conversations" element={<div>Conversations coming soon</div>} />
                         <Route path="documents" element={<div>Documents coming soon</div>} />
                       </Routes>

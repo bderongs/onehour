@@ -4,8 +4,6 @@ import { supabase } from '../lib/supabase';
 import { Notification } from '../components/Notification';
 import { Lock } from 'lucide-react';
 import { PasswordRequirements, isPasswordValid, doPasswordsMatch } from '../components/PasswordRequirements';
-import { createClientRequest, getClientRequestsByClientId } from '../services/clientRequests';
-import { getSparkByUrl } from '../services/sparks';
 import logger from '../utils/logger';
 
 export function PasswordSetupPage() {
@@ -67,7 +65,7 @@ export function PasswordSetupPage() {
         try {
             const urlParams = new URLSearchParams(location.search);
             const token = urlParams.get('token');
-            const sparkUrlSlug = urlParams.get('spark_url');
+            const next = urlParams.get('next');
 
             if (!token) {
                 throw new Error('Token manquant');
@@ -91,85 +89,89 @@ export function PasswordSetupPage() {
             if (!signInData.user) throw new Error('Utilisateur non trouvé');
 
             logger.info('Successfully signed in, waiting for session');
-            // Wait for session to be established
+            // Wait for session to be established with a more robust approach
             let session = null;
-            for (let i = 0; i < 5; i++) {
+            let retries = 0;
+            const maxRetries = 5;
+            
+            while (!session && retries < maxRetries) {
                 const { data: { session: currentSession } } = await supabase.auth.getSession();
                 if (currentSession) {
                     session = currentSession;
                     logger.info('Session established');
                     break;
                 }
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Increased delay to 1 second
+                retries++;
+                logger.info(`Retry ${retries} for session establishment`);
             }
 
             if (!session) {
                 throw new Error('Session non établie après plusieurs tentatives');
             }
 
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('roles')
-                .eq('id', signInData.user.id)
-                .single();
-
-            if (!profile) throw new Error('Profil non trouvé');
-            logger.info('Found user profile', { roles: profile.roles });
+            // Refresh the session to ensure we have the latest data
+            const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+            if (refreshError) {
+                logger.error('Error refreshing session:', refreshError);
+                throw refreshError;
+            }
+            if (refreshData.session) {
+                session = refreshData.session;
+                logger.info('Session refreshed successfully');
+            }
 
             setNotification({
                 type: 'success',
                 message: 'Votre mot de passe a été configuré avec succès.'
             });
 
-            // For clients with sparkUrlSlug, redirect to request
-            if (profile.roles.includes('client') && sparkUrlSlug) {
-                logger.info('Client with sparkUrlSlug, checking for existing request');
-                try {
-                    // Get the spark by URL first
-                    const spark = await getSparkByUrl(decodeURIComponent(sparkUrlSlug));
-                    if (!spark) {
-                        throw new Error('Spark non trouvé');
-                    }
+            // If we have a next URL, use it for redirection
+            if (next) {
+                logger.info('Redirecting to next URL', { next });
+                const decodedNext = decodeURIComponent(next);
+                
+                // Wait a moment for the session to be fully established
+                await new Promise(resolve => setTimeout(resolve, 500));
 
-                    // Get existing requests for this client
-                    const requests = await getClientRequestsByClientId(signInData.user.id);
-                    const existingRequest = requests.find(request => request.sparkId === spark.id);
-
-                    if (existingRequest) {
-                        logger.info('Found existing request, redirecting', { requestId: existingRequest.id });
-                        navigate(`/client/requests/${existingRequest.id}`);
-                        return;
-                    }
-
-                    // If no existing request, create one
-                    logger.info('No existing request found, creating new one');
-                    const request = await createClientRequest({ 
-                        sparkId: spark.id
-                    });
-                    
-                    logger.info('Created new request, redirecting', { requestId: request.id });
-                    navigate(`/client/requests/${request.id}`);
-                    return;
-                } catch (err) {
-                    logger.error('Error during request lookup/creation:', err);
-                    // If there's an error, continue with normal role-based redirection
+                // Double check that we're still authenticated
+                const { data: { session: finalSession } } = await supabase.auth.getSession();
+                if (!finalSession) {
+                    logger.error('Session lost after password setup');
+                    throw new Error('Session perdue après la configuration du mot de passe');
                 }
+
+                // If it's a full URL, extract the path
+                try {
+                    const url = new URL(decodedNext);
+                    if (url.origin === window.location.origin) {
+                        window.location.href = url.pathname + url.search + url.hash;
+                    } else {
+                        window.location.href = decodedNext;
+                    }
+                } catch {
+                    // If it's not a valid URL, assume it's a path
+                    window.location.href = decodedNext;
+                }
+                return;
             }
 
-            // Ensure we still have a valid session before redirecting
-            const { data: { session: finalSession } } = await supabase.auth.getSession();
-            if (!finalSession) {
-                logger.error('Session lost before redirection');
-                throw new Error('Session perdue avant la redirection');
-            }
+            // Fallback to role-based redirection if no next URL
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('roles')
+                .eq('id', session.user.id)
+                .single();
 
-            // Redirect based on roles
+            if (!profile) throw new Error('Profil non trouvé');
+            logger.info('Found user profile', { roles: profile.roles });
+
             if (profile.roles.includes('consultant') || profile.roles.includes('admin')) {
                 logger.info('Redirecting consultant/admin to sparks/manage');
-                navigate('/sparks/manage');
+                navigate('/sparks/manage', { replace: true });
             } else if (profile.roles.includes('client')) {
                 logger.info('Redirecting client to dashboard');
-                navigate('/client/dashboard');
+                navigate('/client/dashboard', { replace: true });
             } else {
                 throw new Error('Rôle non reconnu');
             }

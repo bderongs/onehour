@@ -2,14 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Notification } from '../components/Notification';
-import { useClientSignUp } from '../contexts/ClientSignUpContext';
 import logger from '../utils/logger';
 
 export default function AuthCallback() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const { sparkUrlSlug } = useClientSignUp();
 
     useEffect(() => {
         const handleEmailConfirmation = async () => {
@@ -17,25 +15,17 @@ export default function AuthCallback() {
                 const urlParams = new URLSearchParams(window.location.search);
                 const tokenHash = urlParams.get('token_hash');
                 const type = urlParams.get('type');
-                const nextUrl = urlParams.get('next');
+                const next = urlParams.get('next');
                 
-                logger.info('Processing auth callback', { type, hasTokenHash: !!tokenHash, hasNextUrl: !!nextUrl });
+                logger.info('Processing auth callback', { type, hasTokenHash: !!tokenHash, hasNext: !!next });
 
+                // Validate required parameters first
                 if (!tokenHash || !type) {
-                    logger.error('Invalid URL parameters', { tokenHash, type });
-                    throw new Error('Invalid URL parameters');
+                    logger.error('Missing required parameters', { tokenHash, type });
+                    throw new Error('Paramètres d\'authentification manquants');
                 }
 
-                // Extract spark_url from next parameter if present
-                let sparkUrl = null;
-                if (nextUrl) {
-                    const nextUrlParams = new URLSearchParams(new URL(nextUrl).search);
-                    sparkUrl = nextUrlParams.get('spark_url');
-                    logger.info('Found spark_url in next parameter', { sparkUrl });
-                }
-
-                // Verify the OTP
-                logger.info('Verifying OTP', { type });
+                // Verify OTP and establish session
                 const { data, error: verifyError } = await supabase.auth.verifyOtp({
                     token_hash: tokenHash,
                     type: type as any,
@@ -46,27 +36,33 @@ export default function AuthCallback() {
                     throw verifyError;
                 }
 
-                // For signup and recovery, redirect to password setup
+                if (!data?.user) {
+                    throw new Error('Session non établie');
+                }
+
+                // For signup or recovery, redirect to password setup
                 if (type === 'signup' || type === 'recovery') {
-                    const setupPasswordUrl = `/setup-password?token=${tokenHash}${sparkUrl ? `&spark_url=${encodeURIComponent(sparkUrl)}` : ''}`;
+                    let setupPasswordUrl = `/setup-password?token=${tokenHash}`;
+                    
+                    // Add next URL if provided
+                    if (next) {
+                        setupPasswordUrl += `&next=${encodeURIComponent(next)}`;
+                    }
+
                     logger.info('Redirecting to password setup', { setupPasswordUrl });
                     navigate(setupPasswordUrl);
                     return;
                 }
 
-                // For other types, redirect to home if verification successful
-                if (data?.session) {
-                    logger.info('Session established, redirecting to home');
-                    navigate('/');
-                    return;
-                }
-
-                throw new Error('No session established');
+                // For other types (like magic link), redirect to the next URL or default location
+                const redirectUrl = next || '/';
+                logger.info('Redirecting to', { redirectUrl });
+                navigate(redirectUrl);
 
             } catch (err: any) {
                 logger.error('Error during email confirmation:', err);
                 const email = new URLSearchParams(window.location.search).get('email') || '';
-                const errorMessage = err.message || 'An error occurred during confirmation';
+                const errorMessage = err.message || 'Une erreur est survenue lors de la confirmation';
                 setError(errorMessage);
                 navigate(`/signin?error=auth_error&message=${encodeURIComponent(errorMessage)}&email=${encodeURIComponent(email)}`);
             } finally {
@@ -75,7 +71,7 @@ export default function AuthCallback() {
         };
 
         handleEmailConfirmation();
-    }, [navigate, sparkUrlSlug]);
+    }, [navigate]);
 
     if (loading) {
         return (

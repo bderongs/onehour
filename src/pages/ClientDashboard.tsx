@@ -1,88 +1,217 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, MessageSquare, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Sparkles, Clock, ExternalLink } from 'lucide-react';
+import type { ClientRequest } from '../services/clientRequests';
+import { getClientRequestsByClientId } from '../services/clientRequests';
+import { getSparkById } from '../services/sparks';
+import { supabase } from '../lib/supabase';
+import { formatDate } from '../utils/format';
+
+const EmptyState = () => {
+    const navigate = useNavigate();
+    
+    return (
+        <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
+            <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="mb-8"
+            >
+                <Sparkles className="h-20 w-20 text-blue-500" />
+            </motion.div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Aucune demande en cours</h2>
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl">
+                Vous n'avez pas encore fait de demande de conseil. Découvrez nos Sparks pour trouver le conseil qui vous correspond.
+            </p>
+            <button
+                onClick={() => navigate('/')}
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+                Explorer les Sparks
+            </button>
+        </div>
+    );
+};
+
+const RequestRow = ({ request }: { request: ClientRequest & { sparkTitle?: string } }) => {
+    const navigate = useNavigate();
+
+    const getStatusColor = (status: ClientRequest['status']) => {
+        switch (status) {
+            case 'pending':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'accepted':
+                return 'bg-green-100 text-green-800';
+            case 'rejected':
+                return 'bg-red-100 text-red-800';
+            case 'completed':
+                return 'bg-gray-100 text-gray-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const getStatusText = (status: ClientRequest['status']) => {
+        switch (status) {
+            case 'pending':
+                return 'En attente';
+            case 'accepted':
+                return 'Acceptée';
+            case 'rejected':
+                return 'Refusée';
+            case 'completed':
+                return 'Terminée';
+            default:
+                return status;
+        }
+    };
+
+    const handleSparkClick = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent row click when clicking the spark link
+        navigate(`/sparks/${request.sparkId}`);
+    };
+
+    return (
+        <div 
+            className="bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer"
+            onClick={() => navigate(`/client/requests/${request.id}`)}
+        >
+            <div className="p-4 hover:bg-gray-50 transition-colors">
+                <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-4">
+                            <h3 className="text-lg font-medium text-gray-900">
+                                {request.sparkTitle || 'Chargement...'}
+                            </h3>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
+                                {getStatusText(request.status)}
+                            </span>
+                        </div>
+                        <div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                                <Clock className="h-4 w-4" />
+                                {formatDate(request.createdAt)}
+                            </span>
+                        </div>
+                        {request.message && (
+                            <p className="mt-2 text-sm text-gray-600">
+                                {request.message}
+                            </p>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleSparkClick}
+                            className="text-gray-400 hover:text-blue-600 transition-colors p-2 hover:bg-blue-50 rounded-full"
+                            title="Voir le Spark"
+                        >
+                            <ExternalLink className="h-5 w-5" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export function ClientDashboard() {
     const navigate = useNavigate();
+    const [requests, setRequests] = useState<(ClientRequest & { sparkTitle?: string })[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const menuItems = [
-        {
-            title: 'Explorer les Sparks',
-            description: 'Découvrez les offres de conseil disponibles',
-            icon: <Sparkles className="h-8 w-8 text-blue-500" />,
-            onClick: () => navigate('/sparks/explore'),
-            cta: 'Voir les Sparks',
-            highlight: true
-        },
-        {
-            title: 'Mes conversations',
-            description: 'Accédez à vos échanges avec les consultants',
-            icon: <MessageSquare className="h-8 w-8 text-blue-500" />,
-            onClick: () => navigate('/client/conversations'),
-            cta: 'Voir les conversations'
-        },
-        {
-            title: 'Mes documents',
-            description: 'Retrouvez tous vos documents et livrables',
-            icon: <FileText className="h-8 w-8 text-blue-500" />,
-            onClick: () => navigate('/client/documents'),
-            cta: 'Voir les documents'
-        }
-    ];
+    useEffect(() => {
+        const fetchRequests = async () => {
+            try {
+                // Get current user
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    navigate('/signin');
+                    return;
+                }
+
+                // Fetch requests
+                const clientRequests = await getClientRequestsByClientId(user.id);
+                
+                // Fetch spark titles
+                const requestsWithTitles = await Promise.all(
+                    clientRequests.map(async (request) => {
+                        const spark = await getSparkById(request.sparkId);
+                        return {
+                            ...request,
+                            sparkTitle: spark?.title
+                        };
+                    })
+                );
+
+                setRequests(requestsWithTitles);
+                setLoading(false);
+            } catch (err) {
+                console.error('Error fetching requests:', err);
+                setError('Impossible de charger vos demandes. Veuillez réessayer plus tard.');
+                setLoading(false);
+            }
+        };
+
+        fetchRequests();
+    }, [navigate]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Chargement de vos demandes...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-red-600">{error}</p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="mt-4 text-blue-600 hover:text-blue-700"
+                    >
+                        Réessayer
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-            <div className="max-w-7xl mx-auto px-4 py-12">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <h1 className="text-3xl font-bold text-gray-900 mb-8">
-                        Tableau de bord client
-                    </h1>
-
-                    {/* Menu Grid */}
-                    <div className="grid md:grid-cols-3 gap-6">
-                        {menuItems.map((item, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                className={`bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow ${
-                                    item.highlight ? 'ring-2 ring-blue-500' : ''
-                                }`}
-                            >
-                                <div className="p-6">
-                                    <div className="flex flex-col items-center text-center">
-                                        <div className="flex-shrink-0 mb-4">
-                                            {item.icon}
-                                        </div>
-                                        <div>
-                                            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                                                {item.title}
-                                            </h2>
-                                            <p className="text-gray-600 mb-4">
-                                                {item.description}
-                                            </p>
-                                            <button
-                                                onClick={item.onClick}
-                                                className={`inline-flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${
-                                                    item.highlight
-                                                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                                                }`}
-                                            >
-                                                {item.cta}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900">Mes demandes</h1>
+                        <p className="text-gray-600 mt-2">Suivez l'état de vos demandes de conseil</p>
                     </div>
-                </motion.div>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        Explorer les Sparks
+                    </button>
+                </div>
+
+                {requests.length === 0 ? (
+                    <EmptyState />
+                ) : (
+                    <div className="space-y-4">
+                        {requests
+                            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                            .map((request) => (
+                                <RequestRow key={request.id} request={request} />
+                            ))}
+                    </div>
+                )}
             </div>
         </div>
     );

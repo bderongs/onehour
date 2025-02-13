@@ -8,7 +8,7 @@ import { formatDuration, formatPrice } from '../utils/format';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { supabase } from '../lib/supabase';
 import logger from '../utils/logger';
-import { createClientRequest } from '../services/clientRequests';
+import { createClientRequest, getClientRequestsByClientId } from '../services/clientRequests';
 import { useClientSignUp } from '../contexts/ClientSignUpContext';
 
 const fadeInUp = {
@@ -108,16 +108,40 @@ export function SparkProductPage() {
                                 logger.error('Spark not found when creating request', { sparkUrl });
                                 throw new Error('Spark not found');
                             }
-                            logger.info('Found spark, creating client request', { sparkId: spark.id });
-                            return createClientRequest({ sparkId: spark.id });
+                            logger.info('Found spark, checking existing requests', { sparkId: spark.id });
+                            // Get current user and check for existing requests
+                            return supabase.auth.getUser()
+                                .then(({ data }) => {
+                                    if (!data.user) throw new Error('User not found');
+                                    return getClientRequestsByClientId(data.user.id)
+                                        .then(requests => {
+                                            const existingRequest = requests.find(r => 
+                                                r.sparkId === spark.id && 
+                                                (r.status === 'pending' || r.status === 'accepted')
+                                            );
+                                            
+                                            if (existingRequest) {
+                                                logger.info('Found existing active request, redirecting', { requestId: existingRequest.id });
+                                                return Promise.reject({ type: 'existing_request', requestId: existingRequest.id });
+                                            }
+                                            
+                                            logger.info('No existing active request found, creating new request', { sparkId: spark.id });
+                                            return createClientRequest({ sparkId: spark.id });
+                                        });
+                                });
                         })
                         .then(request => {
                             logger.info('Client request created successfully', { requestId: request.id });
                             navigate(`/client/requests/${request.id}`);
                         })
                         .catch(error => {
-                            logger.error('Error creating client request:', error);
-                            // TODO: Show error notification
+                            if (error?.type === 'existing_request' && error.requestId) {
+                                navigate(`/client/requests/${error.requestId}`);
+                            } else {
+                                logger.error('Error creating client request:', error);
+                                // TODO: Show error notification
+                                alert('Une erreur est survenue lors de la création de votre demande. Veuillez réessayer.');
+                            }
                         });
                 }
                 break;

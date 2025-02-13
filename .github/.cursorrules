@@ -6,6 +6,8 @@ Use stock photos from unsplash where appropriate, only valid URLs you know exist
 
 Always follow best practices in code organisation, and check the codebase for relevant prior structuration when needed. Use the service layer for all database operations rather than making direct Supabase queries.
 
+Comment all the code you write.
+
 When writing content in French, respect the French grammar and spelling usage, and the French way of writing. In particular, do not capitalize the first letter of each word in titles.
 
 The brand is Sparkier, the site domain name is sparkier.io

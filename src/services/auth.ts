@@ -56,7 +56,7 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
         email: data.email,
         password: generateTempPassword(),
         options: {
-            emailRedirectTo: `${siteUrl}/auth/callback`,
+            emailRedirectTo: `${siteUrl}/sparks/manage`,
             data: {
                 first_name: data.firstName,
                 last_name: data.lastName,
@@ -70,6 +70,9 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
     const baseSlug = generateSlug(`${data.firstName} ${data.lastName}`);
     const slug = await ensureUniqueSlug(baseSlug, 'profile');
 
+    // Determine roles
+    const roles = ['consultant'];
+
     // Then, store additional user data in a profiles table
     const { error: profileError } = await supabase
         .from('profiles')
@@ -80,7 +83,7 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
                 first_name: data.firstName,
                 last_name: data.lastName,
                 linkedin: data.linkedin,
-                roles: ['consultant'],
+                roles: roles,
                 slug: slug,
                 created_at: new Date().toISOString()
             }
@@ -93,47 +96,81 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
 
 export const signUpClientWithEmail = async (data: ClientSignUpData) => {
     const siteUrl = getSiteUrl();
-    
-    // Create the auth user with email confirmation
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: generateTempPassword(),
-        options: {
-            emailRedirectTo: data.sparkUrlSlug 
-                ? `${siteUrl}/auth/callback?spark_url=${encodeURIComponent(data.sparkUrlSlug)}`
-                : `${siteUrl}/auth/callback`,
-            data: {
-                first_name: data.firstName,
-                last_name: data.lastName,
-            }
-        }
-    })
+    let retryCount = 0;
+    const maxRetries = 3;
+    const retryDelay = 1000; // 1 second
 
-    if (authError) throw authError
-
-    // Then, store additional user data in the profiles table
-    const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([
-            {
-                id: authData.user?.id,
+    while (retryCount < maxRetries) {
+        try {
+            // Create the auth user with email confirmation
+            const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: data.email,
-                first_name: data.firstName,
-                last_name: data.lastName,
-                company: data.company,
-                roles: ['client'],
-                created_at: new Date().toISOString()
+                password: generateTempPassword(),
+                options: {
+                    emailRedirectTo: data.sparkUrlSlug 
+                        ? `${siteUrl}/client/spark-request-handler?spark_url=${encodeURIComponent(data.sparkUrlSlug)}`
+                        : `${siteUrl}/client/dashboard`,
+                    data: {
+                        first_name: data.firstName,
+                        last_name: data.lastName,
+                    }
+                }
+            });
+
+            if (authError) {
+                // If it's a timeout or network error, retry
+                if (authError.message?.includes('timeout') || authError.message?.includes('network') || authError.message === '{}') {
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        logger.info(`Retry attempt ${retryCount} for signup`);
+                        await new Promise(resolve => setTimeout(resolve, retryDelay));
+                        continue;
+                    }
+                }
+                throw authError;
             }
-        ])
 
-    if (profileError) throw profileError
+            // Determine roles
+            const roles = ['client'];
 
-    // Return the auth data and sparkUrlSlug
-    return {
-        ...authData,
-        sparkUrlSlug: data.sparkUrlSlug // Return sparkUrlSlug if it was provided
+            // Then, store additional user data in the profiles table
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .insert([
+                    {
+                        id: authData.user?.id,
+                        email: data.email,
+                        first_name: data.firstName,
+                        last_name: data.lastName,
+                        company: data.company,
+                        roles: roles,
+                        created_at: new Date().toISOString()
+                    }
+                ]);
+
+            if (profileError) {
+                logger.error('Error creating profile:', profileError);
+                throw profileError;
+            }
+
+            // Return the auth data and sparkUrlSlug
+            return {
+                ...authData,
+                sparkUrlSlug: data.sparkUrlSlug
+            };
+        } catch (error: any) {
+            // On last retry, throw the error
+            if (retryCount === maxRetries - 1) {
+                if (error.message === '{}') {
+                    throw new Error('Le service d\'authentification est temporairement indisponible. Veuillez réessayer dans quelques instants.');
+                }
+                throw error;
+            }
+            retryCount++;
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
     }
-}
+};
 
 export type UserRole = 'client' | 'consultant' | 'admin';
 
@@ -255,4 +292,19 @@ export const resendConfirmationEmail = async (email: string): Promise<void> => {
         logger.error('Error sending confirmation email:', error);
         throw error;
     }
+};
+
+export const checkEmailExists = async (email: string): Promise<boolean> => {
+    const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
+
+    if (error) {
+        logger.error('Error checking email existence:', error);
+        throw error;
+    }
+
+    return !!profile;
 }; 
