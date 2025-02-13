@@ -25,29 +25,31 @@ export function SparkSignUpPage() {
 
     const handleSignInSuccess = async () => {
         if (!sparkUrlSlug) {
-            navigate('/client/dashboard');
+            window.location.href = '/client/dashboard';
             return;
         }
 
         try {
+            // Wait a moment for the session to be established
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Double check that we're still authenticated
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                logger.error('Session lost after sign in');
+                throw new Error('Session perdue après la connexion');
+            }
+
             // Get the spark first
             const spark = await getSparkByUrl(sparkUrlSlug);
             if (!spark) {
                 logger.error('Spark not found after sign in', { sparkUrlSlug });
-                navigate('/client/dashboard');
-                return;
-            }
-
-            // Get current user
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                logger.error('User not found after sign in');
-                navigate('/client/dashboard');
+                window.location.href = '/client/dashboard';
                 return;
             }
 
             // Check for existing requests
-            const requests = await getClientRequestsByClientId(user.id);
+            const requests = await getClientRequestsByClientId(session.user.id);
             const existingRequest = requests.find(r => 
                 r.sparkId === spark.id && 
                 (r.status === 'pending' || r.status === 'accepted')
@@ -55,16 +57,16 @@ export function SparkSignUpPage() {
 
             if (existingRequest) {
                 logger.info('Found existing active request after sign in, redirecting', { requestId: existingRequest.id });
-                navigate(`/client/requests/${existingRequest.id}`);
+                window.location.href = `/client/requests/${existingRequest.id}`;
             } else {
                 // Create new request
                 logger.info('Creating new request after sign in', { sparkId: spark.id });
                 const request = await createClientRequest({ sparkId: spark.id });
-                navigate(`/client/requests/${request.id}`);
+                window.location.href = `/client/requests/${request.id}`;
             }
         } catch (error) {
             logger.error('Error handling sign in success:', error);
-            navigate('/client/dashboard');
+            window.location.href = '/client/dashboard';
         }
     };
 
