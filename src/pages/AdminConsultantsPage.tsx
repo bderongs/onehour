@@ -231,19 +231,15 @@ const ConsultantRow = ({
                                         <h4 className="font-medium text-gray-900 mb-2">Informations</h4>
                                         <dl className="space-y-2">
                                             <div>
+                                                <dt className="text-sm font-medium text-gray-500">Titre</dt>
+                                                <dd className="text-sm text-gray-900">{consultant.title || 'Non défini'}</dd>
+                                            </div>
+                                            <div>
                                                 <dt className="text-sm font-medium text-gray-500">Email</dt>
                                                 <dd className="text-sm text-gray-900 flex items-center gap-1">
                                                     <Mail className="h-4 w-4" />
                                                     {consultant.email}
                                                 </dd>
-                                            </div>
-                                            <div>
-                                                <dt className="text-sm font-medium text-gray-500">Titre</dt>
-                                                <dd className="text-sm text-gray-900">{consultant.title || 'Non défini'}</dd>
-                                            </div>
-                                            <div>
-                                                <dt className="text-sm font-medium text-gray-500">Rôles</dt>
-                                                <dd className="text-sm text-gray-900">{consultant.roles.join(', ')}</dd>
                                             </div>
                                         </dl>
                                     </div>

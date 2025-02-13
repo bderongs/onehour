@@ -20,7 +20,7 @@ export function AdminDashboard() {
             icon: <Users className="h-8 w-8 text-blue-500" />,
             onClick: () => navigate('/admin/clients'),
             cta: 'Gérer les clients',
-            isImplemented: false
+            isImplemented: true
         },
         {
             title: 'Gestion des sparks',

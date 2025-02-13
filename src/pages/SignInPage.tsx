@@ -53,35 +53,72 @@ export function SignInPage() {
         setLoading(true);
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
+            const { error: signInError } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
 
-            if (error) {
-                if (error.message.includes('Invalid login credentials')) {
+            if (signInError) {
+                if (signInError.message.includes('Invalid login credentials')) {
                     throw new Error('Email ou mot de passe incorrect.');
                 }
-                throw error;
+                throw signInError;
             }
 
-            // Get user role and redirect accordingly
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) throw new Error('Utilisateur non trouvé');
+            // Wait for session to be established
+            let session = null;
+            let retries = 0;
+            const maxRetries = 5;
+            
+            while (!session && retries < maxRetries) {
+                const { data: { session: currentSession } } = await supabase.auth.getSession();
+                if (currentSession) {
+                    session = currentSession;
+                    break;
+                }
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                retries++;
+            }
 
+            if (!session) {
+                throw new Error('Session non établie après plusieurs tentatives');
+            }
+
+            // Refresh the session to ensure we have the latest data
+            const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+            if (refreshError) throw refreshError;
+            if (refreshData.session) {
+                session = refreshData.session;
+            }
+
+            // Get user profile and roles
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('roles')
-                .eq('id', user.id)
+                .eq('id', session.user.id)
                 .single();
 
             if (!profile) throw new Error('Profil non trouvé');
 
-            // Redirect based on roles
-            if (profile.roles.includes('consultant') || profile.roles.includes('admin')) {
-                navigate('/sparks/manage');
+            // Wait a moment for the session to be fully established
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Double check that we're still authenticated
+            const { data: { session: finalSession } } = await supabase.auth.getSession();
+            if (!finalSession) {
+                throw new Error('Session perdue après la connexion');
+            }
+
+            // Get return URL if any
+            const returnUrl = searchParams.get('returnUrl');
+
+            // Use window.location.href for redirection to ensure a full page reload
+            if (returnUrl) {
+                window.location.href = returnUrl;
+            } else if (profile.roles.includes('consultant') || profile.roles.includes('admin')) {
+                window.location.href = '/sparks/manage';
             } else if (profile.roles.includes('client')) {
-                navigate('/client/dashboard');
+                window.location.href = '/client/dashboard';
             } else {
                 throw new Error('Rôle non reconnu');
             }
@@ -90,7 +127,6 @@ export function SignInPage() {
                 type: 'error',
                 message: error.message || 'Une erreur est survenue lors de la connexion.'
             });
-        } finally {
             setLoading(false);
         }
     };
