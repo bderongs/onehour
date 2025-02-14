@@ -4,6 +4,7 @@ import { Clock, ArrowRight, CheckCircle, Plus } from 'lucide-react';
 import { Spark } from '../types/spark';
 import { Logo } from './Logo';
 import { formatDuration, formatPrice } from '../utils/format';
+import { useNavigate } from 'react-router-dom';
 
 // Utility function to get next available business date
 const getNextBusinessDate = () => {
@@ -72,6 +73,7 @@ export function SparksGrid({
     showDetailsButton = false,
     onDetailsClick
 }: SparksGridProps) {
+    const navigate = useNavigate();
     // Memoize the dates for each card
     const availableDates = useMemo(() => {
         return sparks.map(() => getNextBusinessDate());
@@ -158,7 +160,7 @@ export function SparksGrid({
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        onCallClick(spark.prefillText);
+                                                        navigate(`/sparks/${spark.url}`);
                                                         setExpandedCallIndex(null);
                                                     }}
                                                     className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg 
