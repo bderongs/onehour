@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Rocket } from 'lucide-react';
+import { Plus, Rocket, ChevronDown } from 'lucide-react';
 import type { Spark } from '../types/spark';
 import { supabase } from '../lib/supabase';
 import { getSparks, deleteSpark } from '../services/sparks';
@@ -39,15 +39,35 @@ const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
     </div>
 );
 
+type FilterType = 'consultants' | 'demo' | 'orphan' | 'all';
+
 export function AdminSparksPage() {
     const navigate = useNavigate();
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const [filterType, setFilterType] = useState<FilterType>('consultants');
     const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; sparkUrl: string | null }>({
         isOpen: false,
         sparkUrl: null
+    });
+
+    const filteredSparks = sparks.filter(spark => {
+        const demoConsultantId = import.meta.env.VITE_DEMO_CONSULTANT_ID;
+        
+        switch (filterType) {
+            case 'consultants':
+                return spark.consultant && spark.consultant !== demoConsultantId;
+            case 'demo':
+                return spark.consultant === demoConsultantId;
+            case 'orphan':
+                return !spark.consultant;
+            case 'all':
+                return true;
+            default:
+                return true;
+        }
     });
 
     useEffect(() => {
@@ -167,16 +187,35 @@ export function AdminSparksPage() {
                 variant="danger"
             />
             <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Gestion des Sparks</h1>
-                    <p className="text-gray-600 mt-2">Gérez tous les Sparks de la plateforme</p>
+                <div className="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900">Gestion des Sparks</h1>
+                        <p className="text-gray-600 mt-2">Gérez tous les Sparks de la plateforme</p>
+                    </div>
+                    <div className="relative">
+                        <select
+                            value={filterType}
+                            onChange={(e) => setFilterType(e.target.value as FilterType)}
+                            className="appearance-none block w-64 pl-4 pr-10 py-2.5 text-sm bg-white border border-gray-300 rounded-lg shadow-sm 
+                            text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                            hover:border-blue-300 transition-colors cursor-pointer"
+                        >
+                            <option value="consultants" className="py-2">Sparks des consultants</option>
+                            <option value="demo" className="py-2">Sparks de démo</option>
+                            <option value="orphan" className="py-2">Faux Sparks</option>
+                            <option value="all" className="py-2">Tous les Sparks</option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <ChevronDown className="h-5 w-5" />
+                        </div>
+                    </div>
                 </div>
 
-                {sparks.length === 0 ? (
+                {filteredSparks.length === 0 ? (
                     <EmptyState onCreateSpark={handleCreateSpark} />
                 ) : (
                     <DashboardSparksGrid
-                        sparks={sparks}
+                        sparks={filteredSparks}
                         onCreateSpark={handleCreateSpark}
                         onPreviewSpark={handlePreviewSpark}
                         onEditSpark={handleEditSpark}

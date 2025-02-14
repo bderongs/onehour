@@ -1,6 +1,6 @@
 import { Logo } from '../components/Logo';
 import { BrandName } from '../components/BrandName';
-import { ArrowRight, CheckCircle, Linkedin, Twitter, Globe, Instagram, Facebook, Youtube, FileText, BookOpen, Sparkles, Package2, Clock, Store, Upload, PenSquare, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { ArrowRight, CheckCircle, Linkedin, Twitter, Globe, Instagram, Facebook, Youtube, FileText, BookOpen, Sparkles, Package2, Clock, Store, Upload, PenSquare, Loader2, AlertCircle, ArrowLeft, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const fadeInUp = {
@@ -355,6 +355,27 @@ export function BrandPage() {
                       rows={3}
                       placeholder="Placeholder text"
                     />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Select Field
+                    </label>
+                    <div className="relative">
+                      <select
+                        className="block w-full pl-4 pr-10 py-2.5 text-sm bg-white border border-gray-300 rounded-lg shadow-sm 
+                        text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                        hover:border-blue-300 transition-colors cursor-pointer appearance-none"
+                      >
+                        <option value="option1" className="py-2">Option 1</option>
+                        <option value="option2" className="py-2">Option 2</option>
+                        <option value="option3" className="py-2">Option 3</option>
+                        <option value="option4" className="py-2">Option 4</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <ChevronDown className="h-5 w-5" />
+                      </div>
+                    </div>
+                    <p className="mt-2 text-sm text-gray-500">Utilisez appearance-none pour masquer la flèche native et ajouter votre propre icône</p>
                   </div>
                 </div>
               </div>
