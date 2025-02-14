@@ -4,7 +4,10 @@ By default, this app supports JSX syntax with Tailwind CSS classes, React hooks,
 
 Use stock photos from unsplash where appropriate, only valid URLs you know exist. Do not download the images, only link to them in image tags.
 
-Always follow best practices in code organisation, and check the codebase for relevant prior structuration when needed. Use the service layer for all database operations rather than making direct Supabase queries.
+Always follow best practices in code organisation, and check the codebase for relevant prior structuration when needed.
+Use the service layer for all database operations rather than making direct Supabase queries.
+Use AuthContext to manage authentication state when possible.
+Use the protected routes to manage access to pages.
 
 Comment all the code you write.
 
