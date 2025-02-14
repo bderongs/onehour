@@ -11,7 +11,6 @@ export function Header() {
   const location = useLocation();
   const isConsultantPage = location.pathname === '/consultants';
   const isPricingPage = location.pathname === '/pricing';
-  const isBrandPage = location.pathname === '/brand';
   const isLandingClientsPage = location.pathname === '/';
   const isAuthPage = location.pathname === '/signin' || location.pathname === '/signup';
 
