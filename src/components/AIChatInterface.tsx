@@ -92,10 +92,13 @@ export function AIChatInterface({
     useEffect(() => {
         if (initialMessages && initialMessages.length > 0) {
             setMessages(initialMessages);
-        } else if (messages.length === 0 && systemPrompt) {
-            setMessages([{ role: 'assistant', content: systemPrompt }]);
+        } else if (messages.length === 0 && !isInitialized) {
+            setMessages([{ 
+                role: 'assistant', 
+                content: template.placeholderMessage || "Bonjour ! Comment puis-je vous aider ?"
+            }]);
         }
-    }, [initialMessages, systemPrompt, messages.length]);
+    }, [initialMessages, isInitialized, messages.length, template.placeholderMessage]);
 
     // Handle initial AI response when external messages are provided
     useEffect(() => {
