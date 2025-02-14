@@ -7,6 +7,7 @@ import { getClientRequestsByClientId } from '../services/clientRequests';
 import { getSparkById } from '../services/sparks';
 import { formatDate } from '../utils/format';
 import { useAuth } from '../contexts/AuthContext';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 const EmptyState = () => {
     const navigate = useNavigate();
@@ -126,15 +127,8 @@ export function ClientDashboard() {
     useEffect(() => {
         const fetchRequests = async () => {
             try {
-                if (!user) {
-                    navigate('/signin');
-                    return;
-                }
-
-                // Fetch requests
-                const clientRequests = await getClientRequestsByClientId(user.id);
+                const clientRequests = await getClientRequestsByClientId(user!.id);
                 
-                // Fetch spark titles
                 const requestsWithTitles = await Promise.all(
                     clientRequests.map(async (request) => {
                         const spark = await getSparkById(request.sparkId);
@@ -155,17 +149,10 @@ export function ClientDashboard() {
         };
 
         fetchRequests();
-    }, [navigate, user]);
+    }, [user]);
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Chargement de vos demandes...</p>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner message="Chargement de vos demandes..." />;
     }
 
     if (error) {

@@ -5,6 +5,7 @@ import { getSparkByUrl } from '../../services/sparks';
 import { Notification } from '../../components/Notification';
 import { supabase } from '../../lib/supabase';
 import logger from '../../utils/logger';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 
 export default function SparkRequestHandler() {
     const [loading, setLoading] = useState(true);
@@ -68,14 +69,7 @@ export default function SparkRequestHandler() {
     }, [navigate, searchParams]);
 
     if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Création de votre demande...</p>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner message="Traitement de votre demande..." />;
     }
 
     if (error) {

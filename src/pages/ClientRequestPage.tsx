@@ -8,6 +8,7 @@ import type { ClientRequest } from '../services/clientRequests';
 import type { Spark } from '../types/spark';
 import { formatDuration, formatPrice } from '../utils/format';
 import logger from '../utils/logger';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -124,14 +125,7 @@ export function ClientRequestPage() {
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Chargement des détails de la demande...</p>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner message="Chargement de la demande..." />;
     }
 
     if (error || !request || !spark) {

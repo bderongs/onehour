@@ -8,6 +8,7 @@ import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DashboardSparksGrid } from '../components/DashboardSparksGrid';
 import { useAuth } from '../contexts/AuthContext';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 
 const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
@@ -133,14 +134,7 @@ export function SparkManagementPage() {
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Chargement des Sparks...</p>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner message="Chargement de vos Sparks..." />;
     }
 
     if (error) {

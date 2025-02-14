@@ -12,6 +12,7 @@ import { getConsultantProfile, getConsultantBySlug, getConsultantReviews, getCon
 import { formatDuration, formatPrice } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../services/auth';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
     const { slug: urlSlug } = useParams<{ slug: string }>();
@@ -177,16 +178,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
 
     // Handle loading state
     if (loading) {
-        return (
-            <div className="min-h-screen flex flex-col">
-                <main className="flex-grow flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-md p-8">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                        <p className="text-gray-600">Chargement du profil...</p>
-                    </div>
-                </main>
-            </div>
-        );
+        return <LoadingSpinner message="Chargement du profil..." />;
     }
 
     // Handle error state

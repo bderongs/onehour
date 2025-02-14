@@ -8,6 +8,7 @@ import type { Spark } from '../types/spark';
 import { ConsultantSignUpForm } from '../components/ConsultantSignUpForm';
 import '../styles/highlight.css';
 import { Helmet } from 'react-helmet-async';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -143,8 +144,7 @@ const LandingConsultants = () => {
                     <div className="mb-12 sm:mb-16">
                         {loading ? (
                             <div className="text-center py-8">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                                <p className="mt-4 text-gray-600">Chargement des Sparks...</p>
+                                <LoadingSpinner message="Chargement des Sparks..." />
                             </div>
                         ) : error ? (
                             <div className="text-center py-8">

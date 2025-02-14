@@ -12,6 +12,7 @@ import type { DocumentSummary } from '../types/chat';
 import { Notification } from '../components/Notification';
 import '../styles/highlight.css';
 import { ClientSignUpForm } from '../components/ClientSignUpForm';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -217,6 +218,10 @@ export function LandingClients() {
         }
     ];
 
+    if (loading) {
+        return <LoadingSpinner message="Chargement..." />;
+    }
+
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
             {notification && (
@@ -245,8 +250,7 @@ export function LandingClients() {
                     <div className="mb-12 sm:mb-16">
                         {loading ? (
                             <div className="text-center py-8">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                                <p className="mt-4 text-gray-600">Chargement des Sparks...</p>
+                                <LoadingSpinner message="Chargement des Sparks..." />
                             </div>
                         ) : error ? (
                             <div className="text-center py-8">

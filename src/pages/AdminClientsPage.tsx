@@ -7,6 +7,7 @@ import { getAllClients, deleteClient } from '../services/clients';
 import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { useAuth } from '../contexts/AuthContext';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 const EmptyState = () => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -218,14 +219,7 @@ export function AdminClientsPage() {
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Chargement des clients...</p>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner message="Chargement des clients..." />;
     }
 
     if (error) {

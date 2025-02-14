@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { SparkForm } from '../components/SparkForm';
 import { getSparkByUrl, updateSpark } from '../services/sparks';
 import type { Spark } from '../types/spark';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 export function SparkEditPage() {
     const navigate = useNavigate();
@@ -61,14 +62,7 @@ export function SparkEditPage() {
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Chargement du spark...</p>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner message="Chargement du Spark..." />;
     }
 
     if (error || !spark) {

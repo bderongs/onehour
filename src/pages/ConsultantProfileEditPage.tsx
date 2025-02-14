@@ -7,6 +7,7 @@ import { getConsultantProfile, updateConsultantProfile, getConsultantReviews, ge
 import { uploadProfileImage, deleteProfileImage } from '../services/storage';
 import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 export default function ConsultantProfileEditPage() {
     const { id } = useParams<{ id: string }>();
@@ -201,14 +202,7 @@ export default function ConsultantProfileEditPage() {
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Chargement du profil...</p>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner message="Chargement du profil..." />;
     }
 
     if (error || !consultant) {
@@ -985,8 +979,7 @@ export default function ConsultantProfileEditPage() {
                             >
                                 {saving ? (
                                     <div className="flex items-center gap-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                        Enregistrement...
+                                        <LoadingSpinner message="Enregistrement..." />
                                     </div>
                                 ) : (
                                     'Mettre à jour'

@@ -1,27 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BrandName } from './BrandName';
 import { Menu, X } from 'lucide-react';
 import { ProfileMenu } from './ProfileMenu';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { user, loading: authLoading } = useAuth();
   const location = useLocation();
   const isConsultantPage = location.pathname === '/consultants';
   const isPricingPage = location.pathname === '/pricing';
   const isBrandPage = location.pathname === '/brand';
   const isLandingClientsPage = location.pathname === '/';
   const isAuthPage = location.pathname === '/signin' || location.pathname === '/signup';
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const navigation = [
     { name: 'Le Spark', href: '#spark' },
@@ -71,49 +63,49 @@ export function Header() {
             </Link>
           </div>
 
-          {!isBrandPage && !isAuthPage && (
+          {/* Desktop navigation */}
+          {!authLoading && (
             <>
-              <div className="flex items-center space-x-8">
-                {isLandingClientsPage && (
-                  <div className="hidden md:flex space-x-8">
-                    {navigation.map((item) => (
-                      <button
-                        key={item.name}
-                        onClick={() => scrollToSection(item.href)}
-                        className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-                      >
-                        {item.name}
-                      </button>
-                    ))}
-                  </div>
+              <div className="hidden md:flex md:items-center md:space-x-4">
+                {isLandingClientsPage && navigation.map((item) => (
+                  <button
+                    key={item.name}
+                    onClick={() => scrollToSection(item.href)}
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                  >
+                    {item.name}
+                  </button>
+                ))}
+
+                {isConsultantPage && (
+                  <Link
+                    to="/pricing"
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                  >
+                    Tarifs
+                  </Link>
                 )}
 
-                <div className="hidden md:flex items-center space-x-4">
-                  {isConsultantPage && (
-                    <Link
-                      to="/pricing"
-                      className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-                    >
-                      Tarifs
-                    </Link>
-                  )}
-                  {isPricingPage && (
-                    <Link
-                      to="/consultants"
-                      className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-                    >
-                      Pourquoi Sparkier ?
-                    </Link>
-                  )}
-                  {(isConsultantPage || isPricingPage) && !isAuthenticated && (
-                    <Link
-                      to="/profile"
-                      className="text-blue-600 hover:text-blue-900 px-3 py-2 text-sm font-medium"
-                    >
-                      Voir un exemple de profil
-                    </Link>
-                  )}
-                  {isAuthenticated ? (
+                {isPricingPage && (
+                  <Link
+                    to="/consultants"
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                  >
+                    Pourquoi Sparkier ?
+                  </Link>
+                )}
+                
+                {(isConsultantPage || isPricingPage) && !user && (
+                  <Link
+                    to="/profile"
+                    className="text-blue-600 hover:text-blue-900 px-3 py-2 text-sm font-medium"
+                  >
+                    Voir un exemple de profil
+                  </Link>
+                )}
+
+                <div className="flex items-center space-x-4">
+                  {user ? (
                     <ProfileMenu />
                   ) : !isAuthPage && (
                     <>
@@ -138,7 +130,7 @@ export function Header() {
 
               {/* Mobile menu button */}
               <div className="flex items-center md:hidden">
-                {isAuthenticated && <ProfileMenu />}
+                {user && <ProfileMenu />}
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 ml-2"
@@ -156,18 +148,19 @@ export function Header() {
         </div>
 
         {/* Mobile menu */}
-        {!isBrandPage && !isAuthPage && isMenuOpen && (
+        {isMenuOpen && !authLoading && (
           <div className="md:hidden">
-            <div className="pt-2 pb-3 space-y-1">
+            <div className="px-2 pt-2 pb-3 space-y-1">
               {isLandingClientsPage && navigation.map((item) => (
                 <button
                   key={item.name}
                   onClick={() => scrollToSection(item.href)}
-                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 w-full text-left"
                 >
                   {item.name}
                 </button>
               ))}
+
               {isConsultantPage && (
                 <Link
                   to="/pricing"
@@ -176,6 +169,7 @@ export function Header() {
                   Tarifs
                 </Link>
               )}
+
               {isPricingPage && (
                 <Link
                   to="/consultants"
@@ -184,7 +178,8 @@ export function Header() {
                   Pourquoi Sparkier ?
                 </Link>
               )}
-              {(isConsultantPage || isPricingPage) && !isAuthenticated && (
+              
+              {(isConsultantPage || isPricingPage) && !user && (
                 <Link
                   to="/profile"
                   className="block px-3 py-2 text-base font-medium text-blue-600 hover:text-blue-900 hover:bg-gray-50"
@@ -192,7 +187,8 @@ export function Header() {
                   Voir un exemple de profil
                 </Link>
               )}
-              {!isAuthenticated && (
+
+              {!user && !isAuthPage && (
                 <div className="pt-2 space-y-1 border-t border-gray-200">
                   <Link
                     to="/signin"

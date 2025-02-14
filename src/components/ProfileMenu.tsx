@@ -1,31 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
-import { UserProfile, getCurrentUser } from '../services/auth';
 import { getConsultantProfile } from '../services/consultants';
 import type { ConsultantProfile } from '../types/consultant';
 import { supabase } from '../lib/supabase';
 import { User, LogOut, Settings, UserCircle, Sparkles, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export function ProfileMenu() {
     const [isOpen, setIsOpen] = useState(false);
-    const [user, setUser] = useState<UserProfile | null>(null);
     const [consultantProfile, setConsultantProfile] = useState<ConsultantProfile | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+    const { user, refreshUser } = useAuth();
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const userProfile = await getCurrentUser();
-            setUser(userProfile);
-            
-            if (userProfile?.roles.includes('consultant')) {
-                const consultantData = await getConsultantProfile(userProfile.id);
+        const fetchConsultantProfile = async () => {
+            if (user?.roles.includes('consultant')) {
+                const consultantData = await getConsultantProfile(user.id);
                 setConsultantProfile(consultantData);
             }
         };
 
-        fetchUser();
-    }, []);
+        fetchConsultantProfile();
+    }, [user]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -39,8 +36,17 @@ export function ProfileMenu() {
     }, []);
 
     const handleLogout = async () => {
-        await supabase.auth.signOut();
-        navigate('/');
+        try {
+            await supabase.auth.signOut();
+            // Force refresh the auth state
+            await refreshUser();
+            // Only navigate after the auth state has been refreshed
+            navigate('/', { replace: true });
+        } catch (error) {
+            console.error('Error during logout:', error);
+            // Still try to navigate home if there's an error
+            navigate('/', { replace: true });
+        }
     };
 
     if (!user) return null;
@@ -65,20 +71,33 @@ export function ProfileMenu() {
                         <p className="text-sm font-medium text-gray-900 truncate">{user.firstName} {user.lastName}</p>
                         <p className="text-sm text-gray-500 truncate">{user.email}</p>
                     </div>
+
                     <div className="py-1">
-                        {user.roles.includes('consultant') && consultantProfile?.slug && (
+                        {user.roles.includes('client') && (
+                            <button
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    navigate('/client/dashboard');
+                                }}
+                                className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                                <UserCircle className="w-4 h-4 mr-2" />
+                                Mon tableau de bord
+                            </button>
+                        )}
+
+                        {user.roles.includes('consultant') && (
                             <>
-                                <a
-                                    href={`/${consultantProfile.slug}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={() => setIsOpen(false)}
+                                <button
+                                    onClick={() => {
+                                        setIsOpen(false);
+                                        navigate(`/${consultantProfile?.slug || ''}`);
+                                    }}
                                     className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                                 >
-                                    <UserCircle className="w-4 h-4 mr-2" />
-                                    <span className="flex-1">Page Sparkier</span>
-                                    <ExternalLink className="w-3 h-3 text-gray-400" />
-                                </a>
+                                    <ExternalLink className="w-4 h-4 mr-2" />
+                                    Voir mon profil
+                                </button>
                                 <button
                                     onClick={() => {
                                         setIsOpen(false);
@@ -87,7 +106,7 @@ export function ProfileMenu() {
                                     className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                                 >
                                     <Settings className="w-4 h-4 mr-2" />
-                                    Mon profil
+                                    Éditer mon profil
                                 </button>
                                 <button
                                     onClick={() => {
