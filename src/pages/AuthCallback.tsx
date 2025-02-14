@@ -12,6 +12,14 @@ export default function AuthCallback() {
     useEffect(() => {
         const handleEmailConfirmation = async () => {
             try {
+                // First check if we already have a valid session
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.user) {
+                    logger.info('Valid session found, skipping confirmation flow');
+                    navigate('/');
+                    return;
+                }
+
                 const urlParams = new URLSearchParams(window.location.search);
                 const tokenHash = urlParams.get('token_hash');
                 const type = urlParams.get('type');
@@ -19,10 +27,11 @@ export default function AuthCallback() {
                 
                 logger.info('Processing auth callback', { type, hasTokenHash: !!tokenHash, hasNext: !!next });
 
-                // Validate required parameters first
+                // If no parameters and no session, redirect to sign in
                 if (!tokenHash || !type) {
-                    logger.error('Missing required parameters', { tokenHash, type });
-                    throw new Error('Paramètres d\'authentification manquants');
+                    logger.info('No auth parameters found, redirecting to sign in');
+                    navigate('/signin');
+                    return;
                 }
 
                 // Verify OTP and establish session
