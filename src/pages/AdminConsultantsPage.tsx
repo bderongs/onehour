@@ -4,12 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Mail, ExternalLink, ChevronDown, ChevronUp, Linkedin, Edit, Trash2, Eye, Clock, Plus } from 'lucide-react';
 import type { ConsultantProfile } from '../types/consultant';
 import type { Spark } from '../types/spark';
-import { supabase } from '../lib/supabase';
 import { getAllConsultants, deleteConsultant, getConsultantSparks } from '../services/consultants';
 import { deleteSpark } from '../services/sparks';
 import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatDuration, formatPrice } from '../utils/format';
+import { useAuth } from '../contexts/AuthContext';
 
 const EmptyState = () => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -394,6 +394,7 @@ const ConsultantRow = ({
 
 export function AdminConsultantsPage() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [consultants, setConsultants] = useState<ConsultantProfile[]>([]);
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -416,20 +417,12 @@ export function AdminConsultantsPage() {
     useEffect(() => {
         const checkUserAndFetchConsultants = async () => {
             try {
-                // Get current user and verify admin role
-                const { data: { user } } = await supabase.auth.getUser();
                 if (!user) {
                     navigate('/signin');
                     return;
                 }
 
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('roles')
-                    .eq('id', user.id)
-                    .single();
-
-                if (!profile || !profile.roles.includes('admin')) {
+                if (!user.roles?.includes('admin')) {
                     navigate('/');
                     return;
                 }
@@ -444,7 +437,7 @@ export function AdminConsultantsPage() {
         };
 
         checkUserAndFetchConsultants();
-    }, [navigate, showAllConsultants]);
+    }, [navigate, showAllConsultants, user]);
 
     const toggleShowAll = async () => {
         setLoading(true);

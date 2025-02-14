@@ -10,7 +10,7 @@ import { formatDuration, formatPrice } from '../utils/format';
 import { generateSparkCreatePrompt, generateSparkEditPrompt } from '../services/promptGenerators';
 import { editSparkWithAI } from '../services/openai';
 import { createSpark, getSparkByUrl, updateSpark } from '../services/sparks';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 // Animation variants
 const fadeInUp = {
@@ -39,29 +39,12 @@ const DEFAULT_SPARK: Omit<Spark, 'id'> = {
 
 // Custom hook for authentication
 const useAuthenticatedUser = () => {
-    const navigate = useNavigate();
-    const [userId, setUserId] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) {
-                    navigate('/signin');
-                    return;
-                }
-                setUserId(user.id);
-            } catch (err) {
-                console.error('Error checking auth:', err);
-                setError('Authentication failed. Please try again later.');
-            }
-        };
-
-        checkAuth();
-    }, [navigate]);
-
-    return { userId, error };
+    const { user } = useAuth();
+    return { 
+        userId: user?.id ?? null, 
+        isAdmin: user?.roles?.includes('admin') ?? false, 
+        error: null 
+    };
 };
 
 // Custom hook for AI interaction
@@ -153,7 +136,7 @@ export function SparkAIPage() {
     const navigate = useNavigate();
     const { sparkUrl } = useParams();
     const mode = sparkUrl ? 'edit' : 'create';
-    const { userId, error: authError } = useAuthenticatedUser();
+    const { userId, isAdmin, error: authError } = useAuthenticatedUser();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -197,7 +180,7 @@ export function SparkAIPage() {
             if (mode === 'create') {
                 await createSpark({
                     ...spark,
-                    consultant: userId
+                    consultant: isAdmin ? null : userId
                 });
             } else {
                 await updateSpark(sparkUrl!, spark);

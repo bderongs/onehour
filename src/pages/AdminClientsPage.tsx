@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Mail, ChevronDown, ChevronUp, Trash2, Building, Clock } from 'lucide-react';
 import type { ClientProfile } from '../services/clients';
 import { getAllClients, deleteClient } from '../services/clients';
-import { supabase } from '../lib/supabase';
 import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { useAuth } from '../contexts/AuthContext';
 
 const EmptyState = () => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -155,6 +155,7 @@ const ClientRow = ({
 
 export function AdminClientsPage() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [clients, setClients] = useState<ClientProfile[]>([]);
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -177,20 +178,12 @@ export function AdminClientsPage() {
     useEffect(() => {
         const checkUserAndFetchClients = async () => {
             try {
-                // Get current user and verify admin role
-                const { data: { user } } = await supabase.auth.getUser();
                 if (!user) {
                     navigate('/signin');
                     return;
                 }
 
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('roles')
-                    .eq('id', user.id)
-                    .single();
-
-                if (!profile || !profile.roles.includes('admin')) {
+                if (!user.roles?.includes('admin')) {
                     navigate('/');
                     return;
                 }
@@ -205,7 +198,7 @@ export function AdminClientsPage() {
         };
 
         checkUserAndFetchClients();
-    }, [navigate, showAllClients]);
+    }, [navigate, showAllClients, user]);
 
     const toggleShowAll = async () => {
         setLoading(true);

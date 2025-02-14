@@ -5,8 +5,8 @@ import { Sparkles, Clock, ExternalLink } from 'lucide-react';
 import type { ClientRequest } from '../services/clientRequests';
 import { getClientRequestsByClientId } from '../services/clientRequests';
 import { getSparkById } from '../services/sparks';
-import { supabase } from '../lib/supabase';
 import { formatDate } from '../utils/format';
+import { useAuth } from '../contexts/AuthContext';
 
 const EmptyState = () => {
     const navigate = useNavigate();
@@ -118,6 +118,7 @@ const RequestRow = ({ request }: { request: ClientRequest & { sparkTitle?: strin
 
 export function ClientDashboard() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [requests, setRequests] = useState<(ClientRequest & { sparkTitle?: string })[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -125,8 +126,6 @@ export function ClientDashboard() {
     useEffect(() => {
         const fetchRequests = async () => {
             try {
-                // Get current user
-                const { data: { user } } = await supabase.auth.getUser();
                 if (!user) {
                     navigate('/signin');
                     return;
@@ -156,7 +155,7 @@ export function ClientDashboard() {
         };
 
         fetchRequests();
-    }, [navigate]);
+    }, [navigate, user]);
 
     if (loading) {
         return (

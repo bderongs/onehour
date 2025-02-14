@@ -6,10 +6,10 @@ import { getSparkByUrl } from '../services/sparks';
 import type { Spark } from '../types/spark';
 import { formatDuration, formatPrice } from '../utils/format';
 import { DashboardLayout } from '../layouts/DashboardLayout';
-import { supabase } from '../lib/supabase';
 import logger from '../utils/logger';
 import { createClientRequest, getClientRequestsByClientId } from '../services/clientRequests';
 import { useClientSignUp } from '../contexts/ClientSignUpContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -24,6 +24,7 @@ export function SparkProductPage() {
     const { sparkUrl } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
+    const { user } = useAuth();
     const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
     const [spark, setSpark] = useState<Spark | null>(null);
     const [loading, setLoading] = useState(true);
@@ -42,9 +43,7 @@ export function SparkProductPage() {
             }
 
             try {
-                // Check authentication and user roles
-                const { data: { session } } = await supabase.auth.getSession();
-                setIsAuthenticated(!!session);
+                setIsAuthenticated(!!user);
 
                 // Fetch spark
                 const fetchedSpark = await getSparkByUrl(sparkUrl);
@@ -57,14 +56,8 @@ export function SparkProductPage() {
                 // Determine page context
                 if (fetchedSpark.consultant === DEMO_CONSULTANT_ID) {
                     setPageContext('consultant_marketing');
-                } else if (session?.user) {
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('roles')
-                        .eq('id', session.user.id)
-                        .single();
-                    
-                    if (profile?.roles?.includes('consultant')) {
+                } else if (user) {
+                    if (user.roles?.includes('consultant')) {
                         setPageContext('consultant_preview');
                     } else {
                         setPageContext('client_purchase');
@@ -82,7 +75,7 @@ export function SparkProductPage() {
         };
 
         checkAuthAndFetchSpark();
-    }, [sparkUrl, navigate, DEMO_CONSULTANT_ID, isAuthenticated]);
+    }, [sparkUrl, navigate, DEMO_CONSULTANT_ID, user]);
 
     const handleAction = () => {
         if (!spark) return;
@@ -99,8 +92,9 @@ export function SparkProductPage() {
                     navigate('/spark-signup');
                 } else {
                     // If authenticated, create a client request directly
-                    if (!sparkUrl) return;
+                    if (!sparkUrl || !user) return;
                     logger.info('Creating client request for authenticated user', { sparkUrl });
+                    
                     // Get the spark by URL first to ensure we have the correct data
                     getSparkByUrl(sparkUrl)
                         .then(spark => {
@@ -109,25 +103,22 @@ export function SparkProductPage() {
                                 throw new Error('Spark not found');
                             }
                             logger.info('Found spark, checking existing requests', { sparkId: spark.id });
-                            // Get current user and check for existing requests
-                            return supabase.auth.getUser()
-                                .then(({ data }) => {
-                                    if (!data.user) throw new Error('User not found');
-                                    return getClientRequestsByClientId(data.user.id)
-                                        .then(requests => {
-                                            const existingRequest = requests.find(r => 
-                                                r.sparkId === spark.id && 
-                                                (r.status === 'pending' || r.status === 'accepted')
-                                            );
-                                            
-                                            if (existingRequest) {
-                                                logger.info('Found existing active request, redirecting', { requestId: existingRequest.id });
-                                                return Promise.reject({ type: 'existing_request', requestId: existingRequest.id });
-                                            }
-                                            
-                                            logger.info('No existing active request found, creating new request', { sparkId: spark.id });
-                                            return createClientRequest({ sparkId: spark.id });
-                                        });
+                            
+                            // Check for existing requests
+                            return getClientRequestsByClientId(user.id)
+                                .then(requests => {
+                                    const existingRequest = requests.find(r => 
+                                        r.sparkId === spark.id && 
+                                        (r.status === 'pending' || r.status === 'accepted')
+                                    );
+                                    
+                                    if (existingRequest) {
+                                        logger.info('Found existing active request, redirecting', { requestId: existingRequest.id });
+                                        return Promise.reject({ type: 'existing_request', requestId: existingRequest.id });
+                                    }
+                                    
+                                    logger.info('No existing active request found, creating new request', { sparkId: spark.id });
+                                    return createClientRequest({ sparkId: spark.id });
                                 });
                         })
                         .then(request => {

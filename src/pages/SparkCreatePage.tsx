@@ -4,14 +4,19 @@ import { motion } from 'framer-motion';
 import { SparkForm } from '../components/SparkForm';
 import { createSpark } from '../services/sparks';
 import type { Spark } from '../types/spark';
+import { useAuth } from '../contexts/AuthContext';
 
 export function SparkCreatePage() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (data: Spark) => {
         try {
-            await createSpark(data);
+            await createSpark({
+                ...data,
+                consultant: user?.roles?.includes('admin') ? null : (user?.id ?? null)
+            });
             navigate('/sparks/manage');
         } catch (error) {
             console.error('Error creating spark:', error);

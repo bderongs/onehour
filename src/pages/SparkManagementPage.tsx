@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Eye, Sparkles, Rocket } from 'lucide-react';
 import type { Spark } from '../types/spark';
-import { supabase } from '../lib/supabase';
 import { getSparksByConsultant, deleteSpark } from '../services/sparks';
 import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DashboardSparksGrid } from '../components/DashboardSparksGrid';
+import { useAuth } from '../contexts/AuthContext';
 
 
 const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
@@ -59,6 +59,7 @@ const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
 
 export function SparkManagementPage() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -71,32 +72,19 @@ export function SparkManagementPage() {
     useEffect(() => {
         const fetchUserAndSparks = async () => {
             try {
-                // Get current user and their role
-                const { data: { user } } = await supabase.auth.getUser();
                 if (!user) {
                     navigate('/signin');
                     return;
                 }
 
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('roles')
-                    .eq('id', user.id)
-                    .single();
-
-                if (!profile) {
-                    throw new Error('Profile not found');
-                }
-
                 // Only allow consultants and admins to access this page
-                if (!profile.roles.includes('consultant') && !profile.roles.includes('admin')) {
+                if (!user.roles?.includes('consultant') && !user.roles?.includes('admin')) {
                     navigate('/');
                     return;
                 }
 
                 // Fetch only sparks belonging to the current user
                 const fetchedSparks = await getSparksByConsultant(user.id);
-
                 setSparks(fetchedSparks);
                 setLoading(false);
             } catch (err) {
@@ -107,7 +95,7 @@ export function SparkManagementPage() {
         };
 
         fetchUserAndSparks();
-    }, [navigate]);
+    }, [navigate, user]);
 
     const handleCreateSpark = () => {
         navigate('/sparks/ai-create');

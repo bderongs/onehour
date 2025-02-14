@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, Rocket, ChevronDown } from 'lucide-react';
 import type { Spark } from '../types/spark';
-import { supabase } from '../lib/supabase';
 import { getSparks, deleteSpark } from '../services/sparks';
 import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DashboardSparksGrid } from '../components/DashboardSparksGrid';
+import { useAuth } from '../contexts/AuthContext';
 
 const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -43,11 +43,12 @@ type FilterType = 'consultants' | 'demo' | 'orphan' | 'all';
 
 export function AdminSparksPage() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-    const [filterType, setFilterType] = useState<FilterType>('consultants');
+    const [filterType, setFilterType] = useState<FilterType>('orphan');
     const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; sparkUrl: string | null }>({
         isOpen: false,
         sparkUrl: null
@@ -73,20 +74,12 @@ export function AdminSparksPage() {
     useEffect(() => {
         const fetchUserAndSparks = async () => {
             try {
-                // Get current user and verify admin role
-                const { data: { user } } = await supabase.auth.getUser();
                 if (!user) {
                     navigate('/signin');
                     return;
                 }
 
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('roles')
-                    .eq('id', user.id)
-                    .single();
-
-                if (!profile || !profile.roles.includes('admin')) {
+                if (!user.roles?.includes('admin')) {
                     navigate('/');
                     return;
                 }
@@ -103,7 +96,7 @@ export function AdminSparksPage() {
         };
 
         fetchUserAndSparks();
-    }, [navigate]);
+    }, [navigate, user]);
 
     const handleCreateSpark = () => {
         navigate('/sparks/ai-create');
