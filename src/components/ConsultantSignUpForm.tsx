@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ArrowRight, Beaker } from 'lucide-react';
-import { signUpConsultantWithEmail } from '../services/auth';
+import { signUpConsultantWithEmail, checkEmailExists } from '../services/auth';
 import { useNotification } from '../contexts/NotificationContext';
+import { useNavigate } from 'react-router-dom';
 
 interface ConsultantSignUpFormProps {
     buttonText?: string;
@@ -24,6 +25,7 @@ export function ConsultantSignUpForm({
     });
     const { showNotification } = useNotification();
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const generateTestData = () => {
         const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
@@ -43,6 +45,12 @@ export function ConsultantSignUpForm({
         const testData = generateTestData();
         
         try {
+            // Check if email is already registered
+            const emailExists = await checkEmailExists(testData.email);
+            if (emailExists) {
+                throw new Error('Cette adresse email est déjà utilisée.');
+            }
+
             await signUpConsultantWithEmail(testData);
             
             // Clear form data after successful submission
@@ -53,7 +61,8 @@ export function ConsultantSignUpForm({
                 email: ''
             });
 
-            showNotification('success', 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.');
+            // Navigate to email confirmation page instead of showing notification
+            navigate('/email-confirmation');
             onSuccess?.();
         } catch (error: any) {
             console.error('Error submitting test form:', error);
@@ -76,13 +85,34 @@ export function ConsultantSignUpForm({
         e.preventDefault();
         setLoading(true);
         try {
+            // Add validation before submission
+            if (!formData.email || !formData.firstName || !formData.lastName) {
+                throw new Error('Veuillez remplir tous les champs obligatoires.');
+            }
+
+            // Check if email is already registered
+            const emailExists = await checkEmailExists(formData.email);
+            if (emailExists) {
+                throw new Error('Cette adresse email est déjà utilisée.');
+            }
+
             await signUpConsultantWithEmail(formData);
             setFormData({ firstName: '', lastName: '', linkedin: '', email: '' });
-            showNotification('success', 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.');
+            
+            // Navigate to email confirmation page instead of showing notification
+            navigate('/email-confirmation');
             onSuccess?.();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error submitting form:', error);
-            showNotification('error', 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.');
+            let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
+            
+            if (error.message?.includes('timeout') || error.message?.includes('network')) {
+                errorMessage = 'Problème de connexion. Veuillez vérifier votre connexion internet et réessayer.';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            showNotification('error', errorMessage);
             onError?.(error);
         } finally {
             setLoading(false);

@@ -50,49 +50,85 @@ const generateTempPassword = () => {
 
 export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
     const siteUrl = getSiteUrl();
-    
-    // Create the auth user with email confirmation
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: generateTempPassword(),
-        options: {
-            emailRedirectTo: `${siteUrl}/sparks/manage`,
-            data: {
-                first_name: data.firstName,
-                last_name: data.lastName,
-            }
-        }
-    })
+    let retryCount = 0;
+    const maxRetries = 3;
+    const retryDelay = 1000; // 1 second
 
-    if (authError) throw authError
-
-    // Generate the initial slug
-    const baseSlug = generateSlug(`${data.firstName} ${data.lastName}`);
-    const slug = await ensureUniqueSlug(baseSlug, 'profile');
-
-    // Determine roles
-    const roles = ['consultant'];
-
-    // Then, store additional user data in a profiles table
-    const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([
-            {
-                id: authData.user?.id,
+    while (retryCount < maxRetries) {
+        try {
+            // Create the auth user with email confirmation
+            const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: data.email,
-                first_name: data.firstName,
-                last_name: data.lastName,
-                linkedin: data.linkedin,
-                roles: roles,
-                slug: slug,
-                created_at: new Date().toISOString()
+                password: generateTempPassword(),
+                options: {
+                    emailRedirectTo: `${siteUrl}/sparks/manage`,
+                    data: {
+                        first_name: data.firstName,
+                        last_name: data.lastName,
+                    }
+                }
+            });
+
+            if (authError) {
+                // If it's a timeout or network error, retry
+                if (authError.message?.includes('timeout') || authError.message?.includes('network') || authError.message === '{}') {
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        logger.info(`Retry attempt ${retryCount} for signup`);
+                        await new Promise(resolve => setTimeout(resolve, retryDelay));
+                        continue;
+                    }
+                }
+                throw authError;
             }
-        ])
 
-    if (profileError) throw profileError
+            // Verify that we have a user before proceeding
+            if (!authData?.user?.id) {
+                throw new Error('Erreur lors de la création du compte. Veuillez réessayer.');
+            }
 
-    return authData
-}
+            // Generate the initial slug
+            const baseSlug = generateSlug(`${data.firstName} ${data.lastName}`);
+            const slug = await ensureUniqueSlug(baseSlug, 'profile');
+
+            // Determine roles
+            const roles = ['consultant'];
+
+            // Then, store additional user data in a profiles table
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .insert([
+                    {
+                        id: authData.user.id,
+                        email: data.email,
+                        first_name: data.firstName,
+                        last_name: data.lastName,
+                        linkedin: data.linkedin,
+                        roles: roles,
+                        slug: slug,
+                        created_at: new Date().toISOString()
+                    }
+                ]);
+
+            if (profileError) {
+                logger.error('Error creating profile:', profileError);
+                throw profileError;
+            }
+
+            return authData;
+        } catch (error: any) {
+            // On last retry, throw the error
+            if (retryCount === maxRetries - 1) {
+                if (error.message === '{}') {
+                    throw new Error('Le service d\'authentification est temporairement indisponible. Veuillez réessayer dans quelques instants.');
+                }
+                throw error;
+            }
+            retryCount++;
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+    }
+};
 
 export const signUpClientWithEmail = async (data: ClientSignUpData) => {
     const siteUrl = getSiteUrl();
