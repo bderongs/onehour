@@ -343,4 +343,19 @@ export const checkEmailExists = async (email: string): Promise<boolean> => {
     }
 
     return !!profile;
+};
+
+export const deleteUser = async (userId: string): Promise<void> => {
+    // Call the RPC function to delete the user
+    const { error: deleteError } = await supabase.rpc('delete_user', {
+        user_id: userId
+    });
+
+    if (deleteError) {
+        logger.error('Error deleting user:', deleteError);
+        throw new Error('Erreur lors de la suppression de l\'utilisateur');
+    }
+
+    // The profile will be automatically deleted due to the ON DELETE CASCADE constraint
+    logger.info(`Successfully deleted user with ID: ${userId}`);
 }; 

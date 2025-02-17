@@ -3,6 +3,7 @@ import type { ConsultantProfile, ConsultantReview } from '../types/consultant';
 import type { Spark } from '../types/spark';
 import type { ConsultantMission } from '../types/consultant';
 import { generateSlug, ensureUniqueSlug } from '../utils/url';
+import { deleteUser } from '../services/auth';
 
 export async function getConsultantProfile(id: string): Promise<ConsultantProfile | null> {
     const { data, error } = await supabase
@@ -318,21 +319,29 @@ export async function getAllConsultants(includeSparkierEmails: boolean = false):
 
 export async function deleteConsultant(consultantId: string): Promise<boolean> {
     try {
-        // Delete consultant's profile
-        const { error: profileError } = await supabase
+        // First, verify that the user exists and is a consultant
+        const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .delete()
+            .select('roles')
             .eq('id', consultantId)
-            .contains('roles', ['consultant']);
+            .single();
 
         if (profileError) {
-            console.error('Error deleting consultant profile:', profileError);
+            console.error('Error getting profile:', profileError);
             return false;
         }
 
+        if (!profile || !profile.roles.includes('consultant')) {
+            console.error('User not found or is not a consultant');
+            return false;
+        }
+
+        // Delete the user from Supabase Auth
+        // The profile will be automatically deleted due to ON DELETE CASCADE
+        await deleteUser(consultantId);
         return true;
     } catch (error) {
-        console.error('Error in deleteConsultant:', error);
+        console.error('Error deleting consultant:', error);
         return false;
     }
 }

@@ -554,20 +554,18 @@ create index if not exists client_requests_client_id_idx on client_requests (cli
 create index if not exists client_requests_spark_id_idx on client_requests (spark_id);
 create index if not exists client_requests_status_idx on client_requests (status);
 
--- Set up triggers for updated_at (moved to end after all tables exist)
+-- Create the trigger function if it doesn't exist
+create or replace function public.handle_updated_at()
+returns trigger as $$
+begin
+    new.updated_at = now();
+    return new;
+end;
+$$ language plpgsql;
+
+-- Create triggers for updated_at
 do $$
 begin
-    -- Create the trigger function if it doesn't exist
-    if not exists (select 1 from pg_proc where proname = 'handle_updated_at') then
-        create function public.handle_updated_at()
-        returns trigger as $trigger$
-        begin
-            new.updated_at = now();
-            return new;
-        end;
-        $trigger$ language plpgsql;
-    end if;
-
     -- Create triggers if they don't exist
     if not exists (select 1 from pg_trigger where tgname = 'handle_profiles_updated_at') then
         create trigger handle_profiles_updated_at
@@ -598,37 +596,31 @@ begin
     end if;
 end $$;
 
--- Create a function to delete auth user when profile is deleted
-do $$
+-- Drop the old profile deletion function and trigger
+drop trigger if exists on_profile_deletion on profiles;
+drop function if exists public.handle_profile_deletion();
+
+-- Function to delete a user (can only be called by admins)
+create or replace function delete_user(user_id uuid)
+returns void
+language plpgsql
+security definer
+as $$
 begin
-    -- Create the http extension if it doesn't exist
-    create extension if not exists "http" with schema extensions;
-
-    if not exists (select 1 from pg_proc where proname = 'handle_profile_deletion') then
-        create function public.handle_profile_deletion()
-        returns trigger as $$
-        begin
-            -- Call the Supabase Auth API to delete the user
-            perform
-                https_post(
-                    url := current_setting('SUPABASE_URL') || '/auth/v1/admin/users/' || old.id,
-                    headers := jsonb_build_object(
-                        'Authorization', 'Bearer ' || current_setting('SUPABASE_SERVICE_ROLE_KEY'),
-                        'apikey', current_setting('SUPABASE_SERVICE_ROLE_KEY')
-                    ),
-                    method := 'DELETE'
-                );
-
-            return old;
-        end;
-        $$ language plpgsql security definer;
+    -- Check if the caller is an admin
+    if not exists (
+        select 1
+        from profiles
+        where id = auth.uid()
+        and roles @> array['admin']::user_role[]
+    ) then
+        raise exception 'Only administrators can delete users';
     end if;
 
-    -- Create the trigger if it doesn't exist
-    if not exists (select 1 from pg_trigger where tgname = 'on_profile_deletion') then
-        create trigger on_profile_deletion
-            after delete on profiles
-            for each row
-            execute procedure public.handle_profile_deletion();
-    end if;
-end $$; 
+    -- Delete the auth.user (this will cascade to profiles and other related data)
+    delete from auth.users where id = user_id;
+end;
+$$;
+
+-- Grant execute permission on the function
+grant execute on function delete_user to authenticated;
