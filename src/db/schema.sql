@@ -596,4 +596,39 @@ begin
             for each row
             execute procedure handle_updated_at();
     end if;
+end $$;
+
+-- Create a function to delete auth user when profile is deleted
+do $$
+begin
+    -- Create the http extension if it doesn't exist
+    create extension if not exists "http" with schema extensions;
+
+    if not exists (select 1 from pg_proc where proname = 'handle_profile_deletion') then
+        create function public.handle_profile_deletion()
+        returns trigger as $$
+        begin
+            -- Call the Supabase Auth API to delete the user
+            perform
+                https_post(
+                    url := current_setting('SUPABASE_URL') || '/auth/v1/admin/users/' || old.id,
+                    headers := jsonb_build_object(
+                        'Authorization', 'Bearer ' || current_setting('SUPABASE_SERVICE_ROLE_KEY'),
+                        'apikey', current_setting('SUPABASE_SERVICE_ROLE_KEY')
+                    ),
+                    method := 'DELETE'
+                );
+
+            return old;
+        end;
+        $$ language plpgsql security definer;
+    end if;
+
+    -- Create the trigger if it doesn't exist
+    if not exists (select 1 from pg_trigger where tgname = 'on_profile_deletion') then
+        create trigger on_profile_deletion
+            after delete on profiles
+            for each row
+            execute procedure public.handle_profile_deletion();
+    end if;
 end $$; 
