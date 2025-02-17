@@ -37,11 +37,12 @@ export function SignInPage() {
         
         if (errorMessage) {
             showNotification('error', errorMessage);
-            // Pre-fill email if it's in the URL
-            const emailParam = searchParams.get('email');
-            if (emailParam) {
-                setEmail(emailParam);
-            }
+        }
+
+        // Pre-fill email if it's in the URL, regardless of error message
+        const emailParam = searchParams.get('email');
+        if (emailParam) {
+            setEmail(emailParam);
         }
     }, [searchParams, showNotification]);
 
