@@ -173,7 +173,7 @@ export function LandingClients() {
         {
             icon: <Users className="h-6 w-6" />,
             title: "Échangez avec votre Expert",
-            description: "Discutez en direct avec le consultant pour obtenir des réponses concrètes."
+            description: "Travaillez en direct avec le consultant pour obtenir des réponses concrètes."
         },
         {
             icon: <FileText className="h-6 w-6" />,

@@ -72,7 +72,7 @@ export function Footer() {
                 {location.pathname === '/' && (
                   <li className="pt-2">
                     <a href="/consultants" className="text-indigo-400 hover:text-indigo-300 font-medium">
-                      Devenir consultant
+                      Sparkier pour les consultants
                     </a>
                   </li>
                 )}
