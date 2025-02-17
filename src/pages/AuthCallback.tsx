@@ -76,7 +76,8 @@ export default function AuthCallback() {
                 const errorMessage = err.message || 'Une erreur est survenue lors de la confirmation';
                 setError(errorMessage);
                 showNotification('error', errorMessage);
-                navigate(`/signin?error=auth_error&message=${encodeURIComponent(errorMessage)}&email=${encodeURIComponent(email)}`);
+                // Redirect to signin with just the email parameter
+                navigate(`/signin?email=${encodeURIComponent(email)}`);
             } finally {
                 setLoading(false);
             }

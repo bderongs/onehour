@@ -9,7 +9,6 @@ export function SignInPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [_errorType, setErrorType] = useState<string | null>(null);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const { user, loading: authLoading } = useAuth();
@@ -30,19 +29,16 @@ export function SignInPage() {
     }, [user, authLoading, navigate, searchParams]);
 
     useEffect(() => {
-        // Check for error messages in URL
-        const errorMessage = searchParams.get('message');
-        const error = searchParams.get('error');
-        setErrorType(error);
-        
-        if (errorMessage) {
-            showNotification('error', errorMessage);
-        }
-
-        // Pre-fill email if it's in the URL, regardless of error message
+        // Pre-fill email if it's in the URL
         const emailParam = searchParams.get('email');
         if (emailParam) {
             setEmail(emailParam);
+        }
+
+        // Display error message if present
+        const errorMessage = searchParams.get('message');
+        if (errorMessage) {
+            showNotification('error', errorMessage);
         }
     }, [searchParams, showNotification]);
 
