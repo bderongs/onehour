@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowRight, Beaker } from 'lucide-react';
 import { signUpClientWithEmail, type ClientSignUpData, checkEmailExists } from '../services/auth';
 import { useNotification } from '../contexts/NotificationContext';
+import { useNavigate } from 'react-router-dom';
 
 interface ClientSignUpFormProps {
     buttonText?: string;
@@ -31,6 +32,7 @@ export function ClientSignUpForm({
     });
     const { showNotification } = useNotification();
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const generateTestData = () => {
         const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
@@ -59,21 +61,21 @@ export function ClientSignUpForm({
                 throw new Error('Cette adresse email est déjà utilisée.');
             }
 
-            const result = await signUpClientWithEmail(testData);
+            await signUpClientWithEmail(testData);
             
-            // Update form data after successful submission
+            // Clear form data after successful submission
             setFormData({
                 firstName: '',
                 lastName: '',
                 company: '',
                 email: '',
                 companyRole: '',
-                industry: '',
-                sparkUrlSlug: undefined
+                industry: ''
             });
 
-            showNotification('success', 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.');
-            onSuccess?.({ sparkUrlSlug: result?.sparkUrlSlug });
+            // Navigate to email confirmation page instead of showing notification
+            navigate('/email-confirmation');
+            onSuccess?.({ sparkUrlSlug: undefined });
         } catch (error: any) {
             console.error('Error submitting test form:', error);
             let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
@@ -96,12 +98,6 @@ export function ClientSignUpForm({
         if (loading) return; // Prevent multiple submissions while loading
         setLoading(true);
 
-        // Add a timeout to reset loading state if it takes too long
-        const timeoutId = setTimeout(() => {
-            setLoading(false);
-            showNotification('error', 'La requête a pris trop de temps. Veuillez réessayer.');
-        }, 30000); // 30 seconds timeout
-
         try {
             // Add validation before submission
             if (!formData.email || !formData.firstName || !formData.lastName || !formData.company || !formData.companyRole || !formData.industry) {
@@ -114,21 +110,19 @@ export function ClientSignUpForm({
                 throw new Error('Cette adresse email est déjà utilisée.');
             }
 
-            const result = await signUpClientWithEmail(formData);
-            
-            // Clear form data only after successful submission
+            await signUpClientWithEmail(formData);
             setFormData({
                 firstName: '',
                 lastName: '',
                 company: '',
                 email: '',
                 companyRole: '',
-                industry: '',
-                sparkUrlSlug: undefined
+                industry: ''
             });
 
-            showNotification('success', 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.');
-            onSuccess?.({ sparkUrlSlug: result?.sparkUrlSlug });
+            // Navigate to email confirmation page instead of showing notification
+            navigate('/email-confirmation');
+            onSuccess?.({ sparkUrlSlug: undefined });
         } catch (error: any) {
             console.error('Error submitting form:', error);
             let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
@@ -142,7 +136,6 @@ export function ClientSignUpForm({
             showNotification('error', errorMessage);
             onError?.(error);
         } finally {
-            clearTimeout(timeoutId);
             setLoading(false);
         }
     };
