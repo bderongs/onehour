@@ -83,7 +83,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching consultant data:', err);
-                setError('Failed to load consultant data');
+                setError('Impossible de charger les données du consultant');
                 setLoading(false);
                 navigate('/', { replace: true });
                 showNotification('error', 'Vous avez été redirigé vers la page d\'accueil car le profil n\'existe pas.');

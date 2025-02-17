@@ -216,7 +216,7 @@ export function AIChatInterface({
                         onMessagesUpdate(messagesWithSummary);
                     }
                 } catch (e) {
-                    console.error('Failed to parse summary JSON:', e);
+                    console.error('Impossible de parser le JSON du résumé:', e);
                     console.error('Failed JSON string:', jsonStr!);
                 }
             }

@@ -160,7 +160,7 @@ export function SparkAIPage() {
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching spark:', err);
-                setError('Failed to load spark. Please try again later.');
+                setError('Impossible de charger le spark. Veuillez réessayer plus tard.');
                 setLoading(false);
             }
         };
@@ -189,7 +189,7 @@ export function SparkAIPage() {
             navigate(-1);
         } catch (error) {
             console.error('Error saving spark:', error);
-            setError(`Failed to ${mode} spark. Please try again later.`);
+            setError(`Impossible de ${mode === 'create' ? 'créer' : 'mettre à jour'} le spark. Veuillez réessayer plus tard.`);
             setIsSaving(false);
         }
     };

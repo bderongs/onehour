@@ -166,7 +166,7 @@ export async function editSparkWithAI(
         return response;
     } catch (error) {
         logger.error('OpenAI API Error in editSparkWithAI:', {
-            error: error instanceof Error ? error.message : 'Unknown error',
+            error: error instanceof Error ? error.message : 'Erreur inconnue',
             stack: error instanceof Error ? error.stack : undefined
         });
         return {
@@ -214,7 +214,7 @@ export async function analyzeWithOpenAI(
         return response;
     } catch (error) {
         logger.error('OpenAI API Error in analyzeWithOpenAI:', {
-            error: error instanceof Error ? error.message : 'Unknown error',
+            error: error instanceof Error ? error.message : 'Erreur inconnue',
             stack: error instanceof Error ? error.stack : undefined,
             isSummaryMode
         });

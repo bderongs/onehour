@@ -69,7 +69,7 @@ export default function ConsultantProfileEditPage() {
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching consultant data:', err);
-                setError('Failed to load consultant data');
+                setError('Impossible de charger les données du consultant');
                 setLoading(false);
             }
         };
@@ -143,12 +143,12 @@ export default function ConsultantProfileEditPage() {
                     navigate(`/${consultant!.slug}`);
                 }, 1500);
             } else {
-                setError('Failed to update profile');
+                setError('Impossible de mettre à jour le profil');
                 showNotification('error', 'Échec de la mise à jour du profil');
             }
         } catch (err) {
             console.error('Error updating profile:', err);
-            setError('Failed to update profile');
+            setError('Impossible de mettre à jour le profil');
             showNotification('error', 'Échec de la mise à jour du profil');
         } finally {
             setSaving(false);

@@ -94,7 +94,7 @@ serve(async (req) => {
         statusText: response.statusText,
         error
       })
-      throw new Error(`Failed to send email: ${error}`)
+      throw new Error(`Impossible d'envoyer l'email: ${error}`)
     }
 
     return new Response('Notification sent successfully', { status: 200 })

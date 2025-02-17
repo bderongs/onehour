@@ -13,7 +13,7 @@ const getFilePathFromUrl = (url: string): string | null => {
         const matches = url.match(/public\/profiles\/([^?#]+)/);
         return matches ? matches[1] : null;
     } catch (e) {
-        logger.error('Failed to parse URL:', e);
+        logger.error('Impossible de parser l\'URL:', e);
         return null;
     }
 };
@@ -27,7 +27,7 @@ const deleteImage = async (filePath: string): Promise<void> => {
             .remove([filePath]);
 
         if (error) {
-            logger.error('Error deleting image:', error);
+            logger.error('Impossible de supprimer l\'image:', error);
             logger.error('Error details:', {
                 message: error.message,
                 name: error.name
@@ -37,7 +37,7 @@ const deleteImage = async (filePath: string): Promise<void> => {
             logger.debug('Successfully deleted file:', filePath);
         }
     } catch (error) {
-        logger.error('Failed to delete image:', error);
+        logger.error('Erreur lors de la suppression de l\'image:', error);
         throw error;
     }
 };

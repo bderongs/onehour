@@ -225,7 +225,7 @@ export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<S
     }
 
     if (!updatedData) {
-        throw new Error(`Failed to fetch updated spark with URL ${url}`);
+        throw new Error(`Impossible de récupérer le spark mis à jour avec l'URL ${url}`);
     }
 
     return transformSparkFromDB(updatedData);

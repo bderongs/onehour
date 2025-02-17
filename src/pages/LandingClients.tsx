@@ -49,7 +49,7 @@ export function LandingClients() {
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching sparks:', err);
-                setError('Failed to load sparks. Please try again later.');
+                setError('Impossible de charger les sparks. Veuillez réessayer plus tard.');
                 setLoading(false);
             }
         };

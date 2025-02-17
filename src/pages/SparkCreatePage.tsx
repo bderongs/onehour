@@ -20,7 +20,7 @@ export function SparkCreatePage() {
             navigate('/sparks/manage');
         } catch (error) {
             console.error('Error creating spark:', error);
-            setError('Failed to create spark. Please try again later.');
+            setError('Impossible de créer le spark. Veuillez réessayer plus tard.');
         }
     };
 

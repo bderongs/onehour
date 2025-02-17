@@ -70,7 +70,7 @@ export function SparkProductPage() {
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching data:', err);
-                setError('Failed to load spark details. Please try again later.');
+                setError('Impossible de charger les détails du spark. Veuillez réessayer plus tard.');
                 setLoading(false);
             }
         };

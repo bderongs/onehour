@@ -19,7 +19,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const currentUser = await getCurrentUser();
             setUser(currentUser);
         } catch (error) {
-            console.error('Failed to refresh user:', error);
+            console.error('Impossible de rafraîchir l\'utilisateur:', error);
             setUser(null);
         } finally {
             setLoading(false);
