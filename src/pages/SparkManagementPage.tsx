@@ -4,12 +4,11 @@ import { motion } from 'framer-motion';
 import { Plus, Eye, Sparkles, Rocket } from 'lucide-react';
 import type { Spark } from '../types/spark';
 import { getSparksByConsultant, deleteSpark } from '../services/sparks';
-import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DashboardSparksGrid } from '../components/DashboardSparksGrid';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
-
+import { useNotification } from '../contexts/NotificationContext';
 
 const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -61,10 +60,10 @@ const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
 export function SparkManagementPage() {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { showNotification } = useNotification();
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; sparkUrl: string | null }>({
         isOpen: false,
         sparkUrl: null
@@ -124,10 +123,10 @@ export function SparkManagementPage() {
         try {
             await deleteSpark(deleteConfirm.sparkUrl);
             setSparks(sparks.filter(spark => spark.url !== deleteConfirm.sparkUrl));
-            setNotification({ type: 'success', message: 'Le Spark a été supprimé avec succès' });
+            showNotification('success', 'Le Spark a été supprimé avec succès');
         } catch (error) {
             console.error('Error deleting spark:', error);
-            setNotification({ type: 'error', message: 'Échec de la suppression du Spark. Veuillez réessayer.' });
+            showNotification('error', 'Échec de la suppression du Spark. Veuillez réessayer.');
         } finally {
             setDeleteConfirm({ isOpen: false, sparkUrl: null });
         }
@@ -155,13 +154,6 @@ export function SparkManagementPage() {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            {notification && (
-                <Notification
-                    type={notification.type}
-                    message={notification.message}
-                    onClose={() => setNotification(null)}
-                />
-            )}
             <ConfirmDialog
                 isOpen={deleteConfirm.isOpen}
                 title="Supprimer le Spark"

@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Notification } from '../components/Notification';
 import { Lock } from 'lucide-react';
 import { PasswordRequirements, isPasswordValid, doPasswordsMatch } from '../components/PasswordRequirements';
 import logger from '../utils/logger';
+import { useNotification } from '../contexts/NotificationContext';
 
 export function PasswordSetupPage() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [loading, setLoading] = useState(false);
-    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const { showNotification } = useNotification();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -42,22 +42,15 @@ export function PasswordSetupPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setNotification(null);
 
         if (!isPasswordValid(password)) {
-            setNotification({
-                type: 'error',
-                message: 'Le mot de passe ne respecte pas les critères de sécurité.'
-            });
+            showNotification('error', 'Le mot de passe ne respecte pas les critères de sécurité.');
             setLoading(false);
             return;
         }
 
         if (!doPasswordsMatch(password, confirmPassword)) {
-            setNotification({
-                type: 'error',
-                message: 'Les mots de passe ne correspondent pas.'
-            });
+            showNotification('error', 'Les mots de passe ne correspondent pas.');
             setLoading(false);
             return;
         }
@@ -121,10 +114,7 @@ export function PasswordSetupPage() {
                 logger.info('Session refreshed successfully');
             }
 
-            setNotification({
-                type: 'success',
-                message: 'Votre mot de passe a été configuré avec succès.'
-            });
+            showNotification('success', 'Votre mot de passe a été configuré avec succès.');
 
             // If we have a next URL, use it for redirection
             if (next) {
@@ -178,10 +168,7 @@ export function PasswordSetupPage() {
         } catch (err: any) {
             console.error('Error setting password:', err);
             logger.error('Error in password setup:', err);
-            setNotification({
-                type: 'error',
-                message: err.message || 'Une erreur est survenue'
-            });
+            showNotification('error', err.message || 'Une erreur est survenue');
         } finally {
             setLoading(false);
         }
@@ -189,13 +176,6 @@ export function PasswordSetupPage() {
 
     return (
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            {notification && (
-                <Notification
-                    type={notification.type}
-                    message={notification.message}
-                    onClose={() => setNotification(null)}
-                />
-            )}
             <div className="max-w-md w-full">
                 <div className="bg-white p-8 rounded-lg shadow-md space-y-6">
                     <div>

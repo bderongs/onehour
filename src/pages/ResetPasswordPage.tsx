@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Notification } from '../components/Notification';
 import { Mail } from 'lucide-react';
+import { useNotification } from '../contexts/NotificationContext';
 
 export function ResetPasswordPage() {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
-    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const { showNotification } = useNotification();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -20,16 +20,10 @@ export function ResetPasswordPage() {
 
             if (error) throw error;
 
-            setNotification({
-                type: 'success',
-                message: 'Un email de réinitialisation de mot de passe vous a été envoyé.'
-            });
+            showNotification('success', 'Un email de réinitialisation de mot de passe vous a été envoyé.');
             setEmail('');
         } catch (error: any) {
-            setNotification({
-                type: 'error',
-                message: error.message || 'Une erreur est survenue lors de la réinitialisation du mot de passe.'
-            });
+            showNotification('error', error.message || 'Une erreur est survenue lors de la réinitialisation du mot de passe.');
         } finally {
             setLoading(false);
         }
@@ -37,13 +31,6 @@ export function ResetPasswordPage() {
 
     return (
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            {notification && (
-                <Notification
-                    type={notification.type}
-                    message={notification.message}
-                    onClose={() => setNotification(null)}
-                />
-            )}
             <div className="max-w-md w-full">
                 <div className="bg-white p-8 rounded-lg shadow-md space-y-6">
                     <div>

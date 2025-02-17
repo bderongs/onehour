@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { UserProfile, updateUserRoles, UserRole } from '../services/auth';
 import { supabase } from '../lib/supabase';
-import { Notification } from '../components/Notification';
 import { Users } from 'lucide-react';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { useNotification } from '../contexts/NotificationContext';
 
 const EmptyState = () => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -26,7 +26,7 @@ const EmptyState = () => (
 export function AdminRolesPage() {
     const [users, setUsers] = useState<UserProfile[]>([]);
     const [loading, setLoading] = useState(true);
-    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const { showNotification } = useNotification();
     const [showAllUsers, setShowAllUsers] = useState(false);
 
     const availableRoles: UserRole[] = ['client', 'consultant', 'admin'];
@@ -52,10 +52,7 @@ export function AdminRolesPage() {
                 roles: profile.roles,
             })));
         } catch (err) {
-            setNotification({
-                type: 'error',
-                message: 'Failed to fetch users'
-            });
+            showNotification('error', 'Impossible de charger les utilisateurs');
             console.error('Error fetching users:', err);
         } finally {
             setLoading(false);
@@ -68,18 +65,13 @@ export function AdminRolesPage() {
 
     const handleRoleToggle = async (userId: string, role: UserRole, currentRoles: UserRole[]) => {
         try {
-            setNotification(null);
-
             const newRoles = currentRoles.includes(role)
                 ? currentRoles.filter(r => r !== role)
                 : [...currentRoles, role];
 
             // Ensure at least one role remains
             if (newRoles.length === 0) {
-                setNotification({
-                    type: 'error',
-                    message: 'User must have at least one role'
-                });
+                showNotification('error', 'L\'utilisateur doit avoir au moins un rôle');
                 return;
             }
 
@@ -89,15 +81,9 @@ export function AdminRolesPage() {
             // Update local state
             await fetchUsers(showAllUsers);
 
-            setNotification({
-                type: 'success',
-                message: 'Roles updated successfully'
-            });
+            showNotification('success', 'Les rôles ont été mis à jour avec succès');
         } catch (err: any) {
-            setNotification({
-                type: 'error',
-                message: err.message || 'Failed to update roles'
-            });
+            showNotification('error', err.message || 'Impossible de mettre à jour les rôles');
             console.error('Error updating roles:', err);
         }
     };
@@ -114,14 +100,6 @@ export function AdminRolesPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
             <div className="max-w-7xl mx-auto px-4 py-12">
-                {notification && (
-                    <Notification
-                        type={notification.type}
-                        message={notification.message}
-                        onClose={() => setNotification(null)}
-                    />
-                )}
-
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">Gestion des rôles</h1>

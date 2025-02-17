@@ -6,11 +6,11 @@ import type { ConsultantProfile } from '../types/consultant';
 import type { Spark } from '../types/spark';
 import { getAllConsultants, deleteConsultant, getConsultantSparks } from '../services/consultants';
 import { deleteSpark } from '../services/sparks';
-import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { formatDuration, formatPrice } from '../utils/format';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { useNotification } from '../contexts/NotificationContext';
 
 const EmptyState = () => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -41,6 +41,7 @@ const ConsultantRow = ({
     onDelete: () => void;
 }) => {
     const navigate = useNavigate();
+    const { showNotification } = useNotification();
     const [isDeleting, setIsDeleting] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [sparks, setSparks] = useState<Spark[]>([]);
@@ -104,8 +105,10 @@ const ConsultantRow = ({
         try {
             await deleteSpark(showSparkDeleteConfirm.sparkUrl);
             setSparks(sparks.filter(spark => spark.url !== showSparkDeleteConfirm.sparkUrl));
+            showNotification('success', 'Le Spark a été supprimé avec succès');
         } catch (error) {
             console.error('Error deleting spark:', error);
+            showNotification('error', 'Échec de la suppression du Spark');
         } finally {
             setShowSparkDeleteConfirm({ isOpen: false, sparkUrl: null, sparkTitle: null });
         }
@@ -395,11 +398,11 @@ const ConsultantRow = ({
 export function AdminConsultantsPage() {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { showNotification } = useNotification();
     const [consultants, setConsultants] = useState<ConsultantProfile[]>([]);
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [showAllConsultants, setShowAllConsultants] = useState(false);
 
     const fetchConsultants = async (includeSparkierEmails: boolean) => {
@@ -449,11 +452,9 @@ export function AdminConsultantsPage() {
     };
 
     const handleConsultantDelete = () => {
-        setNotification({
-            type: 'success',
-            message: 'Le consultant a été supprimé avec succès'
-        });
-        fetchConsultants(showAllConsultants);
+        showNotification('success', 'Le consultant a été supprimé avec succès');
+        setConsultants(consultants.filter(c => c.id !== expandedId));
+        setExpandedId(null);
     };
 
     if (loading) {
@@ -478,13 +479,6 @@ export function AdminConsultantsPage() {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            {notification && (
-                <Notification
-                    type={notification.type}
-                    message={notification.message}
-                    onClose={() => setNotification(null)}
-                />
-            )}
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-8">
                     <div>

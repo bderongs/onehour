@@ -9,7 +9,6 @@ import type { Spark } from '../types/spark';
 import { DOCUMENT_TEMPLATES } from '../data/documentTemplates';
 import { createChatConfigs } from '../data/chatConfigs';
 import type { DocumentSummary } from '../types/chat';
-import { Notification } from '../components/Notification';
 import '../styles/highlight.css';
 import { ClientSignUpForm } from '../components/ClientSignUpForm';
 import { LoadingSpinner } from '../components/LoadingSpinner';
@@ -21,11 +20,9 @@ const fadeInUp = {
 };
 
 export function LandingClients() {
-    const [problem, setProblem] = useState('');
     const [showConnect, setShowConnect] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [shouldReset, setShouldReset] = useState(false);
-    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -74,7 +71,6 @@ export function LandingClients() {
     }, []);
 
     const handleUseCaseClick = (prefillText: string) => {
-        setProblem(prefillText);
         if (prefillText.trim()) {
             const initialMessages: Message[] = [{
                 role: 'user',
@@ -83,26 +79,6 @@ export function LandingClients() {
             setMessages(initialMessages);
             setShowConnect(false);
             setIsChatExpanded(true);
-        }
-    };
-
-    const handleSubmit = (e: React.FormEvent, message: string) => {
-        e.preventDefault();
-        if (message.trim()) {
-            const initialMessages: Message[] = [{
-                role: 'user',
-                content: message.trim()
-            }];
-            setMessages(initialMessages);
-            setShowConnect(false);
-            setIsChatExpanded(true);
-        }
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit(e, problem);
         }
     };
 
@@ -136,7 +112,6 @@ export function LandingClients() {
                 previousAttempts: '',
                 hasEnoughData: false
             });
-            setProblem('');
             setIsChatExpanded(false);
             setExpandedCallIndex(0);
         } else {
@@ -224,13 +199,6 @@ export function LandingClients() {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            {notification && (
-                <Notification
-                    type={notification.type}
-                    message={notification.message}
-                    onClose={() => setNotification(null)}
-                />
-            )}
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* Hero Section */}
                 <motion.div
@@ -533,24 +501,6 @@ export function LandingClients() {
                     scroll-padding-top: 80px; /* Add padding for fixed header */
                 }
             `}</style>
-
-            <div className="hidden">
-                <textarea
-                    value={problem}
-                    onChange={(e) => setProblem(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Décrivez votre problématique..."
-                    className="w-full p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                    rows={4}
-                />
-                <button
-                    onClick={(e) => handleSubmit(e, problem)}
-                    className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2"
-                >
-                    Commencer
-                    <ArrowRight className="h-5 w-5" />
-                </button>
-            </div>
         </div>
     );
 }

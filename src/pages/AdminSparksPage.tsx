@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 import { Plus, Rocket, ChevronDown } from 'lucide-react';
 import type { Spark } from '../types/spark';
 import { getSparks, deleteSpark } from '../services/sparks';
-import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DashboardSparksGrid } from '../components/DashboardSparksGrid';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { useNotification } from '../contexts/NotificationContext';
 
 const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -45,10 +45,10 @@ type FilterType = 'consultants' | 'demo' | 'orphan' | 'all';
 export function AdminSparksPage() {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { showNotification } = useNotification();
     const [sparks, setSparks] = useState<Spark[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [filterType, setFilterType] = useState<FilterType>('orphan');
     const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; sparkUrl: string | null }>({
         isOpen: false,
@@ -125,10 +125,10 @@ export function AdminSparksPage() {
         try {
             await deleteSpark(deleteConfirm.sparkUrl);
             setSparks(sparks.filter(spark => spark.url !== deleteConfirm.sparkUrl));
-            setNotification({ type: 'success', message: 'Le Spark a été supprimé avec succès' });
+            showNotification('success', 'Le Spark a été supprimé avec succès');
         } catch (error) {
             console.error('Error deleting spark:', error);
-            setNotification({ type: 'error', message: 'Échec de la suppression du Spark. Veuillez réessayer.' });
+            showNotification('error', 'Échec de la suppression du Spark');
         } finally {
             setDeleteConfirm({ isOpen: false, sparkUrl: null });
         }
@@ -156,23 +156,6 @@ export function AdminSparksPage() {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            {notification && (
-                <Notification
-                    type={notification.type}
-                    message={notification.message}
-                    onClose={() => setNotification(null)}
-                />
-            )}
-            <ConfirmDialog
-                isOpen={deleteConfirm.isOpen}
-                title="Supprimer le Spark"
-                message="Êtes-vous sûr de vouloir supprimer ce spark ? Cette action est irréversible."
-                confirmLabel="Supprimer"
-                cancelLabel="Annuler"
-                onConfirm={handleConfirmDelete}
-                onCancel={() => setDeleteConfirm({ isOpen: false, sparkUrl: null })}
-                variant="danger"
-            />
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-8">
                     <div>
@@ -211,6 +194,16 @@ export function AdminSparksPage() {
                     />
                 )}
             </div>
+            <ConfirmDialog
+                isOpen={deleteConfirm.isOpen}
+                title="Supprimer le Spark"
+                message="Êtes-vous sûr de vouloir supprimer ce Spark ? Cette action est irréversible."
+                confirmLabel="Supprimer"
+                cancelLabel="Annuler"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeleteConfirm({ isOpen: false, sparkUrl: null })}
+                variant="danger"
+            />
         </div>
     );
 } 

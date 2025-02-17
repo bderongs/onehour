@@ -4,10 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Mail, ChevronDown, ChevronUp, Trash2, Building, Clock } from 'lucide-react';
 import type { ClientProfile } from '../services/clients';
 import { getAllClients, deleteClient } from '../services/clients';
-import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { useNotification } from '../contexts/NotificationContext';
 
 const EmptyState = () => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -157,11 +157,15 @@ const ClientRow = ({
 export function AdminClientsPage() {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { showNotification } = useNotification();
     const [clients, setClients] = useState<ClientProfile[]>([]);
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; clientId: string | null }>({
+        isOpen: false,
+        clientId: null
+    });
     const [showAllClients, setShowAllClients] = useState(false);
 
     const fetchClients = async (includeSparkierEmails: boolean) => {
@@ -211,11 +215,23 @@ export function AdminClientsPage() {
     };
 
     const handleClientDelete = () => {
-        setNotification({
-            type: 'success',
-            message: 'Le client a été supprimé avec succès'
-        });
+        showNotification('success', 'Le client a été supprimé avec succès');
         fetchClients(showAllClients);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deleteConfirm.clientId) return;
+        
+        try {
+            await deleteClient(deleteConfirm.clientId);
+            setClients(clients.filter(client => client.id !== deleteConfirm.clientId));
+            showNotification('success', 'Le client a été supprimé avec succès');
+        } catch (error) {
+            console.error('Error deleting client:', error);
+            showNotification('error', 'Échec de la suppression du client');
+        } finally {
+            setDeleteConfirm({ isOpen: false, clientId: null });
+        }
     };
 
     if (loading) {
@@ -240,13 +256,6 @@ export function AdminClientsPage() {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            {notification && (
-                <Notification
-                    type={notification.type}
-                    message={notification.message}
-                    onClose={() => setNotification(null)}
-                />
-            )}
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-8">
                     <div>
@@ -279,6 +288,17 @@ export function AdminClientsPage() {
                     </div>
                 )}
             </div>
+
+            <ConfirmDialog
+                isOpen={deleteConfirm.isOpen}
+                title="Supprimer le client"
+                message="Êtes-vous sûr de vouloir supprimer ce client ? Cette action est irréversible."
+                confirmLabel="Supprimer"
+                cancelLabel="Annuler"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeleteConfirm({ isOpen: false, clientId: null })}
+                variant="danger"
+            />
         </div>
     );
 } 

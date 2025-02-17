@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Notification } from '../components/Notification';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import logger from '../utils/logger';
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function AuthCallback() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const { showNotification } = useNotification();
 
     useEffect(() => {
         const handleEmailConfirmation = async () => {
@@ -74,6 +75,7 @@ export default function AuthCallback() {
                 const email = new URLSearchParams(window.location.search).get('email') || '';
                 const errorMessage = err.message || 'Une erreur est survenue lors de la confirmation';
                 setError(errorMessage);
+                showNotification('error', errorMessage);
                 navigate(`/signin?error=auth_error&message=${encodeURIComponent(errorMessage)}&email=${encodeURIComponent(email)}`);
             } finally {
                 setLoading(false);
@@ -81,7 +83,7 @@ export default function AuthCallback() {
         };
 
         handleEmailConfirmation();
-    }, [navigate]);
+    }, [navigate, showNotification]);
 
     if (loading) {
         return <LoadingSpinner message="Vérification de votre email..." />;
@@ -91,11 +93,6 @@ export default function AuthCallback() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-lg">
-                    <Notification
-                        type="error"
-                        message={error}
-                        onClose={() => setError(null)}
-                    />
                     <div className="text-center mt-4">
                         <p className="text-gray-600">
                             Veuillez réessayer de vous connecter.

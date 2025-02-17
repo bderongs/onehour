@@ -5,9 +5,9 @@ import { motion } from 'framer-motion';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '../types/consultant';
 import { getConsultantProfile, updateConsultantProfile, getConsultantReviews, getConsultantMissions, updateConsultantReviews, updateConsultantMissions } from '../services/consultants';
 import { uploadProfileImage, deleteProfileImage } from '../services/storage';
-import { Notification } from '../components/Notification';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function ConsultantProfileEditPage() {
     const { id } = useParams<{ id: string }>();
@@ -16,7 +16,7 @@ export default function ConsultantProfileEditPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const { showNotification } = useNotification();
     const [formData, setFormData] = useState<Partial<ConsultantProfile> & {
         languagesInput?: string,
         keyCompetenciesInput?: string,
@@ -125,7 +125,7 @@ export default function ConsultantProfileEditPage() {
         delete submissionData.keyCompetenciesInput;
         delete submissionData.reviews;
         delete submissionData.missions;
-        delete submissionData.profile_image_path; // Remove profile_image_path before sending to database
+        delete submissionData.profile_image_path;
 
         setSaving(true);
         try {
@@ -137,19 +137,19 @@ export default function ConsultantProfileEditPage() {
             ]);
 
             if (updatedProfile && reviewsUpdated && missionsUpdated) {
-                setNotification({ type: 'success', message: 'Profil mis à jour avec succès' });
+                showNotification('success', 'Profil mis à jour avec succès');
                 // Wait a bit to show the success message before redirecting
                 setTimeout(() => {
                     navigate(`/${consultant!.slug}`);
                 }, 1500);
             } else {
                 setError('Failed to update profile');
-                setNotification({ type: 'error', message: 'Échec de la mise à jour du profil' });
+                showNotification('error', 'Échec de la mise à jour du profil');
             }
         } catch (err) {
             console.error('Error updating profile:', err);
             setError('Failed to update profile');
-            setNotification({ type: 'error', message: 'Échec de la mise à jour du profil' });
+            showNotification('error', 'Échec de la mise à jour du profil');
         } finally {
             setSaving(false);
         }
@@ -168,10 +168,7 @@ export default function ConsultantProfileEditPage() {
             }));
         } catch (error) {
             console.error('Error uploading image:', error);
-            setNotification({
-                type: 'error',
-                message: error instanceof Error ? error.message : 'Erreur lors de l\'upload de l\'image'
-            });
+            showNotification('error', error instanceof Error ? error.message : 'Erreur lors de l\'upload de l\'image');
         } finally {
             setUploadingImage(false);
             if (fileInputRef.current) {
@@ -190,10 +187,7 @@ export default function ConsultantProfileEditPage() {
                 }));
             } catch (error) {
                 console.error('Error deleting image:', error);
-                setNotification({
-                    type: 'error',
-                    message: 'Erreur lors de la suppression de l\'image'
-                });
+                showNotification('error', 'Erreur lors de la suppression de l\'image');
             }
         }
         if (fileInputRef.current) {
@@ -223,14 +217,6 @@ export default function ConsultantProfileEditPage() {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            {notification && (
-                <Notification
-                    type={notification.type}
-                    message={notification.message}
-                    onClose={() => setNotification(null)}
-                />
-            )}
-
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

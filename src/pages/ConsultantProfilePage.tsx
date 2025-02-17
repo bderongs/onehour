@@ -13,10 +13,12 @@ import { formatDuration, formatPrice } from '../utils/format';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../services/auth';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
     const { slug: urlSlug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
+    const { showNotification } = useNotification();
     const [showChat, setShowChat] = useState(false);
     const [showConnect, setShowConnect] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -53,21 +55,18 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
     // Fetch consultant data when component mounts
     useEffect(() => {
         const fetchData = async () => {
-            if (!consultantIdentifier) {
-                setError('Consultant identifier is required');
-                setLoading(false);
-                return;
-            }
-
             try {
                 // If we have a propId, use getConsultantProfile, otherwise use getConsultantBySlug
                 const consultantData = propId 
                     ? await getConsultantProfile(propId)
-                    : await getConsultantBySlug(consultantIdentifier);
+                    : await getConsultantBySlug(consultantIdentifier || '');
 
                 if (!consultantData) {
+                    console.error('No consultant found for identifier:', consultantIdentifier || 'unknown');
                     setError('Consultant not found');
                     setLoading(false);
+                    navigate('/', { replace: true });
+                    showNotification('error', 'Vous avez été redirigé vers la page d\'accueil car le profil n\'existe pas.');
                     return;
                 }
 
@@ -83,8 +82,11 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                 setMissions(missionsData);
                 setLoading(false);
             } catch (err) {
+                console.error('Error fetching consultant data:', err);
                 setError('Failed to load consultant data');
                 setLoading(false);
+                navigate('/', { replace: true });
+                showNotification('error', 'Vous avez été redirigé vers la page d\'accueil car le profil n\'existe pas.');
             }
         };
 
@@ -99,7 +101,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
             setSparks([]);
             setMissions([]);
         };
-    }, [consultantIdentifier, propId]);
+    }, [consultantIdentifier, propId, navigate, showNotification]);
 
     // Memoize chat configs based on consultant's firstname
     const chatConfigs = useMemo(
@@ -181,23 +183,9 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
         return <LoadingSpinner message="Chargement du profil..." />;
     }
 
-    // Handle error state
-    if (error || !consultant) {
-        return (
-            <div className="min-h-screen flex flex-col">
-                <main className="flex-grow flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-md p-8">
-                        <p className="text-red-600">{error || 'Profil introuvable'}</p>
-                        <button 
-                            onClick={() => window.location.reload()} 
-                            className="mt-4 text-blue-600 hover:text-blue-700"
-                        >
-                            Réessayer
-                        </button>
-                    </div>
-                </main>
-            </div>
-        );
+    // If no consultant data, don't render anything as we're redirecting
+    if (!consultant) {
+        return null;
     }
 
     return (

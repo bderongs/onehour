@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle, X } from 'lucide-react';
 import { submitToGoogleForm } from '../services/formSubmission';
 import type { DocumentTemplate, DocumentSummary } from '../types/chat';
-import { Notification } from '../components/Notification';
 import type { Message } from '../components/AIChatInterface';
+import { useNotification } from '../contexts/NotificationContext';
 
 interface ContactForm {
     name: string;
@@ -30,7 +30,7 @@ export function ConsultantConnect({
     messages
 }: ConsultantConnectProps) {
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const { showNotification } = useNotification();
     const [form, setForm] = useState<ContactForm>({
         name: '',
         email: '',
@@ -69,16 +69,10 @@ export function ConsultantConnect({
             });
 
             setIsSubmitted(true);
-            setNotification({
-                type: 'success',
-                message: confirmationMessage
-            });
+            showNotification('success', confirmationMessage);
         } catch (error) {
             console.error('Error submitting consultation:', error);
-            setNotification({
-                type: 'error',
-                message: 'Une erreur est survenue lors de l\'envoi du formulaire. Veuillez réessayer.'
-            });
+            showNotification('error', 'Une erreur est survenue lors de l\'envoi du formulaire. Veuillez réessayer.');
         }
     };
 
@@ -147,14 +141,6 @@ export function ConsultantConnect({
 
     return (
         <>
-            {notification && (
-                <Notification
-                    type={notification.type}
-                    message={notification.message}
-                    onClose={() => setNotification(null)}
-                />
-            )}
-            
             <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">

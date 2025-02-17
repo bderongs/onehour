@@ -2,16 +2,17 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { createClientRequest, getClientRequestsByClientId } from '../../services/clientRequests';
 import { getSparkByUrl } from '../../services/sparks';
-import { Notification } from '../../components/Notification';
 import { supabase } from '../../lib/supabase';
 import logger from '../../utils/logger';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
+import { useNotification } from '../../contexts/NotificationContext';
 
 export default function SparkRequestHandler() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const { showNotification } = useNotification();
 
     useEffect(() => {
         const handleSparkRequest = async () => {
@@ -59,6 +60,7 @@ export default function SparkRequestHandler() {
                 logger.error('Error handling spark request:', err);
                 const errorMessage = err.message || 'Une erreur est survenue lors de la création de la demande';
                 setError(errorMessage);
+                showNotification('error', errorMessage);
                 navigate('/client/dashboard');
             } finally {
                 setLoading(false);
@@ -66,7 +68,7 @@ export default function SparkRequestHandler() {
         };
 
         handleSparkRequest();
-    }, [navigate, searchParams]);
+    }, [navigate, searchParams, showNotification]);
 
     if (loading) {
         return <LoadingSpinner message="Traitement de votre demande..." />;
@@ -76,11 +78,11 @@ export default function SparkRequestHandler() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-lg">
-                    <Notification
-                        type="error"
-                        message={error}
-                        onClose={() => setError(null)}
-                    />
+                    <div className="text-center">
+                        <p className="text-gray-600">
+                            Une erreur est survenue. Veuillez réessayer.
+                        </p>
+                    </div>
                 </div>
             </div>
         );

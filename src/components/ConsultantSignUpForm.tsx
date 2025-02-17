@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowRight, Beaker } from 'lucide-react';
 import { signUpConsultantWithEmail } from '../services/auth';
-import { Notification } from './Notification';
+import { useNotification } from '../contexts/NotificationContext';
 
 interface ConsultantSignUpFormProps {
     buttonText?: string;
@@ -22,7 +22,7 @@ export function ConsultantSignUpForm({
         linkedin: '',
         email: ''
     });
-    const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const { showNotification } = useNotification();
     const [loading, setLoading] = useState(false);
 
     const generateTestData = () => {
@@ -39,7 +39,6 @@ export function ConsultantSignUpForm({
         e.preventDefault();
         if (loading) return;
         setLoading(true);
-        setNotification(null);
 
         const testData = generateTestData();
         
@@ -54,11 +53,7 @@ export function ConsultantSignUpForm({
                 email: ''
             });
 
-            setNotification({
-                type: 'success',
-                message: 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.'
-            });
-
+            showNotification('success', 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.');
             onSuccess?.();
         } catch (error: any) {
             console.error('Error submitting test form:', error);
@@ -70,10 +65,7 @@ export function ConsultantSignUpForm({
                 errorMessage = error.message;
             }
 
-            setNotification({
-                type: 'error',
-                message: errorMessage
-            });
+            showNotification('error', errorMessage);
             onError?.(error);
         } finally {
             setLoading(false);
@@ -86,17 +78,11 @@ export function ConsultantSignUpForm({
         try {
             await signUpConsultantWithEmail(formData);
             setFormData({ firstName: '', lastName: '', linkedin: '', email: '' });
-            setNotification({
-                type: 'success',
-                message: 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.'
-            });
+            showNotification('success', 'Inscription réussie ! Veuillez vérifier votre email pour finaliser votre inscription.');
             onSuccess?.();
         } catch (error) {
             console.error('Error submitting form:', error);
-            setNotification({
-                type: 'error',
-                message: 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.'
-            });
+            showNotification('error', 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.');
             onError?.(error);
         } finally {
             setLoading(false);
@@ -111,107 +97,97 @@ export function ConsultantSignUpForm({
     };
 
     return (
-        <>
-            {notification && (
-                <Notification
-                    type={notification.type}
-                    message={notification.message}
-                    onClose={() => setNotification(null)}
-                />
-            )}
-            <form onSubmit={handleSubmit} className={`space-y-6 ${className}`}>
-                <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Prénom
-                        </label>
-                        <input
-                            type="text"
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Votre prénom"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Nom
-                        </label>
-                        <input
-                            type="text"
-                            name="lastName"
-                            value={formData.lastName}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Votre nom"
-                        />
-                    </div>
-                </div>
+        <form onSubmit={handleSubmit} className={`space-y-6 ${className}`}>
+            <div className="grid md:grid-cols-2 gap-6">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email professionnel
+                        Prénom
                     </label>
                     <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
+                        type="text"
+                        name="firstName"
+                        value={formData.firstName}
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="vous@entreprise.com"
+                        placeholder="Votre prénom"
                     />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        LinkedIn (optionnel)
+                        Nom
                     </label>
                     <input
-                        type="url"
-                        name="linkedin"
-                        value={formData.linkedin}
+                        type="text"
+                        name="lastName"
+                        value={formData.lastName}
                         onChange={handleChange}
-                        placeholder="https://linkedin.com/in/votre-profil"
+                        required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Votre nom"
                     />
                 </div>
-                <div className="flex flex-col gap-4">
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {loading ? (
-                            <>
-                                <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></span>
-                                <span className="ml-2">Inscription en cours...</span>
-                            </>
-                        ) : (
-                            <>
-                                {buttonText}
-                                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                            </>
-                        )}
-                    </button>
-
-                    {import.meta.env.DEV && (
-                        <button
-                            type="button"
-                            onClick={handleTestSignup}
-                            disabled={loading}
-                            className="w-full bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <Beaker className="h-5 w-5" />
-                            <span>Test Signup</span>
-                        </button>
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email professionnel
+                </label>
+                <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="vous@entreprise.com"
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    LinkedIn (optionnel)
+                </label>
+                <input
+                    type="url"
+                    name="linkedin"
+                    value={formData.linkedin}
+                    onChange={handleChange}
+                    placeholder="https://linkedin.com/in/votre-profil"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+            </div>
+            <div className="flex flex-col gap-4">
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {loading ? (
+                        <>
+                            <div className="h-5 w-5 border-t-2 border-white border-solid rounded-full animate-spin"></div>
+                            <span>Inscription en cours...</span>
+                        </>
+                    ) : (
+                        <>
+                            {buttonText}
+                            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                        </>
                     )}
-                </div>
-                <p className="text-center text-sm text-gray-500">
-                    En créant votre profil, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
-                </p>
-            </form>
-        </>
+                </button>
+
+                {process.env.NODE_ENV === 'development' && (
+                    <button
+                        onClick={handleTestSignup}
+                        disabled={loading}
+                        className="w-full bg-gray-100 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <Beaker className="h-5 w-5" />
+                        Test Signup
+                    </button>
+                )}
+            </div>
+            <p className="text-center text-sm text-gray-500">
+                En créant votre profil, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
+            </p>
+        </form>
     );
 } 
