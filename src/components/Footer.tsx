@@ -19,8 +19,6 @@ export function Footer() {
   const isPricingPage = location.pathname === '/pricing';
   const isProfilePage = location.pathname === '/profile' || /^\/consultants\/[^/]+$/.test(location.pathname);
   const isConsultantSection = isConsultantsPage || isPricingPage;
-  const isDevelopment = import.meta.env.MODE === 'development';
-  const buildDate = import.meta.env.VITE_BUILD_DATE;
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -85,18 +83,6 @@ export function Footer() {
 
         <div className={`${!isProfilePage ? 'border-t border-gray-800 mt-12 pt-8' : ''} text-center text-gray-400`}>
           <p>&copy; {new Date().getFullYear()} Sparkier. Tous droits réservés.</p>
-          {isDevelopment && buildDate && (
-            <p className="text-xs mt-2 text-gray-500">
-              Build date: {new Date(buildDate).toLocaleString('fr-FR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-              })}
-            </p>
-          )}
         </div>
       </div>
     </footer>
