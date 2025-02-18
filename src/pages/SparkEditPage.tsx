@@ -98,6 +98,7 @@ export function SparkEditPage() {
                         </button>
                         <h1 className="text-3xl font-bold text-gray-900">Modifier le Spark</h1>
                     </div>
+
                     <SparkForm
                         initialData={spark}
                         onSubmit={handleSubmit}

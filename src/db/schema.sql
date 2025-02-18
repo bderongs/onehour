@@ -221,9 +221,22 @@ create table if not exists sparks (
     faq jsonb[],
     testimonials jsonb[],
     next_steps text[],
+    social_image_url text,
     created_at timestamp with time zone default timezone('utc'::text, now()) not null,
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
+
+-- Add social_image_url column if it doesn't exist
+do $$
+begin
+    if not exists (
+        select 1 from information_schema.columns 
+        where table_name = 'sparks' 
+        and column_name = 'social_image_url'
+    ) then
+        alter table sparks add column social_image_url text;
+    end if;
+end $$;
 
 -- Enable Row Level Security
 alter table sparks enable row level security;
@@ -599,6 +612,79 @@ end $$;
 -- Drop the old profile deletion function and trigger
 drop trigger if exists on_profile_deletion on profiles;
 drop function if exists public.handle_profile_deletion();
+
+-- Create storage bucket and policies for sparks bucket
+do $$
+begin
+    -- Create the sparks bucket if it doesn't exist
+    if not exists (
+        select 1 from storage.buckets 
+        where id = 'sparks'
+    ) then
+        insert into storage.buckets (id, name, public)
+        values ('sparks', 'sparks', true);
+    end if;
+
+    -- Drop existing policies if they exist
+    drop policy if exists "Permettre la lecture publique des images" on storage.objects;
+    drop policy if exists "Permettre l'upload aux consultants et admins" on storage.objects;
+    drop policy if exists "Permettre la modification aux consultants et admins" on storage.objects;
+    drop policy if exists "Permettre la suppression aux consultants et admins" on storage.objects;
+
+    -- Create new policies
+    -- Politique de lecture (SELECT) - Accessible à tous
+    create policy "Permettre la lecture publique des images"
+    on storage.objects for select
+    using (bucket_id = 'sparks');
+
+    -- Politique d'insertion (INSERT) - Consultants et Admins uniquement
+    create policy "Permettre l'upload aux consultants et admins"
+    on storage.objects for insert
+    with check (
+        bucket_id = 'sparks'
+        and auth.role() = 'authenticated'
+        and exists (
+            select 1 from profiles
+            where id = auth.uid()
+            and (
+                roles @> array['consultant']::user_role[]
+                or roles @> array['admin']::user_role[]
+            )
+        )
+    );
+
+    -- Politique de mise à jour (UPDATE) - Consultants et Admins uniquement
+    create policy "Permettre la modification aux consultants et admins"
+    on storage.objects for update
+    using (
+        bucket_id = 'sparks'
+        and auth.role() = 'authenticated'
+        and exists (
+            select 1 from profiles
+            where id = auth.uid()
+            and (
+                roles @> array['consultant']::user_role[]
+                or roles @> array['admin']::user_role[]
+            )
+        )
+    );
+
+    -- Politique de suppression (DELETE) - Consultants et Admins uniquement
+    create policy "Permettre la suppression aux consultants et admins"
+    on storage.objects for delete
+    using (
+        bucket_id = 'sparks'
+        and auth.role() = 'authenticated'
+        and exists (
+            select 1 from profiles
+            where id = auth.uid()
+            and (
+                roles @> array['consultant']::user_role[]
+                or roles @> array['admin']::user_role[]
+            )
+        )
+    );
+end $$;
 
 -- Function to delete a user (can only be called by admins)
 create or replace function delete_user(user_id uuid)

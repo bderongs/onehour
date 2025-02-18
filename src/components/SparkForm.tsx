@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { Spark } from '../types/spark';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Trash2, Upload, Link } from 'lucide-react';
 import { formatDuration, formatPrice } from '../utils/format';
+import { Loader2 } from 'lucide-react';
+import { uploadSparkImage, deleteSparkImage } from '../services/storage';
+import { useNotification } from '../contexts/NotificationContext';
 
 interface SparkFormProps {
     initialData?: Spark;
@@ -52,7 +55,9 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
                 experience: ''
             },
             faq: [],
-            nextSteps: []
+            nextSteps: [],
+            social_image_url: '',
+            uploadingImage: false
         };
     });
 
@@ -145,6 +150,47 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
                 setFormData(prev => ({ ...prev, highlight: trimmedValue }));
                 setHighlightError(null); // Clear the error message after trimming
             }
+        }
+    };
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [showUrlInput, setShowUrlInput] = useState(false);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const { showNotification } = useNotification();
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !initialData?.id) return;
+
+        try {
+            setUploadingImage(true);
+            const { publicUrl } = await uploadSparkImage(file, initialData.id, formData.social_image_url);
+            handleChange('social_image_url', publicUrl);
+            showNotification('success', 'Image mise à jour avec succès');
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            showNotification('error', error instanceof Error ? error.message : 'Erreur lors de l\'upload de l\'image');
+        } finally {
+            setUploadingImage(false);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    };
+
+    const handleImageDelete = async () => {
+        if (formData.social_image_url) {
+            try {
+                await deleteSparkImage(formData.social_image_url);
+                handleChange('social_image_url', undefined);
+                showNotification('success', 'Image supprimée avec succès');
+            } catch (error) {
+                console.error('Error deleting image:', error);
+                showNotification('error', 'Erreur lors de la suppression de l\'image');
+            }
+        }
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
         }
     };
 
@@ -579,6 +625,73 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
                         <Plus className="h-4 w-4" />
                         Ajouter une FAQ
                     </button>
+                </div>
+            </div>
+
+            {/* Social Image */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-semibold mb-4">Image de partage social</h2>
+                <p className="text-sm text-gray-500 mb-4">
+                    Cette image sera utilisée lorsque votre Spark est partagé sur les réseaux sociaux. 
+                    Format recommandé : 1200x630 pixels.
+                </p>
+                <div className="space-y-4">
+                    {formData.social_image_url && (
+                        <div className="relative w-full max-w-2xl">
+                            <img
+                                src={formData.social_image_url}
+                                alt="Social preview"
+                                className="w-full rounded-lg shadow-md"
+                            />
+                            <button
+                                type="button"
+                                onClick={handleImageDelete}
+                                className="absolute bottom-2 right-2 p-2 bg-black/50 backdrop-blur-sm text-white rounded-lg hover:bg-black/70 transition-colors"
+                                title="Supprimer l'image"
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </button>
+                        </div>
+                    )}
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex items-center gap-2 px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+                            disabled={uploadingImage}
+                        >
+                            {uploadingImage ? (
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                            ) : (
+                                <Upload className="h-5 w-5" />
+                            )}
+                            <span>{uploadingImage ? 'Upload en cours...' : 'Uploader une image'}</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowUrlInput(!showUrlInput)}
+                            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-300 rounded-md transition-colors"
+                        >
+                            <Link className="h-5 w-5" />
+                            <span>Utiliser une URL</span>
+                        </button>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                        />
+                    </div>
+                    {showUrlInput && (
+                        <input
+                            type="url"
+                            value={formData.social_image_url || ''}
+                            onChange={(e) => handleChange('social_image_url', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            placeholder="https://example.com/votre-image.jpg"
+                        />
+                    )}
                 </div>
             </div>
 

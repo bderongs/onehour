@@ -183,7 +183,7 @@ export function SparkProductPage() {
                 {/* OpenGraph Meta Tags */}
                 <meta name="title" property="og:title" content={spark?.title ? `${spark.title} | Sparkier` : 'Sparkier'} />
                 <meta name="description" property="og:description" content={spark?.description || ''} />
-                <meta name="image" property="og:image" content="https://sparkier.io/images/og-spark.png" />
+                <meta name="image" property="og:image" content={spark?.social_image_url || 'https://sparkier.io/images/og-spark.png'} />
                 <meta name="image:width" property="og:image:width" content="1200" />
                 <meta name="image:height" property="og:image:height" content="630" />
                 <meta name="logo" property="og:logo" content="https://sparkier.io/favicon.png" />
@@ -196,7 +196,7 @@ export function SparkProductPage() {
                 <meta name="twitter:site" content="@sparkier" />
                 <meta name="twitter:title" content={spark?.title ? `${spark.title} | Sparkier` : 'Sparkier'} />
                 <meta name="twitter:description" content={spark?.description || ''} />
-                <meta name="twitter:image" content="https://sparkier.io/images/og-spark.png" />
+                <meta name="twitter:image" content={spark?.social_image_url || 'https://sparkier.io/images/og-spark.png'} />
                 <meta name="twitter:image:alt" content={spark?.title || 'Sparkier'} />
             </Helmet>
             

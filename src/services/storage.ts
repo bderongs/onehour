@@ -259,4 +259,100 @@ export const deleteProfileImage = async (imageUrl: string): Promise<void> => {
     }
     
     await deleteImage(filePath);
+};
+
+// Extract file path from Supabase URL for Spark images
+const getSparkImagePathFromUrl = (url: string): string | null => {
+    try {
+        // Extract the path after 'public/'
+        const matches = url.match(/public\/sparks\/([^?#]+)/);
+        return matches ? matches[1] : null;
+    } catch (e) {
+        logger.error('Impossible de parser l\'URL:', e);
+        return null;
+    }
+};
+
+// Delete a Spark image from storage using its file path
+const deleteSparkImageFromStorage = async (filePath: string): Promise<void> => {
+    try {
+        logger.debug('Attempting to delete Spark image:', filePath);
+        const { error } = await supabase.storage
+            .from('sparks')
+            .remove([filePath]);
+
+        if (error) {
+            logger.error('Impossible de supprimer l\'image:', error);
+            logger.error('Error details:', {
+                message: error.message,
+                name: error.name
+            });
+            throw new Error(`Erreur lors de la suppression de l'image: ${error.message}`);
+        } else {
+            logger.debug('Successfully deleted Spark image:', filePath);
+        }
+    } catch (error) {
+        logger.error('Erreur lors de la suppression de l\'image:', error);
+        throw error;
+    }
+};
+
+export const uploadSparkImage = async (file: File, sparkId: string, oldImageUrl?: string): Promise<{ publicUrl: string; filePath: string }> => {
+    let objectUrl: string | null = null;
+    
+    try {
+        // Optimize image before upload - using same optimization function as profile images
+        const optimizedImageBlob = await optimizeImage(file);
+        
+        const fileExt = 'jpg';
+        const fileName = `spark_${sparkId}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `social-images/${fileName}`;
+
+        // Delete old image if URL is provided
+        if (oldImageUrl) {
+            const oldPath = getSparkImagePathFromUrl(oldImageUrl);
+            if (oldPath) {
+                await deleteSparkImageFromStorage(oldPath);
+            } else {
+                logger.warn('Could not extract file path from URL:', oldImageUrl);
+            }
+        }
+
+        const { error: uploadError } = await supabase.storage
+            .from('sparks')
+            .upload(filePath, optimizedImageBlob, {
+                cacheControl: '3600',
+                upsert: true,
+                contentType: 'image/jpeg'
+            });
+
+        if (uploadError) {
+            throw new Error('Erreur lors de l\'upload : ' + uploadError.message);
+        }
+
+        // Get the public URL
+        const { data: { publicUrl } } = supabase.storage
+            .from('sparks')
+            .getPublicUrl(filePath);
+
+        // Return both the public URL and the file path
+        return { publicUrl, filePath };
+    } finally {
+        if (objectUrl) {
+            URL.revokeObjectURL(objectUrl);
+        }
+    }
+};
+
+// Delete Spark image using URL
+export const deleteSparkImage = async (imageUrl: string): Promise<void> => {
+    if (!imageUrl) return;
+    
+    const filePath = getSparkImagePathFromUrl(imageUrl);
+    if (!filePath) {
+        logger.warn('Could not extract file path from URL:', imageUrl);
+        return;
+    }
+    
+    await deleteSparkImageFromStorage(filePath);
 }; 
