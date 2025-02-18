@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../services/auth';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { useNotification } from '../contexts/NotificationContext';
+import { Helmet } from 'react-helmet-async';
+import { getDefaultAvatarUrl } from '../utils/avatar';
 
 export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
     const { slug: urlSlug } = useParams<{ slug: string }>();
@@ -190,6 +192,41 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
 
     return (
         <div className="min-h-screen flex flex-col">
+            {/* Meta tags for social sharing */}
+            <Helmet>
+                <title>{consultant?.first_name} {consultant?.last_name} | Sparkier</title>
+                <meta name="description" content={consultant?.bio || ''} />
+                
+                {/* OpenGraph Meta Tags */}
+                <meta property="og:title" content={`${consultant?.first_name} ${consultant?.last_name} | Sparkier`} />
+                <meta property="og:description" content={consultant?.bio || ''} />
+                <meta property="og:image" content={consultant?.profile_image_url || getDefaultAvatarUrl(consultant?.id || '', 1200)} />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:type" content="profile" />
+                <meta property="og:url" content={`https://sparkier.io/${consultant?.slug}`} />
+                <meta property="og:site_name" content="Sparkier" />
+                
+                {/* Profile specific OpenGraph tags */}
+                <meta property="profile:first_name" content={consultant?.first_name || ''} />
+                <meta property="profile:last_name" content={consultant?.last_name || ''} />
+                {consultant?.title && <meta property="profile:title" content={consultant.title} />}
+                {consultant?.linkedin && <meta property="profile:username" content={consultant.linkedin.split('/').pop()} />}
+                
+                {/* Twitter Card Meta Tags */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:site" content="@sparkier" />
+                <meta name="twitter:title" content={`${consultant?.first_name} ${consultant?.last_name} | Sparkier`} />
+                <meta name="twitter:description" content={consultant?.bio || ''} />
+                <meta name="twitter:image" content={consultant?.profile_image_url || getDefaultAvatarUrl(consultant?.id || '', 1200)} />
+                <meta name="twitter:image:alt" content={`Photo de profil de ${consultant?.first_name} ${consultant?.last_name}`} />
+                {consultant?.twitter && <meta name="twitter:creator" content={`@${consultant.twitter.split('/').pop()}`} />}
+
+                {/* Professional Meta Tags */}
+                {consultant?.company && <meta property="business:business_name" content={consultant.company} />}
+                {consultant?.location && <meta property="business:location" content={consultant.location} />}
+            </Helmet>
+
             {/* Sticky Edit Button */}
             {currentUser?.id === consultant.id && (
                 <div className="fixed right-4 top-4 z-50">
@@ -224,7 +261,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                             <div className="flex flex-col md:flex-row md:items-start gap-6">
                                 <div className="w-40 h-40 md:w-72 md:h-96 mx-auto md:mx-0 flex-shrink-0 bg-gray-400 rounded-2xl border-4 border-white overflow-hidden">
                                     <img
-                                        src={consultant.profile_image_url || `https://ui-avatars.com/api/?name=${consultant.first_name}+${consultant.last_name}&size=384`}
+                                        src={consultant.profile_image_url || getDefaultAvatarUrl(consultant.id, 384)}
                                         alt={`${consultant.first_name} ${consultant.last_name}`}
                                         width={288}
                                         height={384}
@@ -490,7 +527,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
                                     <div key={review.id} className="flex items-start p-4 bg-gray-50 rounded-lg">
                                         <div className="flex-shrink-0">
                                             <img
-                                                src={review.client_image_url || `https://ui-avatars.com/api/?name=${review.client_name}&size=40`}
+                                                src={review.client_image_url || getDefaultAvatarUrl(review.id, 40)}
                                                 alt={review.client_name}
                                                 className="h-10 w-10 rounded-full object-cover"
                                             />
