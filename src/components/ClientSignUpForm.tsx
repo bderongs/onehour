@@ -58,7 +58,11 @@ export function ClientSignUpForm({
             // Check if email is already registered
             const emailExists = await checkEmailExists(testData.email);
             if (emailExists) {
-                throw new Error('Cette adresse email est déjà utilisée.');
+                // Show notification before redirect
+                showNotification('success', 'Un compte existe déjà avec cet email. Vous allez être redirigé vers la page de connexion.');
+                // Redirect to signin page with email parameter
+                navigate(`/signin?email=${encodeURIComponent(testData.email)}`);
+                return;
             }
 
             await signUpClientWithEmail(testData);
@@ -107,7 +111,11 @@ export function ClientSignUpForm({
             // Check if email is already registered
             const emailExists = await checkEmailExists(formData.email);
             if (emailExists) {
-                throw new Error('Cette adresse email est déjà utilisée.');
+                // Show notification before redirect
+                showNotification('success', 'Un compte existe déjà avec cet email. Vous allez être redirigé vers la page de connexion.');
+                // Redirect to signin page with email parameter
+                navigate(`/signin?email=${encodeURIComponent(formData.email)}`);
+                return;
             }
 
             await signUpClientWithEmail(formData);
