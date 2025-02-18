@@ -21,7 +21,8 @@ function generateSparkFields(): DocumentField[] {
         faq: { label: 'FAQ', description: 'Questions fréquemment posées' },
         nextSteps: { label: 'Prochaines étapes', description: 'Liste des prochaines étapes après le Spark' },
         url: { label: 'URL', description: 'URL unique du Spark' },
-        prefillText: { label: 'Texte prérempli', description: 'Texte de préparation pour le client' }
+        prefillText: { label: 'Texte prérempli', description: 'Texte de préparation pour le client' },
+        social_image_url: { label: 'Image sociale', description: 'URL de l\'image pour les réseaux sociaux' }
     };
 
     // Fields that should be editable in the AI interface
