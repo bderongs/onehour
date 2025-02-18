@@ -11,6 +11,7 @@ import { createClientRequest, getClientRequestsByClientId } from '../services/cl
 import { useClientSignUp } from '../contexts/ClientSignUpContext';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { Helmet } from 'react-helmet-async';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -175,6 +176,30 @@ export function SparkProductPage() {
 
     const MainContent = () => (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+            <Helmet>
+                <title>{spark?.title ? `${spark.title} | Sparkier` : 'Sparkier'}</title>
+                <meta name="description" content={spark?.description || ''} />
+                
+                {/* OpenGraph Meta Tags */}
+                <meta name="title" property="og:title" content={spark?.title ? `${spark.title} | Sparkier` : 'Sparkier'} />
+                <meta name="description" property="og:description" content={spark?.description || ''} />
+                <meta name="image" property="og:image" content="https://sparkier.io/images/og-spark.png" />
+                <meta name="image:width" property="og:image:width" content="1200" />
+                <meta name="image:height" property="og:image:height" content="630" />
+                <meta name="logo" property="og:logo" content="https://sparkier.io/favicon.png" />
+                <meta name="url" property="og:url" content={`https://sparkier.io/sparks/${sparkUrl}`} />
+                <meta name="type" property="og:type" content="product" />
+                <meta name="site_name" property="og:site_name" content="Sparkier" />
+                
+                {/* Twitter Card Meta Tags */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:site" content="@sparkier" />
+                <meta name="twitter:title" content={spark?.title ? `${spark.title} | Sparkier` : 'Sparkier'} />
+                <meta name="twitter:description" content={spark?.description || ''} />
+                <meta name="twitter:image" content="https://sparkier.io/images/og-spark.png" />
+                <meta name="twitter:image:alt" content={spark?.title || 'Sparkier'} />
+            </Helmet>
+            
             {/* Demo Warning Banner */}
             {pageContext === 'consultant_marketing' && (
                 <div className="bg-amber-50 border-b border-amber-200">
