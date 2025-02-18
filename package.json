@@ -9,7 +9,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "migrate-sparks": "NODE_ENV=development tsx scripts/migrate-sparks.ts",
-    "inject-demo-consultant": "NODE_ENV=development tsx scripts/injectDemoConsultant.ts"
+    "inject-demo-consultant": "NODE_ENV=development tsx scripts/injectDemoConsultant.ts",
+    "generate-brand-assets": "NODE_ENV=development tsx scripts/generateBrandAssets.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -33,18 +34,20 @@
     "@types/react-router-dom": "^5.3.3",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
-    "@vitejs/plugin-react": "^4.2.0",
+    "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.0",
     "dotenv": "^16.4.7",
+    "esbuild": "^0.25.0",
     "eslint": "^8.0.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.0",
-    "pageres-cli": "^8.0.0",
-    "postcss": "^8.4.0",
+    "lodash": "^4.17.21",
+    "postcss": "^8.5.2",
+    "puppeteer": "^24.2.1",
     "tailwindcss": "^3.4.0",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.2",
+    "tsx": "^3.12.10",
     "typescript": "^5.2.0",
-    "vite": "^5.4.11"
+    "vite": "^5.1.4"
   }
 }
