@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../services/auth';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { useNotification } from '../contexts/NotificationContext';
-import { Helmet } from 'react-helmet-async';
+import { Metadata } from '../components/Metadata';
 import { getDefaultAvatarUrl } from '../utils/avatar';
 
 export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
@@ -192,40 +192,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
 
     return (
         <div className="min-h-screen flex flex-col">
-            {/* Meta tags for social sharing */}
-            <Helmet>
-                <title>{consultant?.first_name} {consultant?.last_name} | Sparkier</title>
-                <meta name="description" content={consultant?.bio || ''} />
-                
-                {/* OpenGraph Meta Tags */}
-                <meta property="og:title" content={`${consultant?.first_name} ${consultant?.last_name} | Sparkier`} />
-                <meta property="og:description" content={consultant?.bio || ''} />
-                <meta property="og:image" content={consultant?.profile_image_url || getDefaultAvatarUrl(consultant?.id || '', 1200)} />
-                <meta property="og:image:width" content="1200" />
-                <meta property="og:image:height" content="630" />
-                <meta property="og:type" content="profile" />
-                <meta property="og:url" content={`https://sparkier.io/${consultant?.slug}`} />
-                <meta property="og:site_name" content="Sparkier" />
-                
-                {/* Profile specific OpenGraph tags */}
-                <meta property="profile:first_name" content={consultant?.first_name || ''} />
-                <meta property="profile:last_name" content={consultant?.last_name || ''} />
-                {consultant?.title && <meta property="profile:title" content={consultant.title} />}
-                {consultant?.linkedin && <meta property="profile:username" content={consultant.linkedin.split('/').pop()} />}
-                
-                {/* Twitter Card Meta Tags */}
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:site" content="@sparkier" />
-                <meta name="twitter:title" content={`${consultant?.first_name} ${consultant?.last_name} | Sparkier`} />
-                <meta name="twitter:description" content={consultant?.bio || ''} />
-                <meta name="twitter:image" content={consultant?.profile_image_url || getDefaultAvatarUrl(consultant?.id || '', 1200)} />
-                <meta name="twitter:image:alt" content={`Photo de profil de ${consultant?.first_name} ${consultant?.last_name}`} />
-                {consultant?.twitter && <meta name="twitter:creator" content={`@${consultant.twitter.split('/').pop()}`} />}
-
-                {/* Professional Meta Tags */}
-                {consultant?.company && <meta property="business:business_name" content={consultant.company} />}
-                {consultant?.location && <meta property="business:location" content={consultant.location} />}
-            </Helmet>
+            <Metadata consultant={consultant} />
 
             {/* Sticky Edit Button */}
             {currentUser?.id === consultant.id && (

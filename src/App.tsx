@@ -38,6 +38,7 @@ import { ClientSignUpProvider } from './contexts/ClientSignUpContext';
 import { SparkSignUpPage } from './pages/SparkSignUpPage';
 import { EmailConfirmationPage } from './pages/EmailConfirmationPage';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { Metadata } from './components/Metadata';
 
 function App() {
   const location = useLocation();
@@ -71,6 +72,7 @@ function App() {
           <AuthProvider>
             <ClientSignUpProvider>
               <div className="min-h-screen flex flex-col">
+                <Metadata />
                 <Routes>
                   {/* Public routes */}
                   <Route path="/auth/callback" element={<AuthCallback />} />
