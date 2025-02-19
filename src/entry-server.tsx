@@ -11,10 +11,12 @@ interface RenderOptions {
 }
 
 export async function render(url: string, options?: RenderOptions) {
+  const helmetContext = options?.helmetContext || {}
+  
   const html = ReactDOMServer.renderToString(
     <React.StrictMode>
-      <HelmetProvider context={options?.helmetContext || {}}>
-        <StaticRouter location={url}>
+      <HelmetProvider context={helmetContext}>
+        <StaticRouter location={url} basename="">
           <App />
         </StaticRouter>
       </HelmetProvider>
