@@ -4,6 +4,12 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './index.css'
 
+declare global {
+  interface Window {
+    __INITIAL_PATH__?: string;
+  }
+}
+
 ReactDOM.hydrateRoot(
   document.getElementById('root') as HTMLElement,
   <React.StrictMode>

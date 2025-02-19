@@ -34,27 +34,38 @@ const handler: Handler = async (event) => {
       const appHtml = await render(url)
       console.log('App rendered successfully')
       
-      // Find the client entry script
-      const clientScriptPath = fs.readdirSync(path.join(__dirname, '../../dist/client/assets'))
-        .find(file => file.match(/^entry-client\.[a-z0-9]+\.js$/))
+      // Find the client entry script and other assets
+      const assetsDir = path.join(__dirname, '../../dist/client/assets')
+      const files = fs.readdirSync(assetsDir)
       
-      if (!clientScriptPath) {
-        throw new Error('Could not find client entry script')
+      const clientScriptPath = files.find(file => file.match(/^entry-client\.[a-z0-9]+\.js$/))
+      const appScriptPath = files.find(file => file.match(/^app\.[a-z0-9]+\.js$/))
+      
+      if (!clientScriptPath || !appScriptPath) {
+        throw new Error('Could not find required script files')
       }
       
-      // Inject the CSS and app HTML
-      const html = template
+      // Inject the CSS and app HTML, and update script paths
+      let html = template
         .replace('</head>', `<style>${styleContent}</style></head>`)
         .replace('<!--app-html-->', appHtml)
         .replace(
           '<script type="module" src="/src/entry-client.tsx">',
-          `<script type="module" src="/assets/${clientScriptPath}">`
+          `<script type="module" src="/assets/${clientScriptPath}"></script>
+           <script type="module" src="/assets/${appScriptPath}">`
         )
+      
+      // Add state context if needed (you might want to pass initial state to the client)
+      html = html.replace(
+        '</body>',
+        `<script>window.__INITIAL_PATH__ = "${url}";</script></body>`
+      )
       
       return {
         statusCode: 200,
         headers: {
           'Content-Type': 'text/html',
+          'Cache-Control': 'no-store, must-revalidate'
         },
         body: html,
       }
