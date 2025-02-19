@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { isBrowser } from './browser';
 
 /**
  * Converts a string to a URL-friendly slug
@@ -64,4 +65,30 @@ export const ensureUniqueSlug = async (
     }
 
     return slug;
+};
+
+export const createObjectURL = (blob: Blob): string | null => {
+    if (!isBrowser) return null;
+    try {
+        return URL.createObjectURL(blob);
+    } catch (e) {
+        console.error('Error creating object URL:', e);
+        return null;
+    }
+};
+
+export const revokeObjectURL = (url: string): void => {
+    if (!isBrowser) return;
+    try {
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        console.error('Error revoking object URL:', e);
+    }
+};
+
+export const setScrollRestoration = (value: ScrollRestoration): void => {
+    if (!isBrowser) return;
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = value;
+    }
 }; 
