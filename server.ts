@@ -10,8 +10,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 async function createServer(
   root = process.cwd(),
-  isProd = process.env.NODE_ENV === 'production'
+  isProd = process.env.NODE_ENV ? process.env.NODE_ENV.toLowerCase() === 'production' : false
 ) {
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('isProd:', isProd);
+  
   const app = express()
 
   let vite: any
