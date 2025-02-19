@@ -4,7 +4,8 @@ import path from 'path'
 
 const handler: Handler = async (event) => {
   try {
-    console.log('Render function called with path:', event.path)
+    const url = event.path || '/'
+    console.log('Render function called with path:', url)
     console.log('Current working directory:', process.cwd())
     console.log('Directory contents:', fs.readdirSync(process.cwd()))
 
@@ -22,25 +23,32 @@ const handler: Handler = async (event) => {
     }
     
     // Import the server entry point
+    console.log('Attempting to import entry-server.js')
     // @ts-ignore - This file is generated during build
     const { render } = await import('./entry-server.js')
     console.log('Server entry point loaded successfully')
     
-    // Render the app
-    const appHtml = await render(event.path || '/')
-    console.log('App rendered successfully')
-    
-    // Inject the CSS and app HTML
-    const html = template
-      .replace('</head>', `<style>${styleContent}</style></head>`)
-      .replace('<!--app-html-->', appHtml)
-    
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'text/html',
-      },
-      body: html,
+    try {
+      // Render the app
+      console.log('Attempting to render app with URL:', url)
+      const appHtml = await render(url)
+      console.log('App rendered successfully')
+      
+      // Inject the CSS and app HTML
+      const html = template
+        .replace('</head>', `<style>${styleContent}</style></head>`)
+        .replace('<!--app-html-->', appHtml)
+      
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'text/html',
+        },
+        body: html,
+      }
+    } catch (renderError) {
+      console.error('Error during app rendering:', renderError)
+      throw renderError // Re-throw to be caught by outer try-catch
     }
   } catch (error) {
     console.error('Render error:', error)
@@ -52,8 +60,9 @@ const handler: Handler = async (event) => {
         cwd: process.cwd(),
         files: fs.existsSync(process.cwd()) ? fs.readdirSync(process.cwd()) : [],
         dirname: __dirname,
-        dirnameContents: fs.existsSync(__dirname) ? fs.readdirSync(__dirname) : []
-      })
+        dirnameContents: fs.existsSync(__dirname) ? fs.readdirSync(__dirname) : [],
+        url: event.path
+      }, null, 2)
     }
   }
 }

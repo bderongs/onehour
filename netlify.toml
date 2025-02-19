@@ -12,7 +12,7 @@
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["react-dom/server"]
-  included_files = ["dist/client/**"]
+  included_files = ["dist/**/*"]
 
 [build.environment]
   NODE_VERSION = "20" 

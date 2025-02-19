@@ -27,7 +27,17 @@ export default defineConfig({
   },
   ssr: {
     target: 'node',
-    noExternal: ['react-router-dom', 'react-helmet-async', 'tailwindcss', '@tailwindcss/forms', 'framer-motion']
+    noExternal: [
+      'react-router-dom',
+      'react-helmet-async',
+      'tailwindcss',
+      '@tailwindcss/forms',
+      'framer-motion',
+      'react',
+      'react-dom',
+      'react-router',
+      '@remix-run/router'
+    ]
   },
   optimizeDeps: {
     include: ['tailwindcss', '@tailwindcss/forms']
