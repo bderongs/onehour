@@ -34,10 +34,22 @@ const handler: Handler = async (event) => {
       const appHtml = await render(url)
       console.log('App rendered successfully')
       
+      // Find the client entry script
+      const clientScriptPath = fs.readdirSync(path.join(__dirname, '../../dist/client/assets'))
+        .find(file => file.match(/^entry-client\.[a-z0-9]+\.js$/))
+      
+      if (!clientScriptPath) {
+        throw new Error('Could not find client entry script')
+      }
+      
       // Inject the CSS and app HTML
       const html = template
         .replace('</head>', `<style>${styleContent}</style></head>`)
         .replace('<!--app-html-->', appHtml)
+        .replace(
+          '<script type="module" src="/src/entry-client.tsx">',
+          `<script type="module" src="/assets/${clientScriptPath}">`
+        )
       
       return {
         statusCode: 200,
