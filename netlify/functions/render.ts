@@ -1,21 +1,25 @@
 import { Handler } from '@netlify/functions'
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const handler: Handler = async (event) => {
   try {
+    console.log('Render function called with path:', event.path)
+    console.log('Current working directory:', process.cwd())
+    console.log('Directory contents:', fs.readdirSync(process.cwd()))
+
     // Get the template from the published client directory
     const template = fs.readFileSync(path.join(process.cwd(), 'dist/client/index.html'), 'utf-8')
+    console.log('Template loaded successfully')
     
-    // Import the server entry point from the functions directory
+    // Import the server entry point
     // @ts-expect-error - This file will exist at runtime after the build
-    const { render } = await import('../server/entry-server.js')
+    const { render } = await import('./entry-server.js')
+    console.log('Server entry point loaded successfully')
     
     // Render the app
-    const appHtml = await render(event.path)
+    const appHtml = await render(event.path || '/')
+    console.log('App rendered successfully')
     
     // Replace the placeholder with the app HTML
     const html = template.replace('<!--app-html-->', appHtml)
@@ -31,7 +35,12 @@ const handler: Handler = async (event) => {
     console.error('Render error:', error)
     return {
       statusCode: 500,
-      body: 'Internal Server Error',
+      body: JSON.stringify({
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        cwd: process.cwd(),
+        files: fs.existsSync(process.cwd()) ? fs.readdirSync(process.cwd()) : []
+      })
     }
   }
 }
