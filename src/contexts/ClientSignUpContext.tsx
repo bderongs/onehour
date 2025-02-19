@@ -8,25 +8,36 @@ interface ClientSignUpContextType {
 
 const ClientSignUpContext = createContext<ClientSignUpContextType | undefined>(undefined);
 
+const isBrowserEnvironment = typeof window !== 'undefined';
+
+const getStoredValue = (key: string): string | null => {
+    if (!isBrowserEnvironment) return null;
+    return localStorage.getItem(key);
+};
+
+const setStoredValue = (key: string, value: string | null) => {
+    if (!isBrowserEnvironment) return;
+    if (value) {
+        localStorage.setItem(key, value);
+    } else {
+        localStorage.removeItem(key);
+    }
+};
+
 export function ClientSignUpProvider({ children }: { children: React.ReactNode }) {
     // Initialize from localStorage if available
     const [sparkUrlSlug, setSparkUrlSlugState] = useState<string | null>(() => {
-        const stored = localStorage.getItem('sparkSignUpUrlSlug');
-        return stored ? stored : null;
+        return getStoredValue('sparkSignUpUrlSlug');
     });
 
     const setSparkUrlSlug = (slug: string | null) => {
         setSparkUrlSlugState(slug);
-        if (slug) {
-            localStorage.setItem('sparkSignUpUrlSlug', slug);
-        } else {
-            localStorage.removeItem('sparkSignUpUrlSlug');
-        }
+        setStoredValue('sparkSignUpUrlSlug', slug);
     };
 
     const clearSignUpData = () => {
         setSparkUrlSlugState(null);
-        localStorage.removeItem('sparkSignUpUrlSlug');
+        setStoredValue('sparkSignUpUrlSlug', null);
     };
 
     return (

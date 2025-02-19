@@ -6,11 +6,11 @@ interface MarketingLayoutProps {
   withTopPadding?: boolean;
 }
 
-export const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children, withTopPadding = true }) => {
+export const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
   return (
     <>
       <Header />
-      <main className={`flex-grow ${withTopPadding ? 'pt-16' : ''}`}>
+      <main className="flex-grow">
         {children}
       </main>
       <Footer />
