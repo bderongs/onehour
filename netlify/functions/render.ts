@@ -7,12 +7,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const handler: Handler = async (event) => {
   try {
-    // Get the template
-    const template = fs.readFileSync(path.join(__dirname, '../client/index.html'), 'utf-8')
+    // Get the template from the published client directory
+    const template = fs.readFileSync(path.join(process.cwd(), 'dist/client/index.html'), 'utf-8')
     
-    // Import the server entry point
+    // Import the server entry point from the functions directory
     // @ts-expect-error - This file will exist at runtime after the build
-    const { render } = await import('./entry-server.js')
+    const { render } = await import('../server/entry-server.js')
     
     // Render the app
     const appHtml = await render(event.path)
