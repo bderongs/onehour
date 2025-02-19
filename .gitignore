@@ -12,6 +12,7 @@
 /dist/server
 /netlify/functions/*.js
 /netlify/functions/*.js.map
+/netlify/functions/assets/*.css
 
 # misc
 .DS_Store
