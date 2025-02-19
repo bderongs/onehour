@@ -72,23 +72,27 @@ function App() {
             <div className="min-h-screen flex flex-col">
               <Metadata />
               <Routes>
-                {/* Public routes */}
+                {/* Auth routes */}
                 <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/reset-password" element={<MarketingLayout><ResetPasswordPage /></MarketingLayout>} />
                 <Route path="/setup-password" element={<MarketingLayout><PasswordSetupPage /></MarketingLayout>} />
                 <Route path="/email-confirmation" element={<MarketingLayout><EmailConfirmationPage /></MarketingLayout>} />
-                <Route path="/" element={<MarketingLayout><LandingClients /></MarketingLayout>} />
-                <Route path="/consultants" element={<MarketingLayout><LandingConsultants /></MarketingLayout>} />
-                <Route path="/pricing" element={<MarketingLayout><PricingPage /></MarketingLayout>} />
-                <Route path="/terms" element={<MarketingLayout><Terms /></MarketingLayout>} />
-                <Route path="/privacy" element={<MarketingLayout><Privacy /></MarketingLayout>} />
-                <Route path="/brand" element={<MarketingLayout><BrandPage /></MarketingLayout>} />
                 <Route path="/signin" element={<MarketingLayout><SignInPage /></MarketingLayout>} />
                 <Route path="/signup" element={<MarketingLayout><SignUpPage /></MarketingLayout>} />
                 <Route path="/spark-signup" element={<MarketingLayout><SparkSignUpPage /></MarketingLayout>} />
+
+                {/* SEO Heavy public routes */}
+                <Route path="/" element={<MarketingLayout><LandingClients /></MarketingLayout>} />
+                <Route path="/consultants" element={<MarketingLayout><LandingConsultants /></MarketingLayout>} />
+                <Route path="/pricing" element={<MarketingLayout><PricingPage /></MarketingLayout>} />
                 <Route path="/sparks/:sparkUrl" element={<MarketingLayout><SparkProductPage /></MarketingLayout>} />
                 <Route path="/profile" element={<ConsultantProfileLayout><DemoProfileWrapper /></ConsultantProfileLayout>} />
                 <Route path="/:slug" element={<ConsultantProfileLayout><ConsultantProfilePage /></ConsultantProfileLayout>} />
+
+                {/* Public routes */}
+                <Route path="/terms" element={<MarketingLayout><Terms /></MarketingLayout>} />
+                <Route path="/privacy" element={<MarketingLayout><Privacy /></MarketingLayout>} />
+                <Route path="/brand" element={<MarketingLayout><BrandPage /></MarketingLayout>} />
 
                 {/* Protected consultant routes */}
                 <Route path="/sparks/manage" element={
