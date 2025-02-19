@@ -22,7 +22,6 @@ const handler: Handler = async (event) => {
     }
     
     // Import the server entry point
-    // @ts-expect-error - This file will exist at runtime after the build
     const { render } = await import('./entry-server.js')
     console.log('Server entry point loaded successfully')
     

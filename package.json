@@ -8,7 +8,7 @@
     "build": "npm run build:client && npm run build:server && npm run copy:function",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
-    "copy:function": "mkdir -p netlify/functions && cp -r dist/server/* netlify/functions/ && cp netlify/functions/render.ts netlify/functions/",
+    "copy:function": "mkdir -p netlify/functions && cp -r dist/server/* netlify/functions/",
     "serve": "NODE_ENV=production tsx server.ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
