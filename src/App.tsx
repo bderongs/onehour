@@ -84,7 +84,7 @@ function App() {
                   <Route path="/pricing" element={<MarketingLayout><PricingPage /></MarketingLayout>} />
                   <Route path="/terms" element={<MarketingLayout><Terms /></MarketingLayout>} />
                   <Route path="/privacy" element={<MarketingLayout><Privacy /></MarketingLayout>} />
-                  <Route path="/brand" element={<MarketingLayout withTopPadding={false}><BrandPage /></MarketingLayout>} />
+                  <Route path="/brand" element={<MarketingLayout><BrandPage /></MarketingLayout>} />
                   <Route path="/signin" element={<MarketingLayout><SignInPage /></MarketingLayout>} />
                   <Route path="/signup" element={<MarketingLayout><SignUpPage /></MarketingLayout>} />
                   <Route path="/spark-signup" element={<MarketingLayout><SparkSignUpPage /></MarketingLayout>} />
