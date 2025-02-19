@@ -4,12 +4,12 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx server.ts",
+    "dev": "NODE_ENV=development node --import tsx server.ts",
     "build": "npm run build:client && npm run build:server && npm run copy:function",
-    "build:client": "vite build --outDir dist/client",
+    "build:client": "vite build --outDir dist/client --ssrManifest",
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
     "copy:function": "mkdir -p netlify/functions && cp -r dist/server/* netlify/functions/",
-    "serve": "NODE_ENV=production tsx server.ts",
+    "serve": "NODE_ENV=production node --import tsx server.ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "migrate-sparks": "NODE_ENV=development tsx scripts/migrate-sparks.ts",
@@ -35,6 +35,7 @@
     "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.25.9",
     "@netlify/functions": "^3.0.0",
     "@types/compression": "^1.7.5",
     "@types/express": "^5.0.0",

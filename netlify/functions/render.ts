@@ -3,6 +3,12 @@ import fs from 'fs'
 import path from 'path'
 import type { HelmetServerState } from 'react-helmet-async'
 
+interface RenderOptions {
+  helmetContext: { helmet?: HelmetServerState }
+}
+
+type RenderFunction = (url: string, options?: RenderOptions) => Promise<string>
+
 const handler: Handler = async (event) => {
   try {
     const url = event.path || '/'
@@ -26,7 +32,7 @@ const handler: Handler = async (event) => {
     // Import the server entry point
     console.log('Attempting to import entry-server.js')
     // @ts-ignore - This file is generated during build
-    const { render } = await import('./entry-server.js')
+    const { render } = await import('./entry-server.js') as { render: RenderFunction }
     console.log('Server entry point loaded successfully')
     
     try {

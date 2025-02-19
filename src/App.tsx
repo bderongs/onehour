@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { LandingClients } from './pages/LandingClients';
 import LandingConsultants from './pages/LandingConsultants';
@@ -19,7 +20,6 @@ import { SignInPage } from './pages/SignInPage';
 import { SignUpPage } from './pages/SignUpPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { PasswordSetupPage } from './pages/PasswordSetupPage';
-import { useEffect } from 'react';
 import { initializeGoatCounter } from './utils/analytics';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { AdminSparksPage } from './pages/AdminSparksPage';
