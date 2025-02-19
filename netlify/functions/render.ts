@@ -8,32 +8,17 @@ const handler: Handler = async (event) => {
     console.log('Current working directory:', process.cwd())
     console.log('Directory contents:', fs.readdirSync(process.cwd()))
 
-    // Get the template from the published client directory
-    let template: string
-    try {
-      // Try the production path first
-      template = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf-8')
-      console.log('Template loaded from root successfully')
-    } catch (e) {
-      // Fall back to development path
-      template = fs.readFileSync(path.join(process.cwd(), 'dist/client/index.html'), 'utf-8')
-      console.log('Template loaded from dist/client successfully')
-    }
+    // Get the template
+    const template = fs.readFileSync(path.join(__dirname, '../../dist/client/index.html'), 'utf-8')
+    console.log('Template loaded successfully')
     
     // Read the CSS file
     let styleContent = ''
     try {
-      // Try the production path first
-      styleContent = fs.readFileSync(path.join(process.cwd(), 'assets/index.css'), 'utf-8')
-      console.log('CSS loaded from root successfully')
-    } catch (e) {
-      try {
-        // Fall back to development path
-        styleContent = fs.readFileSync(path.join(process.cwd(), 'dist/client/assets/index.css'), 'utf-8')
-        console.log('CSS loaded from dist/client successfully')
-      } catch (cssError) {
-        console.warn('Could not load CSS file:', cssError)
-      }
+      styleContent = fs.readFileSync(path.join(__dirname, '../../dist/client/assets/index.css'), 'utf-8')
+      console.log('CSS loaded successfully')
+    } catch (cssError) {
+      console.warn('Could not load CSS file:', cssError)
     }
     
     // Import the server entry point
@@ -65,7 +50,9 @@ const handler: Handler = async (event) => {
         error: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined,
         cwd: process.cwd(),
-        files: fs.existsSync(process.cwd()) ? fs.readdirSync(process.cwd()) : []
+        files: fs.existsSync(process.cwd()) ? fs.readdirSync(process.cwd()) : [],
+        dirname: __dirname,
+        dirnameContents: fs.existsSync(__dirname) ? fs.readdirSync(__dirname) : []
       })
     }
   }
