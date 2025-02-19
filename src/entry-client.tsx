@@ -14,8 +14,6 @@ declare global {
 
 // Wait for all scripts to load before hydrating
 window.addEventListener('load', () => {
-  const initialPath = window.__INITIAL_PATH__ || '/'
-  
   ReactDOM.hydrateRoot(
     document.getElementById('root') as HTMLElement,
     <React.StrictMode>
