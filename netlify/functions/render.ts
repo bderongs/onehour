@@ -12,6 +12,15 @@ const handler: Handler = async (event) => {
     const template = fs.readFileSync(path.join(process.cwd(), 'dist/client/index.html'), 'utf-8')
     console.log('Template loaded successfully')
     
+    // Read the CSS file
+    let styleContent = ''
+    try {
+      styleContent = fs.readFileSync(path.join(process.cwd(), 'dist/client/assets/index.css'), 'utf-8')
+      console.log('CSS loaded successfully')
+    } catch (e) {
+      console.warn('Could not load CSS file:', e)
+    }
+    
     // Import the server entry point
     // @ts-expect-error - This file will exist at runtime after the build
     const { render } = await import('./entry-server.js')
@@ -21,8 +30,10 @@ const handler: Handler = async (event) => {
     const appHtml = await render(event.path || '/')
     console.log('App rendered successfully')
     
-    // Replace the placeholder with the app HTML
-    const html = template.replace('<!--app-html-->', appHtml)
+    // Inject the CSS and app HTML
+    const html = template
+      .replace('</head>', `<style>${styleContent}</style></head>`)
+      .replace('<!--app-html-->', appHtml)
     
     return {
       statusCode: 200,

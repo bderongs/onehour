@@ -14,6 +14,13 @@ export default defineConfig({
       input: {
         app: './index.html',
       },
+      output: {
+        // Ensure CSS is emitted as a separate file
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name === 'style.css') return 'assets/index.css';
+          return 'assets/[name]-[hash][extname]';
+        },
+      },
     },
     outDir: 'dist/client',
     cssCodeSplit: false, // Force all CSS into a single file
