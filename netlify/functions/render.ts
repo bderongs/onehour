@@ -34,32 +34,48 @@ const handler: Handler = async (event) => {
       const appHtml = await render(url)
       console.log('App rendered successfully')
       
-      // Find the client entry script and other assets
+      // Find all necessary scripts
       const assetsDir = path.join(__dirname, '../../dist/client/assets')
       const files = fs.readdirSync(assetsDir)
       
-      const clientScriptPath = files.find(file => file.match(/^entry-client\.[a-z0-9]+\.js$/))
-      const appScriptPath = files.find(file => file.match(/^app\.[a-z0-9]+\.js$/))
-      
-      if (!clientScriptPath || !appScriptPath) {
-        throw new Error('Could not find required script files')
+      // Get all JS files in the correct order
+      const scriptFiles = files
+        .filter(file => file.endsWith('.js'))
+        .sort((a, b) => {
+          // Ensure entry-client comes first, then app.js, then others
+          if (a.startsWith('entry-client')) return -1
+          if (b.startsWith('entry-client')) return 1
+          if (a.startsWith('app')) return -1
+          if (b.startsWith('app')) return 1
+          return 0
+        })
+
+      if (scriptFiles.length === 0) {
+        throw new Error('Could not find any script files')
       }
+
+      // Create script tags for all JS files
+      const scriptTags = scriptFiles
+        .map(file => `<script type="module" src="/assets/${file}"></script>`)
+        .join('\n')
       
-      // Inject the CSS and app HTML, and update script paths
+      // Inject everything into the template
       let html = template
         .replace('</head>', `<style>${styleContent}</style></head>`)
         .replace('<!--app-html-->', appHtml)
         .replace(
           '<script type="module" src="/src/entry-client.tsx">',
-          `<script type="module" src="/assets/${clientScriptPath}"></script>
-           <script type="module" src="/assets/${appScriptPath}">`
+          scriptTags
         )
       
-      // Add state context if needed (you might want to pass initial state to the client)
-      html = html.replace(
-        '</body>',
-        `<script>window.__INITIAL_PATH__ = "${url}";</script></body>`
-      )
+      // Add state and routing context
+      const stateScript = `
+        <script>
+          window.__INITIAL_PATH__ = ${JSON.stringify(url)};
+          window.__INITIAL_STATE__ = {};
+        </script>
+      `
+      html = html.replace('</body>', `${stateScript}</body>`)
       
       return {
         statusCode: 200,
@@ -71,7 +87,7 @@ const handler: Handler = async (event) => {
       }
     } catch (renderError) {
       console.error('Error during app rendering:', renderError)
-      throw renderError // Re-throw to be caught by outer try-catch
+      throw renderError
     }
   } catch (error) {
     console.error('Render error:', error)
@@ -84,7 +100,10 @@ const handler: Handler = async (event) => {
         files: fs.existsSync(process.cwd()) ? fs.readdirSync(process.cwd()) : [],
         dirname: __dirname,
         dirnameContents: fs.existsSync(__dirname) ? fs.readdirSync(__dirname) : [],
-        url: event.path
+        url: event.path,
+        assetsDir: fs.existsSync(path.join(__dirname, '../../dist/client/assets')) 
+          ? fs.readdirSync(path.join(__dirname, '../../dist/client/assets')) 
+          : []
       }, null, 2)
     }
   }

@@ -7,14 +7,18 @@ import './index.css'
 declare global {
   interface Window {
     __INITIAL_PATH__?: string;
+    __INITIAL_STATE__?: any;
   }
 }
 
-ReactDOM.hydrateRoot(
-  document.getElementById('root') as HTMLElement,
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
-) 
+// Wait for all scripts to load before hydrating
+window.addEventListener('load', () => {
+  ReactDOM.hydrateRoot(
+    document.getElementById('root') as HTMLElement,
+    <React.StrictMode>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </React.StrictMode>
+  )
+}) 
