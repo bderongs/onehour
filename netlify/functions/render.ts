@@ -22,6 +22,7 @@ const handler: Handler = async (event) => {
     }
     
     // Import the server entry point
+    // @ts-ignore - This file is generated during build
     const { render } = await import('./entry-server.js')
     console.log('Server entry point loaded successfully')
     
