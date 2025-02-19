@@ -53,6 +53,15 @@ const formatFileSize = (bytes: number): string => {
 
 // Check browser support for required features
 const checkBrowserSupport = () => {
+    if (typeof window === 'undefined') {
+        return {
+            canvas: false,
+            blobConstructor: false,
+            createObjectURL: false,
+            fileReader: false
+        };
+    }
+    
     const features = {
         canvas: !!document.createElement('canvas').getContext,
         blobConstructor: !!window.Blob,

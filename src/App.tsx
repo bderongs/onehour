@@ -44,11 +44,15 @@ function App() {
 
   // Reset scroll position when route changes
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+    }
   }, [location.pathname]);
 
   // Set manual scroll restoration
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }

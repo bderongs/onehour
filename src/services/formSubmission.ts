@@ -1,4 +1,10 @@
+const isBrowser = typeof window !== 'undefined';
+
 export async function submitToGoogleForm(data: any) {
+    if (!isBrowser) {
+        throw new Error('Form submission is only available in browser environment');
+    }
+    
     // Replace with your Google Form pre-filled URL
     const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScnQ2Oar_UrZLJ28f9WZeV91Gf47gFIJy8tcuEXlKImfjFDYQ/formResponse';
 

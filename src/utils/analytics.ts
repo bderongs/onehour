@@ -1,8 +1,13 @@
+const isBrowser = typeof window !== 'undefined';
+
 export const shouldExcludeAnalytics = () => {
+    if (!isBrowser) return false;
     return localStorage.getItem('exclude-analytics') === 'true';
 };
 
 export const initializeGoatCounter = () => {
+    if (!isBrowser) return;
+    
     if (shouldExcludeAnalytics()) {
         return; // Don't load the script if excluded
     }
