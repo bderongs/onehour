@@ -3,14 +3,13 @@ import { Footer } from '../components/Footer';
 
 interface MarketingLayoutProps {
   children: React.ReactNode;
-  withTopPadding?: boolean;
 }
 
 export const MarketingLayout: React.FC<MarketingLayoutProps> = ({ children }) => {
   return (
     <>
       <Header />
-      <main className="flex-grow">
+      <main className="flex-grow pt-16">
         {children}
       </main>
       <Footer />
