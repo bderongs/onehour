@@ -1,4 +1,3 @@
-
 # dependencies
 /node_modules
 /.pnp
@@ -9,6 +8,8 @@
 
 # production
 /dist
+/netlify/functions/*.js
+/netlify/functions/*.js.map
 
 # misc
 .DS_Store
