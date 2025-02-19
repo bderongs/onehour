@@ -11,6 +11,7 @@ const handler: Handler = async (event) => {
     const template = fs.readFileSync(path.join(__dirname, '../client/index.html'), 'utf-8')
     
     // Import the server entry point
+    // @ts-expect-error - This file will exist at runtime after the build
     const { render } = await import('./entry-server.js')
     
     // Render the app
