@@ -1,43 +1,34 @@
 import React, { createContext, useContext, useState } from 'react';
+import { browserStorage } from '../utils/storage';
 
-interface ClientSignUpContextType {
+type ClientSignUpContextType = {
     sparkUrlSlug: string | null;
     setSparkUrlSlug: (slug: string | null) => void;
     clearSignUpData: () => void;
-}
+};
 
 const ClientSignUpContext = createContext<ClientSignUpContextType | undefined>(undefined);
 
-const isBrowserEnvironment = typeof window !== 'undefined';
-
-const getStoredValue = (key: string): string | null => {
-    if (!isBrowserEnvironment) return null;
-    return localStorage.getItem(key);
-};
-
-const setStoredValue = (key: string, value: string | null) => {
-    if (!isBrowserEnvironment) return;
-    if (value) {
-        localStorage.setItem(key, value);
-    } else {
-        localStorage.removeItem(key);
-    }
-};
+const STORAGE_KEY = 'sparkSignUpUrlSlug';
 
 export function ClientSignUpProvider({ children }: { children: React.ReactNode }) {
-    // Initialize from localStorage if available
+    // Initialize from storage if available
     const [sparkUrlSlug, setSparkUrlSlugState] = useState<string | null>(() => {
-        return getStoredValue('sparkSignUpUrlSlug');
+        return browserStorage.get(STORAGE_KEY);
     });
 
     const setSparkUrlSlug = (slug: string | null) => {
         setSparkUrlSlugState(slug);
-        setStoredValue('sparkSignUpUrlSlug', slug);
+        if (slug) {
+            browserStorage.set(STORAGE_KEY, slug);
+        } else {
+            browserStorage.remove(STORAGE_KEY);
+        }
     };
 
     const clearSignUpData = () => {
         setSparkUrlSlugState(null);
-        setStoredValue('sparkSignUpUrlSlug', null);
+        browserStorage.remove(STORAGE_KEY);
     };
 
     return (

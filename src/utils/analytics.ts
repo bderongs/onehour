@@ -1,8 +1,9 @@
-const isBrowser = typeof window !== 'undefined';
+import { browserStorage } from './storage';
+import { createAndAppendScript } from './dom';
+import { isBrowser } from './browser';
 
 export const shouldExcludeAnalytics = () => {
-    if (!isBrowser) return false;
-    return localStorage.getItem('exclude-analytics') === 'true';
+    return browserStorage.get('exclude-analytics') === 'true';
 };
 
 export const initializeGoatCounter = () => {
@@ -12,9 +13,8 @@ export const initializeGoatCounter = () => {
         return; // Don't load the script if excluded
     }
 
-    const script = document.createElement('script');
-    script.setAttribute('data-goatcounter', 'https://sparkier.goatcounter.com/count');
-    script.setAttribute('async', 'true');
-    script.src = '//gc.zgo.at/count.js';
-    document.body.appendChild(script);
+    createAndAppendScript('//gc.zgo.at/count.js', {
+        'data-goatcounter': 'https://sparkier.goatcounter.com/count',
+        'async': 'true'
+    });
 }; 

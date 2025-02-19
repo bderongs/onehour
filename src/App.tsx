@@ -38,30 +38,21 @@ import { SparkSignUpPage } from './pages/SparkSignUpPage';
 import { EmailConfirmationPage } from './pages/EmailConfirmationPage';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { Metadata } from './components/Metadata';
+import { scrollToTop } from './utils/browser';
+import { setScrollRestoration } from './utils/url';
 
 function App() {
   const location = useLocation();
 
   // Reset scroll position when route changes
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.scrollTo(0, 0);
-    }
+    scrollToTop();
   }, [location.pathname]);
 
   // Set manual scroll restoration
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    if ('scrollRestoration' in history) {
-      history.scrollRestoration = 'manual';
-    }
-
-    return () => {
-      if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'auto';
-      }
-    };
+    setScrollRestoration('manual');
+    return () => setScrollRestoration('auto');
   }, []);
 
   useEffect(() => {

@@ -1,5 +1,8 @@
 import { supabase } from '../lib/supabase';
 import logger from '../utils/logger';
+import { createElement } from '../utils/dom';
+import { createObjectURL, revokeObjectURL } from '../utils/url';
+import { isBrowser } from '../utils/browser';
 
 const MAX_WIDTH = 800;  // Maximum width for profile pictures
 const MAX_HEIGHT = 1200; // Maximum height for profile pictures
@@ -53,7 +56,7 @@ const formatFileSize = (bytes: number): string => {
 
 // Check browser support for required features
 const checkBrowserSupport = () => {
-    if (typeof window === 'undefined') {
+    if (!isBrowser) {
         return {
             canvas: false,
             blobConstructor: false,
@@ -63,7 +66,7 @@ const checkBrowserSupport = () => {
     }
     
     const features = {
-        canvas: !!document.createElement('canvas').getContext,
+        canvas: !!createElement('canvas')?.getContext('2d'),
         blobConstructor: !!window.Blob,
         createObjectURL: !!window.URL?.createObjectURL,
         fileReader: !!window.FileReader
@@ -113,7 +116,10 @@ const optimizeImage = async (file: File): Promise<Blob> => {
                 }
 
                 // Create canvas and resize image
-                const canvas = document.createElement('canvas');
+                const canvas = createElement('canvas');
+                if (!canvas) {
+                    throw new Error('Canvas creation not supported');
+                }
                 canvas.width = width;
                 canvas.height = height;
                 
@@ -180,17 +186,27 @@ const optimizeImage = async (file: File): Promise<Blob> => {
                 }
             } catch (e) {
                 reject(e);
+            } finally {
+                if (objectUrl) {
+                    revokeObjectURL(objectUrl);
+                }
             }
         };
         
         img.onerror = () => {
+            if (objectUrl) {
+                revokeObjectURL(objectUrl);
+            }
             reject(new Error('Impossible de charger l\'image. Vérifiez que le fichier est une image valide.'));
         };
 
         // Use FileReader as a fallback if createObjectURL is not supported
         try {
             if (support.createObjectURL) {
-                objectUrl = URL.createObjectURL(file);
+                objectUrl = createObjectURL(file);
+                if (!objectUrl) {
+                    throw new Error('Failed to create object URL');
+                }
                 img.src = objectUrl;
             } else if (support.fileReader) {
                 const reader = new FileReader();
@@ -252,7 +268,7 @@ export const uploadProfileImage = async (file: File, userId: string, oldImageUrl
         return { publicUrl, filePath };
     } finally {
         if (objectUrl) {
-            URL.revokeObjectURL(objectUrl);
+            revokeObjectURL(objectUrl);
         }
     }
 };
@@ -348,7 +364,7 @@ export const uploadSparkImage = async (file: File, sparkId: string, oldImageUrl?
         return { publicUrl, filePath };
     } finally {
         if (objectUrl) {
-            URL.revokeObjectURL(objectUrl);
+            revokeObjectURL(objectUrl);
         }
     }
 };
