@@ -1,6 +1,7 @@
 import { Handler } from '@netlify/functions'
 import fs from 'fs'
 import path from 'path'
+import type { HelmetServerState } from 'react-helmet-async'
 
 const handler: Handler = async (event) => {
   try {
@@ -29,10 +30,16 @@ const handler: Handler = async (event) => {
     console.log('Server entry point loaded successfully')
     
     try {
+      // Create a fresh context for React Helmet Async
+      const helmetContext: { helmet?: HelmetServerState } = {}
+
       // Render the app
       console.log('Attempting to render app with URL:', url)
-      const appHtml = await render(url)
+      const appHtml = await render(url, { helmetContext })
       console.log('App rendered successfully')
+      
+      // Extract helmet data
+      const { helmet } = helmetContext
       
       // Find all necessary scripts
       const assetsDir = path.join(__dirname, '../../dist/client/assets')
@@ -61,7 +68,15 @@ const handler: Handler = async (event) => {
       
       // Inject everything into the template
       let html = template
-        .replace('</head>', `<style>${styleContent}</style></head>`)
+        // Replace the default head content with Helmet data
+        .replace(/<title>.*?<\/title>/i, helmet?.title?.toString() || '')
+        .replace('</head>',
+          `${helmet?.meta?.toString() || ''}
+           ${helmet?.link?.toString() || ''}
+           ${helmet?.script?.toString() || ''}
+           <style>${styleContent}</style>
+           </head>`
+        )
         .replace('<!--app-html-->', appHtml)
         .replace(
           '<script type="module" src="/src/entry-client.tsx">',
