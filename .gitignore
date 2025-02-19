@@ -8,6 +8,8 @@
 
 # production
 /dist
+/dist/client
+/dist/server
 /netlify/functions/*.js
 /netlify/functions/*.js.map
 
@@ -27,4 +29,3 @@ yarn-error.log*
 
 # Local Netlify folder
 .netlify
-dist/ build/ *.env .env* node_modules/

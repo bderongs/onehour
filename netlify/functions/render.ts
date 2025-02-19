@@ -9,16 +9,31 @@ const handler: Handler = async (event) => {
     console.log('Directory contents:', fs.readdirSync(process.cwd()))
 
     // Get the template from the published client directory
-    const template = fs.readFileSync(path.join(process.cwd(), 'dist/client/index.html'), 'utf-8')
-    console.log('Template loaded successfully')
+    let template: string
+    try {
+      // Try the production path first
+      template = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf-8')
+      console.log('Template loaded from root successfully')
+    } catch (e) {
+      // Fall back to development path
+      template = fs.readFileSync(path.join(process.cwd(), 'dist/client/index.html'), 'utf-8')
+      console.log('Template loaded from dist/client successfully')
+    }
     
     // Read the CSS file
     let styleContent = ''
     try {
-      styleContent = fs.readFileSync(path.join(process.cwd(), 'dist/client/assets/index.css'), 'utf-8')
-      console.log('CSS loaded successfully')
+      // Try the production path first
+      styleContent = fs.readFileSync(path.join(process.cwd(), 'assets/index.css'), 'utf-8')
+      console.log('CSS loaded from root successfully')
     } catch (e) {
-      console.warn('Could not load CSS file:', e)
+      try {
+        // Fall back to development path
+        styleContent = fs.readFileSync(path.join(process.cwd(), 'dist/client/assets/index.css'), 'utf-8')
+        console.log('CSS loaded from dist/client successfully')
+      } catch (cssError) {
+        console.warn('Could not load CSS file:', cssError)
+      }
     }
     
     // Import the server entry point
