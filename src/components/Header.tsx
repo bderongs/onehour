@@ -1,5 +1,8 @@
+'use client';
+
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { BrandName } from './BrandName';
 import { Menu, X } from 'lucide-react';
 import { ProfileMenu } from './ProfileMenu';
@@ -8,11 +11,11 @@ import { useAuth } from '../contexts/AuthContext';
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, loading: authLoading } = useAuth();
-  const location = useLocation();
-  const isConsultantPage = location.pathname === '/consultants';
-  const isPricingPage = location.pathname === '/pricing';
-  const isLandingClientsPage = location.pathname === '/';
-  const isAuthPage = location.pathname === '/signin' || location.pathname === '/signup';
+  const pathname = usePathname();
+  const isConsultantPage = pathname === '/consultants';
+  const isPricingPage = pathname === '/pricing';
+  const isLandingClientsPage = pathname === '/';
+  const isAuthPage = pathname === '/signin' || pathname === '/signup';
 
   const navigation = [
     { name: 'Le Spark', href: '#spark' },
@@ -57,7 +60,7 @@ export function Header() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to={isConsultantPage || isPricingPage ? "/consultants" : "/"} className="flex items-center">
+            <Link href={isConsultantPage || isPricingPage ? "/consultants" : "/"} className="flex items-center">
               <BrandName color="blue-900" />
             </Link>
           </div>
@@ -78,7 +81,7 @@ export function Header() {
 
                 {isConsultantPage && (
                   <Link
-                    to="/pricing"
+                    href="/pricing"
                     className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
                   >
                     Tarifs
@@ -87,7 +90,7 @@ export function Header() {
 
                 {isPricingPage && (
                   <Link
-                    to="/consultants"
+                    href="/consultants"
                     className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
                   >
                     Pourquoi Sparkier ?
@@ -96,7 +99,7 @@ export function Header() {
                 
                 {(isConsultantPage || isPricingPage) && !user && (
                   <Link
-                    to="/profile"
+                    href="/profile"
                     className="text-blue-600 hover:text-blue-900 px-3 py-2 text-sm font-medium"
                   >
                     Voir un exemple de profil
@@ -109,7 +112,7 @@ export function Header() {
                   ) : !isAuthPage && (
                     <>
                       <Link
-                        to="/signin"
+                        href="/signin"
                         className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                       >
                         Se connecter
@@ -162,7 +165,7 @@ export function Header() {
 
               {isConsultantPage && (
                 <Link
-                  to="/pricing"
+                  href="/pricing"
                   className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 >
                   Tarifs
@@ -171,7 +174,7 @@ export function Header() {
 
               {isPricingPage && (
                 <Link
-                  to="/consultants"
+                  href="/consultants"
                   className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 >
                   Pourquoi Sparkier ?
@@ -180,7 +183,7 @@ export function Header() {
               
               {(isConsultantPage || isPricingPage) && !user && (
                 <Link
-                  to="/profile"
+                  href="/profile"
                   className="block px-3 py-2 text-base font-medium text-blue-600 hover:text-blue-900 hover:bg-gray-50"
                 >
                   Voir un exemple de profil
@@ -190,7 +193,7 @@ export function Header() {
               {!user && !isAuthPage && (
                 <div className="pt-2 space-y-1 border-t border-gray-200">
                   <Link
-                    to="/signin"
+                    href="/signin"
                     className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   >
                     Se connecter

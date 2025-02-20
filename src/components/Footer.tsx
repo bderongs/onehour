@@ -1,23 +1,25 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+'use client';
+
+import { useRouter, usePathname } from 'next/navigation';
 import { BrandName } from './BrandName';
 
-const scrollToSection = (sectionId: string, navigate: any, currentPath: string) => {
+const scrollToSection = (sectionId: string, router: any, currentPath: string) => {
   if (currentPath === '/') {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   } else {
-    navigate(`/#${sectionId}`);
+    router.push(`/#${sectionId}`);
   }
 };
 
 export function Footer() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const isConsultantsPage = location.pathname === '/consultants';
-  const isPricingPage = location.pathname === '/pricing';
-  const isProfilePage = location.pathname === '/profile' || /^\/consultants\/[^/]+$/.test(location.pathname);
+  const router = useRouter();
+  const pathname = usePathname() ?? '/';
+  const isConsultantsPage = pathname === '/consultants';
+  const isPricingPage = pathname === '/pricing';
+  const isProfilePage = pathname === '/profile' || /^\/consultants\/[^/]+$/.test(pathname);
   const isConsultantSection = isConsultantsPage || isPricingPage;
 
   return (
@@ -39,17 +41,17 @@ export function Footer() {
                 <h3 className="text-lg font-semibold mb-4">Liens Rapides</h3>
                 <ul className="space-y-2">
                   <li>
-                    <button onClick={() => scrollToSection('why-choose', navigate, location.pathname)} className="text-gray-400 hover:text-white">
+                    <button onClick={() => scrollToSection('why-choose', router, pathname)} className="text-gray-400 hover:text-white">
                       Pourquoi Nous Choisir
                     </button>
                   </li>
                   <li>
-                    <button onClick={() => scrollToSection('experts', navigate, location.pathname)} className="text-gray-400 hover:text-white">
+                    <button onClick={() => scrollToSection('experts', router, pathname)} className="text-gray-400 hover:text-white">
                       Nos Experts
                     </button>
                   </li>
                   <li>
-                    <button onClick={() => scrollToSection('how-it-works', navigate, location.pathname)} className="text-gray-400 hover:text-white">
+                    <button onClick={() => scrollToSection('how-it-works', router, pathname)} className="text-gray-400 hover:text-white">
                       Comment ça Marche
                     </button>
                   </li>
@@ -69,7 +71,7 @@ export function Footer() {
               <h3 className="text-lg font-semibold mb-4">Contact</h3>
               <ul className="space-y-2">
                 <li><a href="mailto:contact@sparkier.io" className="text-gray-400 hover:text-white">contact@sparkier.io</a></li>
-                {location.pathname === '/' && (
+                {pathname === '/' && (
                   <li className="pt-2">
                     <a href="/consultants" className="text-indigo-400 hover:text-indigo-300 font-medium">
                       Sparkier pour les consultants

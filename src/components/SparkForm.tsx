@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useRef } from 'react';
 import type { Spark } from '../types/spark';
 import { Plus, X, Trash2, Upload, Link } from 'lucide-react';

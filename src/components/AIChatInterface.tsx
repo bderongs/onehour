@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { analyzeWithOpenAI } from '../services/openai';
@@ -33,7 +35,7 @@ export type Message = {
 };
 
 interface AIChatInterfaceProps {
-    template: DocumentTemplate;
+    template?: DocumentTemplate;
     messages?: Message[];
     onMessagesUpdate?: (messages: Message[]) => void;
     shouldReset?: boolean;
@@ -58,7 +60,7 @@ export function AIChatInterface({
     isSparkConfig = false
 }: AIChatInterfaceProps) {
     logger.debug('AIChatInterface props:', {
-        templateId: template?.id,
+        templateId: template?.id || 'no-template',
         hasMessages: initialMessages.length > 0,
         hasSystemPrompt: !!systemPrompt,
         hasSummaryInstructions: !!summaryInstructions,
@@ -95,10 +97,10 @@ export function AIChatInterface({
         } else if (messages.length === 0 && !isInitialized) {
             setMessages([{ 
                 role: 'assistant', 
-                content: template.placeholderMessage || "Bonjour ! Comment puis-je vous aider ?"
+                content: template?.placeholderMessage || "Bonjour ! Comment puis-je vous aider ?"
             }]);
         }
-    }, [initialMessages, isInitialized, messages.length, template.placeholderMessage]);
+    }, [initialMessages, isInitialized, messages.length, template?.placeholderMessage]);
 
     // Handle initial AI response when external messages are provided
     useEffect(() => {
@@ -340,7 +342,18 @@ export function AIChatInterface({
     };
 
     return (
-        <div ref={componentRef} className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto">
+        <div ref={componentRef} className="flex flex-col h-full">
+            {!hideSummary && template && (
+                <div ref={summaryContainerRef} className="p-4 bg-gray-50">
+                    <DocumentSummary
+                        template={template}
+                        summary={documentSummary}
+                        onConnect={onConnect}
+                        hasUserMessage={messages.some(m => m.role === 'user')}
+                        isLoading={isSummaryLoading}
+                    />
+                </div>
+            )}
             <div className="flex-1 rounded-lg p-4 flex flex-col">
                 <div
                     ref={chatContainerRef}
@@ -402,18 +415,6 @@ export function AIChatInterface({
                     </div>
                 </form>
             </div>
-
-            {!hideSummary && (
-                <div ref={summaryContainerRef} className="lg:w-80">
-                    <DocumentSummary 
-                        template={template}
-                        summary={documentSummary}
-                        onConnect={onConnect}
-                        hasUserMessage={messages.some(m => m.role === 'user')}
-                        isLoading={isSummaryLoading}
-                    />
-                </div>
-            )}
         </div>
     );
 }

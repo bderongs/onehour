@@ -1,11 +1,11 @@
 import { AlertCircle, ArrowRight } from 'lucide-react';
-import ConsultantProfilePage from '../pages/ConsultantProfilePage';
+import ConsultantProfilePage from '@/app/consultant/[slug]/page';
 
 export function DemoProfileWrapper() {
-    const DEMO_CONSULTANT_ID = import.meta.env.VITE_DEMO_CONSULTANT_ID;
+    const DEMO_CONSULTANT_ID = process.env.NEXT_PUBLIC_DEMO_CONSULTANT_ID;
 
     if (!DEMO_CONSULTANT_ID) {
-        console.error('Missing DEMO_CONSULTANT_ID environment variable');
+        console.error('Missing NEXT_PUBLIC_DEMO_CONSULTANT_ID environment variable');
         return null;
     }
 

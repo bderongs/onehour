@@ -4,7 +4,7 @@ import type { Spark } from '../types/spark';
 import logger from '../utils/logger';
 
 const openai = new OpenAI({
-    apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
     dangerouslyAllowBrowser: true
 });
 

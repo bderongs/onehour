@@ -21,8 +21,11 @@ export interface ClientSignUpData {
 
 // Get the site URL based on environment
 const getSiteUrl = () => {
-    const isDevelopment = import.meta.env.MODE === 'development';
-    return isDevelopment ? 'http://localhost:5173' : 'https://www.sparkier.io';
+    const url = process.env.NEXT_PUBLIC_SITE_URL;
+    if (!url) {
+        throw new Error('NEXT_PUBLIC_SITE_URL environment variable is not defined');
+    }
+    return url;
 };
 
 // Generate a strong temporary password that meets Supabase requirements

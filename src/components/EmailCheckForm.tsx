@@ -1,7 +1,9 @@
+'use client';
+
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { checkEmailExists } from '../services/auth';
-import { useNotification } from '../contexts/NotificationContext';
+import { checkEmailExists } from '@/services/auth';
+import { useNotification } from '@/contexts/NotificationContext';
 
 interface EmailCheckFormProps {
     onEmailExists: (email: string) => void;
@@ -57,8 +59,17 @@ export function EmailCheckForm({
                 disabled={loading}
                 className="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                {loading ? 'Vérification...' : 'Continuer'}
-                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                {loading ? (
+                    <>
+                        <div className="h-5 w-5 border-t-2 border-white border-solid rounded-full animate-spin"></div>
+                        <span>Vérification en cours...</span>
+                    </>
+                ) : (
+                    <>
+                        Continuer
+                        <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    </>
+                )}
             </button>
         </form>
     );

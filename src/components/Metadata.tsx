@@ -1,4 +1,6 @@
-import { useLocation } from 'react-router-dom';
+'use client';
+
+import { usePathname } from 'next/navigation';
 import { Helmet } from 'react-helmet-async';
 import { getMetadataForRoute, defaultMetadata } from '../config/metadata';
 import type { Spark } from '../types/spark';
@@ -11,7 +13,7 @@ interface MetadataProps {
 }
 
 function MetadataComponent({ spark, consultant }: MetadataProps) {
-    const { pathname } = useLocation();
+    const pathname = usePathname() ?? '/';
     const metadata = getMetadataForRoute(pathname, { spark, consultant });
 
     return (

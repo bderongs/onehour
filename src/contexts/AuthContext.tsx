@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { getCurrentUser } from '../services/auth';
 import type { UserProfile } from '../services/auth';

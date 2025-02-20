@@ -1,16 +1,18 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import { getConsultantProfile } from '../services/consultants';
 import type { ConsultantProfile } from '../types/consultant';
 import { supabase } from '../lib/supabase';
 import { User, LogOut, Settings, UserCircle, Sparkles, ExternalLink, ShieldCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 
 export function ProfileMenu() {
     const [isOpen, setIsOpen] = useState(false);
     const [consultantProfile, setConsultantProfile] = useState<ConsultantProfile | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
-    const navigate = useNavigate();
+    const router = useRouter();
     const { user, refreshUser } = useAuth();
 
     useEffect(() => {
@@ -41,11 +43,11 @@ export function ProfileMenu() {
             // Force refresh the auth state
             await refreshUser();
             // Only navigate after the auth state has been refreshed
-            navigate('/', { replace: true });
+            router.push('/');
         } catch (error) {
             console.error('Error during logout:', error);
             // Still try to navigate home if there's an error
-            navigate('/', { replace: true });
+            router.push('/');
         }
     };
 
@@ -77,7 +79,7 @@ export function ProfileMenu() {
                             <button
                                 onClick={() => {
                                     setIsOpen(false);
-                                    navigate('/client/dashboard');
+                                    router.push('/client/dashboard');
                                 }}
                                 className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                             >
@@ -91,7 +93,7 @@ export function ProfileMenu() {
                                 <button
                                     onClick={() => {
                                         setIsOpen(false);
-                                        navigate(`/${consultantProfile?.slug || ''}`);
+                                        router.push(`/${consultantProfile?.slug || ''}`);
                                     }}
                                     className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                                 >
@@ -101,7 +103,7 @@ export function ProfileMenu() {
                                 <button
                                     onClick={() => {
                                         setIsOpen(false);
-                                        navigate(`/consultants/${user.id}/edit`);
+                                        router.push(`/consultants/${user.id}/edit`);
                                     }}
                                     className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                                 >
@@ -111,7 +113,7 @@ export function ProfileMenu() {
                                 <button
                                     onClick={() => {
                                         setIsOpen(false);
-                                        navigate('/sparks/manage');
+                                        router.push('/sparks/manage');
                                     }}
                                     className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                                 >
@@ -124,7 +126,7 @@ export function ProfileMenu() {
                             <button
                                 onClick={() => {
                                     setIsOpen(false);
-                                    navigate('/admin/dashboard');
+                                    router.push('/admin/dashboard');
                                 }}
                                 className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                             >

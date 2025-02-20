@@ -1,13 +1,11 @@
-/// <reference types="vite/client" />
-
 import { createClient } from '@supabase/supabase-js';
 
 const isDev = process.env.NODE_ENV === 'development';
 
 // Initialize Supabase client with service role key
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_KEY;
-const demoConsultantId = import.meta.env.VITE_DEMO_CONSULTANT_ID;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const demoConsultantId = process.env.NEXT_PUBLIC_DEMO_CONSULTANT_ID;
 
 if (!supabaseUrl || !supabaseServiceKey || !demoConsultantId) {
     console.error('Missing required environment variables');

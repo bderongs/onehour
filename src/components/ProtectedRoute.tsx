@@ -1,5 +1,7 @@
+'use client';
+
 import { ReactNode } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../services/auth';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -12,7 +14,8 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requiredRoles, consultantIdParam }: ProtectedRouteProps) {
     const { user, loading } = useAuth();
-    const params = useParams();
+    const router = useRouter();
+    const params = useParams() as Record<string, string>;
 
     // Handle authentication loading state
     if (loading) {
@@ -22,19 +25,22 @@ export function ProtectedRoute({ children, requiredRoles, consultantIdParam }: P
     // If not authenticated, redirect to sign in with return URL
     if (!user) {
         const returnUrl = encodeURIComponent(window.location.pathname);
-        return <Navigate to={`/signin?returnUrl=${returnUrl}`} replace />;
+        router.push(`/signin?returnUrl=${returnUrl}`);
+        return null;
     }
 
     // Check roles requirement if specified
     if (requiredRoles && !requiredRoles.some(role => user.roles.includes(role))) {
-        return <Navigate to="/" replace />;
+        router.push('/');
+        return null;
     }
 
     // Check consultant ID match if specified
     if (consultantIdParam && params[consultantIdParam]) {
         const urlConsultantId = params[consultantIdParam];
         if (user.id !== urlConsultantId && !user.roles.includes('admin')) {
-            return <Navigate to="/" replace />;
+            router.push('/');
+            return null;
         }
     }
 

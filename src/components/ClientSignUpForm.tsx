@@ -1,8 +1,10 @@
+'use client';
+
 import React, { useState } from 'react';
 import { ArrowRight, Beaker } from 'lucide-react';
-import { signUpClientWithEmail, type ClientSignUpData, checkEmailExists } from '../services/auth';
-import { useNotification } from '../contexts/NotificationContext';
-import { useNavigate } from 'react-router-dom';
+import { signUpClientWithEmail, type ClientSignUpData, checkEmailExists } from '@/services/auth';
+import { useNotification } from '@/contexts/NotificationContext';
+import { useRouter } from 'next/navigation';
 
 interface ClientSignUpFormProps {
     buttonText?: string;
@@ -32,7 +34,7 @@ export function ClientSignUpForm({
     });
     const { showNotification } = useNotification();
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+    const router = useRouter();
 
     const generateTestData = () => {
         const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
@@ -61,7 +63,7 @@ export function ClientSignUpForm({
                 // Show notification before redirect
                 showNotification('success', 'Un compte existe déjà avec cet email. Vous allez être redirigé vers la page de connexion.');
                 // Redirect to signin page with email parameter
-                navigate(`/signin?email=${encodeURIComponent(testData.email)}`);
+                router.push(`/signin?email=${encodeURIComponent(testData.email)}`);
                 return;
             }
 
@@ -78,7 +80,7 @@ export function ClientSignUpForm({
             });
 
             // Navigate to email confirmation page instead of showing notification
-            navigate('/email-confirmation');
+            router.push('/email-confirmation');
             onSuccess?.({ sparkUrlSlug: undefined });
         } catch (error: any) {
             console.error('Error submitting test form:', error);
@@ -99,7 +101,7 @@ export function ClientSignUpForm({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (loading) return; // Prevent multiple submissions while loading
+        if (loading) return;
         setLoading(true);
 
         try {
@@ -114,7 +116,7 @@ export function ClientSignUpForm({
                 // Show notification before redirect
                 showNotification('success', 'Un compte existe déjà avec cet email. Vous allez être redirigé vers la page de connexion.');
                 // Redirect to signin page with email parameter
-                navigate(`/signin?email=${encodeURIComponent(formData.email)}`);
+                router.push(`/signin?email=${encodeURIComponent(formData.email)}`);
                 return;
             }
 
@@ -129,7 +131,7 @@ export function ClientSignUpForm({
             });
 
             // Navigate to email confirmation page instead of showing notification
-            navigate('/email-confirmation');
+            router.push('/email-confirmation');
             onSuccess?.({ sparkUrlSlug: undefined });
         } catch (error: any) {
             console.error('Error submitting form:', error);

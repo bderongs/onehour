@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useState } from 'react';
 
 interface ClientSignUpContextType {
@@ -11,22 +13,29 @@ const ClientSignUpContext = createContext<ClientSignUpContextType | undefined>(u
 export function ClientSignUpProvider({ children }: { children: React.ReactNode }) {
     // Initialize from localStorage if available
     const [sparkUrlSlug, setSparkUrlSlugState] = useState<string | null>(() => {
-        const stored = localStorage.getItem('sparkSignUpUrlSlug');
-        return stored ? stored : null;
+        if (typeof window !== 'undefined') {
+            const stored = localStorage.getItem('sparkSignUpUrlSlug');
+            return stored ? stored : null;
+        }
+        return null;
     });
 
     const setSparkUrlSlug = (slug: string | null) => {
         setSparkUrlSlugState(slug);
-        if (slug) {
-            localStorage.setItem('sparkSignUpUrlSlug', slug);
-        } else {
-            localStorage.removeItem('sparkSignUpUrlSlug');
+        if (typeof window !== 'undefined') {
+            if (slug) {
+                localStorage.setItem('sparkSignUpUrlSlug', slug);
+            } else {
+                localStorage.removeItem('sparkSignUpUrlSlug');
+            }
         }
     };
 
     const clearSignUpData = () => {
         setSparkUrlSlugState(null);
-        localStorage.removeItem('sparkSignUpUrlSlug');
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('sparkSignUpUrlSlug');
+        }
     };
 
     return (

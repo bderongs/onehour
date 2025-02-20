@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle, X } from 'lucide-react';
 import { submitToGoogleForm } from '../services/formSubmission';

@@ -1,8 +1,10 @@
+'use client';
+
 import React, { useState } from 'react';
 import { ArrowRight, Beaker } from 'lucide-react';
 import { signUpConsultantWithEmail, checkEmailExists } from '../services/auth';
 import { useNotification } from '../contexts/NotificationContext';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 interface ConsultantSignUpFormProps {
     buttonText?: string;
@@ -25,7 +27,7 @@ export function ConsultantSignUpForm({
     });
     const { showNotification } = useNotification();
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+    const router = useRouter();
 
     const generateTestData = () => {
         const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
@@ -51,7 +53,7 @@ export function ConsultantSignUpForm({
                 // Show notification before redirect
                 showNotification('success', 'Un compte existe déjà avec cet email. Vous allez être redirigé vers la page de connexion.');
                 // Redirect to signin page with email parameter
-                navigate(`/signin?email=${encodeURIComponent(testData.email)}`);
+                router.push(`/signin?email=${encodeURIComponent(testData.email)}`);
                 return;
             }
 
@@ -66,7 +68,7 @@ export function ConsultantSignUpForm({
             });
 
             // Navigate to email confirmation page instead of showing notification
-            navigate('/email-confirmation');
+            router.push('/email-confirmation');
             onSuccess?.();
         } catch (error: any) {
             console.error('Error submitting test form:', error);
@@ -100,7 +102,7 @@ export function ConsultantSignUpForm({
                 // Show notification before redirect
                 showNotification('success', 'Un compte existe déjà avec cet email. Vous allez être redirigé vers la page de connexion.');
                 // Redirect to signin page with email parameter
-                navigate(`/signin?email=${encodeURIComponent(formData.email)}`);
+                router.push(`/signin?email=${encodeURIComponent(formData.email)}`);
                 return;
             }
 
@@ -108,7 +110,7 @@ export function ConsultantSignUpForm({
             setFormData({ firstName: '', lastName: '', linkedin: '', email: '' });
             
             // Navigate to email confirmation page instead of showing notification
-            navigate('/email-confirmation');
+            router.push('/email-confirmation');
             onSuccess?.();
         } catch (error: any) {
             console.error('Error submitting form:', error);
