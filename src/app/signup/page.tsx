@@ -15,12 +15,12 @@ export default function SignUpPage() {
     const { sparkUrlSlug, clearSignUpData } = useClientSignUp();
 
     const handleClientSignUpSuccess = () => {
-        router.push('/email-confirmation');
+        router.push('/auth/email-confirmation');
         clearSignUpData();
     };
 
     const handleConsultantSignUpSuccess = () => {
-        router.push('/email-confirmation');
+        router.push('/auth/email-confirmation');
     };
 
     const renderTypeSelection = () => (

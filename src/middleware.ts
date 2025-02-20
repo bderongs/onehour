@@ -4,14 +4,31 @@ import type { NextRequest } from 'next/server';
 import logger from './utils/logger';
 
 export async function middleware(request: NextRequest) {
-  const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req: request, res });
-
   try {
-    // Refresh session if needed
+    // Create a response to modify its headers
+    const res = NextResponse.next();
+    
+    // Create a Supabase client with the request and response
+    const supabase = createMiddlewareClient({ 
+      req: request, 
+      res,
+    });
+
+    // Try to get the session
     const {
       data: { session },
+      error: sessionError
     } = await supabase.auth.getSession();
+
+    if (sessionError) {
+      logger.error('Middleware: Error getting session:', sessionError);
+    }
+
+    logger.info('Middleware: Session check result', { 
+      path: request.nextUrl.pathname,
+      hasSession: !!session,
+      userId: session?.user?.id
+    });
 
     // Protected routes patterns
     const protectedPatterns = [
@@ -27,21 +44,21 @@ export async function middleware(request: NextRequest) {
     );
 
     if (isProtectedRoute && !session) {
-      logger.info('Protected route accessed without session, redirecting to signin', {
+      logger.info('Middleware: Protected route accessed without session, redirecting to signin', {
         path: request.nextUrl.pathname,
       });
 
-      // Create signin URL with returnUrl
       const signinUrl = new URL('/signin', request.url);
       signinUrl.searchParams.set('returnUrl', request.nextUrl.pathname);
       
       return NextResponse.redirect(signinUrl);
     }
 
+    // Return the response with the session
     return res;
   } catch (error) {
-    logger.error('Middleware error:', error);
-    return res;
+    logger.error('Middleware: Unexpected error:', error);
+    return NextResponse.next();
   }
 }
 
@@ -53,4 +70,4 @@ export const config = {
     '/consultants/:path*/edit',
     '/sparks/:path*',
   ],
-} 
+}; 

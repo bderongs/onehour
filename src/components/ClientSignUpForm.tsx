@@ -80,7 +80,7 @@ export function ClientSignUpForm({
             });
 
             // Navigate to email confirmation page instead of showing notification
-            router.push('/email-confirmation');
+            router.push('/auth/email-confirmation');
             onSuccess?.({ sparkUrlSlug: undefined });
         } catch (error: any) {
             console.error('Error submitting test form:', error);
@@ -131,7 +131,7 @@ export function ClientSignUpForm({
             });
 
             // Navigate to email confirmation page instead of showing notification
-            router.push('/email-confirmation');
+            router.push('/auth/email-confirmation');
             onSuccess?.({ sparkUrlSlug: undefined });
         } catch (error: any) {
             console.error('Error submitting form:', error);

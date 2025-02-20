@@ -68,7 +68,7 @@ export function ConsultantSignUpForm({
             });
 
             // Navigate to email confirmation page instead of showing notification
-            router.push('/email-confirmation');
+            router.push('/auth/email-confirmation');
             onSuccess?.();
         } catch (error: any) {
             console.error('Error submitting test form:', error);
@@ -110,7 +110,7 @@ export function ConsultantSignUpForm({
             setFormData({ firstName: '', lastName: '', linkedin: '', email: '' });
             
             // Navigate to email confirmation page instead of showing notification
-            router.push('/email-confirmation');
+            router.push('/auth/email-confirmation');
             onSuccess?.();
         } catch (error: any) {
             console.error('Error submitting form:', error);

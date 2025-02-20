@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import logger from '@/utils/logger';
+import { getCurrentUser } from '@/services/auth';
 
 export default function SignInPage() {
     const [email, setEmail] = useState('');
@@ -17,50 +18,6 @@ export default function SignInPage() {
     const searchParams = useSearchParams();
     const { user, loading: authLoading, refreshUser } = useAuth();
     const { showNotification } = useNotification();
-
-    // Handle redirect when user is authenticated
-    const handleRedirect = useCallback(async () => {
-        if (!user || authLoading) return;
-
-        const returnUrl = searchParams?.get('returnUrl');
-        logger.info('Handling redirect for authenticated user', { returnUrl, roles: user.roles });
-
-        try {
-            if (returnUrl) {
-                await router.push(returnUrl);
-            } else if (user.roles.includes('consultant') || user.roles.includes('admin')) {
-                await router.push('/sparks/manage');
-            } else if (user.roles.includes('client')) {
-                await router.push('/client/dashboard');
-            }
-        } catch (error) {
-            logger.error('Error during redirect:', error);
-            showNotification('error', 'Erreur lors de la redirection');
-        }
-    }, [user, authLoading, router, searchParams, showNotification]);
-
-    // Check for authenticated user on mount and auth state changes
-    useEffect(() => {
-        if (user && !authLoading) {
-            handleRedirect();
-        }
-    }, [user, authLoading, handleRedirect]);
-
-    useEffect(() => {
-        if (searchParams) {
-            // Pre-fill email if it's in the URL
-            const emailParam = searchParams.get('email');
-            if (emailParam) {
-                setEmail(emailParam);
-            }
-
-            // Display error message if present
-            const errorMessage = searchParams.get('message');
-            if (errorMessage) {
-                showNotification('error', errorMessage);
-            }
-        }
-    }, [searchParams, showNotification]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -96,7 +53,18 @@ export default function SignInPage() {
             // Force refresh the auth context
             await refreshUser();
             
-            // Redirect will be handled by the useEffect
+            // Handle redirect immediately after successful sign-in
+            const returnUrl = searchParams?.get('returnUrl');
+            if (returnUrl) {
+                window.location.href = returnUrl;
+            } else {
+                const currentUser = await getCurrentUser();
+                if (currentUser?.roles.includes('consultant') || currentUser?.roles.includes('admin')) {
+                    window.location.href = '/sparks/manage';
+                } else if (currentUser?.roles.includes('client')) {
+                    window.location.href = '/client/dashboard';
+                }
+            }
         } catch (error: any) {
             logger.error('Sign-in process failed:', error);
             showNotification('error', error.message || 'Une erreur est survenue lors de la connexion.');
@@ -104,8 +72,38 @@ export default function SignInPage() {
         }
     };
 
+    useEffect(() => {
+        if (searchParams) {
+            // Pre-fill email if it's in the URL
+            const emailParam = searchParams.get('email');
+            if (emailParam) {
+                setEmail(emailParam);
+            }
+
+            // Display error message if present
+            const errorMessage = searchParams.get('message');
+            if (errorMessage) {
+                showNotification('error', errorMessage);
+            }
+        }
+    }, [searchParams, showNotification]);
+
+    // If already authenticated, redirect immediately
+    useEffect(() => {
+        if (user && !authLoading) {
+            const returnUrl = searchParams?.get('returnUrl');
+            if (returnUrl) {
+                window.location.href = returnUrl;
+            } else if (user.roles.includes('consultant') || user.roles.includes('admin')) {
+                window.location.href = '/sparks/manage';
+            } else if (user.roles.includes('client')) {
+                window.location.href = '/client/dashboard';
+            }
+        }
+    }, [user, authLoading, searchParams]);
+
     const handleForgotPassword = () => {
-        router.push('/reset-password');
+        router.push('/auth/reset-password');
     };
 
     // If already authenticated, show loading state

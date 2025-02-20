@@ -61,7 +61,7 @@ export default function AuthCallback() {
 
                 // For signup or recovery, redirect to password setup
                 if (type === 'signup' || type === 'recovery') {
-                    let setupPasswordUrl = `/setup-password?token=${tokenHash}`;
+                    let setupPasswordUrl = `/auth/setup-password?token=${tokenHash}`;
                     
                     // Add next URL if provided
                     if (next) {
