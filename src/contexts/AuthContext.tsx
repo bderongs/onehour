@@ -1,8 +1,10 @@
 "use client";
 
-import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import { createContext, useContext, ReactNode, useState, useEffect, useCallback } from 'react';
 import { getCurrentUser } from '../services/auth';
 import type { UserProfile } from '../services/auth';
+import { supabase } from '../lib/supabase';
+import logger from '../utils/logger';
 
 interface AuthContextType {
     user: UserProfile | null;
@@ -16,21 +18,70 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const refreshUser = async () => {
+    const refreshUser = useCallback(async () => {
         try {
+            setLoading(true);
             const currentUser = await getCurrentUser();
             setUser(currentUser);
         } catch (error) {
-            console.error('Impossible de rafraîchir l\'utilisateur:', error);
+            logger.error('Error refreshing user:', error);
             setUser(null);
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
-        refreshUser();
-    }, []);
+        let mounted = true;
+
+        const initialize = async () => {
+            try {
+                // Check if we have a session
+                const { data: { session } } = await supabase.auth.getSession();
+                
+                if (session) {
+                    // If we have a session, refresh the user data
+                    await refreshUser();
+                } else {
+                    // If no session, clear the user and loading state
+                    if (mounted) {
+                        setUser(null);
+                        setLoading(false);
+                    }
+                }
+            } catch (error) {
+                logger.error('Error during initialization:', error);
+                if (mounted) {
+                    setUser(null);
+                    setLoading(false);
+                }
+            }
+        };
+
+        // Initial auth state check
+        initialize();
+
+        // Subscribe to auth state changes
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange(async (event, session) => {
+            logger.info('Auth state changed:', event);
+            
+            if (!mounted) return;
+
+            if (event === 'SIGNED_OUT') {
+                setUser(null);
+                setLoading(false);
+            } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                await refreshUser();
+            }
+        });
+
+        return () => {
+            mounted = false;
+            subscription.unsubscribe();
+        };
+    }, [refreshUser]);
 
     const value = {
         user,

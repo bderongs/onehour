@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
+import logger from '@/utils/logger';
 
 export default function SignInPage() {
     const [email, setEmail] = useState('');
@@ -14,112 +15,90 @@ export default function SignInPage() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading, refreshUser } = useAuth();
     const { showNotification } = useNotification();
 
-    useEffect(() => {
-        // If user is already authenticated, redirect them
-        if (user && !authLoading) {
-            const returnUrl = searchParams.get('returnUrl');
+    // Handle redirect when user is authenticated
+    const handleRedirect = useCallback(async () => {
+        if (!user || authLoading) return;
+
+        const returnUrl = searchParams?.get('returnUrl');
+        logger.info('Handling redirect for authenticated user', { returnUrl, roles: user.roles });
+
+        try {
             if (returnUrl) {
-                router.push(returnUrl);
+                await router.push(returnUrl);
             } else if (user.roles.includes('consultant') || user.roles.includes('admin')) {
-                router.push('/sparks/manage');
+                await router.push('/sparks/manage');
             } else if (user.roles.includes('client')) {
-                router.push('/client/dashboard');
+                await router.push('/client/dashboard');
             }
+        } catch (error) {
+            logger.error('Error during redirect:', error);
+            showNotification('error', 'Erreur lors de la redirection');
         }
-    }, [user, authLoading, router, searchParams]);
+    }, [user, authLoading, router, searchParams, showNotification]);
+
+    // Check for authenticated user on mount and auth state changes
+    useEffect(() => {
+        if (user && !authLoading) {
+            handleRedirect();
+        }
+    }, [user, authLoading, handleRedirect]);
 
     useEffect(() => {
-        // Pre-fill email if it's in the URL
-        const emailParam = searchParams.get('email');
-        if (emailParam) {
-            setEmail(emailParam);
-        }
+        if (searchParams) {
+            // Pre-fill email if it's in the URL
+            const emailParam = searchParams.get('email');
+            if (emailParam) {
+                setEmail(emailParam);
+            }
 
-        // Display error message if present
-        const errorMessage = searchParams.get('message');
-        if (errorMessage) {
-            showNotification('error', errorMessage);
+            // Display error message if present
+            const errorMessage = searchParams.get('message');
+            if (errorMessage) {
+                showNotification('error', errorMessage);
+            }
         }
     }, [searchParams, showNotification]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (loading) return;
+        
         setLoading(true);
+        logger.info('Starting sign-in process...');
 
         try {
-            const { error: signInError } = await supabase.auth.signInWithPassword({
+            logger.info('Attempting to sign in with email...');
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
 
             if (signInError) {
+                logger.error('Sign-in error:', signInError);
                 if (signInError.message.includes('Invalid login credentials')) {
                     throw new Error('Email ou mot de passe incorrect.');
                 }
                 throw signInError;
             }
 
-            // Wait for session to be established
-            let session = null;
-            let retries = 0;
-            const maxRetries = 5;
+            logger.info('Sign-in successful, waiting for session...');
             
-            while (!session && retries < maxRetries) {
-                const { data: { session: currentSession } } = await supabase.auth.getSession();
-                if (currentSession) {
-                    session = currentSession;
-                    break;
-                }
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                retries++;
-            }
-
+            // Wait for session to be established
+            let session = signInData.session;
             if (!session) {
-                throw new Error('Session non établie après plusieurs tentatives');
+                logger.error('No session established after sign in');
+                throw new Error('Session non établie après la connexion');
             }
 
-            // Refresh the session to ensure we have the latest data
-            const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-            if (refreshError) throw refreshError;
-            if (refreshData.session) {
-                session = refreshData.session;
-            }
-
-            // Get user profile and roles
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('roles')
-                .eq('id', session.user.id)
-                .single();
-
-            if (!profile) throw new Error('Profil non trouvé');
-
-            // Wait a moment for the session to be fully established
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            // Double check that we're still authenticated
-            const { data: { session: finalSession } } = await supabase.auth.getSession();
-            if (!finalSession) {
-                throw new Error('Session perdue après la connexion');
-            }
-
-            // Get return URL if any
-            const returnUrl = searchParams.get('returnUrl');
-
-            // Use router.push for client-side navigation
-            if (returnUrl) {
-                router.push(returnUrl);
-            } else if (profile.roles.includes('consultant') || profile.roles.includes('admin')) {
-                router.push('/sparks/manage');
-            } else if (profile.roles.includes('client')) {
-                router.push('/client/dashboard');
-            } else {
-                throw new Error('Rôle non reconnu');
-            }
+            // Force refresh the auth context
+            await refreshUser();
+            
+            // Redirect will be handled by the useEffect
         } catch (error: any) {
+            logger.error('Sign-in process failed:', error);
             showNotification('error', error.message || 'Une erreur est survenue lors de la connexion.');
             setLoading(false);
         }
@@ -128,6 +107,18 @@ export default function SignInPage() {
     const handleForgotPassword = () => {
         router.push('/reset-password');
     };
+
+    // If already authenticated, show loading state
+    if (user && !authLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="max-w-md w-full text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Redirection en cours...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

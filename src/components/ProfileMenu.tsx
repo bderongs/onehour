@@ -39,11 +39,25 @@ export function ProfileMenu() {
 
     const handleLogout = async () => {
         try {
-            await supabase.auth.signOut();
+            setIsOpen(false); // Close the menu first
+            
+            // Sign out from Supabase
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            
+            // Clear any local storage data
+            localStorage.clear();
+            sessionStorage.clear();
+            
             // Force refresh the auth state
             await refreshUser();
-            // Only navigate after the auth state has been refreshed
+            
+            // Wait a moment for the auth state to update
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Navigate to home page
             router.push('/');
+            router.refresh();
         } catch (error) {
             console.error('Error during logout:', error);
             // Still try to navigate home if there's an error

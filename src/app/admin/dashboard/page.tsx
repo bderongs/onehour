@@ -3,9 +3,48 @@
 import { useRouter } from 'next/navigation';
 import { Users, Briefcase, Settings, Zap, UserCog } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 
 export default function AdminDashboard() {
     const router = useRouter();
+    const { user, loading: authLoading } = useAuth();
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const checkAdminAccess = async () => {
+            try {
+                // Wait for auth to be ready
+                if (authLoading) return;
+
+                // Check if we have a session
+                const { data: { session } } = await supabase.auth.getSession();
+                
+                if (!session) {
+                    logger.info('No session found, redirecting to signin');
+                    router.push('/signin');
+                    return;
+                }
+
+                // Check if user has admin role
+                if (!user?.roles?.includes('admin')) {
+                    logger.info('User is not an admin, redirecting to home');
+                    router.push('/');
+                    return;
+                }
+
+                setLoading(false);
+            } catch (error) {
+                logger.error('Error checking admin access:', error);
+                router.push('/');
+            }
+        };
+
+        checkAdminAccess();
+    }, [router, user, authLoading]);
 
     const menuItems = [
         {
@@ -49,6 +88,10 @@ export default function AdminDashboard() {
             isImplemented: false
         }
     ];
+
+    if (loading || authLoading) {
+        return <LoadingSpinner message="Chargement..." />;
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">

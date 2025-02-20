@@ -4,10 +4,8 @@ By default, this app supports JSX syntax with Tailwind CSS classes, React hooks,
 
 Use stock photos from unsplash where appropriate, only valid URLs you know exist. Do not download the images, only link to them in image tags.
 
-Always follow best practices in code organisation, and check the codebase for relevant prior structuration when needed.
+Always follow best industry practices in code organisation, and check the codebase for relevant prior structuration when needed.
 Use the service layer for all database operations rather than making direct Supabase queries.
-Use AuthContext to manage authentication state when possible.
-Use the protected routes to manage access to pages.
 
 Comment all the code you write.
 
@@ -18,6 +16,4 @@ The brand is Sparkier, the site domain name is sparkier.io
 The database schema should always be fully idempotent. Beware of the order of the SQL statements. Keep all table creations together at the top, followed by RLS, policies, and then indexes.
 
 When you remove a lucide-react icon, also remove the import statement from the file.
-
-Routes are managed in the app.tsx file.
 
