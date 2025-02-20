@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BrandName } from './BrandName';
@@ -23,34 +23,81 @@ export function Header() {
     { name: 'Pourquoi Sparkier', href: '#why-sparkier' },
   ];
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId.substring(1));
-    if (element) {
-      const headerOffset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+  useEffect(() => {
+    // Handle initial hash navigation when page loads
+    const hash = window.location.hash;
+    if (hash) {
+      setTimeout(() => {
+        scrollToSection(hash);
+      }, 500);
     }
+  }, []);
+
+  const scrollToSection = (sectionId: string) => {
+    // Close menu first to prevent visual glitches
     setIsMenuOpen(false);
+    
+    const logger = console;
+    logger.info('Attempting to scroll to section:', sectionId);
+    
+    // Ensure we have a proper ID (remove # if present)
+    const targetId = sectionId.startsWith('#') ? sectionId.substring(1) : sectionId;
+    
+    // Try to find the element multiple times with increasing delays
+    const findElementWithRetry = (attempt = 1) => {
+      const element = document.getElementById(targetId);
+      
+      if (element) {
+        logger.info('Found element:', targetId);
+        const headerOffset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      } else if (attempt < 3) {
+        logger.info(`Element not found, retrying... (attempt ${attempt})`);
+        setTimeout(() => findElementWithRetry(attempt + 1), 200 * attempt);
+      } else {
+        logger.warn(`Could not find element with id: ${targetId}`);
+      }
+    };
+
+    // Start the retry process
+    setTimeout(() => findElementWithRetry(), 100);
   };
 
   const handleSignUpClick = () => {
-    const element = document.getElementById('signup-form');
-    if (element) {
-      const headerOffset = 120;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
     setIsMenuOpen(false);
+    
+    const logger = console;
+    logger.info('Attempting to scroll to signup form');
+    
+    const findSignupForm = (attempt = 1) => {
+      const element = document.getElementById('signup-form');
+      
+      if (element) {
+        logger.info('Found signup form');
+        const headerOffset = 120;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      } else if (attempt < 3) {
+        logger.info(`Signup form not found, retrying... (attempt ${attempt})`);
+        setTimeout(() => findSignupForm(attempt + 1), 200 * attempt);
+      } else {
+        logger.warn('Could not find signup form');
+      }
+    };
+
+    // Start the retry process
+    setTimeout(() => findSignupForm(), 100);
   };
 
   const showSignUpButton = isLandingClientsPage || isConsultantPage;
@@ -70,13 +117,17 @@ export function Header() {
             <>
               <div className="hidden md:flex md:items-center md:space-x-4">
                 {isLandingClientsPage && navigation.map((item) => (
-                  <button
+                  <Link
                     key={item.name}
-                    onClick={() => scrollToSection(item.href)}
+                    href={item.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToSection(item.href);
+                    }}
                     className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
                   >
                     {item.name}
-                  </button>
+                  </Link>
                 ))}
 
                 {isConsultantPage && (
@@ -154,13 +205,17 @@ export function Header() {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {isLandingClientsPage && navigation.map((item) => (
-                <button
+                <Link
                   key={item.name}
-                  onClick={() => scrollToSection(item.href)}
+                  href={item.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToSection(item.href);
+                  }}
                   className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 w-full text-left"
                 >
                   {item.name}
-                </button>
+                </Link>
               ))}
 
               {isConsultantPage && (

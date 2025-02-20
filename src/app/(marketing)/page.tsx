@@ -1,34 +1,34 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect, useMemo } from 'react'
-import { Bot, Users, Briefcase, MessageSquare, Calendar, Zap, Shield, Sparkles, ArrowRight, FileText } from 'lucide-react'
-import { AIChatInterface } from '@/components/AIChatInterface'
-import { ConsultantConnect } from '@/components/ConsultantConnect'
-import { motion } from 'framer-motion'
-import { SparksGrid } from '@/components/SparksGrid'
-import { getSparks } from '@/services/sparks'
-import type { Spark } from '@/types/spark'
-import { DOCUMENT_TEMPLATES } from '@/data/documentTemplates'
-import { createChatConfigs } from '@/data/chatConfigs'
-import type { DocumentSummary } from '@/types/chat'
-import '@/styles/highlight.css'
-import { ClientSignUpForm } from '@/components/ClientSignUpForm'
-import { LoadingSpinner } from '@/components/LoadingSpinner'
-import type { Message } from '@/types/chat'
+import React, { useState, useEffect, useMemo } from 'react';
+import { Bot, Users, Briefcase, MessageSquare, Calendar, Zap, Shield, Sparkles, ArrowRight, FileText} from 'lucide-react';
+import { AIChatInterface, Message } from '@/components/AIChatInterface';
+import { ConsultantConnect } from '@/components/ConsultantConnect';
+import { motion } from 'framer-motion';
+import { SparksGrid } from '@/components/SparksGrid';
+import { getSparks } from '@/services/sparks';
+import type { Spark } from '@/types/spark';
+import { DOCUMENT_TEMPLATES } from '@/data/documentTemplates';
+import { createChatConfigs } from '@/data/chatConfigs';
+import type { DocumentSummary } from '@/types/chat';
+import '@/styles/highlight.css';
+import { ClientSignUpForm } from '@/components/ClientSignUpForm';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import logger from '@/utils/logger';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.5 }
-}
+};
 
-export default function LandingClients() {
-    const [showConnect, setShowConnect] = useState(false)
-    const [messages, setMessages] = useState<Message[]>([])
-    const [shouldReset, setShouldReset] = useState(false)
-    const [sparks, setSparks] = useState<Spark[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
+export default function Page() {
+    const [showConnect, setShowConnect] = useState(false);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [shouldReset, setShouldReset] = useState(false);
+    const [sparks, setSparks] = useState<Spark[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [documentSummary, setDocumentSummary] = useState<DocumentSummary>({
         challenge: '',
         currentSituation: '',
@@ -37,75 +37,75 @@ export default function LandingClients() {
         stakeholders: '',
         previousAttempts: '',
         hasEnoughData: false
-    })
-    const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null)
-    const [isChatExpanded, setIsChatExpanded] = useState(false)
+    });
+    const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
+    const [isChatExpanded, setIsChatExpanded] = useState(false);
 
     // Memoize chat configs to prevent unnecessary recreations
-    const chatConfigs = useMemo(() => createChatConfigs(), [])
+    const chatConfigs = useMemo(() => createChatConfigs(), []);
 
     useEffect(() => {
         const fetchSparks = async () => {
             try {
-                const fetchedSparks = await getSparks()
-                setSparks(fetchedSparks)
-                setLoading(false)
+                const fetchedSparks = await getSparks();
+                setSparks(fetchedSparks);
+                setLoading(false);
             } catch (err) {
-                console.error('Error fetching sparks:', err)
-                setError('Impossible de charger les sparks. Veuillez réessayer plus tard.')
-                setLoading(false)
+                logger.error('Error fetching sparks:', err);
+                setError('Impossible de charger les sparks. Veuillez réessayer plus tard.');
+                setLoading(false);
             }
-        }
+        };
 
-        fetchSparks()
-    }, [])
+        fetchSparks();
+    }, []);
 
     useEffect(() => {
         if (shouldReset) {
-            setShouldReset(false)
+            setShouldReset(false);
         }
-    }, [shouldReset])
+    }, [shouldReset]);
 
-  useEffect(() => {
+    useEffect(() => {
         // Always set the first Spark (index 0) to be expanded on load
         if (expandedCallIndex === null) {
-            setExpandedCallIndex(0)
+            setExpandedCallIndex(0);
         }
-  }, [])
+    }, []);
 
     const handleUseCaseClick = (prefillText: string) => {
         if (prefillText.trim()) {
             const initialMessages: Message[] = [{
                 role: 'user',
                 content: prefillText.trim()
-            }]
-            setMessages(initialMessages)
-            setShowConnect(false)
-            setIsChatExpanded(true)
+            }];
+            setMessages(initialMessages);
+            setShowConnect(false);
+            setIsChatExpanded(true);
         }
-    }
+    };
 
     const handleConnect = () => {
         // Scroll to the sign-up form with smooth behavior
-        const element = document.getElementById('signup-form')
+        const element = document.getElementById('signup-form');
         if (element) {
-            const headerOffset = 120
-            const elementPosition = element.getBoundingClientRect().top
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+            const headerOffset = 120;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
             window.scrollTo({
                 top: offsetPosition,
                 behavior: 'smooth'
-            })
+            });
         }
-    }
+    };
 
     const handleBack = (shouldReset?: boolean) => {
         if (shouldReset) {
             // Reset to initial state
-            setShowConnect(false)
-            setMessages([])
-            setShouldReset(true)
+            setShowConnect(false);
+            setMessages([]);
+            setShouldReset(true);
             setDocumentSummary({
                 challenge: '',
                 currentSituation: '',
@@ -114,28 +114,28 @@ export default function LandingClients() {
                 stakeholders: '',
                 previousAttempts: '',
                 hasEnoughData: false
-            })
-            setIsChatExpanded(false)
-            setExpandedCallIndex(0)
+            });
+            setIsChatExpanded(false);
+            setExpandedCallIndex(0);
         } else {
             // Just go back to chat interface while preserving all state
-            setShowConnect(false)
+            setShowConnect(false);
         }
-    }
+    };
 
     const handleMessagesUpdate = (newMessages: Message[]) => {
-        setMessages(newMessages)
+        setMessages(newMessages);
         for (let i = newMessages.length - 1; i >= 0; i--) {
-            const msg = newMessages[i]
+            const msg = newMessages[i];
             if (msg.role === 'assistant' && msg.summary) {
                 // Check if the summary is a DocumentSummary by checking for hasEnoughData property
                 if ('hasEnoughData' in msg.summary) {
-                    setDocumentSummary(msg.summary as DocumentSummary)
+                    setDocumentSummary(msg.summary as DocumentSummary);
                 }
-                break
+                break;
             }
         }
-    }
+    };
 
     const howItWorks = [
         {
@@ -158,7 +158,7 @@ export default function LandingClients() {
             title: "Recevez votre Rapport",
             description: "Recevez un rapport détaillé prêt à partager avec vos équipes."
         }
-    ]
+    ];
 
     const features = [
         {
@@ -181,7 +181,7 @@ export default function LandingClients() {
             description: "Pas de temps masqué ni de gestion commerciale complexe. Réservez votre session et commencez immédiatement.",
             icon: <Calendar className="h-6 w-6" />
         }
-    ]
+    ];
 
     const about_content = [
         {
@@ -194,10 +194,10 @@ export default function LandingClients() {
             description: "Pas de temps masqué. Sélectionnez un Spark, détaillez votre contexte et réservez la session. La mission commence et s'arrête avec votre rendez-vous.",
             icon: <Calendar className="h-6 w-6" />
         }
-    ]
+    ];
 
     if (loading) {
-        return <LoadingSpinner message="Chargement..." />
+        return <LoadingSpinner message="Chargement..." />;
     }
 
     return (
@@ -244,111 +244,266 @@ export default function LandingClients() {
                                     animate={{ height: isChatExpanded ? 'auto' : 'auto' }}
                                     transition={{ duration: 0.3 }}
                                 >
-                                    {showConnect ? (
-                                        <ConsultantConnect
-                                            onBack={handleBack}
-                                            documentSummary={documentSummary}
-                                            template={DOCUMENT_TEMPLATES[0]}
-                                            confirmationMessage="Confirmation de la demande"
-                                            submitMessage="Envoyer la demande"
-                                            messages={messages}
-                                        />
+                                    <div className="p-4 border-b border-gray-200">
+                                        <div className="flex items-center gap-2 text-left">
+                                            <Sparkles className="h-4 w-4 text-blue-600" />
+                                            <h2 className="text-lg font-semibold text-gray-900">
+                                                Rechercher un Spark
+                                            </h2>
+                                        </div>
+                                        <p className="text-xs text-gray-600 mt-1 text-left">
+                                            Notre assistant IA vous aide à trouver le Spark qu'il vous faut
+                                        </p>
+                                    </div>
+
+                                    {!isChatExpanded ? (
+                                        <div
+                                            className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                                            onClick={() => setIsChatExpanded(true)}
+                                        >
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Décrivez votre problématique..."
+                                                    className="w-full px-4 py-3 bg-white rounded-lg border border-gray-200 
+                                                            focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+                                                            transition-all cursor-pointer"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setIsChatExpanded(true);
+                                                    }}
+                                                    readOnly
+                                                />
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-600">
+                                                    <ArrowRight className="h-4 w-4" />
+                                                </div>
+                                            </div>
+                                        </div>
                                     ) : (
-                                        <AIChatInterface
-                                            messages={messages}
-                                            onMessagesUpdate={handleMessagesUpdate}
-                                            onConnect={() => setShowConnect(true)}
-                                            chatConfig={chatConfigs.default}
-                                            documentTemplate={DOCUMENT_TEMPLATES[0]}
-                                            shouldReset={shouldReset}
-                                        />
+                                        <motion.div
+                                            className="p-4"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ duration: 0.3 }}
+                                        >
+                                            <div className="relative">
+                                                {/* Chat Interface - Always rendered but conditionally visible */}
+                                                <div className={`${!showConnect ? 'block' : 'hidden'}`}>
+                                                    <AIChatInterface
+                                                        messages={messages}
+                                                        onMessagesUpdate={handleMessagesUpdate}
+                                                        template={DOCUMENT_TEMPLATES.spark_finder}
+                                                        systemPrompt={chatConfigs.spark_finder.systemPrompt}
+                                                        summaryInstructions={chatConfigs.spark_finder.summaryInstructions}
+                                                        onConnect={handleConnect}
+                                                        shouldReset={shouldReset}
+                                                    />
+                                                </div>
+
+                                                {/* Consultant Connect - Always rendered but conditionally visible */}
+                                                <div className={`${showConnect ? 'block' : 'hidden'}`}>
+                                                    <ConsultantConnect
+                                                        onBack={handleBack}
+                                                        documentSummary={documentSummary}
+                                                        template={DOCUMENT_TEMPLATES.consultant_qualification}
+                                                        confirmationMessage={chatConfigs.consultant_qualification.confirmationMessage}
+                                                        submitMessage={chatConfigs.consultant_qualification.submitMessage}
+                                                        messages={messages}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </motion.div>
                                     )}
                                 </motion.div>
                             </div>
                         </div>
                     </div>
+                </motion.div>
 
-                    {/* How it Works Section */}
-                    <div className="mb-16">
-                        <h2 className="text-3xl font-bold mb-12">Comment ça marche ?</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {howItWorks.map((step, index) => (
-                                <motion.div
-                                    key={step.title}
-                                    className="bg-white p-6 rounded-xl shadow-md"
-                                    {...fadeInUp}
-                                    transition={{ delay: index * 0.1 }}
-                                >
-                                    <div className="flex items-center justify-center w-12 h-12 mb-4 rounded-full bg-blue-100 text-blue-600 mx-auto">
-                                        {step.icon}
-                                    </div>
-                                    <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                                    <p className="text-gray-600">{step.description}</p>
-                                </motion.div>
-                            ))}
-                        </div>
+                {/* Service Packages Section - Replace with Features Section */}
+                <motion.div
+                    id="spark"
+                    className="mb-24"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                            Le <span className="highlight">Spark</span>: un concentré de conseil
+                        </h2>
+                        <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                            Une décision importante à prendre ? Un problème à régler ? Besoin de visibilité sur un sujet complexe ?
+                            Chaque module Spark vous permet de répondre à une problématique précise.
+                        </p>
                     </div>
-
-                    {/* Features Section */}
-                    <div className="mb-16">
-                        <h2 className="text-3xl font-bold mb-12">Pourquoi choisir Sparkier ?</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {features.map((feature, index) => (
-                                <motion.div
-                                    key={feature.title}
-                                    className="bg-white p-6 rounded-xl shadow-md"
-                                    {...fadeInUp}
-                                    transition={{ delay: index * 0.1 }}
-                                >
-                                    <div className="flex items-center justify-center w-12 h-12 mb-4 rounded-full bg-blue-100 text-blue-600 mx-auto">
-                                        {feature.icon}
-                                    </div>
-                                    <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                                    <p className="text-gray-600">{feature.description}</p>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* About Section */}
-                    <div className="mb-16">
-                        <h2 className="text-3xl font-bold mb-12">Pourquoi nous faire confiance ?</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {about_content.map((item, index) => (
-                                <motion.div
-                                    key={item.title}
-                                    className="bg-white p-6 rounded-xl shadow-md"
-                                    {...fadeInUp}
-                                    transition={{ delay: index * 0.1 }}
-                                >
-                                    <div className="flex items-center justify-center w-12 h-12 mb-4 rounded-full bg-blue-100 text-blue-600 mx-auto">
-                                        {item.icon}
-                                    </div>
-                                    <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
-                                    <p className="text-gray-600">{item.description}</p>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Sign Up Form */}
-                    <div id="signup-form" className="max-w-2xl mx-auto">
-                        <div className="text-center mb-8">
-                            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                                Commencez maintenant !
-                            </h2>
-                            <p className="text-gray-600">
-                                Créez votre compte et trouvez l'expert qu'il vous faut
-                            </p>
-                        </div>
-
-                        <ClientSignUpForm 
-                            className="bg-white p-8 rounded-xl shadow-md"
-                            onSuccess={handleConnect}
-                        />
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {features.map((feature, index) => (
+                            <motion.div
+                                key={index}
+                                variants={fadeInUp}
+                                className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-md text-center"
+                            >
+                                <div className="p-3 bg-blue-50 rounded-lg w-fit mx-auto mb-4">
+                                    {React.cloneElement(feature.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
+                                </div>
+                                <h3 className="text-xl font-semibold mb-2 text-gray-900">{feature.title}</h3>
+                                <p className="text-gray-600">{feature.description}</p>
+                            </motion.div>
+                        ))}
                     </div>
                 </motion.div>
+
+                {/* How it Works Section */}
+                <motion.div
+                    id="how-it-works"
+                    className="mb-24"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                            Comment ça <span className="highlight">marche</span> ?
+                        </h2>
+                        <p className="text-xl text-gray-600">
+                            Un processus simple en quatre étapes
+                        </p>
+                    </div>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {howItWorks.map((step, index) => (
+                            <motion.div
+                                key={index}
+                                variants={fadeInUp}
+                                className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-md text-center"
+                            >
+                                <div className="p-3 bg-blue-50 rounded-lg w-fit mx-auto mb-4">
+                                    {React.cloneElement(step.icon as React.ReactElement, { className: "h-6 w-6 text-blue-600" })}
+                                </div>
+                                <h3 className="text-xl font-semibold mb-2 text-gray-900">{step.title}</h3>
+                                <p className="text-gray-600">{step.description}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+
+                {/* Expertise Areas Section */}
+                <motion.div
+                    id="why-sparkier"
+                    className="mb-24"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                            Pourquoi <span className="highlight">Sparkier</span> ?
+                        </h2>
+                        <p className="text-xl text-gray-600">
+                            Une nouvelle approche du conseil, simple et efficace
+                        </p>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-8">
+                        {about_content.map((item, index) => (
+                            <motion.div
+                                key={index}
+                                variants={fadeInUp}
+                                className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-blue-100 shadow-md"
+                            >
+                                <div className="p-3 bg-blue-50 rounded-lg w-fit mb-4">
+                                    {React.cloneElement(item.icon as React.ReactElement, {
+                                        className: "h-6 w-6 text-blue-600"
+                                    })}
+                                </div>
+                                <h3 className="text-xl font-semibold mb-4 text-gray-900">
+                                    {item.title}
+                                </h3>
+                                <p className="text-gray-600 leading-relaxed">
+                                    {item.description}
+                                </p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+
+                {/* CTA Section with Sign Up Form */}
+                <motion.div
+                    id="signup-form"
+                    className="max-w-2xl mx-auto px-3 sm:px-0"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <div className="text-center mb-8">
+                        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                            Prêt à <span className="highlight">commencer</span> ?
+                        </h2>
+                        <p className="text-gray-600">
+                            Créez votre compte et trouvez l'expert qu'il vous faut
+                        </p>
+                    </div>
+
+                    <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md">
+                        <ClientSignUpForm />
+                    </div>
+                </motion.div>
+
+                {/* Connect Form */}
+                {showConnect && (
+                    <div className="max-w-4xl mx-auto px-4 mb-8">
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                            <ConsultantConnect 
+                                onBack={handleBack}
+                                documentSummary={documentSummary}
+                                template={DOCUMENT_TEMPLATES.spark_finder}
+                                confirmationMessage={chatConfigs.spark_finder.confirmationMessage}
+                                submitMessage={chatConfigs.spark_finder.submitMessage}
+                                messages={messages}
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
+
+            <style>{`
+                .scroll-animation {
+                    opacity: 0;
+                    transform: translateY(30px);
+                    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+                    will-change: transform, opacity;
+                }
+                .animate-in {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .scroll-animation {
+                        transition: none;
+                        opacity: 1;
+                        transform: none;
+                    }
+                }
+                .slide-down-enter {
+                    opacity: 0;
+                    max-height: 0;
+                    transform: translateY(-20px);
+                    overflow: hidden;
+                }
+                .slide-down-enter-active {
+                    opacity: 1;
+                    max-height: 2000px;
+                    transform: translateY(0);
+                    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+                    overflow: hidden;
+                }
+                html {
+                    scroll-padding-top: 80px; /* Add padding for fixed header */
+                }
+            `}</style>
         </div>
-    )
-} 
+    );
+}
