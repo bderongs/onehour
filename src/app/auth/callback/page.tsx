@@ -11,11 +11,17 @@ export default function AuthCallback() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
-    const searchParams = useSearchParams();
+    const params = useSearchParams();
     const { showNotification } = useNotification();
 
     useEffect(() => {
         const handleEmailConfirmation = async () => {
+            if (!params) {
+                logger.error('No search params available');
+                router.push('/signin');
+                return;
+            }
+
             try {
                 // First check if we already have a valid session
                 const { data: { session } } = await supabase.auth.getSession();
@@ -25,9 +31,9 @@ export default function AuthCallback() {
                     return;
                 }
 
-                const tokenHash = searchParams.get('token_hash');
-                const type = searchParams.get('type');
-                const next = searchParams.get('next');
+                const tokenHash = params.get('token_hash');
+                const type = params.get('type');
+                const next = params.get('next');
                 
                 logger.info('Processing auth callback', { type, hasTokenHash: !!tokenHash, hasNext: !!next });
 
@@ -74,7 +80,7 @@ export default function AuthCallback() {
 
             } catch (err: any) {
                 logger.error('Error during email confirmation:', err);
-                const email = searchParams.get('email') || '';
+                const email = params.get('email') || '';
                 const errorMessage = err.message || 'Une erreur est survenue lors de la confirmation';
                 setError(errorMessage);
                 showNotification('error', errorMessage);
@@ -86,7 +92,7 @@ export default function AuthCallback() {
         };
 
         handleEmailConfirmation();
-    }, [router, searchParams, showNotification]);
+    }, [router, params, showNotification]);
 
     if (loading) {
         return <LoadingSpinner message="Vérification de votre email..." />;

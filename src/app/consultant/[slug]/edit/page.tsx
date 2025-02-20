@@ -14,7 +14,7 @@ import { useNotification } from '@/contexts/NotificationContext';
 export default function ConsultantProfileEditPage() {
     const router = useRouter();
     const params = useParams();
-    const slug = params.slug as string;
+    const slug = Array.isArray(params?.slug) ? params.slug[0] : params?.slug ?? '';
     const [consultant, setConsultant] = useState<ConsultantProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);

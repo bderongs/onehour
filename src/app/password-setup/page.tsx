@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import type { FormEvent } from 'react';
 import { Lock } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { PasswordRequirements, isPasswordValid, doPasswordsMatch } from '@/components/PasswordRequirements';
@@ -15,11 +16,11 @@ export default function PasswordSetupPage() {
     const [loading, setLoading] = useState(false);
     const { showNotification } = useNotification();
     const router = useRouter();
-    const searchParams = useSearchParams();
+    const params = useSearchParams();
 
     useEffect(() => {
         // Check if we have a valid token in the URL
-        const token = searchParams.get('token');
+        const token = params?.get('token');
         if (!token) {
             logger.error('No token found in URL, redirecting to signin');
             router.push('/signin');
@@ -39,9 +40,9 @@ export default function PasswordSetupPage() {
         };
 
         getEmail();
-    }, [searchParams, router]);
+    }, [params, router]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
 
@@ -58,8 +59,8 @@ export default function PasswordSetupPage() {
         }
 
         try {
-            const token = searchParams.get('token');
-            const next = searchParams.get('next');
+            const token = params?.get('token');
+            const next = params?.get('next');
 
             if (!token) {
                 throw new Error('Token manquant');
