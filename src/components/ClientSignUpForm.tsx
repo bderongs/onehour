@@ -161,7 +161,7 @@ export function ClientSignUpForm({
         <form onSubmit={handleSubmit} className={`space-y-6 ${className}`}>
             <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
                         Prénom
                     </label>
                     <input
@@ -175,7 +175,7 @@ export function ClientSignUpForm({
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
                         Nom
                     </label>
                     <input
@@ -191,7 +191,7 @@ export function ClientSignUpForm({
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
                     Entreprise
                 </label>
                 <input
@@ -206,7 +206,7 @@ export function ClientSignUpForm({
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
                     Email professionnel
                 </label>
                 <input
@@ -221,7 +221,7 @@ export function ClientSignUpForm({
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
                     Fonction
                 </label>
                 <input
@@ -236,7 +236,7 @@ export function ClientSignUpForm({
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
                     Secteur d'activité
                 </label>
                 <select
