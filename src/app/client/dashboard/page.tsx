@@ -130,7 +130,7 @@ export default function Page() {
         const checkUserAndFetchRequests = async () => {
             try {
                 if (!user) {
-                    router.push('/auth/sign-in')
+                    router.push('/sign-in')
                     return
                 }
 

@@ -126,15 +126,22 @@ export default function PasswordSetupPage() {
                 // Wait a moment for the session to be fully established
                 await new Promise(resolve => setTimeout(resolve, 500));
 
-                // Double check that we're still authenticated
-                const { data: { session: finalSession } } = await supabase.auth.getSession();
-                if (!finalSession) {
-                    logger.error('Session lost after password setup');
-                    throw new Error('Session perdue après la configuration du mot de passe');
-                }
+                try {
+                    // Double check that we're still authenticated
+                    const { data: { session: finalSession } } = await supabase.auth.getSession();
+                    if (!finalSession) {
+                        logger.error('Session lost after password setup');
+                        throw new Error('Session perdue après la configuration du mot de passe');
+                    }
 
-                router.push(decodedNext);
-                return;
+                    logger.info('Starting redirection to', { url: decodedNext });
+                    await router.replace(decodedNext);
+                    logger.info('Redirection completed');
+                    return;
+                } catch (error) {
+                    logger.error('Error during redirection:', error);
+                    throw error;
+                }
             }
 
             // Fallback to role-based redirection if no next URL
