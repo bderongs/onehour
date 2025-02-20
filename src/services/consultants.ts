@@ -147,7 +147,7 @@ export async function updateConsultantReviews(consultantId: string, reviews: Con
             const existingReviews = reviews.filter(review => !review.id.startsWith('temp-'));
             const newReviews = reviews.filter(review => review.id.startsWith('temp-'));
             const keepIds = new Set(existingReviews.map(r => r.id));
-            const idsToDelete = [...currentIds].filter(id => !keepIds.has(id));
+            const idsToDelete = Array.from(currentIds).filter(id => !keepIds.has(id));
 
             // Delete reviews that are no longer present
             if (idsToDelete.length > 0) {
@@ -344,4 +344,24 @@ export async function deleteConsultant(consultantId: string): Promise<boolean> {
         console.error('Error deleting consultant:', error);
         return false;
     }
+}
+
+/**
+ * Get a consultant profile by UUID
+ * @param uuid The UUID of the consultant
+ */
+export async function getConsultantByUuid(uuid: string): Promise<ConsultantProfile | null> {
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', uuid)
+        .contains('roles', ['consultant'])
+        .single();
+
+    if (error) {
+        console.error('Error fetching consultant profile by UUID:', error);
+        return null;
+    }
+
+    return data as ConsultantProfile;
 }

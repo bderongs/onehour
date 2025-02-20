@@ -19,7 +19,7 @@ export function Footer() {
   const pathname = usePathname() ?? '/';
   const isConsultantsPage = pathname === '/consultants';
   const isPricingPage = pathname === '/pricing';
-  const isProfilePage = pathname === '/profile' || /^\/consultants\/[^/]+$/.test(pathname);
+  const isProfilePage = pathname === '/profile' || /^\/[^/]+$/.test(pathname);
   const isConsultantSection = isConsultantsPage || isPricingPage;
 
   return (

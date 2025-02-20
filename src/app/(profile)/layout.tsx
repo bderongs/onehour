@@ -1,10 +1,10 @@
-import { Footer } from '../components/Footer';
+import { Footer } from '../../components/Footer';
 
-interface ConsultantProfileLayoutProps {
+export default function Layout({
+  children,
+}: {
   children: React.ReactNode;
-}
-
-export const ConsultantProfileLayout: React.FC<ConsultantProfileLayoutProps> = ({ children }) => {
+}) {
   return (
     <div className="min-h-screen flex flex-col relative">
       {/* Animated Background */}
@@ -36,4 +36,4 @@ export const ConsultantProfileLayout: React.FC<ConsultantProfileLayoutProps> = (
       <Footer />
     </div>
   );
-}; 
+} 
