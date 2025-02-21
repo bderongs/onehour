@@ -12,7 +12,6 @@ import { createClientRequest, getClientRequestsByClientId } from '@/services/cli
 import { useClientSignUp } from '@/contexts/ClientSignUpContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { Metadata } from '@/components/Metadata';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -175,8 +174,6 @@ export default function SparkProductPage() {
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            <Metadata spark={spark} />
-            
             {/* Demo Warning Banner */}
             {pageContext === 'consultant_marketing' && (
                 <div className="bg-amber-50 border-b border-amber-200">

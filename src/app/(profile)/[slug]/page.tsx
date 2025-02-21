@@ -15,7 +15,6 @@ import { formatDuration, formatPrice } from '@/utils/format';
 import { getCurrentUser } from '@/services/auth';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { useNotification } from '@/contexts/NotificationContext';
-import { Metadata } from '@/components/Metadata';
 import { getDefaultAvatarUrl } from '@/utils/avatar';
 import logger from '@/utils/logger';
 
@@ -201,8 +200,6 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Metadata consultant={consultant} />
-
             {/* Sticky Edit Button */}
             {currentUser?.id === consultant.id && (
                 <div className="fixed right-4 top-4 z-50">

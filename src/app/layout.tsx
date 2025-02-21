@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import { Providers } from '@/components/Providers';
 import { Suspense } from 'react';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { Metadata as MetadataComponent } from '@/components/Metadata';
 
 export const metadata: Metadata = {
   title: 'Sparkier',
@@ -20,7 +19,6 @@ export default function RootLayout({
       <body>
         <Providers>
           <div className="min-h-screen flex flex-col">
-            <MetadataComponent />
             <Suspense fallback={<LoadingSpinner />}>
               {children}
             </Suspense>
