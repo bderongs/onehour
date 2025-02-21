@@ -19,7 +19,7 @@ import { Metadata } from '@/components/Metadata';
 import { getDefaultAvatarUrl } from '@/utils/avatar';
 import logger from '@/utils/logger';
 
-export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
+export default function ConsultantProfilePage() {
     const params = useParams<{ slug: string }>();
     const urlSlug = params?.slug;
     const router = useRouter();
@@ -46,7 +46,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
     const [missions, setMissions] = useState<ConsultantMission[]>([]);
 
     // Use propId if provided, otherwise use urlSlug
-    const consultantIdentifier = propId || urlSlug;
+    const consultantIdentifier = urlSlug;
 
     // Fetch current user when component mounts
     useEffect(() => {
@@ -61,8 +61,8 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const consultantData = propId 
-                    ? await getConsultantProfile(propId)
+                const consultantData = urlSlug 
+                    ? await getConsultantProfile(urlSlug)
                     : await getConsultantBySlug(consultantIdentifier || '');
 
                 if (!consultantData) {
@@ -105,7 +105,7 @@ export default function ConsultantProfilePage({ id: propId }: { id?: string }) {
             setSparks([]);
             setMissions([]);
         };
-    }, [consultantIdentifier, propId, router, showNotification]);
+    }, [consultantIdentifier, urlSlug, router, showNotification]);
 
     // Memoize chat configs based on consultant's firstname
     const chatConfigs = useMemo(

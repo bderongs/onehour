@@ -1,34 +1,27 @@
 const isDevelopment = process.env.NODE_ENV === 'development';
 
+console.log('Logger initialized with NODE_ENV:', process.env.NODE_ENV);
+
 const logger = {
   log: (...args: any[]) => {
-    if (isDevelopment) {
-      console.log(...args);
-    }
+    console.log('[LOG]', ...args);
   },
   info: (...args: any[]) => {
-    if (isDevelopment) {
-      console.info(...args);
-    }
+    console.info('[INFO]', ...args);
   },
   warn: (...args: any[]) => {
-    if (isDevelopment) {
-      console.warn(...args);
-    }
+    console.warn('[WARN]', ...args);
   },
   error: (...args: any[]) => {
-    // Always log errors, even in production
-    console.error(...args);
+    console.error('[ERROR]', ...args);
   },
   debug: (...args: any[]) => {
-    if (isDevelopment) {
-      console.debug(...args);
-    }
+    console.debug('[DEBUG]', ...args);
   },
 };
 
-// Log the environment state at debug level
-logger.debug('Current NODE_ENV:', process.env.NODE_ENV);
-logger.debug('isDevelopment:', isDevelopment);
+// Log the environment state
+console.log('Current NODE_ENV:', process.env.NODE_ENV);
+console.log('isDevelopment:', isDevelopment);
 
 export default logger; 

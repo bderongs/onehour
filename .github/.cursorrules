@@ -17,3 +17,5 @@ The database schema should always be fully idempotent. Beware of the order of th
 
 When you remove a lucide-react icon, also remove the import statement from the file.
 
+I am in the process of learning to code, so do not hesitate to explain your choices and to help me understand the code.
+

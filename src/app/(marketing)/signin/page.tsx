@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import logger from '@/utils/logger';
@@ -18,6 +18,7 @@ export default function SignInPage() {
     const searchParams = useSearchParams();
     const { user, loading: authLoading, refreshUser } = useAuth();
     const { showNotification } = useNotification();
+    const supabase = createClientComponentClient();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -59,7 +60,9 @@ export default function SignInPage() {
                 window.location.href = returnUrl;
             } else {
                 const currentUser = await getCurrentUser();
-                if (currentUser?.roles.includes('consultant') || currentUser?.roles.includes('admin')) {
+                if (currentUser?.roles.includes('admin')) {
+                    window.location.href = '/admin/dashboard';
+                } else if (currentUser?.roles.includes('consultant')) {
                     window.location.href = '/sparks/manage';
                 } else if (currentUser?.roles.includes('client')) {
                     window.location.href = '/client/dashboard';
@@ -94,7 +97,9 @@ export default function SignInPage() {
             const returnUrl = searchParams?.get('returnUrl');
             if (returnUrl) {
                 window.location.href = returnUrl;
-            } else if (user.roles.includes('consultant') || user.roles.includes('admin')) {
+            } else if (user.roles.includes('admin')) {
+                window.location.href = '/admin/dashboard';
+            } else if (user.roles.includes('consultant')) {
                 window.location.href = '/sparks/manage';
             } else if (user.roles.includes('client')) {
                 window.location.href = '/client/dashboard';

@@ -91,17 +91,26 @@ const transformSparkToDB = (spark: Partial<Spark>): Record<string, any> => {
 };
 
 export const getSparks = async (): Promise<Spark[]> => {
-    const { data, error } = await supabase
-        .from('sparks')
-        .select('*')
-        .order('title');
+    try {
+        const { data, error } = await supabase
+            .from('sparks')
+            .select('*')
+            .order('title');
 
-    if (error) {
-        console.error('Error fetching sparks:', error);
-        throw error;
+        if (error) {
+            logger.error('Error fetching sparks:', error);
+            throw error;
+        }
+
+        if (!data) {
+            throw new Error('No data received from Supabase');
+        }
+
+        return data.map(transformSparkFromDB);
+    } catch (err) {
+        logger.error('Error in getSparks:', err);
+        throw err;
     }
-
-    return data.map(transformSparkFromDB);
 };
 
 export const getSparkByUrl = async (url: string): Promise<Spark | null> => {

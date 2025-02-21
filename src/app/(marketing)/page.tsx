@@ -48,11 +48,18 @@ export default function Page() {
         const fetchSparks = async () => {
             try {
                 const fetchedSparks = await getSparks();
-                setSparks(fetchedSparks);
+                if (!fetchedSparks || fetchedSparks.length === 0) {
+                    logger.info('No sparks found');
+                    setSparks([]);
+                } else {
+                    logger.info('Sparks fetched successfully:', { count: fetchedSparks.length });
+                    setSparks(fetchedSparks);
+                }
                 setLoading(false);
             } catch (err) {
                 logger.error('Error fetching sparks:', err);
                 setError('Impossible de charger les sparks. Veuillez réessayer plus tard.');
+                setSparks([]);
                 setLoading(false);
             }
         };

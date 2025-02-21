@@ -1,131 +1,47 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import { ArrowRight, Sparkles, Package2, Clock, Store } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { SparksGrid } from '@/components/SparksGrid';
+import React, { Suspense } from 'react';
+import { Package2, Clock, Store, Sparkles } from 'lucide-react';
 import { getSparks } from '@/services/sparks';
-import type { Spark } from '@/types/spark';
+import { SparksGridSection } from './components/SparksGridSection';
+import { InteractiveFeatures } from './components/InteractiveFeatures';
 import { ConsultantSignUpForm } from '@/components/ConsultantSignUpForm';
 import '@/styles/highlight.css';
-import { Helmet } from 'react-helmet-async';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
 
-const fadeInUp = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5 }
+// Define metadata for SEO
+export const metadata = {
+    title: 'Sparkier - Accélérez votre activité de conseil avec des offres packagées',
+    description: 'Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre. Simplifiez votre activité de conseil et augmentez vos revenus.',
+    openGraph: {
+        title: 'Sparkier - Accélérez votre activité de conseil',
+        description: 'Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre.',
+        type: 'website',
+        locale: 'fr_FR',
+        siteName: 'Sparkier',
+    },
 };
 
-const stagger = {
-    animate: {
-        transition: {
-            staggerChildren: 0.1
-        }
-    }
-};
+// Loading fallback components
+const SparksSkeleton = () => (
+    <div className="animate-pulse">
+        <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
+        <div className="h-48 bg-gray-200 rounded-lg"></div>
+    </div>
+);
 
-const LandingConsultants = () => {
-    const router = useRouter();
-    const [sparks, setSparks] = useState<Spark[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(null);
+const FormSkeleton = () => (
+    <div className="animate-pulse">
+        <div className="h-96 bg-gray-200 rounded-lg"></div>
+    </div>
+);
 
-    useEffect(() => {
-        const fetchSparks = async () => {
-            try {
-                const fetchedSparks = await getSparks();
-                setSparks(fetchedSparks);
-                setLoading(false);
-            } catch (err) {
-                console.error('Error fetching sparks:', err);
-                setError('Impossible de charger les sparks. Veuillez réessayer plus tard.');
-                setLoading(false);
-            }
-        };
-
-        fetchSparks();
-    }, []);
-
-    useEffect(() => {
-        // Handle hash-based navigation
-        if (window.location.hash === '#signup-form') {
-            const element = document.getElementById('signup-form');
-            if (element) {
-                const headerOffset = 120;
-                const elementPosition = element.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        }
-    }, []); // Run only once when component mounts
-
-    useEffect(() => {
-        // Always set the first Spark (index 0) to be expanded on load
-        if (expandedCallIndex === null) {
-            setExpandedCallIndex(0);
-        }
-    }, []);
-
-    const handleSparkCreation = () => {
-        const element = document.getElementById('signup-form');
-        const headerOffset = 120; // Increased offset to show more of the form header
-
-        if (element) {
-            // Small delay to ensure smooth animation
-            setTimeout(() => {
-                const elementPosition = element.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }, 100);
-        }
-    };
+async function ConsultantsPage() {
+    // Fetch sparks data server-side
+    const sparks = await getSparks();
 
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-            <Helmet>
-                <title>Sparkier - Créez vos offres de conseil packagées</title>
-                <meta name="description" content="Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre. Simplifiez votre activité de conseil avec Sparkier." />
-                
-                {/* OpenGraph Meta Tags */}
-                <meta name="title" property="og:title" content="Sparkier - Créez vos offres de conseil packagées" />
-                <meta name="description" property="og:description" content="Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre. Simplifiez votre activité de conseil avec Sparkier." />
-                <meta name="image" property="og:image" content="https://sparkier.io/images/og-consultant.png" />
-                <meta name="image:width" property="og:image:width" content="1200" />
-                <meta name="image:height" property="og:image:height" content="630" />
-                <meta name="logo" property="og:logo" content="https://sparkier.io/favicon.png" />
-                <meta name="url" property="og:url" content="https://sparkier.io/consultants" />
-                <meta name="type" property="og:type" content="website" />
-                <meta name="site_name" property="og:site_name" content="Sparkier" />
-                
-                {/* Twitter Card Meta Tags */}
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:site" content="@sparkier" />
-                <meta name="twitter:title" content="Sparkier - Créez vos offres de conseil packagées" />
-                <meta name="twitter:description" content="Transformez vos expertises en Sparks : des modules de conseil packagés et prêts à vendre. Simplifiez votre activité de conseil avec Sparkier." />
-                <meta name="twitter:image" content="https://sparkier.io/images/og-consultant.png" />
-                <meta name="twitter:image:alt" content="Sparkier - Créez vos offres de conseil packagées" />
-            </Helmet>
-
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* Hero Section */}
-                <motion.div
-                    className="text-center mb-16"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                >
+                <div className="text-center mb-16 opacity-0 translate-y-4 animate-[fadeInUp_0.6s_ease-out_forwards]">
                     <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 text-gray-900 leading-tight px-2">
                         Accélérez votre activité de conseil avec des <span className="highlight">offres packagées</span>
                     </h1>
@@ -133,76 +49,20 @@ const LandingConsultants = () => {
                         Transformez vos expertises en <span className="highlight">Sparks</span> : des modules de conseil packagés et <span className="highlight">prêts à vendre</span>.
                     </p>
 
-                    {/* Example Sparks Section */}
-                    <div className="text-center mb-6">
-                        <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3">
-                            Exemples de Sparks populaires
-                        </h3>
-                        <p className="text-gray-600 max-w-3xl mx-auto mb-6">
-                            Découvrez comment d'autres consultants structurent leurs offres. Inspirez-vous de ces exemples pour créer vos propres Sparks personnalisés.
-                        </p>
-                    </div>
-
-                    {/* Sparks Grid */}
-                    <div className="mb-12 sm:mb-16">
-                        {loading ? (
-                            <div className="text-center py-8">
-                                <LoadingSpinner message="Chargement des Sparks..." />
-                            </div>
-                        ) : error ? (
-                            <div className="text-center py-8">
-                                <p className="text-red-600">{error}</p>
-                            </div>
-                        ) : (
-                            <SparksGrid
-                                sparks={sparks.filter(spark => [
-                                    'fda49682-dd97-4e3a-b9db-52a234348454',
-                                    '60f1dcb7-a91b-4821-9fdd-7c19f240aa4d',
-                                    '886c9a5c-19f6-429e-90fd-e3305eb37cf8'
-                                ].includes(spark.id))}
-                                expandedCallIndex={expandedCallIndex}
-                                setExpandedCallIndex={setExpandedCallIndex}
-                                onCallClick={handleSparkCreation}
-                                buttonText="Créer mon premier Spark"
-                                showAvailability={false}
-                                showCreateCard={true}
-                                showDetailsButton={true}
-                                onDetailsClick={(spark: Spark) => {
-                                    router.push(`/sparks/${spark.url}`);
-                                }}
-                            />
-                        )}
-                    </div>
+                    {/* Sparks Grid Section */}
+                    <Suspense fallback={<SparksSkeleton />}>
+                        <SparksGridSection initialSparks={sparks} />
+                    </Suspense>
 
                     <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-8 sm:mb-12 px-2">
                         Avec <span className="highlight">Sparkier.io</span>, dites adieu aux échanges interminables et aux négociations fastidieuses. Créez des <span className="highlight">Sparks</span> — des missions ultra-claires et packagées de 30 minutes à 2 heures — qui vous permettent de convertir des prospects en clients en un clic, et d'offrir une expérience de conseil simple, rapide et efficace.
                     </p>
 
-                    <motion.div
-                        className="flex flex-col sm:flex-row justify-center gap-4"
-                        variants={stagger}
-                        initial="initial"
-                        animate="animate"
-                    >
-                        <motion.button
-                            variants={fadeInUp}
-                            onClick={() => document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="w-full sm:w-auto bg-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center justify-center gap-2 group"
-                        >
-                            <span className="whitespace-nowrap">Créer mes premiers Sparks gratuitement</span>
-                            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                        </motion.button>
-                        <motion.div variants={fadeInUp} className="w-full sm:w-auto">
-                            <Link
-                                href="/profile"
-                                className="w-full sm:w-auto bg-white text-blue-600 border-2 border-blue-600 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors inline-flex items-center justify-center gap-2 group"
-                            >
-                                <span className="whitespace-nowrap">Voir un profil exemple</span>
-                                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                            </Link>
-                        </motion.div>
-                    </motion.div>
-                </motion.div>
+                    {/* Interactive Features (CTA Buttons) */}
+                    <Suspense fallback={<div>Chargement...</div>}>
+                        <InteractiveFeatures />
+                    </Suspense>
+                </div>
 
                 {/* Key Features Section */}
                 <div className="text-center mb-8 sm:mb-12">
@@ -211,10 +71,7 @@ const LandingConsultants = () => {
                     </h2>
                 </div>
 
-                <div
-                    id="key-features"
-                    className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-12 sm:mb-16"
-                >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-12 sm:mb-16">
                     {[
                         {
                             title: "Des offres prêtes à vendre en quelques minutes",
@@ -237,13 +94,10 @@ const LandingConsultants = () => {
                             icon: <Clock className="h-6 w-6" />
                         }
                     ].map((feature, index) => (
-                        <motion.div
+                        <div
                             key={index}
-                            className="bg-white rounded-xl p-6 sm:p-8 shadow-md"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
+                            className="bg-white rounded-xl p-6 sm:p-8 shadow-md opacity-0 translate-y-4 animate-[fadeInUp_0.5s_ease-out_forwards]"
+                            style={{ animationDelay: `${index * 100}ms` }}
                         >
                             <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                                 <div className="p-2 sm:p-3 bg-blue-50 rounded-lg w-fit h-fit">
@@ -258,11 +112,11 @@ const LandingConsultants = () => {
                                     </p>
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
 
-                {/* Features Grid with Title */}
+                {/* How it works Section */}
                 <div className="mb-12 sm:mb-16">
                     <div className="text-center mb-8 sm:mb-12">
                         <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-gray-900 px-2">
@@ -270,14 +124,7 @@ const LandingConsultants = () => {
                         </h2>
                     </div>
 
-                    <motion.div
-                        id="features"
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8"
-                        variants={stagger}
-                        initial="initial"
-                        whileInView="animate"
-                        viewport={{ once: true }}
-                    >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
                         {[
                             {
                                 title: "Configurez et générez vos Sparks",
@@ -292,10 +139,10 @@ const LandingConsultants = () => {
                                 description: "Recevez un brief détaillé avant chaque session et délivrez un conseil impactant dès la première minute !"
                             }
                         ].map((feature, index) => (
-                            <motion.div
+                            <div
                                 key={index}
-                                variants={fadeInUp}
-                                className="bg-white p-4 sm:p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+                                className="bg-white p-4 sm:p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow opacity-0 translate-y-4 animate-[fadeInUp_0.5s_ease-out_forwards]"
+                                style={{ animationDelay: `${index * 100}ms` }}
                             >
                                 <div className="flex items-center gap-2 mb-3">
                                     <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold">
@@ -304,9 +151,9 @@ const LandingConsultants = () => {
                                     <h3 className="text-xl font-semibold text-gray-900">{feature.title}</h3>
                                 </div>
                                 <p className="text-gray-600">{feature.description}</p>
-                            </motion.div>
+                            </div>
                         ))}
-                    </motion.div>
+                    </div>
                 </div>
 
                 {/* Advantages Section */}
@@ -317,35 +164,28 @@ const LandingConsultants = () => {
                         </h2>
                     </div>
 
-                    <motion.div
-                        className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8"
-                        variants={stagger}
-                        initial="initial"
-                        whileInView="animate"
-                        viewport={{ once: true }}
-                    >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
                         {[
                             "Maximisez votre rentabilité en éliminant les phases commerciales chronophages",
-                             "Augmentez votre taux de conversion grâce à des offres standardisées et prêtes à l'emploi",
+                            "Augmentez votre taux de conversion grâce à des offres standardisées et prêtes à l'emploi",
                             "Gagnez du temps sur la préparation de vos offres",
                             "Proposez une expérience client fluide avec des briefs précis et une prise de rendez-vous simplifiée"
-                           
                         ].map((advantage, index) => (
-                            <motion.div
+                            <div
                                 key={index}
-                                variants={fadeInUp}
-                                className="bg-white p-4 sm:p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow flex items-start gap-3"
+                                className="bg-white p-4 sm:p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow flex items-start gap-3 opacity-0 translate-y-4 animate-[fadeInUp_0.5s_ease-out_forwards]"
+                                style={{ animationDelay: `${index * 100}ms` }}
                             >
                                 <div className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1">
                                     {/* Placeholder for the CheckCircle icon */}
                                 </div>
                                 <p className="text-gray-600">{advantage}</p>
-                            </motion.div>
+                            </div>
                         ))}
-                    </motion.div>
+                    </div>
                 </div>
 
-                {/* CTA Section */}
+                {/* Final CTA Section */}
                 <div className="text-center mb-12 sm:mb-16">
                     <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-gray-900">
                         Prêt à <span className="highlight">propulser</span> votre activité de conseil ?
@@ -359,31 +199,29 @@ const LandingConsultants = () => {
                     </p>
                 </div>
 
-                {/* Sign Up Form */}
-                <motion.div
-                    id="signup-form"
-                    className="max-w-2xl mx-auto px-3 sm:px-0"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <div className="text-center mb-8">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                            Créez votre profil maintenant
-                        </h2>
-                        <p className="text-gray-600">
-                            Packagez vos services en Sparks et commencez à vendre
-                        </p>
-                    </div>
+                {/* Sign Up Section */}
+                <Suspense fallback={<FormSkeleton />}>
+                    <div
+                        id="signup-form"
+                        className="max-w-2xl mx-auto px-3 sm:px-0 opacity-0 translate-y-4 animate-[fadeInUp_0.5s_ease-out_forwards]"
+                    >
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                                Créez votre profil maintenant
+                            </h2>
+                            <p className="text-gray-600">
+                                Packagez vos services en Sparks et commencez à vendre
+                            </p>
+                        </div>
 
-                    <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md">
-                        <ConsultantSignUpForm />
+                        <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md">
+                            <ConsultantSignUpForm />
+                        </div>
                     </div>
-                </motion.div>
+                </Suspense>
             </div>
         </div>
     );
-};
+}
 
-export default LandingConsultants;
+export default ConsultantsPage;

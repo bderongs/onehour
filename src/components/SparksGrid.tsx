@@ -5,6 +5,7 @@ import { Spark } from '../types/spark';
 import { Logo } from './Logo';
 import { formatDuration, formatPrice } from '../utils/format';
 import { useRouter } from 'next/navigation';
+import logger from '@/utils/logger';
 
 // Utility function to get next available business date
 const getNextBusinessDate = () => {
@@ -74,10 +75,20 @@ export function SparksGrid({
     onDetailsClick
 }: SparksGridProps) {
     const router = useRouter();
+    
+    // Add logging for initial render and props
+    logger.info('SparksGrid rendered', { 
+        sparksCount: sparks.length, 
+        expandedCallIndex,
+        showAvailability,
+        showCreateCard
+    });
+
     // Memoize the dates for each card
     const availableDates = useMemo(() => {
+        logger.info('Regenerating available dates');
         return sparks.map(() => getNextBusinessDate());
-    }, [sparks.length]); // Only regenerate if the number of calls changes
+    }, [sparks.length]);
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto px-4 sm:px-0">
@@ -90,6 +101,7 @@ export function SparksGrid({
                         transform-gpu hover:scale-[1.02]
                         ${expandedCallIndex === index ? 'sm:col-span-2 md:row-span-3 h-full' : ''}`}
                     onClick={() => {
+                        logger.info('Spark card clicked', { index, currentExpandedIndex: expandedCallIndex });
                         if (expandedCallIndex === index) {
                             return;
                         }
@@ -160,6 +172,7 @@ export function SparksGrid({
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
+                                                        logger.info('Navigating to spark details', { url: `/sparks/${spark.url}` });
                                                         router.push(`/sparks/${spark.url}`);
                                                         setExpandedCallIndex(null);
                                                     }}

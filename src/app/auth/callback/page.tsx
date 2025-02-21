@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import logger from '@/utils/logger';
 import { useNotification } from '@/contexts/NotificationContext';
@@ -13,6 +13,7 @@ export default function AuthCallback() {
     const router = useRouter();
     const params = useSearchParams();
     const { showNotification } = useNotification();
+    const supabase = createClientComponentClient();
 
     useEffect(() => {
         const handleEmailConfirmation = async () => {
@@ -92,7 +93,7 @@ export default function AuthCallback() {
         };
 
         handleEmailConfirmation();
-    }, [router, params, showNotification]);
+    }, [router, params, showNotification, supabase]);
 
     if (loading) {
         return <LoadingSpinner message="Vérification de votre email..." />;
