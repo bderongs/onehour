@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, ReactNode, useState, useEffect, useCallback } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { supabase } from '@/lib/supabase';
 import { getCurrentUser } from '../services/auth';
 import type { UserProfile } from '../services/auth';
 import logger from '../utils/logger';
@@ -17,7 +17,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
-    const supabase = createClientComponentClient();
 
     const refreshUser = useCallback(async () => {
         try {
@@ -82,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             mounted = false;
             subscription.unsubscribe();
         };
-    }, [refreshUser, supabase]);
+    }, [refreshUser]);
 
     const value = {
         user,
