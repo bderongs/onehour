@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase';
 import logger from '../utils/logger';
 
 export interface ClientProfile {
@@ -25,7 +25,7 @@ const transformClientFromDB = (data: any): ClientProfile => ({
 });
 
 export const getClientById = async (id: string): Promise<ClientProfile | null> => {
-    const client = supabase();
+    const client = createClient();
     const { data, error } = await client
         .from('profiles')
         .select('*')
@@ -45,7 +45,7 @@ export const getClientById = async (id: string): Promise<ClientProfile | null> =
 };
 
 export const getAllClients = async (): Promise<ClientProfile[]> => {
-    const client = supabase();
+    const client = createClient();
     const { data, error } = await client
         .from('profiles')
         .select('*')
@@ -62,7 +62,7 @@ export const getAllClients = async (): Promise<ClientProfile[]> => {
 
 export async function deleteClient(clientId: string): Promise<boolean> {
     try {
-        const client = supabase();
+        const client = createClient();
         // Delete client's profile
         const { error: profileError } = await client
             .from('profiles')

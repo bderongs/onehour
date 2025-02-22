@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase';
 import logger from '../utils/logger';
 
 const MAX_WIDTH = 800;  // Maximum width for profile pictures
@@ -22,7 +22,7 @@ const getFilePathFromUrl = (url: string): string | null => {
 const deleteImage = async (filePath: string): Promise<void> => {
     try {
         logger.debug('Attempting to delete file:', filePath);
-        const client = supabase();
+        const client = createClient();
         const { error } = await client.storage
             .from('profiles')
             .remove([filePath]);
@@ -223,7 +223,7 @@ export const uploadProfileImage = async (file: File, userId: string, oldImageUrl
             }
         }
 
-        const client = supabase();
+        const client = createClient();
         const { error: uploadError } = await client.storage
             .from('profiles')
             .upload(filePath, optimizedImageBlob, {
@@ -279,7 +279,7 @@ const getSparkImagePathFromUrl = (url: string): string | null => {
 const deleteSparkImageFromStorage = async (filePath: string): Promise<void> => {
     try {
         logger.debug('Attempting to delete Spark image:', filePath);
-        const client = supabase();
+        const client = createClient();
         const { error } = await client.storage
             .from('sparks')
             .remove([filePath]);
@@ -321,7 +321,7 @@ export const uploadSparkImage = async (file: File, sparkId: string, oldImageUrl?
             }
         }
 
-        const client = supabase();
+        const client = createClient();
         const { error: uploadError } = await client.storage
             .from('sparks')
             .upload(filePath, optimizedImageBlob, {

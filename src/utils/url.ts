@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { createClient } from '../lib/supabase';
 
 /**
  * Converts a string to a URL-friendly slug
@@ -31,7 +31,7 @@ export const ensureUniqueSlug = async (
 
     while (!isUnique) {
         let data, error;
-        const client = supabase();
+        const client = createClient();
 
         if (context === 'spark') {
             const result = await client

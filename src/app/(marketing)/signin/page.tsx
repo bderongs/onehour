@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import logger from '@/utils/logger';
@@ -28,7 +28,8 @@ export default function SignInPage() {
 
         try {
             logger.info('Attempting to sign in with email...');
-            const { data: signInData, error: signInError } = await supabase().auth.signInWithPassword({
+            const supabase = createBrowserClient();
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
@@ -67,140 +68,102 @@ export default function SignInPage() {
                     window.location.href = '/client/dashboard';
                 }
             }
-
         } catch (error: any) {
-            logger.error('Sign-in process error:', error);
-            showNotification('error', error.message);
+            logger.error('Error during sign-in:', error);
+            showNotification('error', error.message || 'Une erreur est survenue lors de la connexion');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        if (searchParams) {
-            // Pre-fill email if it's in the URL
-            const emailParam = searchParams.get('email');
-            if (emailParam) {
-                setEmail(emailParam);
-            }
-
-            // Display error message if present
-            const errorMessage = searchParams.get('message');
-            if (errorMessage) {
-                showNotification('error', errorMessage);
-            }
-        }
-    }, [searchParams, showNotification]);
-
-    // If already authenticated, redirect immediately
-    useEffect(() => {
-        if (user && !authLoading) {
-            const returnUrl = searchParams?.get('returnUrl');
-            if (returnUrl) {
-                window.location.href = returnUrl;
-            } else if (user.roles.includes('admin')) {
-                window.location.href = '/admin/dashboard';
+        // If already authenticated, redirect based on role
+        if (!authLoading && user) {
+            if (user.roles.includes('admin')) {
+                router.push('/admin/dashboard');
             } else if (user.roles.includes('consultant')) {
-                window.location.href = '/sparks/manage';
+                router.push('/sparks/manage');
             } else if (user.roles.includes('client')) {
-                window.location.href = '/client/dashboard';
+                router.push('/client/dashboard');
             }
         }
-    }, [user, authLoading, searchParams]);
+    }, [user, authLoading, router]);
 
-    const handleForgotPassword = () => {
-        router.push('/auth/reset-password');
-    };
-
-    // If already authenticated, show loading state
-    if (user && !authLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="max-w-md w-full text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Redirection en cours...</p>
-                </div>
-            </div>
-        );
+    if (authLoading) {
+        return <div>Redirection en cours...</div>;
     }
 
     return (
-        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center px-4">
             <div className="max-w-md w-full">
-                <div className="bg-white p-8 rounded-lg shadow-md space-y-6">
-                    <div>
-                        <h2 className="text-center text-3xl font-extrabold text-gray-900">
-                            Connectez-vous à votre compte
-                        </h2>
-                        <p className="mt-2 text-center text-sm text-gray-600">
-                            Vous n'avez pas encore de compte ?{' '}
-                            <Link
-                                href="/signup"
-                                className="font-medium text-blue-600 hover:text-blue-500"
-                            >
-                                Créer un compte
-                            </Link>
-                        </p>
-                    </div>
+                <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold text-gray-900">
+                        Connexion
+                    </h2>
+                    <p className="mt-2 text-sm text-gray-600">
+                        Ou{' '}
+                        <Link
+                            href="/consultants#signup-form"
+                            className="font-medium text-blue-600 hover:text-blue-500"
+                        >
+                            créez votre compte consultant
+                        </Link>
+                    </p>
+                </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="rounded-md shadow-sm -space-y-px">
-                            <div>
-                                <label htmlFor="email-address" className="sr-only">
-                                    Adresse email
-                                </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <Mail className="h-5 w-5 text-gray-400" />
-                                    </div>
-                                    <input
-                                        id="email-address"
-                                        name="email"
-                                        type="email"
-                                        autoComplete="email"
-                                        required
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                        placeholder="Adresse email"
-                                    />
+                <div className="bg-white py-8 px-4 shadow-xl rounded-lg sm:px-10">
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                                Email
+                            </label>
+                            <div className="mt-1 relative rounded-md shadow-sm">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Mail className="h-5 w-5 text-gray-400" />
                                 </div>
-                            </div>
-                            <div>
-                                <label htmlFor="password" className="sr-only">
-                                    Mot de passe
-                                </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <Lock className="h-5 w-5 text-gray-400" />
-                                    </div>
-                                    <input
-                                        id="password"
-                                        name="password"
-                                        type="password"
-                                        autoComplete="current-password"
-                                        required
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                        placeholder="Mot de passe"
-                                    />
-                                </div>
-                                <p className="mt-1 text-sm text-gray-500">
-                                    Le mot de passe doit contenir au moins 8 caractères et inclure des lettres et des chiffres.
-                                </p>
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="block w-full pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="vous@example.com"
+                                />
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-end">
+                        <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                Mot de passe
+                            </label>
+                            <div className="mt-1 relative rounded-md shadow-sm">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Lock className="h-5 w-5 text-gray-400" />
+                                </div>
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="current-password"
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="block w-full pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between">
                             <div className="text-sm">
-                                <button
-                                    type="button"
-                                    onClick={handleForgotPassword}
+                                <Link
+                                    href="/auth/reset-password"
                                     className="font-medium text-blue-600 hover:text-blue-500"
                                 >
                                     Mot de passe oublié ?
-                                </button>
+                                </Link>
                             </div>
                         </div>
 
@@ -208,14 +171,11 @@ export default function SignInPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                                    loading ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
                             >
-                                {loading ? (
-                                    <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                                        <div className="h-5 w-5 border-t-2 border-white border-solid rounded-full animate-spin"></div>
-                                    </span>
-                                ) : null}
-                                {loading ? 'Connexion en cours...' : 'Se connecter'}
+                                {loading ? 'Connexion...' : 'Se connecter'}
                             </button>
                         </div>
                     </form>

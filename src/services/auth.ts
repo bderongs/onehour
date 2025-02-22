@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase'
 import { generateSlug, ensureUniqueSlug, getSiteUrl } from '../utils/url';
 import logger from '../utils/logger';
 import type { AuthError } from '@supabase/supabase-js';
@@ -18,54 +18,40 @@ export interface ClientSignUpData {
     sparkUrlSlug?: string;
 }
 
-export type UserRole = 'client' | 'consultant' | 'admin';
+export type UserRole = 'admin' | 'consultant' | 'client';
 
 export interface UserProfile {
     id: string;
     email: string;
     firstName: string | null;
     lastName: string | null;
-    linkedin?: string;
     roles: UserRole[];
+    linkedin?: string | null;
     createdAt: string;
     updatedAt: string;
 }
 
-type ProfileRow = Database['public']['Tables']['profiles']['Row'];
-
-// Generate a strong temporary password that meets Supabase requirements
+// Helper function to generate a temporary password
 const generateTempPassword = () => {
-    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
-    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const numbers = '0123456789';
-    
-    // Ensure at least one of each required character type
-    const password = [
-        lowercase[Math.floor(Math.random() * lowercase.length)],
-        uppercase[Math.floor(Math.random() * uppercase.length)],
-        numbers[Math.floor(Math.random() * numbers.length)],
-    ];
-
-    // Add more random characters to make it longer
-    const allChars = lowercase + uppercase + numbers;
-    for (let i = 0; i < 9; i++) {
-        password.push(allChars[Math.floor(Math.random() * allChars.length)]);
+    const length = 16;
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+';
+    let password = '';
+    for (let i = 0; i < length; i++) {
+        password += charset.charAt(Math.floor(Math.random() * charset.length));
     }
-
-    // Shuffle the password array
-    return password.sort(() => Math.random() - 0.5).join('');
+    return password;
 };
 
-// Transform database snake_case to camelCase
-const transformProfileFromDB = (profile: ProfileRow): UserProfile => ({
+// Helper function to transform profile from DB format to our format
+const transformProfileFromDB = (profile: Database['public']['Tables']['profiles']['Row']): UserProfile => ({
     id: profile.id,
     email: profile.email,
     firstName: profile.first_name,
     lastName: profile.last_name,
-    linkedin: profile.linkedin || undefined,
     roles: profile.roles as UserRole[],
+    linkedin: profile.linkedin,
     createdAt: profile.created_at,
-    updatedAt: profile.updated_at,
+    updatedAt: profile.updated_at
 });
 
 export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
@@ -76,7 +62,7 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
 
     while (retryCount < maxRetries) {
         try {
-            const client = supabase();
+            const client = createClient();
             // Create the auth user with email confirmation
             const { data: authData, error: authError } = await client.auth.signUp({
                 email: data.email,
@@ -119,17 +105,11 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
             if (profileError) throw profileError;
 
             return authData;
-        } catch (error: any) {
+        } catch (error) {
             logger.error('Error during consultant signup:', error);
-            
-            // If we've retried the maximum number of times, or it's not a retryable error
-            if (retryCount >= maxRetries) {
-                throw error;
-            }
+            throw error;
         }
     }
-
-    throw new Error('Maximum retry attempts reached');
 };
 
 export const signUpClientWithEmail = async (data: ClientSignUpData) => {
@@ -140,7 +120,7 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
 
     while (retryCount < maxRetries) {
         try {
-            const client = supabase();
+            const client = createClient();
             // Create the auth user with email confirmation
             const { data: authData, error: authError } = await client.auth.signUp({
                 email: data.email,
@@ -184,21 +164,15 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
             if (profileError) throw profileError;
 
             return authData;
-        } catch (error: any) {
+        } catch (error) {
             logger.error('Error during client signup:', error);
-            
-            // If we've retried the maximum number of times, or it's not a retryable error
-            if (retryCount >= maxRetries) {
-                throw error;
-            }
+            throw error;
         }
     }
-
-    throw new Error('Maximum retry attempts reached');
 };
 
 export const getCurrentUser = async (): Promise<UserProfile | null> => {
-    const client = supabase();
+    const client = createClient();
     const { data: { session }, error: authError } = await client.auth.getSession();
     
     if (authError || !session?.user) {
@@ -224,7 +198,7 @@ export const getCurrentUser = async (): Promise<UserProfile | null> => {
 
 export const resendConfirmationEmail = async (email: string): Promise<void> => {
     const siteUrl = getSiteUrl();
-    const client = supabase();
+    const client = createClient();
     
     const { error } = await client.auth.resetPasswordForEmail(email, {
         redirectTo: `${siteUrl}/auth/callback`
@@ -237,7 +211,7 @@ export const resendConfirmationEmail = async (email: string): Promise<void> => {
 };
 
 export const checkEmailExists = async (email: string): Promise<boolean> => {
-    const client = supabase();
+    const client = createClient();
     const { data: profile, error } = await client
         .from('profiles')
         .select('id')
@@ -253,7 +227,7 @@ export const checkEmailExists = async (email: string): Promise<boolean> => {
 };
 
 export const deleteUser = async (userId: string): Promise<void> => {
-    const client = supabase();
+    const client = createClient();
     const { error: deleteError } = await client.rpc('delete_user', {
         user_id: userId
     });
@@ -286,7 +260,7 @@ export const updateUserRoles = async (userId: string, roles: UserRole[], current
         throw new Error('Only administrators can update user roles');
     }
 
-    const client = supabase();
+    const client = createClient();
     // If adding consultant role, we need to handle slug generation
     if (roles.includes('consultant') && !currentRoles.includes('consultant')) {
         // Get user info to generate slug

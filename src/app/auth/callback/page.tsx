@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import logger from '@/utils/logger';
 import { useNotification } from '@/contexts/NotificationContext';
@@ -24,7 +24,8 @@ export default function AuthCallback() {
 
             try {
                 // First check if we already have a valid session
-                const { data: { session } } = await supabase().auth.getSession();
+                const supabase = createBrowserClient();
+                const { data: { session } } = await supabase.auth.getSession();
                 if (session?.user) {
                     logger.info('Valid session found, skipping confirmation flow');
                     router.push('/');
@@ -45,7 +46,7 @@ export default function AuthCallback() {
                 }
 
                 // Verify OTP and establish session
-                const { data, error: verifyError } = await supabase().auth.verifyOtp({
+                const { data, error: verifyError } = await supabase.auth.verifyOtp({
                     token_hash: tokenHash,
                     type: type as any,
                 });
@@ -73,44 +74,34 @@ export default function AuthCallback() {
                     return;
                 }
 
-                // For other types (like magic link), redirect to the next URL or default location
-                const redirectUrl = next || '/';
-                logger.info('Redirecting to', { redirectUrl });
-                router.push(redirectUrl);
-
-            } catch (err: any) {
-                logger.error('Error during email confirmation:', err);
-                const email = params.get('email') || '';
-                const errorMessage = err.message || 'Une erreur est survenue lors de la confirmation';
-                setError(errorMessage);
-                showNotification('error', errorMessage);
-                // Redirect to signin with just the email parameter
-                router.push(`/signin?email=${encodeURIComponent(email)}`);
-            } finally {
+                // For other types (like email change), redirect to home
+                router.push('/');
+            } catch (error) {
+                logger.error('Error in auth callback:', error);
+                setError('Une erreur est survenue lors de la confirmation. Veuillez réessayer.');
                 setLoading(false);
             }
         };
 
         handleEmailConfirmation();
-    }, [router, params, showNotification]);
-
-    if (loading) {
-        return <LoadingSpinner message="Vérification de votre email..." />;
-    }
+    }, [params, router, showNotification]);
 
     if (error) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-lg">
-                    <div className="text-center mt-4">
-                        <p className="text-gray-600">
-                            Veuillez réessayer de vous connecter.
-                        </p>
-                    </div>
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center px-4">
+                <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-4">Erreur</h1>
+                    <p className="text-red-600 mb-6">{error}</p>
+                    <button
+                        onClick={() => router.push('/signin')}
+                        className="w-full bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition-colors"
+                    >
+                        Retour à la connexion
+                    </button>
                 </div>
             </div>
         );
     }
 
-    return null;
+    return <LoadingSpinner message="Confirmation en cours..." />;
 } 

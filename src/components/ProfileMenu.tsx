@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { getConsultantProfile } from '../services/consultants';
 import type { ConsultantProfile } from '../types/consultant';
-import { supabase } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase';
 import { User, LogOut, Settings, UserCircle, Sparkles, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
@@ -43,7 +43,8 @@ export function ProfileMenu() {
             setIsOpen(false); // Close the menu first
             
             // Sign out from Supabase
-            const { error } = await supabase().auth.signOut();
+            const supabase = createBrowserClient();
+            const { error } = await supabase.auth.signOut();
             if (error) throw error;
             
             // Clear any local storage data

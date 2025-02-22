@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase';
 import { useNotification } from '@/contexts/NotificationContext';
 
 interface SignInFormProps {
@@ -28,7 +28,8 @@ export function SignInForm({
 
         setLoading(true);
         try {
-            const { error } = await supabase().auth.signInWithPassword({
+            const supabase = createBrowserClient();
+            const { error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });

@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase';
 import logger from '../utils/logger';
 
 export interface ClientRequest {
@@ -31,7 +31,7 @@ const transformRequestToDB = (data: Pick<ClientRequest, 'clientId' | 'sparkId' |
 });
 
 export const createClientRequest = async (request: Pick<ClientRequest, 'clientId' | 'sparkId' | 'status' | 'message'>): Promise<ClientRequest> => {
-    const client = supabase();
+    const client = createClient();
     const { data, error } = await client
         .from('client_requests')
         .insert([transformRequestToDB(request)])
@@ -47,7 +47,7 @@ export const createClientRequest = async (request: Pick<ClientRequest, 'clientId
 };
 
 export const updateClientRequest = async (id: string, request: Partial<Pick<ClientRequest, 'clientId' | 'sparkId' | 'status' | 'message'>>): Promise<ClientRequest> => {
-    const client = supabase();
+    const client = createClient();
     const { data, error } = await client
         .from('client_requests')
         .update(transformRequestToDB(request as Pick<ClientRequest, 'clientId' | 'sparkId' | 'status' | 'message'>))
@@ -64,7 +64,7 @@ export const updateClientRequest = async (id: string, request: Partial<Pick<Clie
 };
 
 export const deleteClientRequest = async (id: string): Promise<void> => {
-    const client = supabase();
+    const client = createClient();
     const { error } = await client
         .from('client_requests')
         .delete()
@@ -77,7 +77,7 @@ export const deleteClientRequest = async (id: string): Promise<void> => {
 };
 
 export const getClientRequestById = async (id: string): Promise<ClientRequest | null> => {
-    const client = supabase();
+    const client = createClient();
     const { data, error } = await client
         .from('client_requests')
         .select('*')
@@ -96,7 +96,7 @@ export const getClientRequestById = async (id: string): Promise<ClientRequest | 
 };
 
 export const getClientRequestsByClientId = async (clientId: string): Promise<ClientRequest[]> => {
-    const client = supabase();
+    const client = createClient();
     const { data, error } = await client
         .from('client_requests')
         .select('*')
@@ -112,7 +112,7 @@ export const getClientRequestsByClientId = async (clientId: string): Promise<Cli
 };
 
 export const getClientRequestsBySparkId = async (sparkId: string): Promise<ClientRequest[]> => {
-    const client = supabase();
+    const client = createClient();
     const { data, error } = await client
         .from('client_requests')
         .select('*')

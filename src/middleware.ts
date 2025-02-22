@@ -1,18 +1,15 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createSupabaseMiddlewareClient } from './lib/supabase/supabaseClient';
+import { createClient } from './lib/supabase/middleware';
 import logger from './utils/logger';
 
 export async function middleware(request: NextRequest) {
   try {
     // Create a response to modify its headers
-    const res = NextResponse.next();
+    const response = NextResponse.next();
     
     // Create a Supabase client with the request and response
-    const supabase = createSupabaseMiddlewareClient({ 
-      req: request, 
-      res,
-    });
+    const supabase = createClient(request, response);
 
     // Try to get the session
     const {
@@ -55,7 +52,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Return the response with the session
-    return res;
+    return response;
   } catch (error) {
     logger.error('Middleware: Unexpected error:', error);
     return NextResponse.next();
