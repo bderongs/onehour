@@ -1,6 +1,6 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { createSupabaseMiddlewareClient } from './lib/supabase/supabaseClient';
 import logger from './utils/logger';
 
 export async function middleware(request: NextRequest) {
@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
     const res = NextResponse.next();
     
     // Create a Supabase client with the request and response
-    const supabase = createMiddlewareClient({ 
+    const supabase = createSupabaseMiddlewareClient({ 
       req: request, 
       res,
     });
