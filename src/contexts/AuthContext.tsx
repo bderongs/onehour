@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { getCurrentUser } from '../services/auth';
 import type { UserProfile } from '../services/auth';
 import logger from '../utils/logger';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
     user: UserProfile | null;
@@ -37,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const initialize = async () => {
             try {
                 // Check if we have a session
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await supabase().auth.getSession();
                 
                 if (session) {
                     // If we have a session, refresh the user data
@@ -64,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Subscribe to auth state changes
         const {
             data: { subscription },
-        } = supabase.auth.onAuthStateChange(async (event, session) => {
+        } = supabase().auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
             logger.info('Auth state changed:', event);
             
             if (!mounted) return;

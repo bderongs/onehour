@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { supabase } from '@/lib/supabase';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import logger from '@/utils/logger';
 import { useNotification } from '@/contexts/NotificationContext';
@@ -13,7 +13,6 @@ export default function AuthCallback() {
     const router = useRouter();
     const params = useSearchParams();
     const { showNotification } = useNotification();
-    const supabase = createClientComponentClient();
 
     useEffect(() => {
         const handleEmailConfirmation = async () => {
@@ -25,7 +24,7 @@ export default function AuthCallback() {
 
             try {
                 // First check if we already have a valid session
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await supabase().auth.getSession();
                 if (session?.user) {
                     logger.info('Valid session found, skipping confirmation flow');
                     router.push('/');
@@ -46,7 +45,7 @@ export default function AuthCallback() {
                 }
 
                 // Verify OTP and establish session
-                const { data, error: verifyError } = await supabase.auth.verifyOtp({
+                const { data, error: verifyError } = await supabase().auth.verifyOtp({
                     token_hash: tokenHash,
                     type: type as any,
                 });
@@ -93,7 +92,7 @@ export default function AuthCallback() {
         };
 
         handleEmailConfirmation();
-    }, [router, params, showNotification, supabase]);
+    }, [router, params, showNotification]);
 
     if (loading) {
         return <LoadingSpinner message="Vérification de votre email..." />;

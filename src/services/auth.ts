@@ -1,6 +1,8 @@
-import { supabase } from '../lib/supabase'
-import { generateSlug, ensureUniqueSlug } from '../utils/url';
+import { supabase } from '@/lib/supabase'
+import { generateSlug, ensureUniqueSlug, getSiteUrl } from '../utils/url';
 import logger from '../utils/logger';
+import type { AuthError } from '@supabase/supabase-js';
+import type { Database } from '@/lib/supabase/database.types';
 
 export interface ConsultantSignUpData {
     email: string;
@@ -13,20 +15,23 @@ export interface ClientSignUpData {
     email: string;
     firstName: string;
     lastName: string;
-    company: string;
-    companyRole: string;
-    industry: string;
-    sparkUrlSlug?: string; // Optional sparkUrlSlug for direct signup from SparkProductPage
+    sparkUrlSlug?: string;
 }
 
-// Get the site URL based on environment
-const getSiteUrl = () => {
-    const url = process.env.NEXT_PUBLIC_SITE_URL;
-    if (!url) {
-        throw new Error('NEXT_PUBLIC_SITE_URL environment variable is not defined');
-    }
-    return url;
-};
+export type UserRole = 'client' | 'consultant' | 'admin';
+
+export interface UserProfile {
+    id: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+    linkedin?: string;
+    roles: UserRole[];
+    createdAt: string;
+    updatedAt: string;
+}
+
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
 
 // Generate a strong temporary password that meets Supabase requirements
 const generateTempPassword = () => {
@@ -51,6 +56,18 @@ const generateTempPassword = () => {
     return password.sort(() => Math.random() - 0.5).join('');
 };
 
+// Transform database snake_case to camelCase
+const transformProfileFromDB = (profile: ProfileRow): UserProfile => ({
+    id: profile.id,
+    email: profile.email,
+    firstName: profile.first_name,
+    lastName: profile.last_name,
+    linkedin: profile.linkedin || undefined,
+    roles: profile.roles as UserRole[],
+    createdAt: profile.created_at,
+    updatedAt: profile.updated_at,
+});
+
 export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
     const siteUrl = getSiteUrl();
     let retryCount = 0;
@@ -59,8 +76,9 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
 
     while (retryCount < maxRetries) {
         try {
+            const client = supabase();
             // Create the auth user with email confirmation
-            const { data: authData, error: authError } = await supabase.auth.signUp({
+            const { data: authData, error: authError } = await client.auth.signUp({
                 email: data.email,
                 password: generateTempPassword(),
                 options: {
@@ -85,52 +103,33 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
                 throw authError;
             }
 
-            // Verify that we have a user before proceeding
-            if (!authData?.user?.id) {
-                throw new Error('Erreur lors de la création du compte. Veuillez réessayer.');
-            }
-
-            // Generate the initial slug
-            const baseSlug = generateSlug(`${data.firstName} ${data.lastName}`);
-            const slug = await ensureUniqueSlug(baseSlug, 'profile');
-
             // Determine roles
             const roles = ['consultant'];
 
-            // Then, store additional user data in a profiles table
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .insert([
-                    {
-                        id: authData.user.id,
-                        email: data.email,
-                        first_name: data.firstName,
-                        last_name: data.lastName,
-                        linkedin: data.linkedin,
-                        roles: roles,
-                        slug: slug,
-                        created_at: new Date().toISOString()
-                    }
-                ]);
+            // Create the profile
+            const { error: profileError } = await client.from('profiles').insert({
+                id: authData.user?.id,
+                email: data.email,
+                first_name: data.firstName,
+                last_name: data.lastName,
+                roles: roles,
+                linkedin: data.linkedin,
+            });
 
-            if (profileError) {
-                logger.error('Error creating profile:', profileError);
-                throw profileError;
-            }
+            if (profileError) throw profileError;
 
             return authData;
         } catch (error: any) {
-            // On last retry, throw the error
-            if (retryCount === maxRetries - 1) {
-                if (error.message === '{}') {
-                    throw new Error('Le service d\'authentification est temporairement indisponible. Veuillez réessayer dans quelques instants.');
-                }
+            logger.error('Error during consultant signup:', error);
+            
+            // If we've retried the maximum number of times, or it's not a retryable error
+            if (retryCount >= maxRetries) {
                 throw error;
             }
-            retryCount++;
-            await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
     }
+
+    throw new Error('Maximum retry attempts reached');
 };
 
 export const signUpClientWithEmail = async (data: ClientSignUpData) => {
@@ -141,8 +140,9 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
 
     while (retryCount < maxRetries) {
         try {
+            const client = supabase();
             // Create the auth user with email confirmation
-            const { data: authData, error: authError } = await supabase.auth.signUp({
+            const { data: authData, error: authError } = await client.auth.signUp({
                 email: data.email,
                 password: generateTempPassword(),
                 options: {
@@ -172,68 +172,34 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
             // Determine roles
             const roles = ['client'];
 
-            // Then, store additional user data in the profiles table
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .insert([
-                    {
-                        id: authData.user?.id,
-                        email: data.email,
-                        first_name: data.firstName,
-                        last_name: data.lastName,
-                        company: data.company,
-                        roles: roles,
-                        created_at: new Date().toISOString()
-                    }
-                ]);
+            // Create the profile
+            const { error: profileError } = await client.from('profiles').insert({
+                id: authData.user?.id,
+                email: data.email,
+                first_name: data.firstName,
+                last_name: data.lastName,
+                roles: roles,
+            });
 
-            if (profileError) {
-                logger.error('Error creating profile:', profileError);
-                throw profileError;
-            }
+            if (profileError) throw profileError;
 
-            // Return the auth data and sparkUrlSlug
-            return {
-                ...authData,
-                sparkUrlSlug: data.sparkUrlSlug
-            };
+            return authData;
         } catch (error: any) {
-            // On last retry, throw the error
-            if (retryCount === maxRetries - 1) {
-                if (error.message === '{}') {
-                    throw new Error('Le service d\'authentification est temporairement indisponible. Veuillez réessayer dans quelques instants.');
-                }
+            logger.error('Error during client signup:', error);
+            
+            // If we've retried the maximum number of times, or it's not a retryable error
+            if (retryCount >= maxRetries) {
                 throw error;
             }
-            retryCount++;
-            await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
     }
+
+    throw new Error('Maximum retry attempts reached');
 };
 
-export type UserRole = 'client' | 'consultant' | 'admin';
-
-export interface UserProfile {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    linkedin?: string;
-    roles: UserRole[];
-}
-
-// Transform database snake_case to camelCase
-const transformProfileFromDB = (profile: any): UserProfile => ({
-    id: profile.id,
-    email: profile.email,
-    firstName: profile.first_name,
-    lastName: profile.last_name,
-    linkedin: profile.linkedin,
-    roles: profile.roles,
-});
-
 export const getCurrentUser = async (): Promise<UserProfile | null> => {
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const client = supabase();
+    const { data: { session }, error: authError } = await client.auth.getSession();
     
     if (authError || !session?.user) {
         if (authError) {
@@ -242,7 +208,7 @@ export const getCurrentUser = async (): Promise<UserProfile | null> => {
         return null;
     }
 
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await client
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
@@ -254,6 +220,48 @@ export const getCurrentUser = async (): Promise<UserProfile | null> => {
     }
 
     return transformProfileFromDB(profile);
+};
+
+export const resendConfirmationEmail = async (email: string): Promise<void> => {
+    const siteUrl = getSiteUrl();
+    const client = supabase();
+    
+    const { error } = await client.auth.resetPasswordForEmail(email, {
+        redirectTo: `${siteUrl}/auth/callback`
+    });
+
+    if (error) {
+        logger.error('Error sending confirmation email:', error);
+        throw error;
+    }
+};
+
+export const checkEmailExists = async (email: string): Promise<boolean> => {
+    const client = supabase();
+    const { data: profile, error } = await client
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
+
+    if (error) {
+        logger.error('Error checking email existence:', error);
+        throw error;
+    }
+
+    return !!profile;
+};
+
+export const deleteUser = async (userId: string): Promise<void> => {
+    const client = supabase();
+    const { error: deleteError } = await client.rpc('delete_user', {
+        user_id: userId
+    });
+
+    if (deleteError) {
+        logger.error('Error deleting user:', deleteError);
+        throw deleteError;
+    }
 };
 
 export const isConsultant = async (): Promise<boolean> => {
@@ -278,10 +286,11 @@ export const updateUserRoles = async (userId: string, roles: UserRole[], current
         throw new Error('Only administrators can update user roles');
     }
 
+    const client = supabase();
     // If adding consultant role, we need to handle slug generation
     if (roles.includes('consultant') && !currentRoles.includes('consultant')) {
         // Get user info to generate slug
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile, error: profileError } = await client
             .from('profiles')
             .select('first_name, last_name, slug')
             .eq('id', userId)
@@ -297,7 +306,7 @@ export const updateUserRoles = async (userId: string, roles: UserRole[], current
         const slug = await ensureUniqueSlug(baseSlug, 'profile');
 
         // Update both roles and slug
-        const { error: updateError } = await supabase
+        const { error: updateError } = await client
             .from('profiles')
             .update({ roles, slug })
             .eq('id', userId);
@@ -308,7 +317,7 @@ export const updateUserRoles = async (userId: string, roles: UserRole[], current
         }
     } else {
         // Just update roles
-        const { error } = await supabase
+        const { error } = await client
             .from('profiles')
             .update({ roles })
             .eq('id', userId);
@@ -318,47 +327,4 @@ export const updateUserRoles = async (userId: string, roles: UserRole[], current
             throw error;
         }
     }
-};
-
-export const resendConfirmationEmail = async (email: string): Promise<void> => {
-    const siteUrl = getSiteUrl();
-    
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${siteUrl}/auth/callback`
-    });
-
-    if (error) {
-        logger.error('Error sending confirmation email:', error);
-        throw error;
-    }
-};
-
-export const checkEmailExists = async (email: string): Promise<boolean> => {
-    const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .maybeSingle();
-
-    if (error) {
-        logger.error('Error checking email existence:', error);
-        throw error;
-    }
-
-    return !!profile;
-};
-
-export const deleteUser = async (userId: string): Promise<void> => {
-    // Call the RPC function to delete the user
-    const { error: deleteError } = await supabase.rpc('delete_user', {
-        user_id: userId
-    });
-
-    if (deleteError) {
-        logger.error('Error deleting user:', deleteError);
-        throw new Error('Erreur lors de la suppression de l\'utilisateur');
-    }
-
-    // The profile will be automatically deleted due to the ON DELETE CASCADE constraint
-    logger.info(`Successfully deleted user with ID: ${userId}`);
 }; 

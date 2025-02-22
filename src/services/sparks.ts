@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
 import logger from '../utils/logger';
 import type { Spark } from '../types/spark';
 import { generateSlug, ensureUniqueSlug } from '../utils/url';
@@ -23,6 +23,10 @@ const transformSparkFromDB = (dbSpark: any): Spark => ({
     expertProfile: dbSpark.expert_profile,
     faq: dbSpark.faq,
     nextSteps: dbSpark.next_steps,
+    imageUrl: dbSpark.image_url,
+    socialImageUrl: dbSpark.social_image_url,
+    createdAt: dbSpark.created_at,
+    updatedAt: dbSpark.updated_at,
 });
 
 // Convert frontend camelCase to snake_case for database
@@ -92,7 +96,8 @@ const transformSparkToDB = (spark: Partial<Spark>): Record<string, any> => {
 
 export const getSparks = async (): Promise<Spark[]> => {
     try {
-        const { data, error } = await supabase
+        const client = supabase();
+        const { data, error } = await client
             .from('sparks')
             .select('*')
             .order('title');
@@ -114,7 +119,8 @@ export const getSparks = async (): Promise<Spark[]> => {
 };
 
 export const getSparkByUrl = async (url: string): Promise<Spark | null> => {
-    const { data, error } = await supabase
+    const client = supabase();
+    const { data, error } = await client
         .from('sparks')
         .select('*')
         .eq('url', url)
@@ -129,7 +135,8 @@ export const getSparkByUrl = async (url: string): Promise<Spark | null> => {
 };
 
 export const getSparksByConsultant = async (consultantId: string): Promise<Spark[]> => {
-    const { data, error } = await supabase
+    const client = supabase();
+    const { data, error } = await client
         .from('sparks')
         .select('*')
         .eq('consultant', consultantId)
@@ -154,14 +161,15 @@ export const createSpark = async (spark: Omit<Spark, 'id'>): Promise<Spark> => {
         url
     };
 
-    const { data, error } = await supabase
+    const client = supabase();
+    const { data, error } = await client
         .from('sparks')
         .insert([transformSparkToDB(sparkData)])
         .select()
         .single();
 
     if (error) {
-        console.error('Error creating spark:', error);
+        logger.error('Error creating spark:', error);
         throw error;
     }
 
@@ -169,8 +177,9 @@ export const createSpark = async (spark: Omit<Spark, 'id'>): Promise<Spark> => {
 };
 
 export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<Spark> => {
+    const client = supabase();
     // First, verify the spark exists
-    const { data: existingSpark, error: fetchError } = await supabase
+    const { data: existingSpark, error: fetchError } = await client
         .from('sparks')
         .select('*')
         .eq('url', url)
@@ -191,7 +200,7 @@ export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<S
         const baseSlug = generateSlug(spark.title);
         // Only generate a new URL if the title has changed
         if (baseSlug !== url) {
-            const { data } = await supabase
+            const { data } = await client
                 .from('sparks')
                 .select('url')
                 .eq('url', baseSlug)
@@ -211,7 +220,7 @@ export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<S
     const transformedUpdate = transformSparkToDB(updateFields);
 
     // First update the spark - try without select first
-    const { error: updateError } = await supabase
+    const { error: updateError } = await client
         .from('sparks')
         .update(transformedUpdate)
         .eq('url', url);
@@ -222,7 +231,7 @@ export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<S
     }
 
     // Then fetch the updated record
-    const { data: updatedData, error: fetchUpdatedError } = await supabase
+    const { data: updatedData, error: fetchUpdatedError } = await client
         .from('sparks')
         .select('*')
         .eq('url', updatedSpark.url || url)
@@ -241,7 +250,8 @@ export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<S
 };
 
 export const deleteSpark = async (url: string): Promise<void> => {
-    const { error } = await supabase
+    const client = supabase();
+    const { error } = await client
         .from('sparks')
         .delete()
         .eq('url', url);
@@ -253,7 +263,8 @@ export const deleteSpark = async (url: string): Promise<void> => {
 };
 
 export const getSparkById = async (id: string): Promise<Spark | null> => {
-    const { data, error } = await supabase
+    const client = supabase();
+    const { data, error } = await client
         .from('sparks')
         .select('*')
         .eq('id', id)

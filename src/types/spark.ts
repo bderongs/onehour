@@ -24,5 +24,8 @@ export interface Spark {
     }>;
     nextSteps?: string[];
     url: string;
-    social_image_url?: string; // URL for the social sharing image
+    imageUrl?: string; // URL for the main image
+    socialImageUrl?: string; // URL for the social sharing image
+    createdAt: string;
+    updatedAt: string;
 } 

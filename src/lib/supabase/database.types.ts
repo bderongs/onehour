@@ -16,6 +16,7 @@ export interface Database {
           first_name: string | null
           last_name: string | null
           roles: string[]
+          linkedin?: string | null
           created_at: string
           updated_at: string
         }
@@ -25,6 +26,7 @@ export interface Database {
           first_name?: string | null
           last_name?: string | null
           roles?: string[]
+          linkedin?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -34,6 +36,7 @@ export interface Database {
           first_name?: string | null
           last_name?: string | null
           roles?: string[]
+          linkedin?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -44,7 +47,12 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_user: {
+        Args: {
+          user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

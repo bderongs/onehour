@@ -1,40 +1,70 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
+import logger from '../utils/logger';
 
 export interface ClientProfile {
     id: string;
     email: string;
-    first_name: string;
-    last_name: string;
+    firstName: string;
+    lastName: string;
     company: string;
     roles: string[];
-    created_at: string;
-    updated_at: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
-export async function getAllClients(includeSparkierEmails: boolean = false): Promise<ClientProfile[]> {
-    const { data, error } = await supabase
+// Transform database snake_case to camelCase
+const transformClientFromDB = (data: any): ClientProfile => ({
+    id: data.id,
+    email: data.email,
+    firstName: data.first_name,
+    lastName: data.last_name,
+    company: data.company,
+    roles: data.roles,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+});
+
+export const getClientById = async (id: string): Promise<ClientProfile | null> => {
+    const client = supabase();
+    const { data, error } = await client
         .from('profiles')
         .select('*')
-        .contains('roles', ['client']);
+        .eq('id', id)
+        .eq('roles', ['client'])
+        .single();
 
     if (error) {
-        console.error('Error fetching all clients:', error);
-        return [];
+        if (error.code === 'PGRST116') {
+            return null;
+        }
+        logger.error('Error fetching client:', error);
+        throw error;
     }
 
-    const clients = data as ClientProfile[];
-    
-    if (!includeSparkierEmails) {
-        return clients.filter(c => !c.email.endsWith('@sparkier.io'));
+    return data ? transformClientFromDB(data) : null;
+};
+
+export const getAllClients = async (): Promise<ClientProfile[]> => {
+    const client = supabase();
+    const { data, error } = await client
+        .from('profiles')
+        .select('*')
+        .contains('roles', ['client'])
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        logger.error('Error fetching clients:', error);
+        throw error;
     }
 
-    return clients;
-}
+    return data.map(transformClientFromDB);
+};
 
 export async function deleteClient(clientId: string): Promise<boolean> {
     try {
+        const client = supabase();
         // Delete client's profile
-        const { error: profileError } = await supabase
+        const { error: profileError } = await client
             .from('profiles')
             .delete()
             .eq('id', clientId)

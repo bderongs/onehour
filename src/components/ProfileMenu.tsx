@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { getConsultantProfile } from '../services/consultants';
 import type { ConsultantProfile } from '../types/consultant';
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { User, LogOut, Settings, UserCircle, Sparkles, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
+import logger from '@/utils/logger';
 
 export function ProfileMenu() {
     const [isOpen, setIsOpen] = useState(false);
@@ -42,7 +43,7 @@ export function ProfileMenu() {
             setIsOpen(false); // Close the menu first
             
             // Sign out from Supabase
-            const { error } = await supabase.auth.signOut();
+            const { error } = await supabase().auth.signOut();
             if (error) throw error;
             
             // Clear any local storage data
@@ -59,7 +60,7 @@ export function ProfileMenu() {
             router.push('/');
             router.refresh();
         } catch (error) {
-            console.error('Error during logout:', error);
+            logger.error('Error during logout:', error);
             // Still try to navigate home if there's an error
             router.push('/');
         }

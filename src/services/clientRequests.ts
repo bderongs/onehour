@@ -1,6 +1,5 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
 import logger from '../utils/logger';
-import type { SupabaseClient } from '@supabase/supabase-js';
 
 export interface ClientRequest {
     id: string;
@@ -12,91 +11,93 @@ export interface ClientRequest {
     updatedAt: string;
 }
 
-export interface CreateClientRequestData {
-    sparkId: string;
-    message?: string;
-    clientId?: string; // Optional clientId for admin operations
-}
+// Transform database snake_case to camelCase
+const transformRequestFromDB = (data: any): ClientRequest => ({
+    id: data.id,
+    clientId: data.client_id,
+    sparkId: data.spark_id,
+    status: data.status,
+    message: data.message,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+});
 
-export const createClientRequest = async (
-    data: CreateClientRequestData,
-    client: SupabaseClient = supabase // Default to regular client if none provided
-): Promise<ClientRequest> => {
-    logger.info('Starting client request creation', { data });
-    
-    let userId: string;
-    
-    if (data.clientId) {
-        // If clientId is provided, use it (admin operation)
-        userId = data.clientId;
-        logger.info('Using provided clientId for request creation', { clientId: userId });
-    } else {
-        // Otherwise get the current user's ID
-        const { data: authData, error: authError } = await supabase.auth.getUser();
-        if (authError || !authData.user) {
-            logger.error('Authentication error in createClientRequest', { authError });
-            throw new Error('User must be authenticated to create a request');
-        }
-        userId = authData.user.id;
-        logger.info('Using authenticated user ID for request creation', { userId });
-    }
+// Transform camelCase to database snake_case
+const transformRequestToDB = (data: Pick<ClientRequest, 'clientId' | 'sparkId' | 'status' | 'message'>) => ({
+    client_id: data.clientId,
+    spark_id: data.sparkId,
+    status: data.status,
+    message: data.message,
+});
 
-    const { data: request, error } = await client
+export const createClientRequest = async (request: Pick<ClientRequest, 'clientId' | 'sparkId' | 'status' | 'message'>): Promise<ClientRequest> => {
+    const client = supabase();
+    const { data, error } = await client
         .from('client_requests')
-        .insert([
-            {
-                client_id: userId,
-                spark_id: data.sparkId,
-                message: data.message,
-                status: 'pending'
-            }
-        ])
+        .insert([transformRequestToDB(request)])
         .select()
         .single();
 
     if (error) {
-        logger.error('Database error in createClientRequest', { error });
+        logger.error('Error creating client request:', error);
         throw error;
     }
 
-    logger.info('Client request created successfully', { requestId: request.id });
-    return transformClientRequestFromDB(request);
+    return transformRequestFromDB(data);
 };
 
-export const getClientRequestById = async (requestId: string): Promise<ClientRequest | null> => {
-    logger.info('Fetching client request by ID', { requestId });
-    
-    // Check authentication first
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError || !authData.user) {
-        logger.error('Authentication error in getClientRequestById', { authError });
-        return null;
-    }
-    
-    logger.info('User authenticated, fetching request', { userId: authData.user.id });
-
-    const { data, error } = await supabase
+export const updateClientRequest = async (id: string, request: Partial<Pick<ClientRequest, 'clientId' | 'sparkId' | 'status' | 'message'>>): Promise<ClientRequest> => {
+    const client = supabase();
+    const { data, error } = await client
         .from('client_requests')
-        .select('*')
-        .eq('id', requestId)
+        .update(transformRequestToDB(request as Pick<ClientRequest, 'clientId' | 'sparkId' | 'status' | 'message'>))
+        .eq('id', id)
+        .select()
         .single();
 
     if (error) {
-        logger.error('Database error in getClientRequestById', { error });
-        return null;
+        logger.error('Error updating client request:', error);
+        throw error;
     }
 
-    if (!data) {
-        logger.info('No request found with ID', { requestId });
-        return null;
+    return transformRequestFromDB(data);
+};
+
+export const deleteClientRequest = async (id: string): Promise<void> => {
+    const client = supabase();
+    const { error } = await client
+        .from('client_requests')
+        .delete()
+        .eq('id', id);
+
+    if (error) {
+        logger.error('Error deleting client request:', error);
+        throw error;
+    }
+};
+
+export const getClientRequestById = async (id: string): Promise<ClientRequest | null> => {
+    const client = supabase();
+    const { data, error } = await client
+        .from('client_requests')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error) {
+        if (error.code === 'PGRST116') {
+            return null;
+        }
+        logger.error('Error fetching client request:', error);
+        throw error;
     }
 
-    logger.info('Client request found', { requestId });
-    return transformClientRequestFromDB(data);
+    return data ? transformRequestFromDB(data) : null;
 };
 
 export const getClientRequestsByClientId = async (clientId: string): Promise<ClientRequest[]> => {
-    const { data, error } = await supabase
+    const client = supabase();
+    const { data, error } = await client
         .from('client_requests')
         .select('*')
         .eq('client_id', clientId)
@@ -104,14 +105,15 @@ export const getClientRequestsByClientId = async (clientId: string): Promise<Cli
 
     if (error) {
         logger.error('Error fetching client requests:', error);
-        return [];
+        throw error;
     }
 
-    return data.map(transformClientRequestFromDB);
+    return data.map(transformRequestFromDB);
 };
 
 export const getClientRequestsBySparkId = async (sparkId: string): Promise<ClientRequest[]> => {
-    const { data, error } = await supabase
+    const client = supabase();
+    const { data, error } = await client
         .from('client_requests')
         .select('*')
         .eq('spark_id', sparkId)
@@ -119,57 +121,8 @@ export const getClientRequestsBySparkId = async (sparkId: string): Promise<Clien
 
     if (error) {
         logger.error('Error fetching client requests:', error);
-        return [];
+        throw error;
     }
 
-    return data.map(transformClientRequestFromDB);
-};
-
-export const updateClientRequestStatus = async (
-    requestId: string,
-    status: ClientRequest['status']
-): Promise<ClientRequest | null> => {
-    const { data, error } = await supabase
-        .from('client_requests')
-        .update({ status })
-        .eq('id', requestId)
-        .select()
-        .single();
-
-    if (error) {
-        logger.error('Error updating client request:', error);
-        return null;
-    }
-
-    return transformClientRequestFromDB(data);
-};
-
-export const updateClientRequestMessage = async (
-    requestId: string,
-    message: string
-): Promise<ClientRequest | null> => {
-    const { data, error } = await supabase
-        .from('client_requests')
-        .update({ message })
-        .eq('id', requestId)
-        .select()
-        .single();
-
-    if (error) {
-        logger.error('Error updating client request message:', error);
-        return null;
-    }
-
-    return transformClientRequestFromDB(data);
-};
-
-// Transform database snake_case to camelCase
-const transformClientRequestFromDB = (request: any): ClientRequest => ({
-    id: request.id,
-    clientId: request.client_id,
-    sparkId: request.spark_id,
-    status: request.status,
-    message: request.message,
-    createdAt: request.created_at,
-    updatedAt: request.updated_at
-}); 
+    return data.map(transformRequestFromDB);
+}; 

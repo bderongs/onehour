@@ -31,9 +31,10 @@ export const ensureUniqueSlug = async (
 
     while (!isUnique) {
         let data, error;
+        const client = supabase();
 
         if (context === 'spark') {
-            const result = await supabase
+            const result = await client
                 .from('sparks')
                 .select('url')
                 .eq('url', slug)
@@ -41,7 +42,7 @@ export const ensureUniqueSlug = async (
             data = result.data;
             error = result.error;
         } else {
-            const result = await supabase
+            const result = await client
                 .from('profiles')
                 .select('slug')
                 .eq('slug', slug)
@@ -64,4 +65,13 @@ export const ensureUniqueSlug = async (
     }
 
     return slug;
+};
+
+// Get the site URL based on environment
+export const getSiteUrl = () => {
+    const url = process.env.NEXT_PUBLIC_SITE_URL;
+    if (!url) {
+        throw new Error('NEXT_PUBLIC_SITE_URL environment variable is not defined');
+    }
+    return url;
 }; 

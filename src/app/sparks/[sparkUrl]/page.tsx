@@ -120,7 +120,12 @@ export default function SparkProductPage() {
                                     }
                                     
                                     logger.info('No existing active request found, creating new request', { sparkId: spark.id });
-                                    return createClientRequest({ sparkId: spark.id });
+                                    return createClientRequest({
+                                        sparkId: spark.id,
+                                        clientId: user.id,
+                                        status: 'pending',
+                                        message: undefined // optional field
+                                    });
                                 });
                         })
                         .then(request => {

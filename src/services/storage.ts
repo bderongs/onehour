@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/lib/supabase';
 import logger from '../utils/logger';
 
 const MAX_WIDTH = 800;  // Maximum width for profile pictures
@@ -22,7 +22,8 @@ const getFilePathFromUrl = (url: string): string | null => {
 const deleteImage = async (filePath: string): Promise<void> => {
     try {
         logger.debug('Attempting to delete file:', filePath);
-        const { error } = await supabase.storage
+        const client = supabase();
+        const { error } = await client.storage
             .from('profiles')
             .remove([filePath]);
 
@@ -222,7 +223,8 @@ export const uploadProfileImage = async (file: File, userId: string, oldImageUrl
             }
         }
 
-        const { error: uploadError } = await supabase.storage
+        const client = supabase();
+        const { error: uploadError } = await client.storage
             .from('profiles')
             .upload(filePath, optimizedImageBlob, {
                 cacheControl: '3600',
@@ -235,7 +237,7 @@ export const uploadProfileImage = async (file: File, userId: string, oldImageUrl
         }
 
         // Get the public URL
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = client.storage
             .from('profiles')
             .getPublicUrl(filePath);
 
@@ -277,7 +279,8 @@ const getSparkImagePathFromUrl = (url: string): string | null => {
 const deleteSparkImageFromStorage = async (filePath: string): Promise<void> => {
     try {
         logger.debug('Attempting to delete Spark image:', filePath);
-        const { error } = await supabase.storage
+        const client = supabase();
+        const { error } = await client.storage
             .from('sparks')
             .remove([filePath]);
 
@@ -318,7 +321,8 @@ export const uploadSparkImage = async (file: File, sparkId: string, oldImageUrl?
             }
         }
 
-        const { error: uploadError } = await supabase.storage
+        const client = supabase();
+        const { error: uploadError } = await client.storage
             .from('sparks')
             .upload(filePath, optimizedImageBlob, {
                 cacheControl: '3600',
@@ -331,7 +335,7 @@ export const uploadSparkImage = async (file: File, sparkId: string, oldImageUrl?
         }
 
         // Get the public URL
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = client.storage
             .from('sparks')
             .getPublicUrl(filePath);
 

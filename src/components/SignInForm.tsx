@@ -25,30 +25,18 @@ export function SignInForm({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (loading) return;
-        setLoading(true);
 
+        setLoading(true);
         try {
-            const { error } = await supabase.auth.signInWithPassword({
+            const { error } = await supabase().auth.signInWithPassword({
                 email,
                 password,
             });
 
             if (error) throw error;
-
             onSuccess();
         } catch (error: any) {
-            console.error('Error signing in:', error);
-            let errorMessage = 'Une erreur est survenue lors de la connexion. Veuillez réessayer.';
-            
-            if (error.message?.includes('Invalid login credentials')) {
-                errorMessage = 'Email ou mot de passe incorrect.';
-            } else if (error.message?.includes('Email not confirmed')) {
-                errorMessage = 'Veuillez confirmer votre email avant de vous connecter.';
-            } else if (error.message) {
-                errorMessage = error.message;
-            }
-
-            showNotification('error', errorMessage);
+            showNotification('error', error.message);
         } finally {
             setLoading(false);
         }

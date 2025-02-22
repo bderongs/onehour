@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import logger from '@/utils/logger';
@@ -18,7 +18,6 @@ export default function SignInPage() {
     const searchParams = useSearchParams();
     const { user, loading: authLoading, refreshUser } = useAuth();
     const { showNotification } = useNotification();
-    const supabase = createClientComponentClient();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,7 +28,7 @@ export default function SignInPage() {
 
         try {
             logger.info('Attempting to sign in with email...');
-            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            const { data: signInData, error: signInError } = await supabase().auth.signInWithPassword({
                 email,
                 password,
             });
@@ -68,9 +67,11 @@ export default function SignInPage() {
                     window.location.href = '/client/dashboard';
                 }
             }
+
         } catch (error: any) {
-            logger.error('Sign-in process failed:', error);
-            showNotification('error', error.message || 'Une erreur est survenue lors de la connexion.');
+            logger.error('Sign-in process error:', error);
+            showNotification('error', error.message);
+        } finally {
             setLoading(false);
         }
     };
