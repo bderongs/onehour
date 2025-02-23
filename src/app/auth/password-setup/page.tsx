@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { FormEvent } from 'react';
 import { Lock } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase';
 import { PasswordRequirements, isPasswordValid, doPasswordsMatch } from '@/components/PasswordRequirements';
 import logger from '@/utils/logger';
 import { useNotification } from '@/contexts/NotificationContext';
@@ -29,7 +29,7 @@ export default function PasswordSetupPage() {
 
         // Get the email from the authenticated session
         const getEmail = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await createBrowserClient().auth.getUser();
             if (!user?.email) {
                 logger.error('No user email found, redirecting to signin');
                 router.push('/signin');
@@ -67,15 +67,13 @@ export default function PasswordSetupPage() {
             }
 
             logger.info('Updating user password');
-            const { error: updateError } = await supabase.auth.updateUser({
-                password: password
-            });
+            const { error } = await createBrowserClient().auth.updateUser({ password });
 
-            if (updateError) throw updateError;
+            if (error) throw error;
 
             // Sign in with the new password to get a fresh session
             logger.info('Signing in with new password', { email: userEmail });
-            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            const { data: signInData, error: signInError } = await createBrowserClient().auth.signInWithPassword({
                 email: userEmail,
                 password: password
             });
@@ -90,7 +88,7 @@ export default function PasswordSetupPage() {
             const maxRetries = 5;
             
             while (!session && retries < maxRetries) {
-                const { data: { session: currentSession } } = await supabase.auth.getSession();
+                const { data: { session: currentSession } } = await createBrowserClient().auth.getSession();
                 if (currentSession) {
                     session = currentSession;
                     logger.info('Session established');
@@ -106,7 +104,7 @@ export default function PasswordSetupPage() {
             }
 
             // Refresh the session to ensure we have the latest data
-            const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+            const { data: refreshData, error: refreshError } = await createBrowserClient().auth.refreshSession();
             if (refreshError) {
                 logger.error('Error refreshing session:', refreshError);
                 throw refreshError;
@@ -128,7 +126,7 @@ export default function PasswordSetupPage() {
 
                 try {
                     // Double check that we're still authenticated
-                    const { data: { session: finalSession } } = await supabase.auth.getSession();
+                    const { data: { session: finalSession } } = await createBrowserClient().auth.getSession();
                     if (!finalSession) {
                         logger.error('Session lost after password setup');
                         throw new Error('Session perdue après la configuration du mot de passe');
@@ -145,7 +143,7 @@ export default function PasswordSetupPage() {
             }
 
             // Fallback to role-based redirection if no next URL
-            const { data: profile } = await supabase
+            const { data: profile } = await createBrowserClient()
                 .from('profiles')
                 .select('roles')
                 .eq('id', session.user.id)

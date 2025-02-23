@@ -1,12 +1,28 @@
-import { supabase } from '../lib/supabase';
+import { createClient } from '@/lib/supabase';
 import type { ConsultantProfile, ConsultantReview } from '../types/consultant';
 import type { Spark } from '../types/spark';
 import type { ConsultantMission } from '../types/consultant';
-import { generateSlug, ensureUniqueSlug } from '../utils/url';
+import { generateSlug } from '@/utils/url/shared';
+import { ensureUniqueSlug as ensureUniqueSlugServer } from '@/utils/url/server';
 import { deleteUser } from '../services/auth';
+import logger from '@/utils/logger';
+
+// Transform database response to ConsultantProfile
+const transformConsultantFromDB = (data: any): ConsultantProfile => ({
+    id: data.id,
+    email: data.email,
+    first_name: data.first_name,
+    last_name: data.last_name,
+    roles: data.roles,
+    linkedin: data.linkedin,
+    slug: data.slug,
+    created_at: data.created_at,
+    updated_at: data.updated_at
+});
 
 export async function getConsultantProfile(id: string): Promise<ConsultantProfile | null> {
-    const { data, error } = await supabase
+    const client = createClient();
+    const { data, error } = await client
         .from('profiles')
         .select('*')
         .eq('id', id)
@@ -22,18 +38,19 @@ export async function getConsultantProfile(id: string): Promise<ConsultantProfil
 }
 
 export async function getConsultantReviews(consultantId: string): Promise<ConsultantReview[]> {
-    const { data, error } = await supabase
+    const client = createClient();
+    const { data, error } = await client
         .from('consultant_reviews')
         .select('*')
         .eq('consultant_id', consultantId)
         .order('created_at', { ascending: false });
 
     if (error) {
-        console.error('Error fetching consultant reviews:', error);
+        logger.error('Error fetching consultant reviews:', error);
         return [];
     }
 
-    return data.map(review => ({
+    return data.map((review: any) => ({
         id: review.id,
         consultant_id: review.consultant_id,
         client_name: review.reviewer_name,
@@ -43,11 +60,12 @@ export async function getConsultantReviews(consultantId: string): Promise<Consul
         rating: review.rating,
         client_image_url: review.reviewer_image_url,
         created_at: review.created_at
-    })) as ConsultantReview[];
+    }));
 }
 
 export async function getConsultantSparks(consultantId: string): Promise<Spark[]> {
-    const { data, error } = await supabase
+    const client = createClient();
+    const { data, error } = await client
         .from('sparks')
         .select('*')
         .eq('consultant', consultantId)
@@ -62,7 +80,8 @@ export async function getConsultantSparks(consultantId: string): Promise<Spark[]
 }
 
 export async function getConsultantBySlug(slug: string): Promise<ConsultantProfile | null> {
-    const { data, error } = await supabase
+    const client = createClient();
+    const { data, error } = await client
         .from('profiles')
         .select('*')
         .eq('slug', slug)
@@ -77,81 +96,91 @@ export async function getConsultantBySlug(slug: string): Promise<ConsultantProfi
     return data as ConsultantProfile;
 }
 
-export async function updateConsultantProfile(id: string, profile: Partial<ConsultantProfile>): Promise<ConsultantProfile | null> {
-    let updatedProfile: Partial<ConsultantProfile> = { ...profile };
+export const updateConsultantProfile = async (id: string, profile: Partial<ConsultantProfile>): Promise<ConsultantProfile> => {
+    const client = createClient();
     
     // If name is being updated, generate new slug
+    let updatedProfile = { ...profile };
     if (profile.first_name || profile.last_name) {
-        const { data: currentProfile } = await supabase
+        // Get current profile to get the full name
+        const { data: currentProfile, error: fetchError } = await client
             .from('profiles')
-            .select('first_name, last_name, slug')
+            .select('first_name, last_name')
             .eq('id', id)
             .single();
-            
-        const firstName = profile.first_name || currentProfile?.first_name || '';
-        const lastName = profile.last_name || currentProfile?.last_name || '';
+
+        if (fetchError) {
+            logger.error('Error fetching current profile:', fetchError);
+            throw fetchError;
+        }
+
+        const firstName = profile.first_name || currentProfile.first_name;
+        const lastName = profile.last_name || currentProfile.last_name;
         const baseSlug = generateSlug(`${firstName} ${lastName}`);
-        updatedProfile.slug = await ensureUniqueSlug(baseSlug, 'profile', currentProfile?.slug);
+        
+        // Generate new slug
+        updatedProfile.slug = await ensureUniqueSlugServer(baseSlug, 'profile', profile.slug);
     }
 
-    const { data, error } = await supabase
+    // Update the profile
+    const { data, error } = await client
         .from('profiles')
-        .update({
-            ...updatedProfile,
-            updated_at: new Date().toISOString()
-        })
+        .update(updatedProfile)
         .eq('id', id)
-        .contains('roles', ['consultant'])
         .select()
         .single();
 
     if (error) {
-        console.error('Error updating consultant profile:', error);
-        return null;
+        logger.error('Error updating consultant profile:', error);
+        throw error;
     }
 
-    return data as ConsultantProfile;
-}
+    return transformConsultantFromDB(data);
+};
 
 export async function getConsultantMissions(consultantId: string): Promise<ConsultantMission[]> {
-    const { data, error } = await supabase
+    const client = createClient();
+    const { data, error } = await client
         .from('consultant_missions')
         .select('*')
         .eq('consultant_id', consultantId)
         .order('start_date', { ascending: false });
 
     if (error) {
-        console.error('Error fetching consultant missions:', error);
+        logger.error('Error fetching consultant missions:', error);
         return [];
     }
 
-    return data.map(mission => ({
+    return data.map((mission: any) => ({
         title: mission.title,
         company: mission.company,
         description: mission.description,
         duration: mission.duration,
         date: mission.start_date
-    })) as ConsultantMission[];
+    }));
 }
 
 export async function updateConsultantReviews(consultantId: string, reviews: ConsultantReview[]): Promise<boolean> {
     try {
         // Get current reviews to identify ones that need to be deleted
-        const { data: currentReviews } = await supabase
+        const client = createClient();
+        const { data: currentReviews } = await client
             .from('consultant_reviews')
             .select('id')
             .eq('consultant_id', consultantId);
 
         if (currentReviews) {
-            const currentIds = new Set(currentReviews.map(r => r.id));
+            const currentIds = new Set(currentReviews.map((r: { id: string }) => r.id));
             const existingReviews = reviews.filter(review => !review.id.startsWith('temp-'));
             const newReviews = reviews.filter(review => review.id.startsWith('temp-'));
             const keepIds = new Set(existingReviews.map(r => r.id));
-            const idsToDelete = Array.from(currentIds).filter(id => !keepIds.has(id));
+            const idsToDelete = Array.from(currentIds).filter((id: unknown): id is string => 
+                typeof id === 'string' && !keepIds.has(id)
+            );
 
             // Delete reviews that are no longer present
             if (idsToDelete.length > 0) {
-                const { error: deleteError } = await supabase
+                const { error: deleteError } = await client
                     .from('consultant_reviews')
                     .delete()
                     .in('id', idsToDelete)
@@ -165,7 +194,7 @@ export async function updateConsultantReviews(consultantId: string, reviews: Con
 
             // Update existing reviews one by one to respect RLS
             for (const review of existingReviews) {
-                const { error: updateError } = await supabase
+                const { error: updateError } = await client
                     .from('consultant_reviews')
                     .update({
                         reviewer_name: review.client_name,
@@ -186,7 +215,7 @@ export async function updateConsultantReviews(consultantId: string, reviews: Con
 
             // Insert new reviews
             if (newReviews.length > 0) {
-                const { error: insertError } = await supabase
+                const { error: insertError } = await client
                     .from('consultant_reviews')
                     .insert(newReviews.map(review => ({
                         consultant_id: consultantId,
@@ -208,32 +237,32 @@ export async function updateConsultantReviews(consultantId: string, reviews: Con
 
         return true;
     } catch (error) {
-        console.error('Error in updateConsultantReviews:', error);
+        logger.error('Error in updateConsultantReviews:', error);
         return false;
     }
 }
 
 export async function updateConsultantMissions(consultantId: string, missions: ConsultantMission[]): Promise<boolean> {
     try {
-        // Get current missions to identify ones that need to be deleted
-        const { data: currentMissions } = await supabase
+        const client = createClient();
+        const { data: currentMissions } = await client
             .from('consultant_missions')
             .select('id, title')
             .eq('consultant_id', consultantId);
 
         if (currentMissions) {
-            // Create a map of current missions by title (since we don't have IDs in the frontend)
-            const currentMissionsMap = new Map(currentMissions.map(m => [m.title, m.id]));
+            const currentMissionsMap = new Map(
+                currentMissions.map((m: { title: string; id: string }) => [m.title, m.id])
+            );
             const newTitles = new Set(missions.map(m => m.title));
 
-            // Find missions to delete (those that exist in DB but not in the new list)
             const idsToDelete = currentMissions
-                .filter(m => !newTitles.has(m.title))
-                .map(m => m.id);
+                .filter((m: { title: string }) => !newTitles.has(m.title))
+                .map((m: { id: string }) => m.id);
 
             // Delete removed missions
             if (idsToDelete.length > 0) {
-                const { error: deleteError } = await supabase
+                const { error: deleteError } = await client
                     .from('consultant_missions')
                     .delete()
                     .in('id', idsToDelete)
@@ -252,7 +281,7 @@ export async function updateConsultantMissions(consultantId: string, missions: C
             // Update existing missions one by one
             for (const mission of existingMissions) {
                 const missionId = currentMissionsMap.get(mission.title);
-                const { error: updateError } = await supabase
+                const { error: updateError } = await client
                     .from('consultant_missions')
                     .update({
                         title: mission.title,
@@ -272,7 +301,7 @@ export async function updateConsultantMissions(consultantId: string, missions: C
 
             // Insert new missions
             if (newMissions.length > 0) {
-                const { error: insertError } = await supabase
+                const { error: insertError } = await client
                     .from('consultant_missions')
                     .insert(newMissions.map(mission => ({
                         consultant_id: consultantId,
@@ -292,13 +321,14 @@ export async function updateConsultantMissions(consultantId: string, missions: C
 
         return true;
     } catch (error) {
-        console.error('Error in updateConsultantMissions:', error);
+        logger.error('Error in updateConsultantMissions:', error);
         return false;
     }
 }
 
 export async function getAllConsultants(includeSparkierEmails: boolean = false): Promise<ConsultantProfile[]> {
-    const { data, error } = await supabase
+    const client = createClient();
+    const { data, error } = await client
         .from('profiles')
         .select('*')
         .contains('roles', ['consultant']);
@@ -320,7 +350,8 @@ export async function getAllConsultants(includeSparkierEmails: boolean = false):
 export async function deleteConsultant(consultantId: string): Promise<boolean> {
     try {
         // First, verify that the user exists and is a consultant
-        const { data: profile, error: profileError } = await supabase
+        const client = createClient();
+        const { data: profile, error: profileError } = await client
             .from('profiles')
             .select('roles')
             .eq('id', consultantId)
@@ -351,7 +382,8 @@ export async function deleteConsultant(consultantId: string): Promise<boolean> {
  * @param uuid The UUID of the consultant
  */
 export async function getConsultantByUuid(uuid: string): Promise<ConsultantProfile | null> {
-    const { data, error } = await supabase
+    const client = createClient();
+    const { data, error } = await client
         .from('profiles')
         .select('*')
         .eq('id', uuid)

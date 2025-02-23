@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientRequest, getClientRequestsByClientId } from '@/services/clientRequests';
 import { getSparkByUrl } from '@/services/sparks';
-import { supabase } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { useNotification } from '@/contexts/NotificationContext';
@@ -35,7 +35,7 @@ export default function SparkRequestHandler() {
                 }
 
                 // Get current user
-                const { data: { user } } = await supabase.auth.getUser();
+                const { data: { user } } = await createBrowserClient().auth.getUser();
                 if (!user) {
                     throw new Error('Utilisateur non trouvé');
                 }
@@ -55,7 +55,12 @@ export default function SparkRequestHandler() {
 
                 // Create new request
                 logger.info('Creating new request', { sparkId: spark.id });
-                const request = await createClientRequest({ sparkId: spark.id });
+                const request = await createClientRequest({
+                    sparkId: spark.id,
+                    clientId: user.id,
+                    status: 'pending',
+                    message: ''
+                });
                 router.replace(`/client/requests/${request.id}`);
 
             } catch (err: any) {

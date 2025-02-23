@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Mail } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase';
 import { useNotification } from '@/contexts/NotificationContext';
 
 export default function ResetPasswordPage() {
@@ -16,7 +16,7 @@ export default function ResetPasswordPage() {
         setLoading(true);
 
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            const { error } = await createBrowserClient().auth.resetPasswordForEmail(email, {
                 redirectTo: `${window.location.origin}/auth/callback`,
             });
 

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase'
-import { generateSlug, ensureUniqueSlug, getSiteUrl } from '../utils/url';
+import { generateSlug, getSiteUrl } from '@/utils/url/shared';
+import { ensureUniqueSlug as ensureUniqueSlugServer } from '@/utils/url/server';
 import logger from '../utils/logger';
 import type { AuthError } from '@supabase/supabase-js';
 import type { Database } from '@/lib/supabase/database.types';
@@ -277,7 +278,7 @@ export const updateUserRoles = async (userId: string, roles: UserRole[], current
 
         // Generate slug if needed
         const baseSlug = generateSlug(`${profile.first_name} ${profile.last_name}`);
-        const slug = await ensureUniqueSlug(baseSlug, 'profile');
+        const slug = await ensureUniqueSlugServer(baseSlug, 'profile');
 
         // Update both roles and slug
         const { error: updateError } = await client

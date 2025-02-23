@@ -9,7 +9,7 @@ import { SignInForm } from '@/components/SignInForm';
 import { useClientSignUp } from '@/contexts/ClientSignUpContext';
 import { getSparkByUrl } from '@/services/sparks';
 import { createClientRequest, getClientRequestsByClientId } from '@/services/clientRequests';
-import { supabase } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase';
 import logger from '@/utils/logger';
 
 type FormState = 'email_check' | 'sign_in' | 'sign_up';
@@ -36,8 +36,8 @@ export default function SparkSignUpPage() {
             await new Promise(resolve => setTimeout(resolve, 500));
 
             // Double check that we're still authenticated
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
+            const { data: { user } } = await createBrowserClient().auth.getUser();
+            if (!user) {
                 logger.error('Session lost after sign in');
                 throw new Error('Session perdue après la connexion');
             }
@@ -51,7 +51,7 @@ export default function SparkSignUpPage() {
             }
 
             // Check for existing requests
-            const requests = await getClientRequestsByClientId(session.user.id);
+            const requests = await getClientRequestsByClientId(user.id);
             const existingRequest = requests.find(r => 
                 r.sparkId === spark.id && 
                 (r.status === 'pending' || r.status === 'accepted')
@@ -63,7 +63,12 @@ export default function SparkSignUpPage() {
             } else {
                 // Create new request
                 logger.info('Creating new request after sign in', { sparkId: spark.id });
-                const request = await createClientRequest({ sparkId: spark.id });
+                const request = await createClientRequest({
+                    sparkId: spark.id,
+                    clientId: user.id,
+                    status: 'pending',
+                    message: ''
+                });
                 router.push(`/client/requests/${request.id}`);
             }
         } catch (error) {

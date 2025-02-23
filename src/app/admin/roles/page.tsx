@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Users } from 'lucide-react'
 import { UserProfile, updateUserRoles, UserRole } from '../../../services/auth'
-import { supabase } from '../../../lib/supabase'
+import { createBrowserClient } from '@/lib/supabase'
 import { LoadingSpinner } from '../../../components/LoadingSpinner'
 import { useNotification } from '../../../contexts/NotificationContext'
 import { useAuth } from '../../../contexts/AuthContext'
@@ -39,9 +39,9 @@ export default function Page() {
 
     const fetchUsers = async (includeSparkierEmails: boolean) => {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await createBrowserClient()
                 .from('profiles')
-                .select('id, email, first_name, last_name, roles')
+                .select('id, email, first_name, last_name, roles, created_at, updated_at')
                 .order('email')
 
             if (error) throw error
@@ -56,6 +56,8 @@ export default function Page() {
                 firstName: profile.first_name,
                 lastName: profile.last_name,
                 roles: profile.roles,
+                createdAt: profile.created_at,
+                updatedAt: profile.updated_at
             })))
         } catch (err) {
             showNotification('error', 'Impossible de charger les utilisateurs')

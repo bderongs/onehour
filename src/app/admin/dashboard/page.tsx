@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { supabase } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase';
 import logger from '@/utils/logger';
 
 export default function AdminDashboard() {
@@ -21,16 +21,23 @@ export default function AdminDashboard() {
                 if (authLoading) return;
 
                 // Check if we have a session
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { user } } = await createBrowserClient().auth.getUser();
                 
-                if (!session) {
+                if (!user) {
                     logger.info('No session found, redirecting to signin');
                     router.push('/signin');
                     return;
                 }
 
+                // Get user profile to check roles
+                const { data: profile } = await createBrowserClient()
+                    .from('profiles')
+                    .select('roles')
+                    .eq('id', user.id)
+                    .single();
+
                 // Check if user has admin role
-                if (!user?.roles?.includes('admin')) {
+                if (!profile?.roles?.includes('admin')) {
                     logger.info('User is not an admin, redirecting to home');
                     router.push('/');
                     return;
