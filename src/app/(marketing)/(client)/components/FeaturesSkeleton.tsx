@@ -1,4 +1,4 @@
-export function MarketingFeaturesSkeleton() {
+export function FeaturesSkeleton() {
     return (
         <div className="mb-24 animate-pulse">
             {/* Title Skeleton */}

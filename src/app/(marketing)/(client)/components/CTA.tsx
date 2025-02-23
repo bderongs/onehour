@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ClientSignUpForm } from '@/components/ClientSignUpForm';
 
-export function MarketingCTA() {
+export function CTA() {
     return (
         <motion.div
             id="signup-form"

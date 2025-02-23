@@ -1,21 +1,24 @@
-'use client';
+import { Metadata } from 'next';
+import BackButton from '@/components/navigation/BackButton';
+import { Suspense } from 'react';
 
-import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+export const metadata: Metadata = {
+    title: 'Politique de confidentialité | Sparkier',
+    description: 'Découvrez comment Sparkier protège vos données et respecte votre vie privée. Notre politique de confidentialité détaille nos pratiques en matière de collecte et d\'utilisation des données.',
+    openGraph: {
+        title: 'Politique de confidentialité | Sparkier',
+        description: 'Découvrez comment Sparkier protège vos données et respecte votre vie privée.',
+    },
+};
 
 export default function Privacy() {
-    const router = useRouter();
-
     return (
         <div className="bg-white min-h-screen py-16">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center gap-4 mb-8">
-                    <button
-                        onClick={() => router.back()}
-                        className="text-gray-500 hover:text-gray-700 transition-colors"
-                    >
-                        <ArrowLeft className="h-6 w-6" />
-                    </button>
+                    <Suspense fallback={<div className="w-6 h-6 bg-gray-200 rounded-full animate-pulse" />}>
+                        <BackButton />
+                    </Suspense>
                     <h1 className="text-4xl font-extrabold text-gray-900">Politique de confidentialité</h1>
                 </div>
                 <div className="space-y-8 text-gray-700">

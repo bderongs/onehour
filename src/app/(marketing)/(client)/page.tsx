@@ -13,24 +13,24 @@ import {
     FileText
 } from 'lucide-react';
 import { getSparks } from '@/services/sparks';
-import { MarketingHero } from './components/MarketingHero';
-import { MarketingFeatures } from './components/MarketingFeatures';
-import { MarketingHowItWorks } from './components/MarketingHowItWorks';
-import { MarketingAbout } from './components/MarketingAbout';
-import { MarketingCTA } from './components/MarketingCTA';
-import { MarketingHeroSkeleton } from './components/MarketingHeroSkeleton';
-import { MarketingFeaturesSkeleton } from './components/MarketingFeaturesSkeleton';
+import { Hero } from './components/Hero';
+import { Features } from './components/Features';
+import { HowItWorks } from './components/HowItWorks';
+import { About } from './components/About';
+import { CTA } from './components/CTA';
+import { HeroSkeleton } from './components/HeroSkeleton';
+import { FeaturesSkeleton } from './components/FeaturesSkeleton';
 import '@/styles/highlight.css';
 
 // Add metadata for SEO
 export const metadata: Metadata = {
     title: 'Sparkier - Boostez votre activité avec les Sparks',
-    description: 'Les Sparks allient IA et experts métiers pour mettre l'expertise du monde entier au service de votre réussite.',
+    description: 'Les Sparks allient IA et experts métiers pour mettre l\'expertise du monde entier au service de votre réussite.',
     openGraph: {
         title: 'Sparkier - Boostez votre activité avec les Sparks',
-        description: 'Les Sparks allient IA et experts métiers pour mettre l'expertise du monde entier au service de votre réussite.',
-        type: 'website',
-    },
+        description: 'Les Sparks allient IA et experts métiers pour mettre l\'expertise du monde entier au service de votre réussite.',
+        type: 'website'
+    }
 };
 
 // Static data
@@ -102,23 +102,23 @@ export default async function Page() {
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* Hero Section with Interactive Chat */}
-                <Suspense fallback={<MarketingHeroSkeleton />}>
-                    <MarketingHero sparks={sparks} />
+                <Suspense fallback={<HeroSkeleton />}>
+                    <Hero sparks={sparks} />
                 </Suspense>
 
                 {/* Features Section */}
-                <Suspense fallback={<MarketingFeaturesSkeleton />}>
-                    <MarketingFeatures features={features} />
+                <Suspense fallback={<FeaturesSkeleton />}>
+                    <Features features={features} />
                 </Suspense>
 
                 {/* How it Works Section */}
-                <MarketingHowItWorks steps={howItWorks} />
+                <HowItWorks steps={howItWorks} />
 
                 {/* About Section */}
-                <MarketingAbout content={about_content} />
+                <About content={about_content} />
 
                 {/* CTA Section with Sign Up Form */}
-                <MarketingCTA />
+                <CTA />
             </div>
         </div>
     );

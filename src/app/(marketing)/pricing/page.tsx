@@ -1,69 +1,73 @@
-'use client'
-
-import { Check, ArrowRight } from 'lucide-react';
+import { Metadata } from 'next';
+import { Suspense } from 'react';
+import { PricingTierCard } from '@/components/PricingTierCard';
+import { PricingTierSkeleton } from '@/components/PricingTierSkeleton';
 import { ConsultantSignUpForm } from '@/components/ConsultantSignUpForm';
 
+export const metadata: Metadata = {
+    title: 'Tarifs | Sparkier - Développez votre activité de consultant',
+    description: 'Des tarifs transparents pour vous accompagner à chaque étape de votre croissance. Découvrez nos offres de lancement et nos futurs services premium.',
+    openGraph: {
+        title: 'Tarifs | Sparkier',
+        description: 'Des tarifs transparents pour vous accompagner à chaque étape de votre croissance.',
+        type: 'website',
+    },
+};
+
+const tiers = [
+    {
+        name: 'Lancement',
+        price: '1€',
+        currentPrice: 'Gratuit',
+        period: 'par mois',
+        description: 'Accélérez votre croissance avec Sparkier',
+        features: [
+            'Page de profil professionnelle',
+            'Assistant IA de qualification (100 messages/mois)',
+            '10 Sparks pour présenter vos services',
+        ],
+        cta: 'Commencer gratuitement',
+        highlight: true,
+    },
+    {
+        name: 'Premium',
+        price: '19€',
+        period: 'par mois',
+        description: 'Des services premium bientôt disponibles',
+        features: [
+            'Page de profil personnalisée',
+            'Assistant IA illimité',
+            'Sparks illimités',
+            'Agenda en ligne',
+            'Paiements sécurisés',
+            'Analytics avancés',
+            'Support prioritaire',
+            'Intégration calendrier',
+        ],
+        cta: 'Bientôt disponible',
+        highlight: false,
+    },
+    {
+        name: 'Enterprise',
+        price: 'Sur mesure',
+        period: '',
+        description: 'Solution complète pour les cabinets de conseil',
+        features: [
+            'Tout ce qui est inclus dans Pro',
+            'Pages de profil pour tous les consultants',
+            'Assistant IA personnalisé',
+            'Marque blanche possible',
+            'Account manager dédié',
+            'API access',
+            'SSO & contrôles admin',
+            'Formation personnalisée',
+        ],
+        cta: 'Bientôt disponible',
+        highlight: false,
+    }
+];
+
 export default function PricingPage() {
-    const scrollToSignup = () => {
-        document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    const tiers = [
-        {
-            name: 'Lancement',
-            price: '1€',
-            currentPrice: 'Gratuit',
-            period: 'par mois',
-            description: 'Accélérez votre croissance avec Sparkier',
-            features: [
-                'Page de profil professionnelle',
-                'Assistant IA de qualification (100 messages/mois)',
-                '10 Sparks pour présenter vos services',
-            ],
-            cta: 'Commencer gratuitement',
-            highlight: true,
-            action: scrollToSignup
-        },
-        {
-            name: 'Premium',
-            price: '19€',
-            period: 'par mois',
-            description: 'Des services premium bientôt disponibles',
-            features: [
-                'Page de profil personnalisée',
-                'Assistant IA illimité',
-                'Sparks illimités',
-                'Agenda en ligne',
-                'Paiements sécurisés',
-                'Analytics avancés',
-                'Support prioritaire',
-                'Intégration calendrier',
-            ],
-            cta: 'Bientôt disponible',
-            highlight: false,
-            action: () => {}
-        },
-        {
-            name: 'Enterprise',
-            price: 'Sur mesure',
-            period: '',
-            description: 'Solution complète pour les cabinets de conseil',
-            features: [
-                'Tout ce qui est inclus dans Pro',
-                'Pages de profil pour tous les consultants',
-                'Assistant IA personnalisé',
-                'Marque blanche possible',
-                'Account manager dédié',
-                'API access',
-                'SSO & contrôles admin',
-                'Formation personnalisée',
-            ],
-            cta: 'Bientôt disponible',
-            highlight: false,
-            action: () => {}
-        }
-    ];
-
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen pt-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -79,66 +83,26 @@ export default function PricingPage() {
 
                 {/* Pricing Grid */}
                 <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                    {tiers.map((tier, index) => (
-                        <div 
-                            key={tier.name}
-                            className={`bg-white rounded-2xl shadow-xl p-8 relative flex flex-col ${
-                                tier.highlight ? 'ring-2 ring-blue-600' : ''
-                            }`}
-                        >
-                            {tier.highlight && (
-                                <div className="absolute -top-5 left-0 right-0 mx-auto w-fit">
-                                    <span className="bg-blue-600 text-white text-sm font-medium px-4 py-1 rounded-full">
-                                        Disponible maintenant
-                                    </span>
-                                </div>
-                            )}
-                            <div className="mb-6">
-                                <h3 className="text-2xl font-bold text-gray-900 mb-2">{tier.name}</h3>
-                                <p className="text-gray-600 mb-4">{tier.description}</p>
-                                {index === 0 ? (
-                                    <>
-                                        <div className="flex flex-col">
-                                            <div className="flex items-baseline">
-                                                <span className="text-4xl font-bold text-gray-900 line-through opacity-50">{tier.price}</span>
-                                                <span className="text-4xl font-bold text-gray-900 ml-2">{tier.currentPrice}</span>
-                                            </div>
-                                            <span className="text-gray-600 text-lg">{tier.period}</span>
-                                            <div className="bg-green-500 text-white text-sm font-medium px-3 py-1 rounded-full mt-2 w-fit">
-                                                Offre de lancement 🎉
-                                            </div>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="flex flex-col">
-                                        <span className="text-4xl font-bold text-gray-900">{tier.price}</span>
-                                        <span className="text-gray-600 text-lg">{tier.period}</span>
-                                    </div>
-                                )}
-                            </div>
-                            <ul className="space-y-4 mb-8 flex-grow">
-                                {tier.features.map((feature) => (
-                                    <li key={feature} className="flex items-start">
-                                        <Check className="h-5 w-5 text-blue-600 flex-shrink-0 mt-1" />
-                                        <span className="ml-3 text-gray-600">{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                            <button 
-                                className={`w-full py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-2 group ${
-                                    tier.highlight
-                                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                        : 'bg-gray-50 text-gray-900 hover:bg-gray-100'
-                                }`}
-                                onClick={tier.action}
-                            >
-                                {tier.cta}
-                                {tier.highlight && (
-                                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                                )}
-                            </button>
-                        </div>
-                    ))}
+                    <Suspense fallback={
+                        <>
+                            <PricingTierSkeleton />
+                            <PricingTierSkeleton />
+                            <PricingTierSkeleton />
+                        </>
+                    }>
+                        {tiers.map((tier, index) => (
+                            <PricingTierCard 
+                                key={tier.name}
+                                tier={{
+                                    ...tier,
+                                    action: index === 0 
+                                        ? () => document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' })
+                                        : () => {}
+                                }}
+                                index={index}
+                            />
+                        ))}
+                    </Suspense>
                 </div>
 
                 {/* FAQ Section */}
@@ -175,10 +139,20 @@ export default function PricingPage() {
                         </p>
                     </div>
 
-                    <ConsultantSignUpForm 
-                        className="bg-white p-8 rounded-xl shadow-md"
-                        buttonText="Créer mon profil gratuitement"
-                    />
+                    <Suspense fallback={
+                        <div className="bg-white p-8 rounded-xl shadow-md animate-pulse">
+                            <div className="space-y-4">
+                                <div className="h-10 bg-gray-200 rounded w-full"></div>
+                                <div className="h-10 bg-gray-200 rounded w-full"></div>
+                                <div className="h-10 bg-gray-200 rounded w-full"></div>
+                            </div>
+                        </div>
+                    }>
+                        <ConsultantSignUpForm 
+                            className="bg-white p-8 rounded-xl shadow-md"
+                            buttonText="Créer mon profil gratuitement"
+                        />
+                    </Suspense>
                 </div>
             </div>
         </div>

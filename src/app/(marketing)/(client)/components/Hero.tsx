@@ -17,7 +17,7 @@ interface MarketingHeroProps {
     sparks: Spark[];
 }
 
-export function MarketingHero({ sparks }: MarketingHeroProps) {
+export function Hero({ sparks }: MarketingHeroProps) {
     const [showConnect, setShowConnect] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [shouldReset, setShouldReset] = useState(false);

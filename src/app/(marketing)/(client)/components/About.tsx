@@ -19,7 +19,7 @@ const fadeInUp = {
     transition: { duration: 0.5 }
 };
 
-export function MarketingAbout({ content }: MarketingAboutProps) {
+export function About({ content }: MarketingAboutProps) {
     return (
         <motion.div
             id="why-sparkier"

@@ -1,4 +1,4 @@
-export function MarketingHeroSkeleton() {
+export function HeroSkeleton() {
     return (
         <div className="text-center mb-16 animate-pulse">
             {/* Title Skeleton */}
