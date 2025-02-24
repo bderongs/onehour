@@ -7,12 +7,11 @@ import { Plus, Eye, Sparkles, Rocket } from 'lucide-react';
 import type { Spark } from '@/types/spark';
 import { getSparksByConsultant, deleteSpark } from '@/services/sparks';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
-import { DashboardSparksGrid } from '@/components/DashboardSparksGrid';
+import { SparksGrid } from '@/components/SparksGrid'; // Changed from DashboardSparksGrid since it doesn't exist
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useNotification } from '@/contexts/NotificationContext';
 import logger from '@/utils/logger';
-import { SparksGrid } from '@/components/SparksGrid';
 
 const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -176,7 +175,7 @@ export default function SparkManagementPage() {
                 {sparks.length === 0 ? (
                     <EmptyState onCreateSpark={handleCreateSpark} />
                 ) : (
-                    <DashboardSparksGrid
+                    <SparksGrid
                         sparks={sparks}
                         onCreateSpark={handleCreateSpark}
                         onPreviewSpark={handlePreviewSpark}
