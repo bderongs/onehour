@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Clock, ArrowLeft, CheckCircle, XCircle, Loader2, MessageSquare, ArrowRight } from 'lucide-react';
-import { getClientRequestById, updateClientRequestMessage } from '@/services/clientRequests';
+import { getClientRequestById, updateClientRequest } from '@/services/clientRequests';
 import { getSparkById } from '@/services/sparks';
 import type { ClientRequest } from '@/services/clientRequests';
 import type { Spark } from '@/types/spark';
@@ -114,7 +114,7 @@ export default function ClientRequestPage() {
 
         setIsSubmitting(true);
         try {
-            const updatedRequest = await updateClientRequestMessage(request.id, message);
+            const updatedRequest = await updateClientRequest(request.id, { message });
             if (updatedRequest) {
                 setRequest(updatedRequest);
                 // TODO: Redirect to booking page when ready

@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Sparkles, Clock, ExternalLink } from 'lucide-react'
-import type { ClientRequest } from '../../../services/clientRequests'
-import { getClientRequestsByClientId } from '../../../services/clientRequests'
-import { getSparkById } from '../../../services/sparks'
-import { formatDate } from '../../../utils/format'
-import { useAuth } from '../../../contexts/AuthContext'
-import { LoadingSpinner } from '../../../components/ui/LoadingSpinner'
+import type { ClientRequest } from '@/services/clientRequests'
+import { getClientRequestsByClientId } from '@/services/clientRequests'
+import { getSparkById } from '@/services/sparks'
+import { formatDate } from '@/utils/format'
+import { useAuth } from '@/contexts/AuthContext'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 const EmptyState = () => {
     const router = useRouter()
@@ -142,7 +142,7 @@ export default function Page() {
                 const clientRequests = await getClientRequestsByClientId(user.id)
                 
                 const requestsWithTitles = await Promise.all(
-                    clientRequests.map(async (request) => {
+                    clientRequests.map(async (request: ClientRequest) => {
                         const spark = await getSparkById(request.sparkId)
                         return {
                             ...request,

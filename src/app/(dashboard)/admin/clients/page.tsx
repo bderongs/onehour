@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Users, Mail, ChevronDown, ChevronUp, Trash2, Building, Clock } from 'lucide-react'
-import type { ClientProfile } from '../../../services/clients'
-import { getAllClients, deleteClient } from '../../../services/clients'
-import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
-import { useAuth } from '../../../contexts/AuthContext'
-import { LoadingSpinner } from '../../../components/ui/LoadingSpinner'
-import { useNotification } from '../../../contexts/NotificationContext'
+import type { ClientProfile } from '@/services/clients'
+import { getAllClients, deleteClient } from '@/services/clients'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { useAuth } from '@/contexts/AuthContext'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { useNotification } from '@/contexts/NotificationContext'
 
 const EmptyState = () => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -63,7 +63,7 @@ const ClientRow = ({
                         {/* Nom */}
                         <div className="flex items-center gap-2">
                             <h3 className="text-base font-medium text-gray-900">
-                                {client.first_name} {client.last_name}
+                                {client.firstName} {client.lastName}
                             </h3>
                         </div>
 
@@ -76,7 +76,7 @@ const ClientRow = ({
                         {/* Date d'inscription */}
                         <div className="flex items-center gap-1 text-sm text-gray-500">
                             <Clock className="h-4 w-4" />
-                            <span>Inscrit le {new Date(client.created_at).toLocaleDateString()}</span>
+                            <span>Inscrit le {new Date(client.createdAt).toLocaleDateString()}</span>
                         </div>
                     </div>
 
@@ -131,7 +131,7 @@ const ClientRow = ({
                                             </div>
                                             <div>
                                                 <dt className="text-sm font-medium text-gray-500">Date d'inscription</dt>
-                                                <dd className="text-sm text-gray-900">{new Date(client.created_at).toLocaleDateString()}</dd>
+                                                <dd className="text-sm text-gray-900">{new Date(client.createdAt).toLocaleDateString()}</dd>
                                             </div>
                                         </dl>
                                     </div>
@@ -145,7 +145,7 @@ const ClientRow = ({
             <ConfirmDialog
                 isOpen={showDeleteConfirm}
                 title="Supprimer le client"
-                message={`Êtes-vous sûr de vouloir supprimer le client ${client.first_name} ${client.last_name} ? Cette action supprimera définitivement toutes les données associées et est irréversible.`}
+                message={`Êtes-vous sûr de vouloir supprimer le client ${client.firstName} ${client.lastName} ? Cette action supprimera définitivement toutes les données associées et est irréversible.`}
                 confirmLabel={isDeleting ? "Suppression..." : "Supprimer définitivement"}
                 cancelLabel="Annuler"
                 onConfirm={handleDelete}
@@ -172,8 +172,11 @@ export default function Page() {
 
     const fetchClients = async (includeSparkierEmails: boolean) => {
         try {
-            const clientsData = await getAllClients(includeSparkierEmails)
-            setClients(clientsData)
+            const clientsData = await getAllClients()
+            const filteredClients = includeSparkierEmails 
+                ? clientsData 
+                : clientsData.filter(client => !client.email.endsWith('@sparkier.io'))
+            setClients(filteredClients)
             setLoading(false)
         } catch (err) {
             console.error('Error fetching clients:', err)

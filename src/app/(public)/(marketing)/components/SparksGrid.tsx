@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, Plus } from 'lucide-react';
-import { Spark } from '../types/spark';
-import { Logo } from './Logo';
-import { formatDuration, formatPrice } from '../utils/format';
+import { Spark } from '@/types/spark';
+import { Logo } from '@/components/Logo';
+import { formatDuration, formatPrice } from '@/utils/format';
 import { useRouter } from 'next/navigation';
 import logger from '@/utils/logger';
 
