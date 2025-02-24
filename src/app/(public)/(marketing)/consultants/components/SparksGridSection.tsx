@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { SparksGrid } from '@/components/SparksGrid';
+import { SparksGrid } from '@/app/(public)/(marketing)/components/SparksGrid';
 import type { Spark } from '@/types/spark';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import logger from '@/utils/logger';
