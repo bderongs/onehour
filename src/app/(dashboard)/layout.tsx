@@ -1,7 +1,7 @@
 'use client';
 
 import { Footer } from '@/components/Footer';
-import { DashboardHeader } from '@/components/DashboardHeader';
+import { Header } from '@/components/Header';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 export default function DashboardRootLayout({
@@ -11,7 +11,7 @@ export default function DashboardRootLayout({
 }) {
   return (
     <>
-      <DashboardHeader />
+      <Header />
       <main className="flex-grow pt-16">
         <ProtectedRoute>{children}</ProtectedRoute>
       </main>

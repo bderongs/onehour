@@ -11,6 +11,7 @@ import { DashboardSparksGrid } from '../../../components/DashboardSparksGrid'
 import { useAuth } from '../../../contexts/AuthContext'
 import { LoadingSpinner } from '../../../components/LoadingSpinner'
 import { useNotification } from '../../../contexts/NotificationContext'
+import { SparksGrid } from '../../../components/SparksGrid'
 
 const EmptyState = ({ onCreateSpark }: { onCreateSpark: () => void }) => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">

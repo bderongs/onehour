@@ -1,7 +1,7 @@
 'use client';
 
 import { Footer } from '@/components/Footer';
-import { DashboardHeader } from '@/components/DashboardHeader';
+import { Header } from '@/components/Header';
 
 export default function AdminLayout({
   children,
@@ -10,7 +10,7 @@ export default function AdminLayout({
 }) {
   return (
     <>
-      <DashboardHeader />
+      <Header />
       <main className="flex-grow pt-16">
         {children}
       </main>

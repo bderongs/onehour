@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import { PricingTierCard } from '@/components/PricingTierCard';
-import { PricingTierSkeleton } from '@/components/PricingTierSkeleton';
+import { PricingTierCard } from './components/PricingTierCard';
+import { PricingTierSkeleton } from './components/PricingTierSkeleton';
 import { ConsultantSignUpForm } from '@/components/ConsultantSignUpForm';
 
 export const metadata: Metadata = {
