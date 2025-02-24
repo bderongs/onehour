@@ -2,6 +2,8 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { BrandName } from './BrandName';
+import { usePageType } from '@/contexts/PageTypeContext';
+import logger from '@/utils/logger';
 
 const scrollToSection = (sectionId: string, router: any, currentPath: string) => {
   if (currentPath === '/') {
@@ -17,10 +19,7 @@ const scrollToSection = (sectionId: string, router: any, currentPath: string) =>
 export function Footer() {
   const router = useRouter();
   const pathname = usePathname() ?? '/';
-  const isConsultantsPage = pathname === '/consultants';
-  const isPricingPage = pathname === '/pricing';
-  const isProfilePage = pathname === '/profile' || /^\/[^/]+$/.test(pathname);
-  const isConsultantSection = isConsultantsPage || isPricingPage;
+  const { isProfilePage, isConsultantSection } = usePageType();
 
   return (
     <footer className="bg-gray-900 text-white">
