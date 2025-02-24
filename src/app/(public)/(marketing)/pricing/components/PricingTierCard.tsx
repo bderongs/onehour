@@ -11,7 +11,7 @@ interface PricingTier {
     features: string[];
     cta: string;
     highlight: boolean;
-    action: () => void;
+    action: 'scroll-to-form' | 'no-action';
 }
 
 interface PricingTierCardProps {
@@ -20,6 +20,12 @@ interface PricingTierCardProps {
 }
 
 export function PricingTierCard({ tier, index }: PricingTierCardProps) {
+    const handleAction = () => {
+        if (tier.action === 'scroll-to-form') {
+            document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
     return (
         <div 
             className={`bg-white rounded-2xl shadow-xl p-8 relative flex flex-col ${
@@ -70,7 +76,7 @@ export function PricingTierCard({ tier, index }: PricingTierCardProps) {
                         ? 'bg-blue-600 text-white hover:bg-blue-700'
                         : 'bg-gray-50 text-gray-900 hover:bg-gray-100'
                 }`}
-                onClick={tier.action}
+                onClick={handleAction}
             >
                 {tier.cta}
                 {tier.highlight && (

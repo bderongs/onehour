@@ -96,8 +96,8 @@ export default function PricingPage() {
                                 tier={{
                                     ...tier,
                                     action: index === 0 
-                                        ? () => document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' })
-                                        : () => {}
+                                        ? 'scroll-to-form'
+                                        : 'no-action'
                                 }}
                                 index={index}
                             />
