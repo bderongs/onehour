@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { generateSlug, getSiteUrl } from '@/utils/url/shared';
 import { ensureUniqueSlug as ensureUniqueSlugServer } from '@/utils/url/server';
 import logger from '../utils/logger';

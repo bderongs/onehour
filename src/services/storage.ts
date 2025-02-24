@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/server';
 import logger from '../utils/logger';
 
 const MAX_WIDTH = 800;  // Maximum width for profile pictures

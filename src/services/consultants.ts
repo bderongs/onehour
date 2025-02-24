@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/server';
 import type { ConsultantProfile, ConsultantReview } from '../types/consultant';
 import type { Spark } from '../types/spark';
 import type { ConsultantMission } from '../types/consultant';

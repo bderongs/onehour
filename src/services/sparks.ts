@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/server';
 import logger from '../utils/logger';
 import type { Spark } from '../types/spark';
 import { generateSlug } from '@/utils/url/shared';

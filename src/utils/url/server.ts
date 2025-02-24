@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/server';
 import { generateSlug } from './shared';
 import type { SlugContext } from './shared';
 import logger from '@/utils/logger';
