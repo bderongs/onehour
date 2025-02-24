@@ -12,7 +12,7 @@ interface SignInFormProps {
     className?: string;
 }
 
-export function SignInForm({ 
+export function PasswordSignInStep({ 
     email,
     onSuccess,
     onBack,

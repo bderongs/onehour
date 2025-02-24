@@ -2,9 +2,8 @@
 
 import { createContext, useContext, ReactNode, useState, useEffect, useCallback } from 'react';
 import { createBrowserClient } from '@/lib/supabase';
-import { getCurrentUser } from '../services/auth';
-import type { UserProfile } from '../services/auth';
-import logger from '../utils/logger';
+import { getCurrentUser, signOut, type UserProfile } from '@/services/auth';
+import logger from '@/utils/logger';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {

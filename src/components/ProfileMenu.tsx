@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { getConsultantProfile } from '../services/consultants';
 import type { ConsultantProfile } from '../types/consultant';
 import { createBrowserClient } from '@/lib/supabase';
 import { User, LogOut, Settings, UserCircle, Sparkles, ExternalLink, ShieldCheck } from 'lucide-react';
@@ -11,21 +10,9 @@ import logger from '@/utils/logger';
 
 export function ProfileMenu() {
     const [isOpen, setIsOpen] = useState(false);
-    const [consultantProfile, setConsultantProfile] = useState<ConsultantProfile | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const { user, refreshUser } = useAuth();
-
-    useEffect(() => {
-        const fetchConsultantProfile = async () => {
-            if (user?.roles.includes('consultant')) {
-                const consultantData = await getConsultantProfile(user.id);
-                setConsultantProfile(consultantData);
-            }
-        };
-
-        fetchConsultantProfile();
-    }, [user]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -109,7 +96,7 @@ export function ProfileMenu() {
                                 <button
                                     onClick={() => {
                                         setIsOpen(false);
-                                        router.push(`/${consultantProfile?.slug || ''}`);
+                                        router.push(`/${user.slug || ''}`);
                                     }}
                                     className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                                 >

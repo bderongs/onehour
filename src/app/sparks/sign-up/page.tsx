@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ClientSignUpForm } from '@/components/ClientSignUpForm';
 import { EmailCheckForm } from '@/components/EmailCheckForm';
-import { SignInForm } from '@/components/SignInForm';
+import { PasswordSignInStep } from '@/components/PasswordSignInStep';
 import { useClientSignUp } from '@/contexts/ClientSignUpContext';
 import { getSparkByUrl } from '@/services/sparks';
 import { createClientRequest, getClientRequestsByClientId } from '@/services/clientRequests';
@@ -94,7 +94,7 @@ export default function SparkSignUpPage() {
                 );
             case 'sign_in':
                 return (
-                    <SignInForm
+                    <PasswordSignInStep
                         email={email}
                         onSuccess={handleSignInSuccess}
                         onBack={() => setFormState('email_check')}

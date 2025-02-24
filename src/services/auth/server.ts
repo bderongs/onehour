@@ -1,36 +1,9 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server';
 import { generateSlug, getSiteUrl } from '@/utils/url/shared';
 import { ensureUniqueSlug as ensureUniqueSlugServer } from '@/utils/url/server';
-import logger from '../utils/logger';
-import type { AuthError } from '@supabase/supabase-js';
-import type { Database } from '@/lib/supabase/database.types';
-
-export interface ConsultantSignUpData {
-    email: string;
-    firstName: string;
-    lastName: string;
-    linkedin?: string;
-}
-
-export interface ClientSignUpData {
-    email: string;
-    firstName: string;
-    lastName: string;
-    sparkUrlSlug?: string;
-}
-
-export type UserRole = 'admin' | 'consultant' | 'client';
-
-export interface UserProfile {
-    id: string;
-    email: string;
-    firstName: string | null;
-    lastName: string | null;
-    roles: UserRole[];
-    linkedin?: string | null;
-    createdAt: string;
-    updatedAt: string;
-}
+import logger from '@/utils/logger';
+import type { ConsultantSignUpData, ClientSignUpData, UserProfile, UserRole } from './types';
+import { transformProfileFromDB } from './types';
 
 // Helper function to generate a temporary password
 const generateTempPassword = () => {
@@ -42,18 +15,6 @@ const generateTempPassword = () => {
     }
     return password;
 };
-
-// Helper function to transform profile from DB format to our format
-const transformProfileFromDB = (profile: Database['public']['Tables']['profiles']['Row']): UserProfile => ({
-    id: profile.id,
-    email: profile.email,
-    firstName: profile.first_name,
-    lastName: profile.last_name,
-    roles: profile.roles as UserRole[],
-    linkedin: profile.linkedin,
-    createdAt: profile.created_at,
-    updatedAt: profile.updated_at
-});
 
 export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
     const siteUrl = getSiteUrl();
@@ -174,44 +135,35 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
 
 export const getCurrentUser = async (): Promise<UserProfile | null> => {
     try {
-        const client = await createClient()
-        const { data: { user }, error: sessionError } = await client.auth.getUser()
+        const client = await createClient();
+        const { data: { user }, error: sessionError } = await client.auth.getUser();
 
         if (sessionError) {
-            logger.error('Error getting session:', sessionError)
-            return null
+            logger.error('Error getting session:', sessionError);
+            return null;
         }
 
         if (!user) {
-            return null
+            return null;
         }
 
         const { data: profile, error: profileError } = await client
             .from('profiles')
             .select('*')
             .eq('id', user.id)
-            .single()
+            .single();
 
         if (profileError) {
-            logger.error('Error getting user profile:', profileError)
-            return null
+            logger.error('Error getting user profile:', profileError);
+            return null;
         }
 
-        return {
-            id: profile.id,
-            email: profile.email,
-            firstName: profile.first_name,
-            lastName: profile.last_name,
-            roles: profile.roles as UserRole[],
-            linkedin: profile.linkedin,
-            createdAt: profile.created_at,
-            updatedAt: profile.updated_at
-        }
+        return transformProfileFromDB(profile);
     } catch (error) {
-        logger.error('Error in getCurrentUser:', error)
-        return null
+        logger.error('Error in getCurrentUser:', error);
+        return null;
     }
-}
+};
 
 export const resendConfirmationEmail = async (email: string): Promise<void> => {
     const siteUrl = getSiteUrl();
@@ -322,52 +274,43 @@ export const updateUserRoles = async (userId: string, roles: UserRole[], current
 
 export const signOut = async (): Promise<void> => {
     try {
-        const client = await createClient()
-        const { error } = await client.auth.signOut()
+        const client = await createClient();
+        const { error } = await client.auth.signOut();
         if (error) {
-            logger.error('Error signing out:', error)
-            throw error
+            logger.error('Error signing out:', error);
+            throw error;
         }
     } catch (error) {
-        logger.error('Error in signOut:', error)
-        throw error
+        logger.error('Error in signOut:', error);
+        throw error;
     }
-}
+};
 
 export const updateUserProfile = async (userId: string, updates: Partial<UserProfile>): Promise<UserProfile> => {
     try {
-        const client = await createClient()
+        const client = await createClient();
         
         // Convert camelCase to snake_case for database
-        const dbUpdates: Record<string, any> = {}
-        if (updates.firstName !== undefined) dbUpdates.first_name = updates.firstName
-        if (updates.lastName !== undefined) dbUpdates.last_name = updates.lastName
-        if (updates.roles !== undefined) dbUpdates.roles = updates.roles
+        const dbUpdates: Record<string, any> = {};
+        if (updates.firstName !== undefined) dbUpdates.first_name = updates.firstName;
+        if (updates.lastName !== undefined) dbUpdates.last_name = updates.lastName;
+        if (updates.roles !== undefined) dbUpdates.roles = updates.roles;
         
         const { data, error } = await client
             .from('profiles')
             .update(dbUpdates)
             .eq('id', userId)
             .select()
-            .single()
+            .single();
 
         if (error) {
-            logger.error('Error updating user profile:', error)
-            throw error
+            logger.error('Error updating user profile:', error);
+            throw error;
         }
 
-        return {
-            id: data.id,
-            email: data.email,
-            firstName: data.first_name,
-            lastName: data.last_name,
-            roles: data.roles as UserRole[],
-            linkedin: data.linkedin,
-            createdAt: data.created_at,
-            updatedAt: data.updated_at
-        }
+        return transformProfileFromDB(data);
     } catch (error) {
-        logger.error('Error in updateUserProfile:', error)
-        throw error
+        logger.error('Error in updateUserProfile:', error);
+        throw error;
     }
-} 
+}; 
