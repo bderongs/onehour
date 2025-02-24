@@ -4,7 +4,7 @@ import { ReactNode, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../services/auth';
-import { LoadingSpinner } from './LoadingSpinner';
+import { LoadingSpinner } from './ui/LoadingSpinner';
 import logger from '@/utils/logger';
 
 interface ProtectedRouteProps {

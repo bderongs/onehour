@@ -2,7 +2,7 @@ import './globals.css';
 import { Metadata } from 'next';
 import { Providers } from '@/components/Providers';
 import { Suspense } from 'react';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 export const metadata: Metadata = {
   title: 'Sparkier',
