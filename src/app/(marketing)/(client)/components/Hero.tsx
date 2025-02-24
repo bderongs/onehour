@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Sparkles, ArrowRight } from 'lucide-react';
 import { AIChatInterface, Message } from '@/components/AIChatInterface';
 import { ConsultantConnect } from '@/components/ConsultantConnect';
-import { SparksGrid } from '@/components/SparksGrid';
+import { SparksGrid } from '@/app/(marketing)/components/SparksGrid';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { DOCUMENT_TEMPLATES } from '@/data/documentTemplates';
 import { createChatConfigs } from '@/data/chatConfigs';
