@@ -1,19 +1,19 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ArrowLeft, Sparkles } from 'lucide-react'
-import type { Spark } from '../../../../types/spark'
-import { AIChatInterface, Message } from '../../../../components/AIChatInterface'
-import { DOCUMENT_TEMPLATES } from '../../../../data/documentTemplates'
-import { createChatConfigs } from '../../../../data/chatConfigs'
-import { formatDuration, formatPrice } from '../../../../utils/format'
-import { generateSparkCreatePrompt, generateSparkEditPrompt } from '../../../../services/promptGenerators'
-import { editSparkWithAI } from '../../../../services/openai'
-import { createSpark, getSparkByUrl, updateSpark } from '../../../../services/sparks'
-import { useAuth } from '../../../../contexts/AuthContext'
-import { LoadingSpinner } from '../../../../components/ui/LoadingSpinner'
+import type { Spark } from '@/types/spark'
+import { AIChatInterface, Message } from '@/components/AIChatInterface'
+import { DOCUMENT_TEMPLATES } from '@/data/documentTemplates'
+import { createChatConfigs } from '@/data/chatConfigs'
+import { formatDuration, formatPrice } from '@/utils/format'
+import { generateSparkCreatePrompt, generateSparkEditPrompt } from '@/services/promptGenerators'
+import { editSparkWithAI } from '@/services/openai'
+import { createSpark } from '@/services/sparks'
+import { useAuth } from '@/contexts/AuthContext'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 // Animation variants
 const fadeInUp = {
@@ -37,7 +37,17 @@ const DEFAULT_SPARK: Omit<Spark, 'id'> = {
     url: '',
     consultant: null,
     highlight: '',
-    prefillText: ''
+    prefillText: '',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    benefits: [],
+    expertProfile: {
+        expertise: [],
+        experience: ''
+    },
+    faq: [],
+    imageUrl: '',
+    socialImageUrl: ''
 }
 
 // Custom hook for authentication
@@ -137,34 +147,12 @@ const SparkPreviewSection = ({ title, children }: { title: string; children: Rea
 
 export default function Page() {
     const router = useRouter()
-    const params = useParams()
-    const sparkUrl = params.sparkUrl as string
-    const mode = 'edit'
+    const mode = 'create'
     const { userId, isAdmin, error: authError } = useAuthenticatedUser()
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [isSaving, setIsSaving] = useState(false)
     const [initialSpark, setInitialSpark] = useState<Omit<Spark, 'id'>>(DEFAULT_SPARK)
-
-    useEffect(() => {
-        const fetchSpark = async () => {
-            try {
-                const fetchedSpark = await getSparkByUrl(sparkUrl)
-                if (!fetchedSpark) {
-                    router.push('/admin/sparks')
-                    return
-                }
-                setInitialSpark(fetchedSpark)
-                setLoading(false)
-            } catch (err) {
-                console.error('Error fetching spark:', err)
-                setError('Impossible de charger le spark. Veuillez réessayer plus tard.')
-                setLoading(false)
-            }
-        }
-
-        fetchSpark()
-    }, [sparkUrl, router])
 
     const { spark, messages, handleMessagesUpdate, chatConfig } = useSparkAI(mode, initialSpark)
 
@@ -176,11 +164,14 @@ export default function Page() {
         
         setIsSaving(true)
         try {
-            await updateSpark(sparkUrl, spark)
+            await createSpark({
+                ...spark,
+                consultant: isAdmin ? null : userId
+            })
             router.back()
         } catch (error) {
             console.error('Error saving spark:', error)
-            setError('Impossible de mettre à jour le spark. Veuillez réessayer plus tard.')
+            setError('Impossible de créer le spark. Veuillez réessayer plus tard.')
             setIsSaving(false)
         }
     }
@@ -194,7 +185,7 @@ export default function Page() {
     }
 
     if (loading) {
-        return <LoadingSpinner message="Chargement du Spark..." />
+        return <LoadingSpinner message="Chargement..." />
     }
 
     if (error) {
@@ -228,7 +219,7 @@ export default function Page() {
                                     <ArrowLeft className="h-6 w-6" />
                                 </button>
                                 <h1 className="text-3xl font-bold text-gray-900">
-                                    Modifier le Spark avec l'IA
+                                    Créer un Spark avec l'IA
                                 </h1>
                             </div>
                             <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
@@ -240,7 +231,7 @@ export default function Page() {
                                     <p className="text-sm text-gray-600 mt-1">{chatConfig.subtitle}</p>
                                 </div>
                                 <AIChatInterface
-                                    template={DOCUMENT_TEMPLATES.spark_content_editor}
+                                    template={DOCUMENT_TEMPLATES.spark_content_creator}
                                     messages={messages}
                                     onMessagesUpdate={handleMessagesUpdate}
                                     shouldReset={isSaving}
@@ -282,7 +273,7 @@ export default function Page() {
                             <SparkPreviewSection title="Méthodologie">
                                 <ul className="space-y-2">
                                     {(spark.methodology || []).length > 0 ? (
-                                        (spark.methodology || []).map((step, index) => (
+                                        (spark.methodology || []).map((step: string, index: number) => (
                                             <li key={index} className="flex items-start gap-2">
                                                 <ArrowRight className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                                 <span>{step}</span>
@@ -297,7 +288,7 @@ export default function Page() {
                             <SparkPreviewSection title="Public cible">
                                 <ul className="space-y-2">
                                     {(spark.targetAudience || []).length > 0 ? (
-                                        (spark.targetAudience || []).map((audience, index) => (
+                                        (spark.targetAudience || []).map((audience: string, index: number) => (
                                             <li key={index} className="flex items-start gap-2">
                                                 <Users className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                                 <span>{audience}</span>
@@ -312,7 +303,7 @@ export default function Page() {
                             <SparkPreviewSection title="Prérequis">
                                 <ul className="space-y-2">
                                     {(spark.prerequisites || []).length > 0 ? (
-                                        (spark.prerequisites || []).map((prerequisite, index) => (
+                                        (spark.prerequisites || []).map((prerequisite: string, index: number) => (
                                             <li key={index} className="flex items-start gap-2">
                                                 <Target className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                                 <span>{prerequisite}</span>
@@ -327,7 +318,7 @@ export default function Page() {
                             <SparkPreviewSection title="Livrables">
                                 <ul className="space-y-2">
                                     {(spark.deliverables || []).length > 0 ? (
-                                        (spark.deliverables || []).map((deliverable, index) => (
+                                        (spark.deliverables || []).map((deliverable: string, index: number) => (
                                             <li key={index} className="flex items-start gap-2">
                                                 <FileText className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                                 <span>{deliverable}</span>
@@ -342,7 +333,7 @@ export default function Page() {
                             <SparkPreviewSection title="Prochaines étapes">
                                 <ul className="space-y-2">
                                     {(spark.nextSteps || []).length > 0 ? (
-                                        (spark.nextSteps || []).map((step, index) => (
+                                        (spark.nextSteps || []).map((step: string, index: number) => (
                                             <li key={index} className="flex items-start gap-2">
                                                 <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                                 <span>{step}</span>

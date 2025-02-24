@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
-import { SparkForm } from '../../../../components/SparkForm'
-import { getSparkByUrl, updateSpark } from '../../../../services/sparks'
-import type { Spark } from '../../../../types/spark'
-import { LoadingSpinner } from '../../../../components/ui/LoadingSpinner'
+import { SparkForm } from '@/components/SparkForm'
+import { getSparkByUrl, updateSpark } from '@/services/sparks'
+import type { Spark } from '@/types/spark'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 export default function Page() {
     const router = useRouter()
