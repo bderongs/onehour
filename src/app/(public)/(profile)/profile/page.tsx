@@ -1,7 +1,7 @@
 'use client';
 
 import { AlertCircle, ArrowRight } from 'lucide-react';
-import ConsultantProfilePage from '@/app/(profile)/[slug]/page';
+import ConsultantProfilePage from '../[slug]/page';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getConsultantProfile } from '@/services/consultants';
