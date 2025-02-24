@@ -13,19 +13,19 @@ export interface ClientProfile {
 }
 
 // Transform database snake_case to camelCase
-const transformClientFromDB = (data: any): ClientProfile => ({
-    id: data.id,
-    email: data.email,
-    firstName: data.first_name,
-    lastName: data.last_name,
-    company: data.company,
-    roles: data.roles,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
+const transformClientFromDB = (dbClient: any): ClientProfile => ({
+    id: dbClient.id,
+    email: dbClient.email,
+    firstName: dbClient.first_name,
+    lastName: dbClient.last_name,
+    company: dbClient.company,
+    roles: dbClient.roles,
+    createdAt: dbClient.created_at,
+    updatedAt: dbClient.updated_at,
 });
 
 export const getClientById = async (id: string): Promise<ClientProfile | null> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('profiles')
         .select('*')
@@ -45,7 +45,7 @@ export const getClientById = async (id: string): Promise<ClientProfile | null> =
 };
 
 export const getAllClients = async (): Promise<ClientProfile[]> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('profiles')
         .select('*')
@@ -62,7 +62,7 @@ export const getAllClients = async (): Promise<ClientProfile[]> => {
 
 export async function deleteClient(clientId: string): Promise<boolean> {
     try {
-        const client = createClient();
+        const client = await createClient();
         // Delete client's profile
         const { error: profileError } = await client
             .from('profiles')
@@ -80,4 +80,29 @@ export async function deleteClient(clientId: string): Promise<boolean> {
         console.error('Error in deleteClient:', error);
         return false;
     }
-} 
+}
+
+export const updateClient = async (id: string, updates: Partial<ClientProfile>): Promise<ClientProfile> => {
+    const client = await createClient();
+    
+    // Convert camelCase to snake_case for database
+    const dbUpdates: Record<string, any> = {};
+    if (updates.firstName !== undefined) dbUpdates.first_name = updates.firstName;
+    if (updates.lastName !== undefined) dbUpdates.last_name = updates.lastName;
+    if (updates.company !== undefined) dbUpdates.company = updates.company;
+    if (updates.roles !== undefined) dbUpdates.roles = updates.roles;
+    
+    const { data, error } = await client
+        .from('profiles')
+        .update(dbUpdates)
+        .eq('id', id)
+        .select()
+        .single();
+
+    if (error) {
+        logger.error('Error updating client:', error);
+        throw error;
+    }
+
+    return transformClientFromDB(data);
+}; 

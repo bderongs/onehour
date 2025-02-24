@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+---
+
+# Your rule content
+
+- The app uses the App Router with a root /scr directory

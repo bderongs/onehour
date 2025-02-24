@@ -292,14 +292,14 @@ const ConsultantRow = ({
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <button
-                                                            onClick={() => router.push(`/spark/edit/${spark.url}`)}
+                                                            onClick={() => router.push(`/sparks/edit/${spark.url}`)}
                                                             className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors"
                                                             title="Modifier"
                                                         >
                                                             <Edit className="h-5 w-5" />
                                                         </button>
                                                         <a
-                                                            href={`/spark/product/${spark.url}`}
+                                                            href={`/sparks/product/${spark.url}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors"

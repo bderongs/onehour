@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase';
 import { generateSlug } from './shared';
 import type { SlugContext } from './shared';
 import logger from '@/utils/logger';
@@ -19,7 +19,7 @@ export const ensureUniqueSlug = async (
 
     while (!isUnique) {
         let data, error;
-        const client = createServerClient();
+        const client = await createClient();
 
         if (context === 'spark') {
             const result = await client

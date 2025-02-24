@@ -30,11 +30,16 @@ const transformRequestToDB = (data: Pick<ClientRequest, 'clientId' | 'sparkId' |
     message: data.message,
 });
 
-export const createClientRequest = async (request: Pick<ClientRequest, 'clientId' | 'sparkId' | 'status' | 'message'>): Promise<ClientRequest> => {
-    const client = createClient();
+export const createClientRequest = async (request: Omit<ClientRequest, 'id' | 'createdAt' | 'updatedAt'>): Promise<ClientRequest> => {
+    const client = await createClient();
     const { data, error } = await client
         .from('client_requests')
-        .insert([transformRequestToDB(request)])
+        .insert([{
+            client_id: request.clientId,
+            spark_id: request.sparkId,
+            status: request.status,
+            message: request.message,
+        }])
         .select()
         .single();
 
@@ -46,11 +51,14 @@ export const createClientRequest = async (request: Pick<ClientRequest, 'clientId
     return transformRequestFromDB(data);
 };
 
-export const updateClientRequest = async (id: string, request: Partial<Pick<ClientRequest, 'clientId' | 'sparkId' | 'status' | 'message'>>): Promise<ClientRequest> => {
-    const client = createClient();
+export const updateClientRequest = async (id: string, updates: Partial<ClientRequest>): Promise<ClientRequest> => {
+    const client = await createClient();
     const { data, error } = await client
         .from('client_requests')
-        .update(transformRequestToDB(request as Pick<ClientRequest, 'clientId' | 'sparkId' | 'status' | 'message'>))
+        .update({
+            status: updates.status,
+            message: updates.message,
+        })
         .eq('id', id)
         .select()
         .single();
@@ -64,7 +72,7 @@ export const updateClientRequest = async (id: string, request: Partial<Pick<Clie
 };
 
 export const deleteClientRequest = async (id: string): Promise<void> => {
-    const client = createClient();
+    const client = await createClient();
     const { error } = await client
         .from('client_requests')
         .delete()
@@ -77,7 +85,7 @@ export const deleteClientRequest = async (id: string): Promise<void> => {
 };
 
 export const getClientRequestById = async (id: string): Promise<ClientRequest | null> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('client_requests')
         .select('*')
@@ -96,12 +104,11 @@ export const getClientRequestById = async (id: string): Promise<ClientRequest | 
 };
 
 export const getClientRequestsByClientId = async (clientId: string): Promise<ClientRequest[]> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('client_requests')
         .select('*')
-        .eq('client_id', clientId)
-        .order('created_at', { ascending: false });
+        .eq('client_id', clientId);
 
     if (error) {
         logger.error('Error fetching client requests:', error);
@@ -112,15 +119,14 @@ export const getClientRequestsByClientId = async (clientId: string): Promise<Cli
 };
 
 export const getClientRequestsBySparkId = async (sparkId: string): Promise<ClientRequest[]> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('client_requests')
         .select('*')
-        .eq('spark_id', sparkId)
-        .order('created_at', { ascending: false });
+        .eq('spark_id', sparkId);
 
     if (error) {
-        logger.error('Error fetching client requests:', error);
+        logger.error('Error fetching spark requests:', error);
         throw error;
     }
 

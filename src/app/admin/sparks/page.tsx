@@ -7,7 +7,6 @@ import { Plus, Rocket, ChevronDown } from 'lucide-react'
 import type { Spark } from '../../../types/spark'
 import { getSparks, deleteSpark } from '../../../services/sparks'
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
-import { DashboardSparksGrid } from '../../../components/DashboardSparksGrid'
 import { useAuth } from '../../../contexts/AuthContext'
 import { LoadingSpinner } from '../../../components/ui/LoadingSpinner'
 import { useNotification } from '../../../contexts/NotificationContext'
@@ -103,19 +102,19 @@ export default function Page() {
     }, [router, user])
 
     const handleCreateSpark = () => {
-        router.push('/spark/create')
+        router.push('/sparks/create')
     }
 
     const handleEditSpark = (sparkUrl: string) => {
-        router.push(`/spark/edit/${sparkUrl}`)
+        router.push(`/sparks/edit/${sparkUrl}`)
     }
 
     const handleAIEditSpark = (sparkUrl: string) => {
-        router.push(`/spark/ai/${sparkUrl}`)
+        router.push(`/sparks/ai/${sparkUrl}`)
     }
 
     const handlePreviewSpark = (sparkUrl: string) => {
-        router.push(`/spark/product/${sparkUrl}`)
+        router.push(`/sparks/product/${sparkUrl}`)
     }
 
     const handleDeleteSpark = async (sparkUrl: string) => {
@@ -187,7 +186,7 @@ export default function Page() {
                 {filteredSparks.length === 0 ? (
                     <EmptyState onCreateSpark={handleCreateSpark} />
                 ) : (
-                    <DashboardSparksGrid
+                    <SparksGrid
                         sparks={filteredSparks}
                         onCreateSpark={handleCreateSpark}
                         onPreviewSpark={handlePreviewSpark}

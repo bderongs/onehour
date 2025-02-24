@@ -63,7 +63,7 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
 
     while (retryCount < maxRetries) {
         try {
-            const client = createClient();
+            const client = await createClient();
             // Create the auth user with email confirmation
             const { data: authData, error: authError } = await client.auth.signUp({
                 email: data.email,
@@ -121,7 +121,7 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
 
     while (retryCount < maxRetries) {
         try {
-            const client = createClient();
+            const client = await createClient();
             // Create the auth user with email confirmation
             const { data: authData, error: authError } = await client.auth.signUp({
                 email: data.email,
@@ -173,33 +173,49 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
 };
 
 export const getCurrentUser = async (): Promise<UserProfile | null> => {
-    const client = createClient();
-    const { data: { session }, error: authError } = await client.auth.getSession();
-    
-    if (authError || !session?.user) {
-        if (authError) {
-            logger.error('Error getting session:', authError);
+    try {
+        const client = await createClient()
+        const { data: { user }, error: sessionError } = await client.auth.getUser()
+
+        if (sessionError) {
+            logger.error('Error getting session:', sessionError)
+            return null
         }
-        return null;
+
+        if (!user) {
+            return null
+        }
+
+        const { data: profile, error: profileError } = await client
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+
+        if (profileError) {
+            logger.error('Error getting user profile:', profileError)
+            return null
+        }
+
+        return {
+            id: profile.id,
+            email: profile.email,
+            firstName: profile.first_name,
+            lastName: profile.last_name,
+            roles: profile.roles as UserRole[],
+            linkedin: profile.linkedin,
+            createdAt: profile.created_at,
+            updatedAt: profile.updated_at
+        }
+    } catch (error) {
+        logger.error('Error in getCurrentUser:', error)
+        return null
     }
-
-    const { data: profile, error: profileError } = await client
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-    if (profileError || !profile) {
-        logger.error('Error getting profile:', profileError);
-        return null;
-    }
-
-    return transformProfileFromDB(profile);
-};
+}
 
 export const resendConfirmationEmail = async (email: string): Promise<void> => {
     const siteUrl = getSiteUrl();
-    const client = createClient();
+    const client = await createClient();
     
     const { error } = await client.auth.resetPasswordForEmail(email, {
         redirectTo: `${siteUrl}/auth/callback`
@@ -212,7 +228,7 @@ export const resendConfirmationEmail = async (email: string): Promise<void> => {
 };
 
 export const checkEmailExists = async (email: string): Promise<boolean> => {
-    const client = createClient();
+    const client = await createClient();
     const { data: profile, error } = await client
         .from('profiles')
         .select('id')
@@ -228,7 +244,7 @@ export const checkEmailExists = async (email: string): Promise<boolean> => {
 };
 
 export const deleteUser = async (userId: string): Promise<void> => {
-    const client = createClient();
+    const client = await createClient();
     const { error: deleteError } = await client.rpc('delete_user', {
         user_id: userId
     });
@@ -261,7 +277,7 @@ export const updateUserRoles = async (userId: string, roles: UserRole[], current
         throw new Error('Only administrators can update user roles');
     }
 
-    const client = createClient();
+    const client = await createClient();
     // If adding consultant role, we need to handle slug generation
     if (roles.includes('consultant') && !currentRoles.includes('consultant')) {
         // Get user info to generate slug
@@ -302,4 +318,56 @@ export const updateUserRoles = async (userId: string, roles: UserRole[], current
             throw error;
         }
     }
-}; 
+};
+
+export const signOut = async (): Promise<void> => {
+    try {
+        const client = await createClient()
+        const { error } = await client.auth.signOut()
+        if (error) {
+            logger.error('Error signing out:', error)
+            throw error
+        }
+    } catch (error) {
+        logger.error('Error in signOut:', error)
+        throw error
+    }
+}
+
+export const updateUserProfile = async (userId: string, updates: Partial<UserProfile>): Promise<UserProfile> => {
+    try {
+        const client = await createClient()
+        
+        // Convert camelCase to snake_case for database
+        const dbUpdates: Record<string, any> = {}
+        if (updates.firstName !== undefined) dbUpdates.first_name = updates.firstName
+        if (updates.lastName !== undefined) dbUpdates.last_name = updates.lastName
+        if (updates.roles !== undefined) dbUpdates.roles = updates.roles
+        
+        const { data, error } = await client
+            .from('profiles')
+            .update(dbUpdates)
+            .eq('id', userId)
+            .select()
+            .single()
+
+        if (error) {
+            logger.error('Error updating user profile:', error)
+            throw error
+        }
+
+        return {
+            id: data.id,
+            email: data.email,
+            firstName: data.first_name,
+            lastName: data.last_name,
+            roles: data.roles as UserRole[],
+            linkedin: data.linkedin,
+            createdAt: data.created_at,
+            updatedAt: data.updated_at
+        }
+    } catch (error) {
+        logger.error('Error in updateUserProfile:', error)
+        throw error
+    }
+} 

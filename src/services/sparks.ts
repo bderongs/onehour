@@ -97,7 +97,7 @@ const transformSparkToDB = (spark: Partial<Spark>): Record<string, any> => {
 
 export const getSparks = async (): Promise<Spark[]> => {
     try {
-        const client = createClient();
+        const client = await createClient();
         const { data, error } = await client
             .from('sparks')
             .select('*')
@@ -120,7 +120,7 @@ export const getSparks = async (): Promise<Spark[]> => {
 };
 
 export const getSparkByUrl = async (url: string): Promise<Spark | null> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('sparks')
         .select('*')
@@ -136,7 +136,7 @@ export const getSparkByUrl = async (url: string): Promise<Spark | null> => {
 };
 
 export const getSparksByConsultant = async (consultantId: string): Promise<Spark[]> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('sparks')
         .select('*')
@@ -162,7 +162,7 @@ export const createSpark = async (spark: Omit<Spark, 'id'>): Promise<Spark> => {
         url
     };
 
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('sparks')
         .insert([transformSparkToDB(sparkData)])
@@ -178,7 +178,7 @@ export const createSpark = async (spark: Omit<Spark, 'id'>): Promise<Spark> => {
 };
 
 export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<Spark> => {
-    const client = createClient();
+    const client = await createClient();
     // First, verify the spark exists
     const { data: existingSpark, error: fetchError } = await client
         .from('sparks')
@@ -251,7 +251,7 @@ export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<S
 };
 
 export const deleteSpark = async (url: string): Promise<void> => {
-    const client = createClient();
+    const client = await createClient();
     const { error } = await client
         .from('sparks')
         .delete()
@@ -264,7 +264,7 @@ export const deleteSpark = async (url: string): Promise<void> => {
 };
 
 export const getSparkById = async (id: string): Promise<Spark | null> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('sparks')
         .select('*')

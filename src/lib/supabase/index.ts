@@ -1,5 +1,7 @@
-// Re-export the client utilities
-export { createClient as createServerClient } from './server'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from './database.types'
+
+// Re-export the client utilities - only safe for client components
 export { createClient as createBrowserClient } from './client'
 export { createClient as createMiddlewareClient } from './middleware'
 
@@ -7,11 +9,13 @@ export { createClient as createMiddlewareClient } from './middleware'
 export const isServer = () => typeof window === 'undefined'
 
 // Get the appropriate client based on the context
-export const createClient = () => {
+export const createClient = async (): Promise<SupabaseClient<Database>> => {
   if (isServer()) {
-    const { createClient } = require('./server')
-    return createClient()
+    // Dynamic import for server client to avoid next/headers issues
+    const { createClient: createServerClient } = await import('./server')
+    return createServerClient()
   }
-  const { createClient } = require('./client')
-  return createClient()
+  // Use browser client for client-side
+  const { createClient: createBrowserClient } = await import('./client')
+  return createBrowserClient()
 } 

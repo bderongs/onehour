@@ -73,7 +73,7 @@ const RequestRow = ({ request }: { request: ClientRequest & { sparkTitle?: strin
 
     const handleSparkClick = (e: React.MouseEvent) => {
         e.stopPropagation() // Prevent row click when clicking the spark link
-        router.push(`/spark/product/${request.sparkId}`)
+        router.push(`/sparks/product/${request.sparkId}`)
     }
 
     return (

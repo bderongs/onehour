@@ -21,7 +21,7 @@ const transformConsultantFromDB = (data: any): ConsultantProfile => ({
 });
 
 export async function getConsultantProfile(id: string): Promise<ConsultantProfile | null> {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('profiles')
         .select('*')
@@ -38,7 +38,7 @@ export async function getConsultantProfile(id: string): Promise<ConsultantProfil
 }
 
 export async function getConsultantReviews(consultantId: string): Promise<ConsultantReview[]> {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('consultant_reviews')
         .select('*')
@@ -64,7 +64,7 @@ export async function getConsultantReviews(consultantId: string): Promise<Consul
 }
 
 export async function getConsultantSparks(consultantId: string): Promise<Spark[]> {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('sparks')
         .select('*')
@@ -80,7 +80,7 @@ export async function getConsultantSparks(consultantId: string): Promise<Spark[]
 }
 
 export async function getConsultantBySlug(slug: string): Promise<ConsultantProfile | null> {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('profiles')
         .select('*')
@@ -97,7 +97,7 @@ export async function getConsultantBySlug(slug: string): Promise<ConsultantProfi
 }
 
 export const updateConsultantProfile = async (id: string, profile: Partial<ConsultantProfile>): Promise<ConsultantProfile> => {
-    const client = createClient();
+    const client = await createClient();
     
     // If name is being updated, generate new slug
     let updatedProfile = { ...profile };
@@ -139,7 +139,7 @@ export const updateConsultantProfile = async (id: string, profile: Partial<Consu
 };
 
 export async function getConsultantMissions(consultantId: string): Promise<ConsultantMission[]> {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('consultant_missions')
         .select('*')
@@ -163,7 +163,7 @@ export async function getConsultantMissions(consultantId: string): Promise<Consu
 export async function updateConsultantReviews(consultantId: string, reviews: ConsultantReview[]): Promise<boolean> {
     try {
         // Get current reviews to identify ones that need to be deleted
-        const client = createClient();
+        const client = await createClient();
         const { data: currentReviews } = await client
             .from('consultant_reviews')
             .select('id')
@@ -244,7 +244,7 @@ export async function updateConsultantReviews(consultantId: string, reviews: Con
 
 export async function updateConsultantMissions(consultantId: string, missions: ConsultantMission[]): Promise<boolean> {
     try {
-        const client = createClient();
+        const client = await createClient();
         const { data: currentMissions } = await client
             .from('consultant_missions')
             .select('id, title')
@@ -327,7 +327,7 @@ export async function updateConsultantMissions(consultantId: string, missions: C
 }
 
 export async function getAllConsultants(includeSparkierEmails: boolean = false): Promise<ConsultantProfile[]> {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('profiles')
         .select('*')
@@ -350,7 +350,7 @@ export async function getAllConsultants(includeSparkierEmails: boolean = false):
 export async function deleteConsultant(consultantId: string): Promise<boolean> {
     try {
         // First, verify that the user exists and is a consultant
-        const client = createClient();
+        const client = await createClient();
         const { data: profile, error: profileError } = await client
             .from('profiles')
             .select('roles')
@@ -382,7 +382,7 @@ export async function deleteConsultant(consultantId: string): Promise<boolean> {
  * @param uuid The UUID of the consultant
  */
 export async function getConsultantByUuid(uuid: string): Promise<ConsultantProfile | null> {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('profiles')
         .select('*')

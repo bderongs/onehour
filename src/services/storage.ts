@@ -22,7 +22,7 @@ const getFilePathFromUrl = (url: string): string | null => {
 const deleteImage = async (filePath: string): Promise<void> => {
     try {
         logger.debug('Attempting to delete file:', filePath);
-        const client = createClient();
+        const client = await createClient();
         const { error } = await client.storage
             .from('profiles')
             .remove([filePath]);
@@ -223,7 +223,7 @@ export const uploadProfileImage = async (file: File, userId: string, oldImageUrl
             }
         }
 
-        const client = createClient();
+        const client = await createClient();
         const { error: uploadError } = await client.storage
             .from('profiles')
             .upload(filePath, optimizedImageBlob, {
@@ -237,7 +237,7 @@ export const uploadProfileImage = async (file: File, userId: string, oldImageUrl
         }
 
         // Get the public URL
-        const { data: { publicUrl } } = client.storage
+        const { data: { publicUrl } } = await client.storage
             .from('profiles')
             .getPublicUrl(filePath);
 
@@ -279,7 +279,7 @@ const getSparkImagePathFromUrl = (url: string): string | null => {
 const deleteSparkImageFromStorage = async (filePath: string): Promise<void> => {
     try {
         logger.debug('Attempting to delete Spark image:', filePath);
-        const client = createClient();
+        const client = await createClient();
         const { error } = await client.storage
             .from('sparks')
             .remove([filePath]);
@@ -321,7 +321,7 @@ export const uploadSparkImage = async (file: File, sparkId: string, oldImageUrl?
             }
         }
 
-        const client = createClient();
+        const client = await createClient();
         const { error: uploadError } = await client.storage
             .from('sparks')
             .upload(filePath, optimizedImageBlob, {
@@ -335,7 +335,7 @@ export const uploadSparkImage = async (file: File, sparkId: string, oldImageUrl?
         }
 
         // Get the public URL
-        const { data: { publicUrl } } = client.storage
+        const { data: { publicUrl } } = await client.storage
             .from('sparks')
             .getPublicUrl(filePath);
 
@@ -359,4 +359,46 @@ export const deleteSparkImage = async (imageUrl: string): Promise<void> => {
     }
     
     await deleteSparkImageFromStorage(filePath);
+};
+
+export const uploadFile = async (
+    bucket: string,
+    path: string,
+    file: File
+): Promise<string> => {
+    const client = await createClient();
+    const { data, error } = await client.storage
+        .from(bucket)
+        .upload(path, file, {
+            cacheControl: '3600',
+            upsert: true
+        });
+
+    if (error) {
+        logger.error('Error uploading file:', error);
+        throw error;
+    }
+
+    return data.path;
+};
+
+export const deleteFile = async (bucket: string, path: string): Promise<void> => {
+    const client = await createClient();
+    const { error } = await client.storage
+        .from(bucket)
+        .remove([path]);
+
+    if (error) {
+        logger.error('Error deleting file:', error);
+        throw error;
+    }
+};
+
+export const getPublicUrl = async (bucket: string, path: string): Promise<string> => {
+    const client = await createClient();
+    const { data } = client.storage
+        .from(bucket)
+        .getPublicUrl(path);
+
+    return data.publicUrl;
 }; 
