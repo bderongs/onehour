@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { createBrowserClient } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { useNotification } from '@/contexts/NotificationContext';
 
 interface SignInFormProps {

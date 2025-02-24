@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientRequest, getClientRequestsByClientId } from '@/services/clientRequests';
 import { getSparkByUrl } from '@/services/sparks';
-import { createBrowserClient } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase/client';
 import logger from '@/utils/logger';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useNotification } from '@/contexts/NotificationContext';

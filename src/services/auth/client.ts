@@ -1,4 +1,4 @@
-import { createBrowserClient } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase/client';
 import logger from '@/utils/logger';
 import type { UserProfile } from './types';
 import { transformProfileFromDB } from './types';

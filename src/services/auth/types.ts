@@ -11,6 +11,9 @@ export interface ClientSignUpData {
     email: string;
     firstName: string;
     lastName: string;
+    company: string;
+    companyRole: string;
+    industry: string;
     sparkUrlSlug?: string;
 }
 

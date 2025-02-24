@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import type { ConsultantProfile } from '../types/consultant';
-import { createBrowserClient } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { User, LogOut, Settings, UserCircle, Sparkles, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';

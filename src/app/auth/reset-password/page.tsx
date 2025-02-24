@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Mail } from 'lucide-react';
-import { createBrowserClient } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { useNotification } from '@/contexts/NotificationContext';
 
 export default function ResetPasswordPage() {

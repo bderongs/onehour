@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import { ArrowRight, Beaker } from 'lucide-react';
-import { signUpConsultantWithEmail, checkEmailExists } from '../services/auth';
-import { useNotification } from '../contexts/NotificationContext';
+import type { ConsultantSignUpData } from '@/services/auth/types';
+import { signUpConsultant, checkEmail } from '@/app/auth/actions';
+import { useNotification } from '@/contexts/NotificationContext';
 import { useRouter } from 'next/navigation';
+import logger from '@/utils/logger';
 
 interface ConsultantSignUpFormProps {
     buttonText?: string;
@@ -48,8 +50,12 @@ export function ConsultantSignUpForm({
         
         try {
             // Check if email is already registered
-            const emailExists = await checkEmailExists(testData.email);
-            if (emailExists) {
+            const emailCheck = await checkEmail(testData.email);
+            if (!emailCheck.success) {
+                throw new Error(emailCheck.error);
+            }
+            
+            if (emailCheck.exists) {
                 // Show notification before redirect
                 showNotification('success', 'Un compte existe déjà avec cet email. Vous allez être redirigé vers la page de connexion.');
                 // Redirect to signin page with email parameter
@@ -57,7 +63,10 @@ export function ConsultantSignUpForm({
                 return;
             }
 
-            await signUpConsultantWithEmail(testData);
+            const result = await signUpConsultant(testData);
+            if (!result.success) {
+                throw new Error(result.error);
+            }
             
             // Clear form data after successful submission
             setFormData({
@@ -71,7 +80,7 @@ export function ConsultantSignUpForm({
             router.push('/auth/email-confirmation');
             onSuccess?.();
         } catch (error: any) {
-            console.error('Error submitting test form:', error);
+            logger.error('Error submitting test form:', error);
             let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
             
             if (error.message?.includes('timeout') || error.message?.includes('network')) {
@@ -97,8 +106,12 @@ export function ConsultantSignUpForm({
             }
 
             // Check if email is already registered
-            const emailExists = await checkEmailExists(formData.email);
-            if (emailExists) {
+            const emailCheck = await checkEmail(formData.email);
+            if (!emailCheck.success) {
+                throw new Error(emailCheck.error);
+            }
+            
+            if (emailCheck.exists) {
                 // Show notification before redirect
                 showNotification('success', 'Un compte existe déjà avec cet email. Vous allez être redirigé vers la page de connexion.');
                 // Redirect to signin page with email parameter
@@ -106,14 +119,18 @@ export function ConsultantSignUpForm({
                 return;
             }
 
-            await signUpConsultantWithEmail(formData);
+            const result = await signUpConsultant(formData);
+            if (!result.success) {
+                throw new Error(result.error);
+            }
+
             setFormData({ firstName: '', lastName: '', linkedin: '', email: '' });
             
             // Navigate to email confirmation page instead of showing notification
             router.push('/auth/email-confirmation');
             onSuccess?.();
         } catch (error: any) {
-            console.error('Error submitting form:', error);
+            logger.error('Error submitting form:', error);
             let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
             
             if (error.message?.includes('timeout') || error.message?.includes('network')) {

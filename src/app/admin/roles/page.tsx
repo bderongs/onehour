@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Users } from 'lucide-react'
-import { UserProfile, updateUserRoles, UserRole } from '../../../services/auth'
-import { createBrowserClient } from '@/lib/supabase'
+import type { UserProfile, UserRole } from '../../../services/auth'
+import { createBrowserClient } from '@/lib/supabase/client'
 import { LoadingSpinner } from '../../../components/ui/LoadingSpinner'
 import { useNotification } from '../../../contexts/NotificationContext'
 import { useAuth } from '../../../contexts/AuthContext'
+import { updateRoles } from './actions'
+import logger from '@/utils/logger'
 
 const EmptyState = () => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
@@ -103,9 +105,13 @@ export default function Page() {
                 return
             }
 
-            // Update roles using the service
-            await updateUserRoles(userId, newRoles, currentRoles)
+            // Update roles using the server action
+            const result = await updateRoles(userId, newRoles, currentRoles)
             
+            if (!result.success) {
+                throw new Error(result.error)
+            }
+
             // Update local state
             await fetchUsers(showAllUsers)
 

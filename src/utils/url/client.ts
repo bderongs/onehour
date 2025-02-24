@@ -1,6 +1,6 @@
 'use client';
 
-import { createBrowserClient } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { generateSlug } from './shared';
 import type { SlugContext } from './shared';
 import logger from '@/utils/logger';

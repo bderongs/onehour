@@ -16,6 +16,9 @@ export interface Database {
           first_name: string | null
           last_name: string | null
           roles: string[]
+          company?: string | null
+          company_title?: string | null
+          industry?: string | null
           linkedin?: string | null
           slug?: string | null
           created_at: string
@@ -27,6 +30,9 @@ export interface Database {
           first_name?: string | null
           last_name?: string | null
           roles?: string[]
+          company?: string | null
+          company_title?: string | null
+          industry?: string | null
           linkedin?: string | null
           slug?: string | null
           created_at?: string
@@ -38,6 +44,9 @@ export interface Database {
           first_name?: string | null
           last_name?: string | null
           roles?: string[]
+          company?: string | null
+          company_title?: string | null
+          industry?: string | null
           linkedin?: string | null
           slug?: string | null
           created_at?: string

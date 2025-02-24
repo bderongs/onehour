@@ -1,8 +1,9 @@
 "use client";
 
 import { createContext, useContext, ReactNode, useState, useEffect, useCallback } from 'react';
-import { createBrowserClient } from '@/lib/supabase';
-import { getCurrentUser, signOut, type UserProfile } from '@/services/auth';
+import { createBrowserClient } from '@/lib/supabase/client';
+import { getCurrentUser, signOut } from '@/services/auth/client';
+import type { UserProfile } from '@/services/auth/types';
 import logger from '@/utils/logger';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
@@ -37,14 +38,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const initialize = async () => {
             try {
                 const supabase = createBrowserClient();
-                // Check if we have a session
                 const { data: { session } } = await supabase.auth.getSession();
                 
                 if (session) {
-                    // If we have a session, refresh the user data
                     await refreshUser();
                 } else {
-                    // If no session, clear the user and loading state
                     if (mounted) {
                         setUser(null);
                         setLoading(false);
@@ -59,10 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         };
 
-        // Initial auth state check
         initialize();
 
-        // Subscribe to auth state changes
         const supabase = createBrowserClient();
         const {
             data: { subscription },

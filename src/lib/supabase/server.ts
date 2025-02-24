@@ -3,8 +3,10 @@ import { cookies } from 'next/headers'
 import type { Database } from './database.types'
 import logger from '@/utils/logger'
 
-export const createClient = () => {
-  const cookieStore = cookies()
+// Creates a Supabase client for server-side operations
+// This should only be used in Server Components or Server Actions
+export const createClient = async () => {
+  const cookieStore = await cookies()
 
   try {
     return createServerClient<Database>(
@@ -19,7 +21,6 @@ export const createClient = () => {
             try {
               cookieStore.set({ name, value, ...options })
             } catch (error) {
-              // Handle cookies in edge functions
               logger.error('Error setting cookie:', error)
             }
           },

@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import { ArrowRight, Beaker } from 'lucide-react';
-import { signUpClientWithEmail, type ClientSignUpData, checkEmailExists } from '@/services/auth';
+import type { ClientSignUpData } from '@/services/auth/types';
+import { signUpClient, checkEmail } from '@/app/auth/actions';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useRouter } from 'next/navigation';
+import logger from '@/utils/logger';
 
 interface ClientSignUpFormProps {
     buttonText?: string;
@@ -58,8 +60,12 @@ export function ClientSignUpForm({
         
         try {
             // Check if email is already registered
-            const emailExists = await checkEmailExists(testData.email);
-            if (emailExists) {
+            const emailCheck = await checkEmail(testData.email);
+            if (!emailCheck.success) {
+                throw new Error(emailCheck.error);
+            }
+            
+            if (emailCheck.exists) {
                 // Show notification before redirect
                 showNotification('success', 'Un compte existe déjà avec cet email. Vous allez être redirigé vers la page de connexion.');
                 // Redirect to signin page with email parameter
@@ -67,7 +73,10 @@ export function ClientSignUpForm({
                 return;
             }
 
-            await signUpClientWithEmail(testData);
+            const result = await signUpClient(testData);
+            if (!result.success) {
+                throw new Error(result.error);
+            }
             
             // Clear form data after successful submission
             setFormData({
@@ -83,7 +92,7 @@ export function ClientSignUpForm({
             router.push('/auth/email-confirmation');
             onSuccess?.({ sparkUrlSlug: undefined });
         } catch (error: any) {
-            console.error('Error submitting test form:', error);
+            logger.error('Error submitting test form:', error);
             let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
             
             if (error.message?.includes('timeout') || error.message?.includes('network')) {
@@ -111,8 +120,12 @@ export function ClientSignUpForm({
             }
 
             // Check if email is already registered
-            const emailExists = await checkEmailExists(formData.email);
-            if (emailExists) {
+            const emailCheck = await checkEmail(formData.email);
+            if (!emailCheck.success) {
+                throw new Error(emailCheck.error);
+            }
+            
+            if (emailCheck.exists) {
                 // Show notification before redirect
                 showNotification('success', 'Un compte existe déjà avec cet email. Vous allez être redirigé vers la page de connexion.');
                 // Redirect to signin page with email parameter
@@ -120,7 +133,11 @@ export function ClientSignUpForm({
                 return;
             }
 
-            await signUpClientWithEmail(formData);
+            const result = await signUpClient(formData);
+            if (!result.success) {
+                throw new Error(result.error);
+            }
+
             setFormData({
                 firstName: '',
                 lastName: '',
@@ -134,7 +151,7 @@ export function ClientSignUpForm({
             router.push('/auth/email-confirmation');
             onSuccess?.({ sparkUrlSlug: undefined });
         } catch (error: any) {
-            console.error('Error submitting form:', error);
+            logger.error('Error submitting form:', error);
             let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
             
             if (error.message?.includes('timeout') || error.message?.includes('network')) {

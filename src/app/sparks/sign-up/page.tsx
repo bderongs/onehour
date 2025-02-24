@@ -9,7 +9,7 @@ import { PasswordSignInStep } from '@/components/PasswordSignInStep';
 import { useClientSignUp } from '@/contexts/ClientSignUpContext';
 import { getSparkByUrl } from '@/services/sparks';
 import { createClientRequest, getClientRequestsByClientId } from '@/services/clientRequests';
-import { createBrowserClient } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase/client';
 import logger from '@/utils/logger';
 
 type FormState = 'email_check' | 'sign_in' | 'sign_up';

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { FormEvent } from 'react';
 import { Lock } from 'lucide-react';
-import { createBrowserClient } from '@/lib/supabase';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { PasswordRequirements, isPasswordValid, doPasswordsMatch } from '@/components/PasswordRequirements';
 import logger from '@/utils/logger';
 import { useNotification } from '@/contexts/NotificationContext';

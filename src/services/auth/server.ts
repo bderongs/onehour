@@ -121,6 +121,9 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
                 first_name: data.firstName,
                 last_name: data.lastName,
                 roles: roles,
+                company: data.company,
+                company_title: data.companyRole,
+                industry: data.industry
             });
 
             if (profileError) throw profileError;

@@ -37,6 +37,7 @@ create table if not exists profiles (
     bio text, -- Long form description
     company text,
     company_title text, -- Role at company
+    industry text, -- Industry/sector
     location text, -- e.g. "Paris, France"
     languages text[], -- Array of languages spoken
     
@@ -81,6 +82,9 @@ begin
     end if;
     if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'company_title') then
         alter table profiles add column company_title text;
+    end if;
+    if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'industry') then
+        alter table profiles add column industry text;
     end if;
     if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'location') then
         alter table profiles add column location text;
