@@ -10,7 +10,7 @@ import type { ClientRequest } from '@/services/clientRequests';
 import type { Spark } from '@/types/spark';
 import { formatDuration, formatPrice } from '@/utils/format';
 import logger from '@/utils/logger';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },

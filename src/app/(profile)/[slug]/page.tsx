@@ -13,7 +13,7 @@ import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '@/t
 import { getConsultantBySlug, getConsultantReviews, getConsultantSparks, getConsultantMissions } from '@/services/consultants';
 import { formatDuration, formatPrice } from '@/utils/format';
 import { getCurrentUser } from '@/services/auth';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useNotification } from '@/contexts/NotificationContext';
 import { getDefaultAvatarUrl } from '@/utils/avatar';
 import logger from '@/utils/logger';

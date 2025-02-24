@@ -6,7 +6,7 @@ import { Sparkles, ArrowRight } from 'lucide-react';
 import { AIChatInterface, Message } from '@/components/AIChatInterface';
 import { ConsultantConnect } from '@/components/ConsultantConnect';
 import { SparksGrid } from '@/app/(marketing)/components/SparksGrid';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { DOCUMENT_TEMPLATES } from '@/data/documentTemplates';
 import { createChatConfigs } from '@/data/chatConfigs';
 import type { Spark } from '@/types/spark';

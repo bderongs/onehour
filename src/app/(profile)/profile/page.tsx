@@ -5,7 +5,7 @@ import ConsultantProfilePage from '@/app/(profile)/[slug]/page';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getConsultantProfile } from '@/services/consultants';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 export default function DemoProfilePage() {
     const DEMO_CONSULTANT_ID = process.env.NEXT_PUBLIC_DEMO_CONSULTANT_ID;

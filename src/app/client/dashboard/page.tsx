@@ -9,7 +9,7 @@ import { getClientRequestsByClientId } from '../../../services/clientRequests'
 import { getSparkById } from '../../../services/sparks'
 import { formatDate } from '../../../utils/format'
 import { useAuth } from '../../../contexts/AuthContext'
-import { LoadingSpinner } from '../../../components/LoadingSpinner'
+import { LoadingSpinner } from '../../../components/ui/LoadingSpinner'
 
 const EmptyState = () => {
     const router = useRouter()

@@ -11,7 +11,7 @@ import logger from '@/utils/logger';
 import { createClientRequest, getClientRequestsByClientId } from '@/services/clientRequests';
 import { useClientSignUp } from '@/contexts/ClientSignUpContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },

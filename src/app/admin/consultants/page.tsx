@@ -8,10 +8,10 @@ import type { ConsultantProfile } from '../../../types/consultant'
 import type { Spark } from '../../../types/spark'
 import { getAllConsultants, deleteConsultant, getConsultantSparks } from '../../../services/consultants'
 import { deleteSpark } from '../../../services/sparks'
-import { ConfirmDialog } from '../../../components/ConfirmDialog'
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import { formatDuration, formatPrice } from '../../../utils/format'
 import { useAuth } from '../../../contexts/AuthContext'
-import { LoadingSpinner } from '../../../components/LoadingSpinner'
+import { LoadingSpinner } from '../../../components/ui/LoadingSpinner'
 import { useNotification } from '../../../contexts/NotificationContext'
 
 const EmptyState = () => (

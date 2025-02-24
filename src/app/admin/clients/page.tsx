@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Users, Mail, ChevronDown, ChevronUp, Trash2, Building, Clock } from 'lucide-react'
 import type { ClientProfile } from '../../../services/clients'
 import { getAllClients, deleteClient } from '../../../services/clients'
-import { ConfirmDialog } from '../../../components/ConfirmDialog'
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import { useAuth } from '../../../contexts/AuthContext'
-import { LoadingSpinner } from '../../../components/LoadingSpinner'
+import { LoadingSpinner } from '../../../components/ui/LoadingSpinner'
 import { useNotification } from '../../../contexts/NotificationContext'
 
 const EmptyState = () => (

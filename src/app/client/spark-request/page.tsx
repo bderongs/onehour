@@ -6,7 +6,7 @@ import { createClientRequest, getClientRequestsByClientId } from '@/services/cli
 import { getSparkByUrl } from '@/services/sparks';
 import { createBrowserClient } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useNotification } from '@/contexts/NotificationContext';
 
 export default function SparkRequestHandler() {

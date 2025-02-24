@@ -7,8 +7,8 @@ import { motion } from 'framer-motion';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '@/types/consultant';
 import { getConsultantProfile, updateConsultantProfile, getConsultantReviews, getConsultantMissions, updateConsultantReviews, updateConsultantMissions } from '@/services/consultants';
 import { uploadProfileImage, deleteProfileImage } from '@/services/storage';
-import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useNotification } from '@/contexts/NotificationContext';
 
 export default function ConsultantProfileEditPage() {

@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react'
 import { SparkForm } from '../../../../components/SparkForm'
 import { getSparkByUrl, updateSpark } from '../../../../services/sparks'
 import type { Spark } from '../../../../types/spark'
-import { LoadingSpinner } from '../../../../components/LoadingSpinner'
+import { LoadingSpinner } from '../../../../components/ui/LoadingSpinner'
 
 export default function Page() {
     const router = useRouter()

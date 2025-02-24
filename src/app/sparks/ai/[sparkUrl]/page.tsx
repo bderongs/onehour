@@ -13,7 +13,7 @@ import { generateSparkCreatePrompt, generateSparkEditPrompt } from '../../../../
 import { editSparkWithAI } from '../../../../services/openai'
 import { createSpark, getSparkByUrl, updateSpark } from '../../../../services/sparks'
 import { useAuth } from '../../../../contexts/AuthContext'
-import { LoadingSpinner } from '../../../../components/LoadingSpinner'
+import { LoadingSpinner } from '../../../../components/ui/LoadingSpinner'
 
 // Animation variants
 const fadeInUp = {

@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import { Users } from 'lucide-react'
 import { UserProfile, updateUserRoles, UserRole } from '../../../services/auth'
 import { createBrowserClient } from '@/lib/supabase'
-import { LoadingSpinner } from '../../../components/LoadingSpinner'
+import { LoadingSpinner } from '../../../components/ui/LoadingSpinner'
 import { useNotification } from '../../../contexts/NotificationContext'
 import { useAuth } from '../../../contexts/AuthContext'
 
