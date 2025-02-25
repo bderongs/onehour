@@ -1,3 +1,5 @@
+'use client'
+
 import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,8 +17,6 @@ interface SparkActionButtonProps {
     className?: string;
     isMobile?: boolean;
 }
-
-'use client'
 
 export function SparkActionButton({ pageContext, sparkUrl, className = '', isMobile = false }: SparkActionButtonProps) {
     const router = useRouter();

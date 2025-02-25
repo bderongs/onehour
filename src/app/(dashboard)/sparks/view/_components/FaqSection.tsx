@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -10,8 +12,6 @@ type FaqItem = {
 interface FaqSectionProps {
     faq: FaqItem[];
 }
-
-'use client'
 
 export function FaqSection({ faq }: FaqSectionProps) {
     const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
