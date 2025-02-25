@@ -5,6 +5,7 @@ import logger from '@/utils/logger';
 import type { Spark } from '@/types/spark';
 import { generateSlug } from '@/utils/url/shared';
 import { ensureUniqueSlug } from '@/utils/url/server';
+import { updateSpark as updateSparkServer } from '@/services/serverSparks';
 
 // Get a spark by its URL
 export async function getSparkByUrl(url: string): Promise<Spark | null> {
@@ -197,4 +198,13 @@ const transformSparkToDB = (spark: Partial<Spark>): Record<string, any> => {
   });
 
   return transformed;
-}; 
+};
+
+export async function updateSparkAction(url: string, spark: Partial<Spark>): Promise<Spark> {
+  try {
+    return await updateSparkServer(url, spark);
+  } catch (error) {
+    logger.error('Error in updateSparkAction:', error);
+    throw error;
+  }
+} 

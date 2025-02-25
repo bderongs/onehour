@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 import { SparkForm } from '@/components/SparkForm'
-import { updateSpark } from '@/services/sparks'
+import { updateSparkAction } from '../actions'
 import type { Spark } from '@/types/spark'
 import { useNotification } from '@/contexts/NotificationContext'
 import logger from '@/utils/logger'
@@ -25,7 +25,7 @@ export function SparkEditForm({ spark }: SparkEditFormProps) {
                 ...data,
                 price: data.price || '0'
             }
-            await updateSpark(spark.url, updatedData)
+            await updateSparkAction(spark.url, updatedData)
             showNotification('success', 'Spark mis à jour avec succès')
             router.back()
         } catch (error) {

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Spark } from '@/types/spark';
-import { deleteSpark } from '@/services/sparks';
+import { deleteSparkAction } from '../actions';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { SparksGrid } from '@/components/SparksGrid';
 import { EmptyState } from '@/app/(dashboard)/sparks/manage/components/EmptyState';
@@ -47,7 +47,7 @@ export const SparksManagementClient = ({ initialSparks }: SparksManagementClient
         if (!deleteConfirm.sparkUrl) return;
         
         try {
-            await deleteSpark(deleteConfirm.sparkUrl);
+            await deleteSparkAction(deleteConfirm.sparkUrl);
             setSparks(sparks.filter(spark => spark.url !== deleteConfirm.sparkUrl));
             showNotification('success', 'Le Spark a été supprimé avec succès');
         } catch (error) {

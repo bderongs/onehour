@@ -11,7 +11,7 @@ import { createChatConfigs } from '@/data/chatConfigs'
 import { formatDuration, formatPrice } from '@/utils/format'
 import { generateSparkCreatePrompt, generateSparkEditPrompt } from '@/services/promptGenerators'
 import { editSparkWithAI } from '@/services/openai'
-import { createSpark, updateSpark } from '@/services/sparks'
+import { createSparkAction, updateSparkAction } from '../actions'
 import { useAuth } from '@/contexts/AuthContext'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import logger from '@/utils/logger'
@@ -135,12 +135,12 @@ export default function SparkAIEditor({ mode, initialSpark, sparkUrl, pageTitle 
         setIsSaving(true)
         try {
             if (mode === 'create') {
-                await createSpark({
+                await createSparkAction({
                     ...spark,
                     consultant: isAdmin ? null : userId
                 })
             } else if (mode === 'edit' && sparkUrl) {
-                await updateSpark(sparkUrl, spark)
+                await updateSparkAction(sparkUrl, spark)
             }
             router.back()
         } catch (error) {

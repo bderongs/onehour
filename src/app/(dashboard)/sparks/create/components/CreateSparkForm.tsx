@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { SparkForm } from '@/components/SparkForm';
-import { createSpark } from '@/services/sparks';
+import { createSparkAction } from '../actions';
 import type { Spark } from '@/types/spark';
 import { useAuth } from '@/contexts/AuthContext';
 import logger from '@/utils/logger';
@@ -16,14 +16,14 @@ export default function CreateSparkForm() {
 
     const handleSubmit = async (data: Spark) => {
         try {
-            await createSpark({
+            await createSparkAction({
                 ...data,
-                consultant: user?.roles?.includes('admin') ? null : (user?.id ?? null)
+                consultant: user?.id || null
             });
             router.push('/sparks/manage');
-        } catch (error) {
-            logger.error('Error creating spark:', error);
-            setError('Impossible de créer le spark. Veuillez réessayer plus tard.');
+        } catch (err) {
+            logger.error('Error creating spark:', err);
+            setError('Failed to create spark. Please try again.');
         }
     };
 

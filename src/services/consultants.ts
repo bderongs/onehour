@@ -4,7 +4,7 @@ import type { Spark } from '../types/spark';
 import type { ConsultantMission } from '../types/consultant';
 import { generateSlug } from '@/utils/url/shared';
 import { ensureUniqueSlug as ensureUniqueSlugServer } from '@/utils/url/server';
-import { deleteUser } from '../services/auth';
+import { deleteUserAction } from '@/app/auth/actions';
 import logger from '@/utils/logger';
 
 // Transform database response to ConsultantProfile
@@ -369,7 +369,7 @@ export async function deleteConsultant(consultantId: string): Promise<boolean> {
 
         // Delete the user from Supabase Auth
         // The profile will be automatically deleted due to ON DELETE CASCADE
-        await deleteUser(consultantId);
+        await deleteUserAction(consultantId);
         return true;
     } catch (error) {
         console.error('Error deleting consultant:', error);

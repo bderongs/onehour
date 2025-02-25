@@ -3,9 +3,6 @@ import logger from '../utils/logger';
 import type { Spark } from '../types/spark';
 import { generateSlug } from '@/utils/url/shared';
 
-// Re-export server-side functions that are needed by client components
-export { createSpark, updateSpark, deleteSpark } from './serverSparks';
-
 // Convert database snake_case to camelCase for frontend
 const transformSparkFromDB = (dbSpark: any): Spark => ({
     id: dbSpark.id,

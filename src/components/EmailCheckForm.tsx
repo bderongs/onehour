@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { checkEmailExists } from '@/services/auth';
+import { checkEmailExistsAction } from '@/app/auth/actions';
 import { useNotification } from '@/contexts/NotificationContext';
 
 interface EmailCheckFormProps {
@@ -24,7 +24,7 @@ export function EmailCheckForm({
         e.preventDefault();
         setLoading(true);
         try {
-            const exists = await checkEmailExists(email);
+            const exists = await checkEmailExistsAction(email);
             if (exists) {
                 onEmailExists(email);
             } else {
