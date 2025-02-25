@@ -1,27 +1,26 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, ArrowRight } from 'lucide-react';
 import { AIChatInterface, Message } from '@/components/AIChatInterface';
 import { ConsultantConnect } from '@/components/ConsultantConnect';
-import { SparksGrid } from '../../components/SparksGrid';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { DOCUMENT_TEMPLATES } from '@/data/documentTemplates';
 import { createChatConfigs } from '@/data/chatConfigs';
+import { SparksGridSection } from './SparksGridSection';
 import type { Spark } from '@/types/spark';
 import type { DocumentSummary } from '@/types/chat';
 import logger from '@/utils/logger';
 
 interface MarketingHeroProps {
-    sparks: Spark[];
+    initialSparks: Spark[];
 }
 
-export function Hero({ sparks }: MarketingHeroProps) {
+export const Hero = React.memo(function Hero({ initialSparks }: MarketingHeroProps) {
     const [showConnect, setShowConnect] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [shouldReset, setShouldReset] = useState(false);
-    const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(0);
     const [isChatExpanded, setIsChatExpanded] = useState(false);
     const [documentSummary, setDocumentSummary] = useState<DocumentSummary>({
         challenge: '',
@@ -34,9 +33,9 @@ export function Hero({ sparks }: MarketingHeroProps) {
     });
 
     // Memoize chat configs to prevent unnecessary recreations
-    const chatConfigs = React.useMemo(() => createChatConfigs(), []);
+    const chatConfigs = useMemo(() => createChatConfigs(), []);
 
-    const handleUseCaseClick = (prefillText: string) => {
+    const handleUseCaseClick = useCallback((prefillText: string) => {
         if (prefillText.trim()) {
             const initialMessages: Message[] = [{
                 role: 'user',
@@ -46,10 +45,9 @@ export function Hero({ sparks }: MarketingHeroProps) {
             setShowConnect(false);
             setIsChatExpanded(true);
         }
-    };
+    }, []);
 
-    const handleConnect = () => {
-        // Scroll to the sign-up form with smooth behavior
+    const handleConnect = useCallback(() => {
         const element = document.getElementById('signup-form');
         if (element) {
             const headerOffset = 120;
@@ -61,9 +59,9 @@ export function Hero({ sparks }: MarketingHeroProps) {
                 behavior: 'smooth'
             });
         }
-    };
+    }, []);
 
-    const handleBack = (shouldReset?: boolean) => {
+    const handleBack = useCallback((shouldReset?: boolean) => {
         if (shouldReset) {
             // Reset to initial state
             setShowConnect(false);
@@ -79,14 +77,13 @@ export function Hero({ sparks }: MarketingHeroProps) {
                 hasEnoughData: false
             });
             setIsChatExpanded(false);
-            setExpandedCallIndex(0);
         } else {
             // Just go back to chat interface while preserving all state
             setShowConnect(false);
         }
-    };
+    }, []);
 
-    const handleMessagesUpdate = (newMessages: Message[]) => {
+    const handleMessagesUpdate = useCallback((newMessages: Message[]) => {
         setMessages(newMessages);
         for (let i = newMessages.length - 1; i >= 0; i--) {
             const msg = newMessages[i];
@@ -98,7 +95,7 @@ export function Hero({ sparks }: MarketingHeroProps) {
                 break;
             }
         }
-    };
+    }, []);
 
     return (
         <motion.div
@@ -116,12 +113,9 @@ export function Hero({ sparks }: MarketingHeroProps) {
 
             {/* Use Case Form Section */}
             <div className="mb-12 sm:mb-16">
-                <SparksGrid
-                    sparks={sparks.filter(spark => !spark.consultant && spark.consultant !== undefined)}
-                    expandedCallIndex={expandedCallIndex}
-                    setExpandedCallIndex={setExpandedCallIndex}
-                    onCallClick={handleUseCaseClick}
-                    buttonText="Choisir ce Spark"
+                <SparksGridSection
+                    initialSparks={initialSparks}
+                    onSparkClick={handleUseCaseClick}
                 />
 
                 <div className="mt-6 text-center flex flex-col items-center gap-4">
@@ -207,4 +201,4 @@ export function Hero({ sparks }: MarketingHeroProps) {
             </div>
         </motion.div>
     );
-} 
+}); 

@@ -103,7 +103,7 @@ export default async function Page() {
             <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
                 {/* Hero Section with Interactive Chat */}
                 <Suspense fallback={<HeroSkeleton />}>
-                    <Hero sparks={sparks} />
+                    <Hero initialSparks={sparks} />
                 </Suspense>
 
                 {/* Features Section */}

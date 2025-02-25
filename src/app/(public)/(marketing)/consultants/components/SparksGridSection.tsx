@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { SparksGrid } from '@/app/(public)/(marketing)/components/SparksGrid';
 import type { Spark } from '@/types/spark';
@@ -11,12 +11,12 @@ interface SparksGridSectionProps {
     initialSparks: Spark[];
 }
 
-export const SparksGridSection: React.FC<SparksGridSectionProps> = ({ initialSparks }) => {
+export const SparksGridSection: React.FC<SparksGridSectionProps> = React.memo(({ initialSparks }) => {
     const router = useRouter();
     const [expandedCallIndex, setExpandedCallIndex] = useState<number | null>(0);
     const [loading, setLoading] = useState(false);
 
-    const handleSparkCreation = () => {
+    const handleSparkCreation = useCallback(() => {
         const element = document.getElementById('signup-form');
         const headerOffset = 120;
 
@@ -31,7 +31,18 @@ export const SparksGridSection: React.FC<SparksGridSectionProps> = ({ initialSpa
                 });
             }, 100);
         }
-    };
+    }, []);
+
+    // Memoize the filtered sparks array
+    const filteredSparks = useMemo(() => initialSparks.filter(spark => [
+        'fda49682-dd97-4e3a-b9db-52a234348454',
+        '60f1dcb7-a91b-4821-9fdd-7c19f240aa4d',
+        '886c9a5c-19f6-429e-90fd-e3305eb37cf8'
+    ].includes(spark.id)), [initialSparks]);
+
+    const handleDetailsClick = useCallback((spark: Spark) => {
+        router.push(`/sparks/${spark.url}`);
+    }, [router]);
 
     if (loading) {
         return (
@@ -53,11 +64,7 @@ export const SparksGridSection: React.FC<SparksGridSectionProps> = ({ initialSpa
             </div>
 
             <SparksGrid
-                sparks={initialSparks.filter(spark => [
-                    'fda49682-dd97-4e3a-b9db-52a234348454',
-                    '60f1dcb7-a91b-4821-9fdd-7c19f240aa4d',
-                    '886c9a5c-19f6-429e-90fd-e3305eb37cf8'
-                ].includes(spark.id))}
+                sparks={filteredSparks}
                 expandedCallIndex={expandedCallIndex}
                 setExpandedCallIndex={setExpandedCallIndex}
                 onCallClick={handleSparkCreation}
@@ -65,10 +72,8 @@ export const SparksGridSection: React.FC<SparksGridSectionProps> = ({ initialSpa
                 showAvailability={false}
                 showCreateCard={true}
                 showDetailsButton={true}
-                onDetailsClick={(spark: Spark) => {
-                    router.push(`/sparks/${spark.url}`);
-                }}
+                onDetailsClick={handleDetailsClick}
             />
         </div>
     );
-}; 
+}); 

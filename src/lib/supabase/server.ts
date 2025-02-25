@@ -6,6 +6,7 @@ import logger from '@/utils/logger'
 // Creates a Supabase client for server-side operations
 // This should only be used in Server Components or Server Actions
 export const createClient = async () => {
+  
   const cookieStore = await cookies()
 
   try {

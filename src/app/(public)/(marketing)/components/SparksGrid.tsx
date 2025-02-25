@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, Plus } from 'lucide-react';
 import { Spark } from '@/types/spark';
@@ -6,6 +6,7 @@ import { Logo } from '@/components/Logo';
 import { formatDuration, formatPrice } from '@/utils/format';
 import { useRouter } from 'next/navigation';
 import logger from '@/utils/logger';
+import React from 'react';
 
 // Utility function to get next available business date
 const getNextBusinessDate = () => {
@@ -63,7 +64,7 @@ const fadeInUp = {
     transition: { duration: 0.5 }
 };
 
-export function SparksGrid({
+export const SparksGrid = React.memo(function SparksGrid({
     sparks,
     expandedCallIndex,
     setExpandedCallIndex,
@@ -76,17 +77,18 @@ export function SparksGrid({
 }: SparksGridProps) {
     const router = useRouter();
     
-    // Add logging for initial render and props
-    logger.info('SparksGrid rendered', { 
-        sparksCount: sparks.length, 
-        expandedCallIndex,
-        showAvailability,
-        showCreateCard
-    });
+    // Move logging to useEffect to only log when relevant props change
+    useEffect(() => {
+        logger.info('SparksGrid rendered', { 
+            sparksCount: sparks.length, 
+            expandedCallIndex,
+            showAvailability,
+            showCreateCard
+        });
+    }, [sparks.length, expandedCallIndex, showAvailability, showCreateCard]);
 
     // Memoize the dates for each card
     const availableDates = useMemo(() => {
-        logger.info('Regenerating available dates');
         return sparks.map(() => getNextBusinessDate());
     }, [sparks.length]);
 
@@ -238,4 +240,4 @@ export function SparksGrid({
             )}
         </div>
     );
-} 
+}); 
