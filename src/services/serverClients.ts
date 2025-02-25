@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
 import logger from '../utils/logger';
 
 export interface ClientProfile {
@@ -25,7 +25,7 @@ const transformClientFromDB = (dbClient: any): ClientProfile => ({
 });
 
 export const getClientById = async (id: string): Promise<ClientProfile | null> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('profiles')
         .select('*')
@@ -45,7 +45,7 @@ export const getClientById = async (id: string): Promise<ClientProfile | null> =
 };
 
 export const getAllClients = async (): Promise<ClientProfile[]> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('profiles')
         .select('*')
@@ -62,7 +62,7 @@ export const getAllClients = async (): Promise<ClientProfile[]> => {
 
 export async function deleteClient(clientId: string): Promise<boolean> {
     try {
-        const client = createClient();
+        const client = await createClient();
         // Delete client's profile
         const { error: profileError } = await client
             .from('profiles')
@@ -83,7 +83,7 @@ export async function deleteClient(clientId: string): Promise<boolean> {
 }
 
 export const updateClient = async (id: string, updates: Partial<ClientProfile>): Promise<ClientProfile> => {
-    const client = createClient();
+    const client = await createClient();
     
     // Convert camelCase to snake_case for database
     const dbUpdates: Record<string, any> = {};

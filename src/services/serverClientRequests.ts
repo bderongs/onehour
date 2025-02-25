@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
 import logger from '../utils/logger';
 
 export interface ClientRequest {
@@ -32,7 +32,7 @@ const transformRequestToDB = (data: Pick<ClientRequest, 'clientId' | 'sparkId' |
 
 export const createClientRequest = async (request: Omit<ClientRequest, 'id' | 'createdAt' | 'updatedAt'>): Promise<ClientRequest> => {
     try {
-        const supabase = createClient();
+        const supabase = await createClient();
         const { data, error } = await supabase
             .from('client_requests')
             .insert(transformRequestToDB(request))
@@ -52,7 +52,7 @@ export const createClientRequest = async (request: Omit<ClientRequest, 'id' | 'c
 };
 
 export const updateClientRequest = async (id: string, updates: Partial<ClientRequest>): Promise<ClientRequest> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('client_requests')
         .update({
@@ -72,7 +72,7 @@ export const updateClientRequest = async (id: string, updates: Partial<ClientReq
 };
 
 export const deleteClientRequest = async (id: string): Promise<void> => {
-    const client = createClient();
+    const client = await createClient();
     const { error } = await client
         .from('client_requests')
         .delete()
@@ -85,7 +85,7 @@ export const deleteClientRequest = async (id: string): Promise<void> => {
 };
 
 export const getClientRequestById = async (id: string): Promise<ClientRequest | null> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('client_requests')
         .select('*')
@@ -104,7 +104,7 @@ export const getClientRequestById = async (id: string): Promise<ClientRequest | 
 };
 
 export const getClientRequestsByClientId = async (clientId: string): Promise<ClientRequest[]> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('client_requests')
         .select('*')
@@ -119,7 +119,7 @@ export const getClientRequestsByClientId = async (clientId: string): Promise<Cli
 };
 
 export const getClientRequestsBySparkId = async (sparkId: string): Promise<ClientRequest[]> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('client_requests')
         .select('*')

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
 import logger from '../utils/logger';
 
 const MAX_WIDTH = 800;  // Maximum width for profile pictures
@@ -22,7 +22,7 @@ const getFilePathFromUrl = (url: string): string | null => {
 const deleteImage = async (filePath: string): Promise<void> => {
     try {
         logger.debug('Attempting to delete file:', filePath);
-        const client = await createClient();
+        const client = createClient();
         const { error } = await client.storage
             .from('profiles')
             .remove([filePath]);
@@ -223,7 +223,7 @@ export const uploadProfileImage = async (file: File, userId: string, oldImageUrl
             }
         }
 
-        const client = await createClient();
+        const client = createClient();
         const { error: uploadError } = await client.storage
             .from('profiles')
             .upload(filePath, optimizedImageBlob, {
@@ -237,7 +237,7 @@ export const uploadProfileImage = async (file: File, userId: string, oldImageUrl
         }
 
         // Get the public URL
-        const { data: { publicUrl } } = await client.storage
+        const { data: { publicUrl } } = client.storage
             .from('profiles')
             .getPublicUrl(filePath);
 
@@ -270,7 +270,7 @@ const getSparkImagePathFromUrl = (url: string): string | null => {
         const matches = url.match(/public\/sparks\/([^?#]+)/);
         return matches ? matches[1] : null;
     } catch (e) {
-        logger.error('Impossible de parser l\'URL:', e);
+        logger.error('Impossible de parser l\'URL du spark:', e);
         return null;
     }
 };
@@ -279,7 +279,7 @@ const getSparkImagePathFromUrl = (url: string): string | null => {
 const deleteSparkImageFromStorage = async (filePath: string): Promise<void> => {
     try {
         logger.debug('Attempting to delete Spark image:', filePath);
-        const client = await createClient();
+        const client = createClient();
         const { error } = await client.storage
             .from('sparks')
             .remove([filePath]);
@@ -304,12 +304,12 @@ export const uploadSparkImage = async (file: File, sparkId: string, oldImageUrl?
     let objectUrl: string | null = null;
     
     try {
-        // Optimize image before upload - using same optimization function as profile images
+        // Optimize image before upload
         const optimizedImageBlob = await optimizeImage(file);
         
         const fileExt = 'jpg';
         const fileName = `spark_${sparkId}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-        const filePath = `social-images/${fileName}`;
+        const filePath = `spark-images/${fileName}`;
 
         // Delete old image if URL is provided
         if (oldImageUrl) {
@@ -321,7 +321,7 @@ export const uploadSparkImage = async (file: File, sparkId: string, oldImageUrl?
             }
         }
 
-        const client = await createClient();
+        const client = createClient();
         const { error: uploadError } = await client.storage
             .from('sparks')
             .upload(filePath, optimizedImageBlob, {
@@ -335,7 +335,7 @@ export const uploadSparkImage = async (file: File, sparkId: string, oldImageUrl?
         }
 
         // Get the public URL
-        const { data: { publicUrl } } = await client.storage
+        const { data: { publicUrl } } = client.storage
             .from('sparks')
             .getPublicUrl(filePath);
 
@@ -366,8 +366,8 @@ export const uploadFile = async (
     path: string,
     file: File
 ): Promise<string> => {
-    const client = await createClient();
-    const { data, error } = await client.storage
+    const client = createClient();
+    const { error } = await client.storage
         .from(bucket)
         .upload(path, file, {
             cacheControl: '3600',
@@ -375,15 +375,19 @@ export const uploadFile = async (
         });
 
     if (error) {
-        logger.error('Error uploading file:', error);
+        logger.error(`Error uploading file to ${bucket}:`, error);
         throw error;
     }
 
-    return data.path;
+    const { data } = client.storage
+        .from(bucket)
+        .getPublicUrl(path);
+
+    return data.publicUrl;
 };
 
 export const deleteFile = async (bucket: string, path: string): Promise<void> => {
-    const client = await createClient();
+    const client = createClient();
     const { error } = await client.storage
         .from(bucket)
         .remove([path]);
@@ -394,8 +398,8 @@ export const deleteFile = async (bucket: string, path: string): Promise<void> =>
     }
 };
 
-export const getPublicUrl = async (bucket: string, path: string): Promise<string> => {
-    const client = await createClient();
+export const getPublicUrl = (bucket: string, path: string): string => {
+    const client = createClient();
     const { data } = client.storage
         .from(bucket)
         .getPublicUrl(path);

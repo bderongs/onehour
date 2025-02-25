@@ -1,7 +1,8 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
 import logger from '../utils/logger';
 import type { Spark } from '../types/spark';
 import { generateSlug } from '@/utils/url/shared';
+import { ensureUniqueSlug } from '@/utils/url/server';
 
 // Convert database snake_case to camelCase for frontend
 const transformSparkFromDB = (dbSpark: any): Spark => ({
@@ -96,7 +97,7 @@ const transformSparkToDB = (spark: Partial<Spark>): Record<string, any> => {
 
 export const getSparks = async (): Promise<Spark[]> => {
     try {
-        const client = createClient();
+        const client = await createClient();
         const { data, error } = await client
             .from('sparks')
             .select('*')
@@ -119,7 +120,7 @@ export const getSparks = async (): Promise<Spark[]> => {
 };
 
 export const getSparkByUrl = async (url: string): Promise<Spark | null> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('sparks')
         .select('*')
@@ -135,7 +136,7 @@ export const getSparkByUrl = async (url: string): Promise<Spark | null> => {
 };
 
 export const getSparksByConsultant = async (consultantId: string): Promise<Spark[]> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('sparks')
         .select('*')
@@ -150,11 +151,116 @@ export const getSparksByConsultant = async (consultantId: string): Promise<Spark
     return data.map(transformSparkFromDB);
 };
 
-// Note: For client-side, we don't implement createSpark, updateSpark, and deleteSpark
-// as these operations should be performed server-side
+export const createSpark = async (spark: Omit<Spark, 'id'>): Promise<Spark> => {
+    // Generate URL from title
+    const baseSlug = generateSlug(spark.title);
+    const url = await ensureUniqueSlug(baseSlug, 'spark');
+
+    // Create a new object without the id field and with the generated URL
+    const sparkData = {
+        ...spark,
+        url
+    };
+
+    const client = await createClient();
+    const { data, error } = await client
+        .from('sparks')
+        .insert([transformSparkToDB(sparkData)])
+        .select()
+        .single();
+
+    if (error) {
+        logger.error('Error creating spark:', error);
+        throw error;
+    }
+
+    return transformSparkFromDB(data);
+};
+
+export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<Spark> => {
+    const client = await createClient();
+    // First, verify the spark exists
+    const { data: existingSpark, error: fetchError } = await client
+        .from('sparks')
+        .select('*')
+        .eq('url', url)
+        .single();
+
+    if (fetchError) {
+        logger.error('Error fetching spark:', fetchError);
+        throw fetchError;
+    }
+
+    if (!existingSpark) {
+        throw new Error(`Spark with URL ${url} not found`);
+    }
+
+    // If title is being updated, generate new URL
+    let updatedSpark = { ...spark };
+    if (spark.title) {
+        const baseSlug = generateSlug(spark.title);
+        // Only generate a new URL if the title has changed
+        if (baseSlug !== url) {
+            const { data } = await client
+                .from('sparks')
+                .select('url')
+                .eq('url', baseSlug)
+                .single();
+
+            // If the URL is already taken, generate a unique one
+            if (data) {
+                updatedSpark.url = await ensureUniqueSlug(baseSlug, 'spark');
+            } else {
+                updatedSpark.url = baseSlug;
+            }
+        }
+    }
+
+    // Remove id and transform using the same function as create
+    const { id, ...updateFields } = updatedSpark;
+    const transformedUpdate = transformSparkToDB(updateFields);
+
+    // First update the spark - try without select first
+    const { error: updateError } = await client
+        .from('sparks')
+        .update(transformedUpdate)
+        .eq('url', url);
+
+    if (updateError) {
+        logger.error('Error updating spark:', updateError);
+        throw updateError;
+    }
+
+    // Then fetch the updated record
+    const { data: updatedData, error: fetchUpdatedError } = await client
+        .from('sparks')
+        .select('*')
+        .eq('url', updatedSpark.url || url)
+        .single();
+
+    if (fetchUpdatedError) {
+        logger.error('Error fetching updated spark:', fetchUpdatedError);
+        throw fetchUpdatedError;
+    }
+
+    return transformSparkFromDB(updatedData);
+};
+
+export const deleteSpark = async (url: string): Promise<void> => {
+    const client = await createClient();
+    const { error } = await client
+        .from('sparks')
+        .delete()
+        .eq('url', url);
+
+    if (error) {
+        logger.error('Error deleting spark:', error);
+        throw error;
+    }
+};
 
 export const getSparkById = async (id: string): Promise<Spark | null> => {
-    const client = createClient();
+    const client = await createClient();
     const { data, error } = await client
         .from('sparks')
         .select('*')
