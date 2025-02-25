@@ -4,8 +4,9 @@ import { AlertCircle, ArrowRight } from 'lucide-react';
 import ConsultantProfilePage from '../../[slug]/page';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getConsultantProfile } from '@/services/consultants';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { getDemoConsultantSlug } from './actions';
+import logger from '@/utils/logger';
 
 export default function DemoProfilePage() {
     const DEMO_CONSULTANT_ID = process.env.NEXT_PUBLIC_DEMO_CONSULTANT_ID;
@@ -15,20 +16,20 @@ export default function DemoProfilePage() {
     useEffect(() => {
         async function fetchConsultantSlug() {
             if (!DEMO_CONSULTANT_ID) {
-                console.error('Missing NEXT_PUBLIC_DEMO_CONSULTANT_ID environment variable');
+                logger.error('Missing NEXT_PUBLIC_DEMO_CONSULTANT_ID environment variable');
                 redirect('/');
                 return;
             }
 
-            const consultant = await getConsultantProfile(DEMO_CONSULTANT_ID);
+            const slug = await getDemoConsultantSlug(DEMO_CONSULTANT_ID);
             
-            if (!consultant || !consultant.slug) {
-                console.error('Demo consultant not found or missing slug');
+            if (!slug) {
+                logger.error('Demo consultant not found or missing slug');
                 redirect('/');
                 return;
             }
 
-            setConsultantSlug(consultant.slug);
+            setConsultantSlug(slug);
             setLoading(false);
         }
 

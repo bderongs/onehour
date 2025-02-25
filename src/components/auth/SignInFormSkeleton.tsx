@@ -17,4 +17,6 @@ export function SignInFormSkeleton() {
             </div>
         </div>
     )
-} 
+}
+
+export default SignInFormSkeleton; 

@@ -1,13 +1,15 @@
-import { supabase } from '../src/lib/supabase';
+import { createClient } from '../src/lib/supabase/client';
+import logger from '../src/utils/logger';
 
 async function resetPassword() {
     try {
+        const supabase = createClient();
         await supabase.auth.resetPasswordForEmail('matthieu@sparkier.io', {
             redirectTo: 'http://localhost:5173/auth/callback'
         });
-        console.log('Password reset email sent successfully');
+        logger.info('Password reset email sent successfully');
     } catch (error) {
-        console.error('Error sending password reset email:', error);
+        logger.error('Error sending password reset email:', error);
     }
 }
 

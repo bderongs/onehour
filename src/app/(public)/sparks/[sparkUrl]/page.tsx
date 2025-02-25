@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ChevronDown, ChevronUp, ArrowLeft, AlertCircle } from 'lucide-react';
-import { getSparkByUrl } from '@/services/sparks';
 import type { Spark } from '@/types/spark';
 import { formatDuration, formatPrice } from '@/utils/format';
 import logger from '@/utils/logger';
@@ -12,6 +11,7 @@ import { createClientRequest, getClientRequestsByClientId } from '@/services/cli
 import { useClientSignUp } from '@/contexts/ClientSignUpContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { getSparkByUrlAction } from './actions';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -47,8 +47,8 @@ export default function SparkProductPage() {
             try {
                 setIsAuthenticated(!!user);
 
-                // Fetch spark
-                const fetchedSpark = await getSparkByUrl(sparkUrl);
+                // Fetch spark using the server action
+                const fetchedSpark = await getSparkByUrlAction(sparkUrl);
                 if (!fetchedSpark) {
                     router.push('/');
                     return;
@@ -70,7 +70,7 @@ export default function SparkProductPage() {
 
                 setLoading(false);
             } catch (err) {
-                console.error('Error fetching data:', err);
+                logger.error('Error fetching data:', err);
                 setError('Impossible de charger les détails du spark. Veuillez réessayer plus tard.');
                 setLoading(false);
             }
@@ -98,7 +98,7 @@ export default function SparkProductPage() {
                     logger.info('Creating client request for authenticated user', { sparkUrl });
                     
                     // Get the spark by URL first to ensure we have the correct data
-                    getSparkByUrl(sparkUrl)
+                    getSparkByUrlAction(sparkUrl)
                         .then(spark => {
                             if (!spark) {
                                 logger.error('Spark not found when creating request', { sparkUrl });

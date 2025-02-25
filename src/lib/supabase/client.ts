@@ -2,6 +2,9 @@ import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from './database.types'
 import logger from '@/utils/logger'
 
+// Export the createBrowserClient function for direct imports
+export { createBrowserClient }
+
 // Creates a Supabase client for client-side operations
 export const createClient = () => {
   try {
