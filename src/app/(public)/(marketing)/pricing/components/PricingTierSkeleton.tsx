@@ -1,20 +1,37 @@
+import { Skeleton } from '@/components/ui/skeleton'
+
 export function PricingTierSkeleton() {
     return (
-        <div className="bg-white rounded-2xl shadow-xl p-8 relative flex flex-col animate-pulse">
-            <div className="mb-6">
-                <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
-                <div className="h-10 bg-gray-200 rounded w-1/4"></div>
-            </div>
-            <ul className="space-y-4 mb-8 flex-grow">
-                {[1, 2, 3].map((i) => (
-                    <li key={i} className="flex items-start">
-                        <div className="h-5 w-5 bg-gray-200 rounded-full flex-shrink-0 mt-1"></div>
-                        <div className="h-4 bg-gray-200 rounded w-3/4 ml-3"></div>
-                    </li>
-                ))}
-            </ul>
-            <div className="h-12 bg-gray-200 rounded-lg w-full"></div>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+                <div
+                    key={i}
+                    className="flex flex-col p-6 bg-white shadow-lg rounded-lg dark:bg-zinc-850"
+                >
+                    <div className="space-y-2">
+                        <Skeleton className="h-5 w-24" />
+                        <Skeleton className="h-8 w-32" />
+                    </div>
+                    
+                    <div className="mt-4 space-y-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-5/6" />
+                    </div>
+                    
+                    <div className="my-6">
+                        <Skeleton className="h-12 w-full" />
+                    </div>
+                    
+                    <div className="space-y-4 flex-1">
+                        {[1, 2, 3, 4].map((j) => (
+                            <div key={j} className="flex items-center gap-2">
+                                <Skeleton className="h-5 w-5 rounded-full" />
+                                <Skeleton className="h-4 flex-1" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ))}
         </div>
-    );
+    )
 } 

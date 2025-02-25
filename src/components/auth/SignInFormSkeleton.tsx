@@ -1,23 +1,20 @@
-export default function SignInFormSkeleton() {
+import { Skeleton } from '@/components/ui/skeleton'
+
+export function SignInFormSkeleton() {
     return (
-        <div className="space-y-6 animate-pulse">
-            <div>
-                <div className="h-5 w-20 bg-gray-200 rounded mb-2"></div>
-                <div className="h-10 w-full bg-gray-200 rounded"></div>
+        <div className="space-y-6">
+            <div className="space-y-2">
+                <Skeleton className="h-5 w-20" />
+                <Skeleton className="h-10 w-full" />
             </div>
-
-            <div>
-                <div className="h-5 w-32 bg-gray-200 rounded mb-2"></div>
-                <div className="h-10 w-full bg-gray-200 rounded"></div>
+            <div className="space-y-2">
+                <Skeleton className="h-5 w-20" />
+                <Skeleton className="h-10 w-full" />
             </div>
-
-            <div className="flex justify-end">
-                <div className="h-4 w-32 bg-gray-200 rounded"></div>
-            </div>
-
-            <div>
-                <div className="h-10 w-full bg-gray-200 rounded"></div>
+            <Skeleton className="h-10 w-full" />
+            <div className="flex justify-center">
+                <Skeleton className="h-5 w-32" />
             </div>
         </div>
-    );
+    )
 } 
