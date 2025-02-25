@@ -1,5 +1,6 @@
-import { redirect } from 'next/navigation';
+import ClientPage from './(client)/page';
 
 export default function Page() {
-    redirect('/');
+    // Use the client page component directly
+    return <ClientPage />;
 } 

@@ -117,7 +117,7 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
         }
     }, [consultant, chatConfigs]);
 
-    // Log state changes using logger instead of console.log
+    // Log state changes using logger
     useEffect(() => {
         if (error) {
             logger.error('Error in ConsultantProfilePage:', error);
