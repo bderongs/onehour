@@ -20,9 +20,12 @@ function generateSparkFields(): DocumentField[] {
         expertProfile: { label: 'Profil expert', description: 'Profil de l\'expert' },
         faq: { label: 'FAQ', description: 'Questions fréquemment posées' },
         nextSteps: { label: 'Prochaines étapes', description: 'Liste des prochaines étapes après le Spark' },
+        imageUrl: { label: 'Image', description: 'URL de l\'image principale' },
         url: { label: 'URL', description: 'URL unique du Spark' },
         prefillText: { label: 'Texte prérempli', description: 'Texte de préparation pour le client' },
-        social_image_url: { label: 'Image sociale', description: 'URL de l\'image pour les réseaux sociaux' }
+        socialImageUrl: { label: 'Image sociale', description: 'URL de l\'image pour les réseaux sociaux' },
+        createdAt: { label: 'Date de création', description: 'Date de création du Spark' },
+        updatedAt: { label: 'Date de mise à jour', description: 'Date de dernière mise à jour du Spark' }
     };
 
     // Fields that should be editable in the AI interface

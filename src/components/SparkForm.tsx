@@ -58,7 +58,7 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
             },
             faq: [],
             nextSteps: [],
-            social_image_url: '',
+            socialImageUrl: '',
             uploadingImage: false
         };
     });
@@ -166,8 +166,8 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
 
         try {
             setUploadingImage(true);
-            const { publicUrl } = await uploadSparkImage(file, initialData.id, formData.social_image_url);
-            handleChange('social_image_url', publicUrl);
+            const { publicUrl } = await uploadSparkImage(file, initialData.id, formData.socialImageUrl);
+            handleChange('socialImageUrl', publicUrl);
             showNotification('success', 'Image mise à jour avec succès');
         } catch (error) {
             console.error('Error uploading image:', error);
@@ -181,10 +181,10 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
     };
 
     const handleImageDelete = async () => {
-        if (formData.social_image_url) {
+        if (formData.socialImageUrl) {
             try {
-                await deleteSparkImage(formData.social_image_url);
-                handleChange('social_image_url', undefined);
+                await deleteSparkImage(formData.socialImageUrl);
+                handleChange('socialImageUrl', undefined);
                 showNotification('success', 'Image supprimée avec succès');
             } catch (error) {
                 console.error('Error deleting image:', error);
@@ -638,10 +638,10 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
                     Format recommandé : 1200x630 pixels.
                 </p>
                 <div className="space-y-4">
-                    {formData.social_image_url && (
+                    {formData.socialImageUrl && (
                         <div className="relative w-full max-w-2xl">
                             <img
-                                src={formData.social_image_url}
+                                src={formData.socialImageUrl}
                                 alt="Social preview"
                                 className="w-full rounded-lg shadow-md"
                             />
@@ -688,8 +688,8 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
                     {showUrlInput && (
                         <input
                             type="url"
-                            value={formData.social_image_url || ''}
-                            onChange={(e) => handleChange('social_image_url', e.target.value)}
+                            value={formData.socialImageUrl || ''}
+                            onChange={(e) => handleChange('socialImageUrl', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md"
                             placeholder="https://example.com/votre-image.jpg"
                         />

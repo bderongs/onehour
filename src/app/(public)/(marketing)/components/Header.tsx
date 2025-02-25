@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BrandName } from './BrandName';
+import { BrandName } from '@/components/BrandName';
 import { Menu, X } from 'lucide-react';
-import { ProfileMenu } from './ProfileMenu';
-import { useAuth } from '../contexts/AuthContext';
+import { ProfileMenu } from '@/components/ProfileMenu';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
