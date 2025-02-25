@@ -10,7 +10,7 @@ import { createChatConfigs } from '@/data/chatConfigs';
 import type { DocumentSummary } from '@/types/chat';
 import type { Spark } from '@/types/spark';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '@/types/consultant';
-import { getConsultantProfile, getConsultantBySlug, getConsultantReviews, getConsultantSparks, getConsultantMissions } from '@/services/consultants';
+import { getConsultantProfileAction, getConsultantBySlugAction, getConsultantReviewsAction, getConsultantSparksAction, getConsultantMissionsAction } from './actions';
 import { formatDuration, formatPrice } from '@/utils/format';
 import { getCurrentUser } from '@/services/auth';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
@@ -61,8 +61,8 @@ export default function ConsultantProfilePage() {
         const fetchData = async () => {
             try {
                 const consultantData = urlSlug 
-                    ? await getConsultantProfile(urlSlug)
-                    : await getConsultantBySlug(consultantIdentifier || '');
+                    ? await getConsultantProfileAction(urlSlug)
+                    : await getConsultantBySlugAction(consultantIdentifier || '');
 
                 if (!consultantData) {
                     logger.error('No consultant found for identifier:', consultantIdentifier || 'unknown');
@@ -74,9 +74,9 @@ export default function ConsultantProfilePage() {
                 }
 
                 const [reviewsData, sparksData, missionsData] = await Promise.all([
-                    getConsultantReviews(consultantData.id),
-                    getConsultantSparks(consultantData.id),
-                    getConsultantMissions(consultantData.id)
+                    getConsultantReviewsAction(consultantData.id),
+                    getConsultantSparksAction(consultantData.id),
+                    getConsultantMissionsAction(consultantData.id)
                 ]);
 
                 setConsultant(consultantData);

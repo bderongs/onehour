@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Plus, Rocket, ChevronDown } from 'lucide-react'
 import type { Spark } from '../../../../types/spark'
-import { getSparks, deleteSpark } from '../../../../services/sparks'
+import { getSparksAction, deleteSparkAction } from './actions'
 import { ConfirmDialog } from '../../../../components/ui/ConfirmDialog'
 import { useAuth } from '../../../../contexts/AuthContext'
 import { LoadingSpinner } from '../../../../components/ui/LoadingSpinner'
@@ -87,8 +87,8 @@ export default function Page() {
                     return
                 }
 
-                // Fetch all sparks for admin
-                const fetchedSparks = await getSparks()
+                // Fetch all sparks for admin using server action
+                const fetchedSparks = await getSparksAction()
                 setSparks(fetchedSparks)
                 setLoading(false)
             } catch (err) {
@@ -125,7 +125,8 @@ export default function Page() {
         if (!deleteConfirm.sparkUrl) return
         
         try {
-            await deleteSpark(deleteConfirm.sparkUrl)
+            // Use server action to delete spark
+            await deleteSparkAction(deleteConfirm.sparkUrl)
             setSparks(sparks.filter(spark => spark.url !== deleteConfirm.sparkUrl))
             showNotification('success', 'Le Spark a été supprimé avec succès')
         } catch (error) {

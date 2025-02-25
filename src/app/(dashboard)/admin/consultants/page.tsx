@@ -6,8 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Users, Mail, ExternalLink, ChevronDown, ChevronUp, Linkedin, Edit, Trash2, Eye, Clock, Plus } from 'lucide-react'
 import type { ConsultantProfile } from '../../../../types/consultant'
 import type { Spark } from '../../../../types/spark'
-import { getAllConsultants, deleteConsultant, getConsultantSparks } from '../../../../services/consultants'
-import { deleteSpark } from '../../../../services/sparks'
+import { getAllConsultantsAction, deleteConsultantAction, getConsultantSparksAction, deleteSparkAction } from './actions'
 import { ConfirmDialog } from '../../../../components/ui/ConfirmDialog'
 import { formatDuration, formatPrice } from '../../../../utils/format'
 import { useAuth } from '../../../../contexts/AuthContext'
@@ -60,7 +59,7 @@ const ConsultantRow = ({
             if ((isExpanded || showDeleteConfirm) && consultant.id) {
                 setLoadingSparks(true)
                 try {
-                    const consultantSparks = await getConsultantSparks(consultant.id)
+                    const consultantSparks = await getConsultantSparksAction(consultant.id)
                     setSparks(consultantSparks)
                 } catch (error) {
                     console.error('Error fetching sparks:', error)
@@ -89,7 +88,7 @@ const ConsultantRow = ({
         }
 
         setIsDeleting(true)
-        const success = await deleteConsultant(consultant.id)
+        const success = await deleteConsultantAction(consultant.id)
         setIsDeleting(false)
         if (success) {
             onDelete()
@@ -105,7 +104,7 @@ const ConsultantRow = ({
         if (!showSparkDeleteConfirm.sparkUrl) return
         
         try {
-            await deleteSpark(showSparkDeleteConfirm.sparkUrl)
+            await deleteSparkAction(showSparkDeleteConfirm.sparkUrl)
             setSparks(sparks.filter(spark => spark.url !== showSparkDeleteConfirm.sparkUrl))
             showNotification('success', 'Le Spark a été supprimé avec succès')
         } catch (error) {
@@ -376,13 +375,13 @@ export default function Page() {
     const [showAll, setShowAll] = useState(false)
 
     const fetchConsultants = async (includeSparkierEmails: boolean) => {
+        setLoading(true)
         try {
-            const fetchedConsultants = await getAllConsultants(includeSparkierEmails)
-            setConsultants(fetchedConsultants)
-            setLoading(false)
-        } catch (err) {
-            console.error('Error fetching consultants:', err)
-            setError('Impossible de charger les consultants. Veuillez réessayer plus tard.')
+            const data = await getAllConsultantsAction(includeSparkierEmails)
+            setConsultants(data)
+        } catch (error) {
+            console.error('Error fetching consultants:', error)
+        } finally {
             setLoading(false)
         }
     }
