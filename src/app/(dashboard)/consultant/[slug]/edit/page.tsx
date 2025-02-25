@@ -5,11 +5,19 @@ import { useRouter, useParams } from 'next/navigation';
 import { Loader2, Plus, Trash2, Edit2, Star, X, Upload, Link } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '@/types/consultant';
-import { getConsultantProfile, updateConsultantProfile, getConsultantReviews, getConsultantMissions, updateConsultantReviews, updateConsultantMissions } from '@/services/consultants';
 import { uploadProfileImage, deleteProfileImage } from '@/services/storage';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useNotification } from '@/contexts/NotificationContext';
+import { 
+    getConsultantProfileAction, 
+    getConsultantReviewsAction, 
+    getConsultantMissionsAction,
+    updateConsultantProfileAction,
+    updateConsultantReviewsAction,
+    updateConsultantMissionsAction
+} from './actions';
+import logger from '@/utils/logger';
 
 export default function ConsultantProfileEditPage() {
     const router = useRouter();
@@ -49,17 +57,20 @@ export default function ConsultantProfileEditPage() {
             }
 
             try {
-                const [consultantData, reviews, missions] = await Promise.all([
-                    getConsultantProfile(slug),
-                    getConsultantReviews(slug),
-                    getConsultantMissions(slug)
-                ]);
-
+                // Get the consultant ID first
+                const consultantData = await getConsultantProfileAction(slug);
+                
                 if (!consultantData) {
                     setError('Consultant not found');
                     setLoading(false);
                     return;
                 }
+                
+                // Then get reviews and missions using the ID
+                const [reviews, missions] = await Promise.all([
+                    getConsultantReviewsAction(consultantData.id),
+                    getConsultantMissionsAction(consultantData.id)
+                ]);
 
                 setConsultant(consultantData);
                 setFormData({
@@ -71,7 +82,7 @@ export default function ConsultantProfileEditPage() {
                 });
                 setLoading(false);
             } catch (err) {
-                console.error('Error fetching consultant data:', err);
+                logger.error('Error fetching consultant data:', err);
                 setError('Impossible de charger les données du consultant');
                 setLoading(false);
             }
@@ -112,7 +123,7 @@ export default function ConsultantProfileEditPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!slug) return;
+        if (!slug || !consultant?.id) return;
 
         const submissionData = {
             ...formData,
@@ -129,22 +140,22 @@ export default function ConsultantProfileEditPage() {
         setSaving(true);
         try {
             const [updatedProfile, reviewsUpdated, missionsUpdated] = await Promise.all([
-                updateConsultantProfile(slug, submissionData),
-                updateConsultantReviews(slug, formData.reviews || []),
-                updateConsultantMissions(slug, formData.missions || [])
+                updateConsultantProfileAction(consultant.id, submissionData),
+                updateConsultantReviewsAction(consultant.id, formData.reviews || []),
+                updateConsultantMissionsAction(consultant.id, formData.missions || [])
             ]);
 
             if (updatedProfile && reviewsUpdated && missionsUpdated) {
                 showNotification('success', 'Profil mis à jour avec succès');
                 setTimeout(() => {
-                    router.push(`/consultant/${consultant!.slug}`);
+                    router.push(`/consultant/${updatedProfile.slug}`);
                 }, 1500);
             } else {
                 setError('Impossible de mettre à jour le profil');
                 showNotification('error', 'Échec de la mise à jour du profil');
             }
         } catch (err) {
-            console.error('Error updating profile:', err);
+            logger.error('Error updating profile:', err);
             setError('Impossible de mettre à jour le profil');
             showNotification('error', 'Échec de la mise à jour du profil');
         } finally {
@@ -164,7 +175,7 @@ export default function ConsultantProfileEditPage() {
                 profile_image_url: publicUrl
             }));
         } catch (error) {
-            console.error('Error uploading image:', error);
+            logger.error('Error uploading image:', error);
             showNotification('error', error instanceof Error ? error.message : 'Erreur lors de l\'upload de l\'image');
         } finally {
             setUploadingImage(false);
@@ -183,7 +194,7 @@ export default function ConsultantProfileEditPage() {
                     profile_image_url: ''
                 }));
             } catch (error) {
-                console.error('Error deleting image:', error);
+                logger.error('Error deleting image:', error);
                 showNotification('error', 'Erreur lors de la suppression de l\'image');
             }
         }
