@@ -1,8 +1,21 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient as createServerClient } from '@/lib/supabase/server';
+import { createClient as createBrowserClient } from '@/lib/supabase/client';
 import logger from '../utils/logger';
 import type { Spark } from '../types/spark';
 import { generateSlug } from '@/utils/url/shared';
 import { ensureUniqueSlug as ensureUniqueSlugServer } from '@/utils/url/server';
+
+// Helper to determine if we're on the client side
+const isClient = () => typeof window !== 'undefined';
+
+// Get the appropriate Supabase client based on environment
+const getSupabaseClient = async () => {
+    if (isClient()) {
+        return createBrowserClient();
+    } else {
+        return await createServerClient();
+    }
+};
 
 // Convert database snake_case to camelCase for frontend
 const transformSparkFromDB = (dbSpark: any): Spark => ({
@@ -97,7 +110,7 @@ const transformSparkToDB = (spark: Partial<Spark>): Record<string, any> => {
 
 export const getSparks = async (): Promise<Spark[]> => {
     try {
-        const client = await createClient();
+        const client = await getSupabaseClient();
         const { data, error } = await client
             .from('sparks')
             .select('*')
@@ -120,7 +133,7 @@ export const getSparks = async (): Promise<Spark[]> => {
 };
 
 export const getSparkByUrl = async (url: string): Promise<Spark | null> => {
-    const client = await createClient();
+    const client = await getSupabaseClient();
     const { data, error } = await client
         .from('sparks')
         .select('*')
@@ -136,7 +149,7 @@ export const getSparkByUrl = async (url: string): Promise<Spark | null> => {
 };
 
 export const getSparksByConsultant = async (consultantId: string): Promise<Spark[]> => {
-    const client = await createClient();
+    const client = await getSupabaseClient();
     const { data, error } = await client
         .from('sparks')
         .select('*')
@@ -162,7 +175,7 @@ export const createSpark = async (spark: Omit<Spark, 'id'>): Promise<Spark> => {
         url
     };
 
-    const client = await createClient();
+    const client = await getSupabaseClient();
     const { data, error } = await client
         .from('sparks')
         .insert([transformSparkToDB(sparkData)])
@@ -178,7 +191,7 @@ export const createSpark = async (spark: Omit<Spark, 'id'>): Promise<Spark> => {
 };
 
 export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<Spark> => {
-    const client = await createClient();
+    const client = await getSupabaseClient();
     // First, verify the spark exists
     const { data: existingSpark, error: fetchError } = await client
         .from('sparks')
@@ -251,7 +264,7 @@ export const updateSpark = async (url: string, spark: Partial<Spark>): Promise<S
 };
 
 export const deleteSpark = async (url: string): Promise<void> => {
-    const client = await createClient();
+    const client = await getSupabaseClient();
     const { error } = await client
         .from('sparks')
         .delete()
@@ -264,7 +277,7 @@ export const deleteSpark = async (url: string): Promise<void> => {
 };
 
 export const getSparkById = async (id: string): Promise<Spark | null> => {
-    const client = await createClient();
+    const client = await getSupabaseClient();
     const { data, error } = await client
         .from('sparks')
         .select('*')

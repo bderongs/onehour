@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient as createServerClient } from '@/lib/supabase/server';
+import { createClient as createBrowserClient } from '@/lib/supabase/client';
 import logger from '../utils/logger';
 
 export interface ClientRequest {
@@ -30,29 +31,41 @@ const transformRequestToDB = (data: Pick<ClientRequest, 'clientId' | 'sparkId' |
     message: data.message,
 });
 
-export const createClientRequest = async (request: Omit<ClientRequest, 'id' | 'createdAt' | 'updatedAt'>): Promise<ClientRequest> => {
-    const client = await createClient();
-    const { data, error } = await client
-        .from('client_requests')
-        .insert([{
-            client_id: request.clientId,
-            spark_id: request.sparkId,
-            status: request.status,
-            message: request.message,
-        }])
-        .select()
-        .single();
+// Helper to determine if we're on the client side
+const isClient = () => typeof window !== 'undefined';
 
-    if (error) {
-        logger.error('Error creating client request:', error);
+// Get the appropriate Supabase client based on environment
+const getSupabaseClient = async () => {
+    if (isClient()) {
+        return createBrowserClient();
+    } else {
+        return await createServerClient();
+    }
+};
+
+export const createClientRequest = async (request: Omit<ClientRequest, 'id' | 'createdAt' | 'updatedAt'>): Promise<ClientRequest> => {
+    try {
+        const supabase = await getSupabaseClient();
+        const { data, error } = await supabase
+            .from('client_requests')
+            .insert(transformRequestToDB(request))
+            .select()
+            .single();
+
+        if (error) {
+            logger.error('Error creating client request:', error);
+            throw new Error(error.message);
+        }
+
+        return transformRequestFromDB(data);
+    } catch (error) {
+        logger.error('Error in createClientRequest:', error);
         throw error;
     }
-
-    return transformRequestFromDB(data);
 };
 
 export const updateClientRequest = async (id: string, updates: Partial<ClientRequest>): Promise<ClientRequest> => {
-    const client = await createClient();
+    const client = await getSupabaseClient();
     const { data, error } = await client
         .from('client_requests')
         .update({
@@ -72,7 +85,7 @@ export const updateClientRequest = async (id: string, updates: Partial<ClientReq
 };
 
 export const deleteClientRequest = async (id: string): Promise<void> => {
-    const client = await createClient();
+    const client = await getSupabaseClient();
     const { error } = await client
         .from('client_requests')
         .delete()
@@ -85,7 +98,7 @@ export const deleteClientRequest = async (id: string): Promise<void> => {
 };
 
 export const getClientRequestById = async (id: string): Promise<ClientRequest | null> => {
-    const client = await createClient();
+    const client = await getSupabaseClient();
     const { data, error } = await client
         .from('client_requests')
         .select('*')
@@ -104,7 +117,7 @@ export const getClientRequestById = async (id: string): Promise<ClientRequest | 
 };
 
 export const getClientRequestsByClientId = async (clientId: string): Promise<ClientRequest[]> => {
-    const client = await createClient();
+    const client = await getSupabaseClient();
     const { data, error } = await client
         .from('client_requests')
         .select('*')
@@ -119,7 +132,7 @@ export const getClientRequestsByClientId = async (clientId: string): Promise<Cli
 };
 
 export const getClientRequestsBySparkId = async (sparkId: string): Promise<ClientRequest[]> => {
-    const client = await createClient();
+    const client = await getSupabaseClient();
     const { data, error } = await client
         .from('client_requests')
         .select('*')

@@ -1,8 +1,8 @@
 ---
-description: 
+description: creating or moving files, splitting server and client features for implementing SSR
 globs: 
+alwaysApply: false
 ---
-
-# Your rule content
-
-- The app uses the App Router with a root /scr directory
+Place components and server actions in the route directory that they are used for
+The app uses app router and not pages router
+Do not implement SEO features for protected routes

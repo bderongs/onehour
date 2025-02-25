@@ -1,10 +1,11 @@
-import { createBrowserClient as createBrowserSupabase } from '@supabase/ssr'
+import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from './database.types'
 import logger from '@/utils/logger'
 
-export const createBrowserClient = () => {
+// Creates a Supabase client for client-side operations
+export const createClient = () => {
   try {
-    return createBrowserSupabase<Database>(
+    return createBrowserClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     )
