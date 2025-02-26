@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { EmailCheckForm } from '@/components/EmailCheckForm';
-import { PasswordSignInStep } from '@/components/PasswordSignInStep';
-import { ClientSignUpForm } from '@/components/ClientSignUpForm';
+import { EmailCheckForm } from '../../components/EmailCheckForm';
+import { PasswordSignInStep } from '../../components/PasswordSignInStep';
+import { ClientSignUpForm } from '../../components/ClientSignUpForm';
 import { useClientSignUp } from '@/contexts/ClientSignUpContext';
 import { getSparkByUrl } from '@/services/sparks';
 import { createClientRequest, getClientRequestsByClientId } from '@/services/clientRequests';

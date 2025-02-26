@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ClientSignUpForm } from '@/components/ClientSignUpForm';
+import { ClientSignUpForm } from '@/app/(public)/auth/components/ClientSignUpForm';
 
 export function CTA() {
     return (

@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { ProfileMenu } from './ProfileMenu';
-import { BrandName } from './BrandName';
+import { ProfileMenu } from '@/components/ProfileMenu';
+import { BrandName } from '@/components/BrandName';
 
 export const Header: React.FC = () => {
   return (

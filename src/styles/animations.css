@@ -1,0 +1,41 @@
+/* Animation styles for scroll effects and transitions */
+
+.scroll-animation {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, opacity;
+}
+
+.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scroll-animation {
+        transition: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.slide-down-enter {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-20px);
+    overflow: hidden;
+}
+
+.slide-down-enter-active {
+    opacity: 1;
+    max-height: 2000px;
+    transform: translateY(0);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+/* Layout adjustments */
+html {
+    scroll-padding-top: 80px; /* Add padding for fixed header */
+} 

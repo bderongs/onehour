@@ -1,9 +1,9 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import SignInForm from '@/components/auth/SignInForm';
-import SignInFormSkeleton from '@/components/auth/SignInFormSkeleton';
-import AuthRedirect from '@/components/auth/AuthRedirect';
+import SignInForm from '../components/SignInForm';
+import SignInFormSkeleton from '../components/SignInFormSkeleton';
+import AuthRedirect from '../components/AuthRedirect';
 
 export const metadata: Metadata = {
     title: 'Connexion | Sparkier',

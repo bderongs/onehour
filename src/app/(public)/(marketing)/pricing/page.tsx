@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { PricingTierCard } from './components/PricingTierCard';
 import { PricingTierSkeleton } from './components/PricingTierSkeleton';
-import { ConsultantSignUpForm } from '@/components/ConsultantSignUpForm';
+import { ConsultantSignUpForm } from '@/app/(public)/auth/components/ConsultantSignUpForm';
 
 export const metadata: Metadata = {
     title: 'Tarifs | Sparkier - Développez votre activité de consultant',

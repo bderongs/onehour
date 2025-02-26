@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { type Metadata } from 'next';
-import { SignUpPageClient } from '@/components/SignUpPageClient';
-import { SignUpPageSkeleton } from '@/components/SignUpPageSkeleton';
+import { SignUpPageClient } from '../components/SignUpPageClient';
+import { SignUpPageSkeleton } from '../components/SignUpPageSkeleton';
 
 export const metadata: Metadata = {
     title: 'Créer un compte | Sparkier',

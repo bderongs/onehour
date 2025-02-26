@@ -46,7 +46,7 @@ export const SparksGridSection = React.memo(function SparksGridSection({
                 setExpandedCallIndex={setExpandedCallIndex}
                 onCallClick={onSparkClick}
                 buttonText="Choisir ce Spark"
-                showAvailability={false}
+                showAvailability={true}
                 showCreateCard={false}
                 showDetailsButton={false}
             />

@@ -3,7 +3,7 @@ import { Package2, Clock, Store, Sparkles } from 'lucide-react';
 import { getSparks } from '@/services/sparks';
 import { SparksGridSection } from './components/SparksGridSection';
 import { InteractiveFeatures } from './components/InteractiveFeatures';
-import { ConsultantSignUpForm } from '@/components/ConsultantSignUpForm';
+import { ConsultantSignUpForm } from '@/app/(public)/auth/components/ConsultantSignUpForm';
 import '@/styles/highlight.css';
 
 // Define metadata for SEO

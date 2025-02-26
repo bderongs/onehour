@@ -2,30 +2,37 @@
 
 import React, { useState } from 'react';
 import { ArrowRight, Beaker } from 'lucide-react';
-import type { ConsultantSignUpData } from '@/services/auth/types';
-import { signUpConsultant, checkEmail } from '@/app/auth/actions';
+import type { ClientSignUpData } from '@/services/auth/types';
+import { signUpClient, checkEmail } from '@/app/(public)/auth/actions';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useRouter } from 'next/navigation';
 import logger from '@/utils/logger';
 
-interface ConsultantSignUpFormProps {
+interface ClientSignUpFormProps {
     buttonText?: string;
     className?: string;
-    onSuccess?: () => void;
+    sparkUrlSlug?: string;
+    initialEmail?: string;
+    onSuccess?: (data: { sparkUrlSlug?: string }) => void;
     onError?: (error: any) => void;
 }
 
-export function ConsultantSignUpForm({ 
-    buttonText = "Créer mes premiers Sparks",
+export function ClientSignUpForm({ 
+    buttonText = "Créer mon compte",
     className = "",
+    sparkUrlSlug,
+    initialEmail = '',
     onSuccess,
     onError
-}: ConsultantSignUpFormProps) {
-    const [formData, setFormData] = useState({
+}: ClientSignUpFormProps) {
+    const [formData, setFormData] = useState<ClientSignUpData>({
         firstName: '',
         lastName: '',
-        linkedin: '',
-        email: ''
+        company: '',
+        email: initialEmail,
+        companyRole: '',
+        industry: '',
+        sparkUrlSlug
     });
     const { showNotification } = useNotification();
     const [loading, setLoading] = useState(false);
@@ -35,9 +42,12 @@ export function ConsultantSignUpForm({
         const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
         return {
             firstName: 'Test',
-            lastName: 'Consultant',
-            linkedin: 'https://linkedin.com/in/test-consultant',
-            email: `matthieu+testconsultant${timestamp}@sparkier.io`
+            lastName: 'User',
+            company: '[TEST] Test Company',
+            email: `matthieu+test${timestamp}@sparkier.io`,
+            companyRole: 'Test Role',
+            industry: 'tech',
+            sparkUrlSlug
         };
     };
 
@@ -63,7 +73,7 @@ export function ConsultantSignUpForm({
                 return;
             }
 
-            const result = await signUpConsultant(testData);
+            const result = await signUpClient(testData);
             if (!result.success) {
                 throw new Error(result.error);
             }
@@ -72,13 +82,15 @@ export function ConsultantSignUpForm({
             setFormData({
                 firstName: '',
                 lastName: '',
-                linkedin: '',
-                email: ''
+                company: '',
+                email: '',
+                companyRole: '',
+                industry: ''
             });
 
             // Navigate to email confirmation page instead of showing notification
             router.push('/auth/email-confirmation');
-            onSuccess?.();
+            onSuccess?.({ sparkUrlSlug: undefined });
         } catch (error: any) {
             logger.error('Error submitting test form:', error);
             let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
@@ -98,10 +110,12 @@ export function ConsultantSignUpForm({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (loading) return;
         setLoading(true);
+
         try {
             // Add validation before submission
-            if (!formData.email || !formData.firstName || !formData.lastName) {
+            if (!formData.email || !formData.firstName || !formData.lastName || !formData.company || !formData.companyRole || !formData.industry) {
                 throw new Error('Veuillez remplir tous les champs obligatoires.');
             }
 
@@ -119,16 +133,23 @@ export function ConsultantSignUpForm({
                 return;
             }
 
-            const result = await signUpConsultant(formData);
+            const result = await signUpClient(formData);
             if (!result.success) {
                 throw new Error(result.error);
             }
 
-            setFormData({ firstName: '', lastName: '', linkedin: '', email: '' });
-            
+            setFormData({
+                firstName: '',
+                lastName: '',
+                company: '',
+                email: '',
+                companyRole: '',
+                industry: ''
+            });
+
             // Navigate to email confirmation page instead of showing notification
             router.push('/auth/email-confirmation');
-            onSuccess?.();
+            onSuccess?.({ sparkUrlSlug: undefined });
         } catch (error: any) {
             logger.error('Error submitting form:', error);
             let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
@@ -146,7 +167,7 @@ export function ConsultantSignUpForm({
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
@@ -157,7 +178,7 @@ export function ConsultantSignUpForm({
         <form onSubmit={handleSubmit} className={`space-y-6 ${className}`}>
             <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
                         Prénom
                     </label>
                     <input
@@ -171,7 +192,7 @@ export function ConsultantSignUpForm({
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
                         Nom
                     </label>
                     <input
@@ -185,8 +206,24 @@ export function ConsultantSignUpForm({
                     />
                 </div>
             </div>
+
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
+                    Entreprise
+                </label>
+                <input
+                    type="text"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Nom de votre entreprise"
+                />
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
                     Email professionnel
                 </label>
                 <input
@@ -199,19 +236,44 @@ export function ConsultantSignUpForm({
                     placeholder="vous@entreprise.com"
                 />
             </div>
+
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                    LinkedIn (optionnel)
+                <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
+                    Fonction
                 </label>
                 <input
-                    type="url"
-                    name="linkedin"
-                    value={formData.linkedin}
+                    type="text"
+                    name="companyRole"
+                    value={formData.companyRole}
                     onChange={handleChange}
-                    placeholder="https://linkedin.com/in/votre-profil"
+                    required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Votre fonction dans l'entreprise"
                 />
             </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
+                    Secteur d'activité
+                </label>
+                <select
+                    name="industry"
+                    value={formData.industry}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                    <option value="">Sélectionnez votre secteur</option>
+                    <option value="tech">Technologies</option>
+                    <option value="finance">Finance</option>
+                    <option value="retail">Commerce & Distribution</option>
+                    <option value="manufacturing">Industrie</option>
+                    <option value="services">Services</option>
+                    <option value="healthcare">Santé</option>
+                    <option value="other">Autre</option>
+                </select>
+            </div>
+
             <div className="flex flex-col gap-4">
                 <button
                     type="submit"
@@ -242,9 +304,6 @@ export function ConsultantSignUpForm({
                     </button>
                 )}
             </div>
-            <p className="text-center text-sm text-gray-500">
-                En créant votre profil, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
-            </p>
         </form>
     );
 } 

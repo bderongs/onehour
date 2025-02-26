@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { checkEmailExistsAction } from '@/app/auth/actions';
+import { checkEmailExistsAction } from '@/app/(public)/auth/actions';
 import { useNotification } from '@/contexts/NotificationContext';
 
 interface EmailCheckFormProps {

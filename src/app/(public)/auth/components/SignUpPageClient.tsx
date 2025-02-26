@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ClientSignUpForm } from '@/components/ClientSignUpForm';
-import { ConsultantSignUpForm } from '@/components/ConsultantSignUpForm';
+import { ClientSignUpForm } from './ClientSignUpForm';
+import { ConsultantSignUpForm } from './ConsultantSignUpForm';
 import { useClientSignUp } from '@/contexts/ClientSignUpContext';
-import { UserTypeSelector } from '@/components/UserTypeSelector';
+import { UserTypeSelector } from './UserTypeSelector';
 import { type UserType } from '@/types/auth';
 
 interface SignUpPageClientProps {

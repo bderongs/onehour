@@ -4,7 +4,7 @@ import type { Spark } from '../types/spark';
 import type { ConsultantMission } from '../types/consultant';
 import { generateSlug } from '@/utils/url/shared';
 import { ensureUniqueSlug as ensureUniqueSlugServer } from '@/utils/url/server';
-import { deleteUserAction } from '@/app/auth/actions';
+import { deleteUserAction } from '@/app/(public)/auth/actions';
 import logger from '@/utils/logger';
 
 // Transform database response to ConsultantProfile
