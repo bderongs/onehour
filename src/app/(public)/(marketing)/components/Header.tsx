@@ -193,13 +193,6 @@ export function Header() {
             )}
 
             <div className="flex items-center space-x-4">
-              {/* Debug info */}
-              {process.env.NODE_ENV === 'development' && (
-                <span className="text-xs text-gray-500">
-                  {authLoading ? 'Loading...' : (user ? 'User: Yes' : 'User: No')}
-                </span>
-              )}
-              
               {/* Auth buttons - show when not on auth page and no user is detected */}
               {shouldShowAuthButtons && (
                 <>
@@ -229,13 +222,6 @@ export function Header() {
 
           {/* Mobile menu button */}
           <div className="flex items-center md:hidden">
-            {/* Debug info */}
-            {process.env.NODE_ENV === 'development' && (
-              <span className="text-xs text-gray-500 mr-2">
-                {authLoading ? 'Loading...' : (user ? 'User: Yes' : 'User: No')}
-              </span>
-            )}
-            
             {/* Auth buttons - show when not on auth page and no user is detected */}
             {shouldShowAuthButtons && (
               <div className="flex items-center space-x-2 mr-2">
