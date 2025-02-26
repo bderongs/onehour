@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { SparksGrid } from '@/app/(public)/(marketing)/components/SparksGrid';
+import { SparksGridServer } from '@/app/(public)/(marketing)/components/SparksGridServer';
 import type { Spark } from '@/types/spark';
 import logger from '@/utils/logger';
 
@@ -40,7 +40,7 @@ export const SparksGridSection = React.memo(function SparksGridSection({
                 </p>
             </div>
 
-            <SparksGrid
+            <SparksGridServer
                 sparks={filteredSparks}
                 expandedCallIndex={expandedCallIndex}
                 setExpandedCallIndex={setExpandedCallIndex}

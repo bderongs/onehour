@@ -1,4 +1,14 @@
-import { useMemo, useEffect } from 'react';
+'use client';
+
+/**
+ * SparksGrid Component (Client Component)
+ * 
+ * This component displays a grid of Spark cards with expandable details.
+ * It receives pre-generated availability dates from a server component to ensure
+ * consistent rendering and prevent hydration mismatches.
+ */
+
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight, CheckCircle, Plus } from 'lucide-react';
 import { Spark } from '@/types/spark';
@@ -7,44 +17,6 @@ import { formatDuration, formatPrice } from '@/utils/format';
 import { useRouter } from 'next/navigation';
 import logger from '@/utils/logger';
 import React from 'react';
-
-// Utility function to get next available business date
-const getNextBusinessDate = () => {
-    const date = new Date();
-    const randomDays = Math.floor(Math.random() * 2) + 1; // 1 or 2 days
-    
-    for (let i = 0; i < randomDays;) {
-        date.setDate(date.getDate() + 1);
-        // Skip weekends (0 is Sunday, 6 is Saturday)
-        if (date.getDay() !== 0 && date.getDay() !== 6) {
-            i++;
-        }
-    }
-
-    // Generate random time
-    // First decide morning (9-12) or afternoon (13-18)
-    const isMorning = Math.random() < 0.5;
-    let hours;
-    if (isMorning) {
-        hours = Math.floor(Math.random() * (12 - 9 + 1)) + 9; // 9 to 12
-    } else {
-        hours = Math.floor(Math.random() * (18 - 13 + 1)) + 13; // 13 to 18
-    }
-    
-    // Generate random minutes (0, 15, 30, 45)
-    const minutes = Math.floor(Math.random() * 4) * 15;
-    
-    date.setHours(hours, minutes, 0);
-    
-    // Format the date in French
-    return date.toLocaleDateString('fr-FR', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        hour: 'numeric',
-        minute: '2-digit'
-    });
-};
 
 interface SparksGridProps {
     sparks: Spark[];
@@ -56,6 +28,8 @@ interface SparksGridProps {
     showCreateCard?: boolean;
     showDetailsButton?: boolean;
     onDetailsClick?: (spark: Spark) => void;
+    // Pre-generated dates from server component
+    availableDates: string[];
 }
 
 const fadeInUp = {
@@ -73,7 +47,8 @@ export const SparksGrid = React.memo(function SparksGrid({
     showAvailability = true,
     showCreateCard = false,
     showDetailsButton = false,
-    onDetailsClick
+    onDetailsClick,
+    availableDates
 }: SparksGridProps) {
     const router = useRouter();
     
@@ -86,11 +61,6 @@ export const SparksGrid = React.memo(function SparksGrid({
             showCreateCard
         });
     }, [sparks.length, expandedCallIndex, showAvailability, showCreateCard]);
-
-    // Memoize the dates for each card
-    const availableDates = useMemo(() => {
-        return sparks.map(() => getNextBusinessDate());
-    }, [sparks.length]);
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto px-4 sm:px-0">

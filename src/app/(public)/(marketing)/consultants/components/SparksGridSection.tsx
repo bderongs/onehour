@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { SparksGrid } from '@/app/(public)/(marketing)/components/SparksGrid';
+import { SparksGridServer } from '@/app/(public)/(marketing)/components/SparksGridServer';
 import type { Spark } from '@/types/spark';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import logger from '@/utils/logger';
@@ -63,7 +63,7 @@ export const SparksGridSection: React.FC<SparksGridSectionProps> = React.memo(({
                 </p>
             </div>
 
-            <SparksGrid
+            <SparksGridServer
                 sparks={filteredSparks}
                 expandedCallIndex={expandedCallIndex}
                 setExpandedCallIndex={setExpandedCallIndex}
