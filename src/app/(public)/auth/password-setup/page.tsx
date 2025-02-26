@@ -78,10 +78,16 @@ export default function PasswordSetupPage() {
                 password: password
             });
 
-            if (signInError) throw signInError;
-            if (!signInData.user) throw new Error('Utilisateur non trouvé');
+            if (signInError) {
+                logger.error('Error signing in with new password:', signInError);
+                throw signInError;
+            }
+            if (!signInData.user) {
+                logger.error('No user returned after sign in');
+                throw new Error('Utilisateur non trouvé');
+            }
 
-            logger.info('Successfully signed in, waiting for session');
+            logger.info('Successfully signed in, waiting for session', { userId: signInData.user.id });
             // Wait for session to be established with a more robust approach
             let session = null;
             let retries = 0;
@@ -91,15 +97,16 @@ export default function PasswordSetupPage() {
                 const { data: { session: currentSession } } = await createBrowserClient().auth.getSession();
                 if (currentSession) {
                     session = currentSession;
-                    logger.info('Session established');
+                    logger.info('Session established', { userId: session.user.id });
                     break;
                 }
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 retries++;
-                logger.info(`Retry ${retries} for session establishment`);
+                logger.info(`Retry ${retries}/${maxRetries} for session establishment`);
             }
 
             if (!session) {
+                logger.error('Failed to establish session after maximum retries');
                 throw new Error('Session non établie après plusieurs tentatives');
             }
 
@@ -122,7 +129,7 @@ export default function PasswordSetupPage() {
                 const decodedNext = decodeURIComponent(next);
                 
                 // Wait a moment for the session to be fully established
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(resolve => setTimeout(resolve, 1500));
 
                 try {
                     // Double check that we're still authenticated
@@ -133,8 +140,7 @@ export default function PasswordSetupPage() {
                     }
 
                     logger.info('Starting redirection to', { url: decodedNext });
-                    await router.replace(decodedNext);
-                    logger.info('Redirection completed');
+                    window.location.href = decodedNext;
                     return;
                 } catch (error) {
                     logger.error('Error during redirection:', error);
@@ -143,6 +149,9 @@ export default function PasswordSetupPage() {
             }
 
             // Fallback to role-based redirection if no next URL
+            // Wait a moment for the session to be fully established
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
             const { data: profile } = await createBrowserClient()
                 .from('profiles')
                 .select('roles')
@@ -153,12 +162,13 @@ export default function PasswordSetupPage() {
             logger.info('Found user profile', { roles: profile.roles });
 
             if (profile.roles.includes('consultant') || profile.roles.includes('admin')) {
-                logger.info('Redirecting consultant/admin to sparks/manage');
-                router.push('/sparks/manage');
+                logger.info('Redirecting consultant/admin to sparks/manage', { roles: profile.roles });
+                window.location.href = '/sparks/manage';
             } else if (profile.roles.includes('client')) {
-                logger.info('Redirecting client to dashboard');
-                router.push('/client/dashboard');
+                logger.info('Redirecting client to dashboard', { roles: profile.roles });
+                window.location.href = '/client/dashboard';
             } else {
+                logger.error('Unrecognized user role', { roles: profile.roles });
                 throw new Error('Rôle non reconnu');
             }
         } catch (err: any) {

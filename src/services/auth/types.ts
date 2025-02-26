@@ -13,7 +13,6 @@ export interface ClientSignUpData {
     lastName: string;
     company: string;
     companyRole: string;
-    industry: string;
     sparkUrlSlug?: string;
 }
 

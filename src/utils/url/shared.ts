@@ -15,9 +15,20 @@ export const generateSlug = (text: string): string => {
 // Get the site URL based on environment
 export const getSiteUrl = () => {
     const url = process.env.NEXT_PUBLIC_SITE_URL;
+    
     if (!url) {
-        throw new Error('NEXT_PUBLIC_SITE_URL environment variable is not defined');
+        const errorMessage = 'NEXT_PUBLIC_SITE_URL environment variable is not defined';
+        console.error(errorMessage);
+        
+        // Provide a fallback for development
+        if (process.env.NODE_ENV === 'development') {
+            console.warn('Using fallback URL for development: http://localhost:3000');
+            return 'http://localhost:3000';
+        }
+        
+        throw new Error(errorMessage);
     }
+    
     return url;
 };
 

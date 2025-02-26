@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ArrowRight, Beaker } from 'lucide-react';
 import type { ClientSignUpData } from '@/services/auth/types';
-import { signUpClient, checkEmail } from '@/app/(public)/auth/actions';
+import { signUpClient, checkEmail, testSupabaseConnection } from '@/app/(public)/auth/actions';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useRouter } from 'next/navigation';
 import logger from '@/utils/logger';
@@ -31,7 +31,6 @@ export function ClientSignUpForm({
         company: '',
         email: initialEmail,
         companyRole: '',
-        industry: '',
         sparkUrlSlug
     });
     const { showNotification } = useNotification();
@@ -46,7 +45,6 @@ export function ClientSignUpForm({
             company: '[TEST] Test Company',
             email: `matthieu+test${timestamp}@sparkier.io`,
             companyRole: 'Test Role',
-            industry: 'tech',
             sparkUrlSlug
         };
     };
@@ -56,13 +54,31 @@ export function ClientSignUpForm({
         if (loading) return;
         setLoading(true);
 
-        const testData = generateTestData();
-        
         try {
+            // First test the Supabase connection
+            logger.info('Testing Supabase connection before signup');
+            const connectionTest = await testSupabaseConnection();
+            if (!connectionTest.success) {
+                logger.error('Supabase connection test failed');
+                throw new Error('Unable to connect to the database. Please try again later.');
+            }
+            
+            const testData = generateTestData();
+            
+            // Validate form data before submission
+            if (!testData.email || !testData.firstName || !testData.lastName || 
+                !testData.company || !testData.companyRole) {
+                showNotification('error', 'Veuillez remplir tous les champs obligatoires.');
+                setLoading(false);
+                return;
+            }
+            
             // Check if email is already registered
+            logger.info('Checking if email exists:', testData.email);
             const emailCheck = await checkEmail(testData.email);
             if (!emailCheck.success) {
-                throw new Error(emailCheck.error);
+                logger.error('Error checking email:', emailCheck.error);
+                throw new Error(emailCheck.error || 'Erreur lors de la vérification de l\'email');
             }
             
             if (emailCheck.exists) {
@@ -73,36 +89,52 @@ export function ClientSignUpForm({
                 return;
             }
 
+            logger.info('Submitting client signup form');
             const result = await signUpClient(testData);
             if (!result.success) {
-                throw new Error(result.error);
+                logger.error('Error submitting client signup form:', result.error);
+                throw new Error(result.error || 'Échec de l\'inscription');
             }
             
+            logger.info('Client signup successful');
             // Clear form data after successful submission
             setFormData({
                 firstName: '',
                 lastName: '',
                 company: '',
                 email: '',
-                companyRole: '',
-                industry: ''
+                companyRole: ''
             });
-
-            // Navigate to email confirmation page instead of showing notification
-            router.push('/auth/email-confirmation');
-            onSuccess?.({ sparkUrlSlug: undefined });
-        } catch (error: any) {
-            logger.error('Error submitting test form:', error);
-            let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
             
-            if (error.message?.includes('timeout') || error.message?.includes('network')) {
-                errorMessage = 'Problème de connexion. Veuillez vérifier votre connexion internet et réessayer.';
-            } else if (error.message) {
-                errorMessage = error.message;
+            // Show success message
+            showNotification('success', 'Inscription réussie ! Veuillez vérifier votre email pour confirmer votre compte.');
+            
+            // Call onSuccess callback if provided
+            if (onSuccess) {
+                onSuccess({ sparkUrlSlug });
             }
-
+            
+        } catch (error) {
+            logger.error('Error submitting test form:', error);
+            
+            // Handle specific error messages
+            let errorMessage = 'Une erreur est survenue lors de l\'inscription';
+            
+            if (error instanceof Error) {
+                // Check for password-related errors
+                if (error.message.includes('Password')) {
+                    errorMessage = 'Erreur interne: Problème avec la génération du mot de passe temporaire. Veuillez réessayer.';
+                } else {
+                    errorMessage = error.message;
+                }
+            }
+            
             showNotification('error', errorMessage);
-            onError?.(error);
+            
+            // Call onError callback if provided
+            if (onError) {
+                onError(error);
+            }
         } finally {
             setLoading(false);
         }
@@ -114,15 +146,25 @@ export function ClientSignUpForm({
         setLoading(true);
 
         try {
+            // First test the Supabase connection
+            logger.info('Testing Supabase connection before signup');
+            const connectionTest = await testSupabaseConnection();
+            if (!connectionTest.success) {
+                logger.error('Supabase connection test failed');
+                throw new Error('Unable to connect to the database. Please try again later.');
+            }
+            
             // Add validation before submission
-            if (!formData.email || !formData.firstName || !formData.lastName || !formData.company || !formData.companyRole || !formData.industry) {
+            if (!formData.email || !formData.firstName || !formData.lastName || !formData.company || !formData.companyRole) {
                 throw new Error('Veuillez remplir tous les champs obligatoires.');
             }
 
             // Check if email is already registered
+            logger.info('Checking if email exists:', formData.email);
             const emailCheck = await checkEmail(formData.email);
             if (!emailCheck.success) {
-                throw new Error(emailCheck.error);
+                logger.error('Error checking email:', emailCheck.error);
+                throw new Error(emailCheck.error || 'Erreur lors de la vérification de l\'email');
             }
             
             if (emailCheck.exists) {
@@ -133,35 +175,48 @@ export function ClientSignUpForm({
                 return;
             }
 
+            logger.info('Submitting client signup form');
             const result = await signUpClient(formData);
             if (!result.success) {
-                throw new Error(result.error);
+                logger.error('Error submitting client signup form:', result.error);
+                throw new Error(result.error || 'Échec de l\'inscription');
             }
 
+            logger.info('Client signup successful');
             setFormData({
                 firstName: '',
                 lastName: '',
                 company: '',
                 email: '',
-                companyRole: '',
-                industry: ''
+                companyRole: ''
             });
 
-            // Navigate to email confirmation page instead of showing notification
+            // Navigate to email confirmation page
             router.push('/auth/email-confirmation');
-            onSuccess?.({ sparkUrlSlug: undefined });
-        } catch (error: any) {
+            if (onSuccess) {
+                onSuccess({ sparkUrlSlug: undefined });
+            }
+        } catch (error) {
             logger.error('Error submitting form:', error);
+            
+            // Handle specific error messages
             let errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
             
-            if (error.message?.includes('timeout') || error.message?.includes('network')) {
-                errorMessage = 'Problème de connexion. Veuillez vérifier votre connexion internet et réessayer.';
-            } else if (error.message) {
-                errorMessage = error.message;
+            if (error instanceof Error) {
+                // Check for specific error types
+                if (error.message.includes('Password')) {
+                    errorMessage = 'Erreur interne: Problème avec la génération du mot de passe temporaire. Veuillez réessayer.';
+                } else if (error.message.includes('timeout') || error.message.includes('network')) {
+                    errorMessage = 'Problème de connexion. Veuillez vérifier votre connexion internet et réessayer.';
+                } else {
+                    errorMessage = error.message;
+                }
             }
 
             showNotification('error', errorMessage);
-            onError?.(error);
+            if (onError) {
+                onError(error);
+            }
         } finally {
             setLoading(false);
         }
@@ -250,28 +305,6 @@ export function ClientSignUpForm({
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Votre fonction dans l'entreprise"
                 />
-            </div>
-
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 text-left">
-                    Secteur d'activité
-                </label>
-                <select
-                    name="industry"
-                    value={formData.industry}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                    <option value="">Sélectionnez votre secteur</option>
-                    <option value="tech">Technologies</option>
-                    <option value="finance">Finance</option>
-                    <option value="retail">Commerce & Distribution</option>
-                    <option value="manufacturing">Industrie</option>
-                    <option value="services">Services</option>
-                    <option value="healthcare">Santé</option>
-                    <option value="other">Autre</option>
-                </select>
             </div>
 
             <div className="flex flex-col gap-4">
