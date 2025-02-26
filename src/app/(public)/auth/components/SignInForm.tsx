@@ -8,7 +8,7 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import logger from '@/utils/logger';
-import { getCurrentUser } from '@/services/auth';
+import { getCurrentUser } from '@/services/auth/client';
 
 export default function SignInForm() {
     const [email, setEmail] = useState('');
@@ -50,19 +50,42 @@ export default function SignInForm() {
                 throw new Error('Session non établie après la connexion');
             }
 
+            logger.info('Session established, refreshing user data...');
             await refreshUser();
             
+            logger.info('User data refreshed, preparing for redirect...');
             const returnUrl = searchParams?.get('returnUrl');
+            
             if (returnUrl) {
-                window.location.href = returnUrl;
+                logger.info(`Redirecting to return URL: ${returnUrl}`);
+                router.push(returnUrl);
             } else {
-                const currentUser = await getCurrentUser();
-                if (currentUser?.roles.includes('admin')) {
-                    window.location.href = '/admin/dashboard';
-                } else if (currentUser?.roles.includes('consultant')) {
-                    window.location.href = '/sparks/manage';
-                } else if (currentUser?.roles.includes('client')) {
-                    window.location.href = '/client/dashboard';
+                try {
+                    const currentUser = await getCurrentUser();
+                    logger.info('Current user retrieved for role-based redirect:', currentUser);
+                    
+                    if (!currentUser) {
+                        logger.error('User data not available after refresh');
+                        throw new Error('Données utilisateur non disponibles');
+                    }
+                    
+                    if (currentUser.roles.includes('admin')) {
+                        logger.info('Redirecting admin user to dashboard');
+                        router.push('/admin/dashboard');
+                    } else if (currentUser.roles.includes('consultant')) {
+                        logger.info('Redirecting consultant user to sparks management');
+                        router.push('/sparks/manage');
+                    } else if (currentUser.roles.includes('client')) {
+                        logger.info('Redirecting client user to dashboard');
+                        router.push('/client/dashboard');
+                    } else {
+                        logger.warn('User has no recognized role, redirecting to default page');
+                        router.push('/');
+                    }
+                } catch (redirectError) {
+                    logger.error('Error during role-based redirect:', redirectError);
+                    // Fallback to home page if role-based redirect fails
+                    router.push('/');
                 }
             }
         } catch (error: any) {

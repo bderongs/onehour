@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
 
                     <div className="text-center">
                         <Link
-                            href="/signin"
+                            href="/auth/signin"
                             className="font-medium text-blue-600 hover:text-blue-500"
                         >
                             Retour à la connexion

@@ -33,7 +33,7 @@ export function SparkActionButton({ pageContext, sparkUrl, className = '', isMob
                 if (!isAuthenticated) {
                     logger.info('User not authenticated, redirecting to signup', { sparkUrl });
                     setSparkUrlSlug(sparkUrl || null);
-                    router.push('/spark-signup');
+                    router.push('/auth/spark-signup');
                 } else {
                     if (!sparkUrl || !user) return;
                     logger.info('Creating client request for authenticated user', { sparkUrl });

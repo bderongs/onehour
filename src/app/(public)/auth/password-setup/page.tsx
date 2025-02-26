@@ -23,7 +23,7 @@ export default function PasswordSetupPage() {
         const token = params?.get('token');
         if (!token) {
             logger.error('No token found in URL, redirecting to signin');
-            router.push('/signin');
+            router.push('/auth/signin');
             return;
         }
 
@@ -32,7 +32,7 @@ export default function PasswordSetupPage() {
             const { data: { user } } = await createBrowserClient().auth.getUser();
             if (!user?.email) {
                 logger.error('No user email found, redirecting to signin');
-                router.push('/signin');
+                router.push('/auth/signin');
                 return;
             }
             logger.info('Found user email for password setup', { email: user.email });

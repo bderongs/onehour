@@ -15,7 +15,7 @@ export function Header() {
   const isConsultantPage = pathname === '/consultants';
   const isPricingPage = pathname === '/pricing';
   const isLandingClientsPage = pathname === '/';
-  const isAuthPage = pathname === '/signin' || pathname === '/signup';
+  const isAuthPage = pathname === '/auth/signin' || pathname === '/auth/signup';
 
   const navigation = [
     { name: 'Le Spark', href: '#spark' },
@@ -163,7 +163,7 @@ export function Header() {
                   ) : !isAuthPage && (
                     <>
                       <Link
-                        href="/signin"
+                        href="/auth/signin"
                         className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                       >
                         Se connecter
@@ -248,7 +248,7 @@ export function Header() {
               {!user && !isAuthPage && (
                 <div className="pt-2 space-y-1 border-t border-gray-200">
                   <Link
-                    href="/signin"
+                    href="/auth/signin"
                     className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   >
                     Se connecter

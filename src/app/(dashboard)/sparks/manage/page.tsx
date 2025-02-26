@@ -19,7 +19,7 @@ export default async function SparkManagementPage() {
     const user = await getCurrentUser();
 
     if (!user) {
-        redirect('/signin');
+        redirect('/auth/signin');
     }
 
     // Only allow consultants and admins to access this page

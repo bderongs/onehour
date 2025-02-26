@@ -64,7 +64,7 @@ export function SignUpPageClient({ sparkUrlSlug }: SignUpPageClientProps) {
             <p className="text-center text-sm text-gray-600">
                 Vous avez déjà un compte ?{' '}
                 <Link
-                    href="/signin"
+                    href="/auth/signin"
                     className="font-medium text-blue-600 hover:text-blue-500"
                 >
                     Se connecter

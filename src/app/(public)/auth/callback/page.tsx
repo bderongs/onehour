@@ -18,7 +18,7 @@ export default function AuthCallback() {
         const handleEmailConfirmation = async () => {
             if (!params) {
                 logger.error('No search params available');
-                router.push('/signin');
+                router.push('/auth/signin');
                 return;
             }
 
@@ -41,7 +41,7 @@ export default function AuthCallback() {
                 // If no parameters and no session, redirect to sign in
                 if (!tokenHash || !type) {
                     logger.info('No auth parameters found, redirecting to sign in');
-                    router.push('/signin');
+                    router.push('/auth/signin');
                     return;
                 }
 
@@ -93,7 +93,7 @@ export default function AuthCallback() {
                     <h1 className="text-2xl font-bold text-gray-900 mb-4">Erreur</h1>
                     <p className="text-red-600 mb-6">{error}</p>
                     <button
-                        onClick={() => router.push('/signin')}
+                        onClick={() => router.push('/auth/signin')}
                         className="w-full bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition-colors"
                     >
                         Retour à la connexion

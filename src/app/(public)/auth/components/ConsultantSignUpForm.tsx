@@ -59,7 +59,7 @@ export function ConsultantSignUpForm({
                 // Show notification before redirect
                 showNotification('success', 'Un compte existe déjà avec cet email. Vous allez être redirigé vers la page de connexion.');
                 // Redirect to signin page with email parameter
-                router.push(`/signin?email=${encodeURIComponent(testData.email)}`);
+                router.push(`/auth/signin?email=${encodeURIComponent(testData.email)}`);
                 return;
             }
 
@@ -115,7 +115,7 @@ export function ConsultantSignUpForm({
                 // Show notification before redirect
                 showNotification('success', 'Un compte existe déjà avec cet email. Vous allez être redirigé vers la page de connexion.');
                 // Redirect to signin page with email parameter
-                router.push(`/signin?email=${encodeURIComponent(formData.email)}`);
+                router.push(`/auth/signin?email=${encodeURIComponent(formData.email)}`);
                 return;
             }
 

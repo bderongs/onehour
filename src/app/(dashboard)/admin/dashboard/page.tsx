@@ -26,7 +26,7 @@ export default function AdminDashboard() {
                 
                 if (!user) {
                     logger.info('No session found, redirecting to signin');
-                    router.push('/signin');
+                    router.push('/auth/signin');
                     return;
                 }
 

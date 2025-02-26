@@ -45,7 +45,7 @@ export async function middleware(request: NextRequest) {
         path: request.nextUrl.pathname,
       });
 
-      const signinUrl = new URL('/signin', request.url);
+      const signinUrl = new URL('/auth/signin', request.url);
       signinUrl.searchParams.set('returnUrl', request.nextUrl.pathname);
       
       return NextResponse.redirect(signinUrl);

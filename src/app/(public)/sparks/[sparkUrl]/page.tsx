@@ -91,7 +91,7 @@ export default function SparkProductPage() {
                     logger.info('User not authenticated, redirecting to signup', { sparkUrl });
                     // Store sparkUrlSlug in context and redirect to dedicated signup page
                     setSparkUrlSlug(sparkUrl || null);
-                    router.push('/spark-signup');
+                    router.push('/auth/spark-signup');
                 } else {
                     // If authenticated, create a client request directly
                     if (!sparkUrl || !user) return;
