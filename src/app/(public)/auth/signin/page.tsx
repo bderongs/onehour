@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import SignInForm from '../components/SignInForm';
 import SignInFormSkeleton from '../components/SignInFormSkeleton';
-import AuthRedirect from '../components/AuthRedirect';
 
 export const metadata: Metadata = {
     title: 'Connexion | Sparkier',
@@ -17,7 +16,6 @@ export const metadata: Metadata = {
 export default function SignInPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center px-4">
-            <AuthRedirect />
             <div className="max-w-md w-full">
                 <div className="text-center mb-8">
                     <h2 className="text-3xl font-bold text-gray-900">

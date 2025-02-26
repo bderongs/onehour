@@ -1,19 +1,30 @@
+/**
+ * SignInForm.tsx
+ * 
+ * This component handles user authentication through email and password.
+ * It provides a form for users to enter their credentials and manages the sign-in process,
+ * including error handling and redirection based on user roles.
+ */
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, Loader2 } from 'lucide-react';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import logger from '@/utils/logger';
 import { getCurrentUser, signOut } from '@/services/auth/client';
 
+// Define authentication stages for better UI state management
+type AuthStage = 'idle' | 'authenticating' | 'redirecting';
+
 export default function SignInForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [authStage, setAuthStage] = useState<AuthStage>('idle');
     const router = useRouter();
     const searchParams = useSearchParams();
     const { refreshUser } = useAuth();
@@ -23,10 +34,10 @@ export default function SignInForm() {
     useEffect(() => {
         let timeoutId: NodeJS.Timeout | null = null;
         
-        if (loading) {
+        if (authStage !== 'idle') {
             timeoutId = setTimeout(() => {
                 logger.error('Sign-in process timed out after 15 seconds');
-                setLoading(false);
+                setAuthStage('idle');
                 showNotification('error', 'La connexion a pris trop de temps. Veuillez réessayer.');
             }, 15000); // 15 seconds timeout
         }
@@ -34,7 +45,7 @@ export default function SignInForm() {
         return () => {
             if (timeoutId) clearTimeout(timeoutId);
         };
-    }, [loading, showNotification]);
+    }, [authStage, showNotification]);
 
     // Check if user is already signed in and sign them out on component mount
     useEffect(() => {
@@ -60,9 +71,9 @@ export default function SignInForm() {
         // Prevent default form submission which would expose credentials in URL
         e.preventDefault();
         
-        if (loading) return;
+        if (authStage !== 'idle') return;
         
-        setLoading(true);
+        setAuthStage('authenticating');
         logger.info('Starting sign-in process...');
 
         try {
@@ -103,6 +114,9 @@ export default function SignInForm() {
             }
 
             logger.info('Sign-in successful, user ID:', signInData.user.id);
+            
+            // Update state to show we're now redirecting
+            setAuthStage('redirecting');
             
             // Use window.location.href for redirection to ensure a full page reload
             const returnUrl = searchParams?.get('returnUrl');
@@ -159,8 +173,19 @@ export default function SignInForm() {
         } catch (error: any) {
             logger.error('Error during sign-in:', error);
             showNotification('error', error.message || 'Une erreur est survenue lors de la connexion');
-        } finally {
-            setLoading(false);
+            setAuthStage('idle');
+        }
+    };
+
+    // Get button text based on current auth stage
+    const getButtonText = () => {
+        switch (authStage) {
+            case 'authenticating':
+                return 'Connexion en cours...';
+            case 'redirecting':
+                return 'Redirection...';
+            default:
+                return 'Se connecter';
         }
     };
 
@@ -189,6 +214,7 @@ export default function SignInForm() {
                         onChange={(e) => setEmail(e.target.value)}
                         className="block w-full pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         placeholder="vous@example.com"
+                        disabled={authStage !== 'idle'}
                     />
                 </div>
             </div>
@@ -210,6 +236,7 @@ export default function SignInForm() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="block w-full pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        disabled={authStage !== 'idle'}
                     />
                 </div>
             </div>
@@ -228,12 +255,15 @@ export default function SignInForm() {
             <div>
                 <button
                     type="submit"
-                    disabled={loading}
+                    disabled={authStage !== 'idle'}
                     className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                        loading ? 'opacity-50 cursor-not-allowed' : ''
+                        authStage !== 'idle' ? 'opacity-80 cursor-not-allowed' : ''
                     }`}
                 >
-                    {loading ? 'Connexion...' : 'Se connecter'}
+                    {authStage !== 'idle' && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    {getButtonText()}
                 </button>
             </div>
         </form>
