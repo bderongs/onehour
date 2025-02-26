@@ -298,7 +298,7 @@ const ConsultantRow = ({
                                                             <Edit className="h-5 w-5" />
                                                         </button>
                                                         <a
-                                                            href={`/sparks/product/${spark.url}`}
+                                                            href={`/sparks/view/${spark.url}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors"

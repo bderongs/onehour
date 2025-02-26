@@ -44,7 +44,7 @@ export const RequestRow = ({ request }: RequestRowProps) => {
 
     const handleSparkClick = (e: React.MouseEvent) => {
         e.stopPropagation()
-        router.push(`/sparks/product/${request.sparkId}`)
+        router.push(`/sparks/view/${request.sparkId}`)
     }
 
     return (

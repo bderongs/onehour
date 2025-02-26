@@ -114,7 +114,7 @@ export default function Page() {
     }
 
     const handlePreviewSpark = (sparkUrl: string) => {
-        router.push(`/sparks/product/${sparkUrl}`)
+        router.push(`/sparks/view/${sparkUrl}`)
     }
 
     const handleDeleteSpark = async (sparkUrl: string) => {

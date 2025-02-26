@@ -1,3 +1,7 @@
+/**
+ * This client component displays an accordion of frequently asked questions
+ * It allows users to expand/collapse individual FAQ items
+ */
 'use client'
 
 import { useState } from 'react';

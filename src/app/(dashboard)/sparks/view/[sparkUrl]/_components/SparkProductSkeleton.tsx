@@ -1,3 +1,7 @@
+/**
+ * This component displays a loading skeleton for the Spark product page
+ * It shows placeholder UI elements while the actual content is being loaded
+ */
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function SparkProductSkeleton() {

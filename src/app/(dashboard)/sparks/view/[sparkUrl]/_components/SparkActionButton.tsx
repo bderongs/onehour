@@ -1,3 +1,7 @@
+/**
+ * This client component handles the action button on the Spark product page
+ * It manages different actions based on the page context (marketing, purchase, preview)
+ */
 'use client'
 
 import { useRouter } from 'next/navigation';

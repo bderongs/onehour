@@ -1,3 +1,9 @@
+/**
+ * This component displays the detailed content of a Spark product
+ * It renders sections like description, methodology, deliverables, etc.
+ */
+'use client'
+
 import { CheckCircle, Users, Target, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { Spark } from '@/types/spark';
