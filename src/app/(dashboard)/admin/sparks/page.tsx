@@ -102,7 +102,7 @@ export default function Page() {
     }, [router, user])
 
     const handleCreateSpark = () => {
-        router.push('/sparks/create')
+        router.push('/sparks/ai-create')
     }
 
     const handleEditSpark = (sparkUrl: string) => {
@@ -110,7 +110,7 @@ export default function Page() {
     }
 
     const handleAIEditSpark = (sparkUrl: string) => {
-        router.push(`/sparks/ai/${sparkUrl}`)
+        router.push(`/sparks/ai-edit/${sparkUrl}`)
     }
 
     const handlePreviewSpark = (sparkUrl: string) => {

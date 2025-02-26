@@ -202,6 +202,7 @@ export default function SparkAIEditor({ mode, initialSpark, sparkUrl, pageTitle 
                                     onMessagesUpdate={handleMessagesUpdate}
                                     shouldReset={isSaving}
                                     onConnect={handleSave}
+                                    hideSummary={true}
                                 />
                             </div>
                         </div>
