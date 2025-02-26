@@ -38,9 +38,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const initialize = async () => {
             try {
                 const supabase = createBrowserClient();
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
                 
-                if (session) {
+                if (userError) {
+                    logger.error('Error getting user:', userError);
+                    if (mounted) {
+                        setUser(null);
+                        setLoading(false);
+                    }
+                    return;
+                }
+                
+                if (user) {
                     await refreshUser();
                 } else {
                     if (mounted) {

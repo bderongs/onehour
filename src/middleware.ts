@@ -13,18 +13,18 @@ export async function middleware(request: NextRequest) {
 
     // Try to get the session
     const {
-      data: { session },
-      error: sessionError
-    } = await supabase.auth.getSession();
+      data: { user },
+      error: userError
+    } = await supabase.auth.getUser();
 
-    if (sessionError) {
-      logger.error('Middleware: Error getting session:', sessionError);
+    if (userError) {
+      logger.error('Middleware: Error getting user:', userError);
     }
 
     logger.info('Middleware: Session check result', { 
       path: request.nextUrl.pathname,
-      hasSession: !!session,
-      userId: session?.user?.id
+      hasSession: !!user,
+      userId: user?.id
     });
 
     // Protected routes patterns
@@ -40,8 +40,8 @@ export async function middleware(request: NextRequest) {
       pattern.test(request.nextUrl.pathname)
     );
 
-    if (isProtectedRoute && !session) {
-      logger.info('Middleware: Protected route accessed without session, redirecting to signin', {
+    if (isProtectedRoute && !user) {
+      logger.info('Middleware: Protected route accessed without authenticated user, redirecting to signin', {
         path: request.nextUrl.pathname,
       });
 

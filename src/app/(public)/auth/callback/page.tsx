@@ -25,9 +25,14 @@ export default function AuthCallback() {
             try {
                 // First check if we already have a valid session
                 const supabase = createBrowserClient();
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session?.user) {
-                    logger.info('Valid session found, skipping confirmation flow');
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
+                
+                if (userError) {
+                    logger.error('Error getting user:', userError);
+                }
+                
+                if (user) {
+                    logger.info('Valid user found, skipping confirmation flow');
                     router.push('/');
                     return;
                 }

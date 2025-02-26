@@ -87,27 +87,42 @@ export default function PasswordSetupPage() {
                 throw new Error('Utilisateur non trouvé');
             }
 
-            logger.info('Successfully signed in, waiting for session', { userId: signInData.user.id });
+            logger.info('Successfully signed in, waiting for session');
             // Wait for session to be established with a more robust approach
-            let session = null;
+            let user = null;
             let retries = 0;
             const maxRetries = 5;
             
-            while (!session && retries < maxRetries) {
-                const { data: { session: currentSession } } = await createBrowserClient().auth.getSession();
-                if (currentSession) {
-                    session = currentSession;
-                    logger.info('Session established', { userId: session.user.id });
+            while (!user && retries < maxRetries) {
+                const { data: { user: currentUser }, error: userError } = await createBrowserClient().auth.getUser();
+                if (userError) {
+                    logger.error('Error getting user:', userError);
+                }
+                
+                if (currentUser) {
+                    user = currentUser;
+                    logger.info('User authenticated', { userId: user.id });
                     break;
                 }
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 retries++;
-                logger.info(`Retry ${retries}/${maxRetries} for session establishment`);
+                logger.info(`Retry ${retries}/${maxRetries} for user authentication`);
             }
 
-            if (!session) {
-                logger.error('Failed to establish session after maximum retries');
-                throw new Error('Session non établie après plusieurs tentatives');
+            if (!user) {
+                logger.error('Failed to authenticate user after maximum retries');
+                throw new Error('Authentification échouée après plusieurs tentatives');
+            }
+
+            // Double check that we're still authenticated
+            const { data: { user: finalUser }, error: finalUserError } = await createBrowserClient().auth.getUser();
+            if (finalUserError) {
+                logger.error('Error getting final user state:', finalUserError);
+            }
+            
+            if (!finalUser) {
+                logger.error('User not authenticated after password setup');
+                throw new Error('Authentification perdue après la configuration du mot de passe');
             }
 
             // Refresh the session to ensure we have the latest data
@@ -116,11 +131,7 @@ export default function PasswordSetupPage() {
                 logger.error('Error refreshing session:', refreshError);
                 throw refreshError;
             }
-            if (refreshData.session) {
-                session = refreshData.session;
-                logger.info('Session refreshed successfully');
-            }
-
+            
             showNotification('success', 'Votre mot de passe a été configuré avec succès.');
 
             // If we have a next URL, use it for redirection
@@ -132,13 +143,6 @@ export default function PasswordSetupPage() {
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
                 try {
-                    // Double check that we're still authenticated
-                    const { data: { session: finalSession } } = await createBrowserClient().auth.getSession();
-                    if (!finalSession) {
-                        logger.error('Session lost after password setup');
-                        throw new Error('Session perdue après la configuration du mot de passe');
-                    }
-
                     logger.info('Starting redirection to', { url: decodedNext });
                     window.location.href = decodedNext;
                     return;
@@ -155,7 +159,7 @@ export default function PasswordSetupPage() {
             const { data: profile } = await createBrowserClient()
                 .from('profiles')
                 .select('roles')
-                .eq('id', session.user.id)
+                .eq('id', user.id)
                 .single();
 
             if (!profile) throw new Error('Profil non trouvé');
