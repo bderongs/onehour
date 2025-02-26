@@ -18,8 +18,10 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps) {
-    // Await params to ensure they're fully resolved
-    const sparkUrl = await Promise.resolve(params.sparkUrl);
+    // Await the entire params object
+    params = await params;
+    const sparkUrl = params.sparkUrl;
+    
     const spark = await getSparkByUrl(sparkUrl);
     
     if (!spark) {
@@ -42,8 +44,10 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function SparkProductPage({ params }: PageProps) {
-    // Await params to ensure they're fully resolved
-    const sparkUrl = await Promise.resolve(params.sparkUrl);
+    // Await the entire params object
+    params = await params;
+    const sparkUrl = params.sparkUrl;
+    
     const DEMO_CONSULTANT_ID = process.env.NEXT_PUBLIC_DEMO_CONSULTANT_ID;
 
     const spark = await getSparkByUrl(sparkUrl);
