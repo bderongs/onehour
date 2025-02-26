@@ -29,14 +29,14 @@ export default function PasswordSetupPage() {
 
         // Get the email from the authenticated session
         const getEmail = async () => {
-            const { data: { user } } = await createBrowserClient().auth.getUser();
-            if (!user?.email) {
+            const { data: { session } } = await createBrowserClient().auth.getSession();
+            if (!session?.user?.email) {
                 logger.error('No user email found, redirecting to signin');
                 router.push('/auth/signin');
                 return;
             }
-            logger.info('Found user email for password setup', { email: user.email });
-            setUserEmail(user.email);
+            logger.info('Found user email for password setup', { email: session.user.email });
+            setUserEmail(session.user.email);
         };
 
         getEmail();
@@ -91,20 +91,20 @@ export default function PasswordSetupPage() {
             // Wait for session to be established with a more robust approach
             let user = null;
             let retries = 0;
-            const maxRetries = 5;
+            const maxRetries = 3;
             
             while (!user && retries < maxRetries) {
-                const { data: { user: currentUser }, error: userError } = await createBrowserClient().auth.getUser();
-                if (userError) {
-                    logger.error('Error getting user:', userError);
+                const { data: { session }, error: sessionError } = await createBrowserClient().auth.getSession();
+                if (sessionError) {
+                    logger.error('Error getting session:', sessionError);
                 }
                 
-                if (currentUser) {
-                    user = currentUser;
+                if (session) {
+                    user = session.user;
                     logger.info('User authenticated', { userId: user.id });
                     break;
                 }
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 500));
                 retries++;
                 logger.info(`Retry ${retries}/${maxRetries} for user authentication`);
             }
@@ -114,15 +114,13 @@ export default function PasswordSetupPage() {
                 throw new Error('Authentification échouée après plusieurs tentatives');
             }
 
-            // Double check that we're still authenticated
-            const { data: { user: finalUser }, error: finalUserError } = await createBrowserClient().auth.getUser();
-            if (finalUserError) {
-                logger.error('Error getting final user state:', finalUserError);
-            }
-            
-            if (!finalUser) {
-                logger.error('User not authenticated after password setup');
-                throw new Error('Authentification perdue après la configuration du mot de passe');
+            // Verify the user is authenticated
+            const { data: { session: finalSession }, error: finalSessionError } = await createBrowserClient().auth.getSession();
+            if (finalSessionError || !finalSession?.user) {
+                logger.error('Error verifying final user state:', finalSessionError);
+                showNotification('error', 'Mot de passe mis à jour, mais une erreur est survenue lors de la vérification finale.');
+                setLoading(false);
+                return;
             }
 
             // Refresh the session to ensure we have the latest data
@@ -140,7 +138,7 @@ export default function PasswordSetupPage() {
                 const decodedNext = decodeURIComponent(next);
                 
                 // Wait a moment for the session to be fully established
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                await new Promise(resolve => setTimeout(resolve, 500));
 
                 try {
                     logger.info('Starting redirection to', { url: decodedNext });
@@ -154,7 +152,7 @@ export default function PasswordSetupPage() {
 
             // Fallback to role-based redirection if no next URL
             // Wait a moment for the session to be fully established
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await new Promise(resolve => setTimeout(resolve, 500));
             
             const { data: profile } = await createBrowserClient()
                 .from('profiles')

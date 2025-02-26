@@ -37,14 +37,14 @@ export function SparkRequestHandler({ sparkUrl }: SparkRequestHandlerProps) {
                 }
 
                 // Get current user
-                const { data: { user } } = await createBrowserClient().auth.getUser();
-                if (!user) {
+                const { data: { session } } = await createBrowserClient().auth.getSession();
+                if (!session?.user) {
                     throw new Error('Utilisateur non trouvé');
                 }
 
                 // Check for existing requests
-                const requests = await getClientRequestsByClientId(user.id);
-                const existingRequest = requests.find(r => 
+                const existingRequests = await getClientRequestsByClientId(session.user.id);
+                const existingRequest = existingRequests.find(r => 
                     r.sparkId === spark.id && 
                     (r.status === 'pending' || r.status === 'accepted')
                 );
@@ -59,7 +59,7 @@ export function SparkRequestHandler({ sparkUrl }: SparkRequestHandlerProps) {
                 logger.info('Creating new request', { sparkId: spark.id });
                 const request = await createClientRequest({
                     sparkId: spark.id,
-                    clientId: user.id,
+                    clientId: session.user.id,
                     status: 'pending',
                     message: ''
                 });

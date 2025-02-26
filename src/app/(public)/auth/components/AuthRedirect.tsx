@@ -1,38 +1,107 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import logger from '@/utils/logger';
 
 export default function AuthRedirect() {
     const router = useRouter();
-    const { user, loading: authLoading } = useAuth();
+    const searchParams = useSearchParams();
+    const { user, loading: authLoading, refreshUser } = useAuth();
     const [isRedirecting, setIsRedirecting] = useState(false);
+    const [redirectAttempts, setRedirectAttempts] = useState(0);
+    const [lastRefreshTime, setLastRefreshTime] = useState(0);
 
-    useEffect(() => {
-        // Only set redirecting if we have a user and are loading
-        // This prevents showing the message during initial auth check
-        if (authLoading && user) {
-            setIsRedirecting(true);
-        } else {
-            setIsRedirecting(false);
+    // Extract returnUrl from search params if available
+    const returnUrl = searchParams?.get('returnUrl');
+
+    // Function to handle redirection based on user roles
+    const performRedirect = useCallback(() => {
+        try {
+            logger.info('Performing redirection with user roles:', user?.roles);
+            
+            // If we have a returnUrl, use that first
+            if (returnUrl) {
+                logger.info(`Redirecting to return URL: ${returnUrl}`);
+                window.location.href = returnUrl;
+                return;
+            }
+            
+            // Otherwise redirect based on role
+            if (user?.roles?.includes('admin')) {
+                logger.info('Redirecting admin to dashboard');
+                window.location.href = '/admin/dashboard';
+            } else if (user?.roles?.includes('consultant')) {
+                logger.info('Redirecting consultant to sparks/manage');
+                window.location.href = '/sparks/manage';
+            } else if (user?.roles?.includes('client')) {
+                logger.info('Redirecting client to dashboard');
+                window.location.href = '/client/dashboard';
+            } else {
+                // Fallback to home page if no specific role
+                logger.info('No specific role found, redirecting to home page');
+                window.location.href = '/';
+            }
+        } catch (error) {
+            logger.error('Error during redirection:', error);
+            setRedirectAttempts(prev => prev + 1);
         }
+    }, [user, returnUrl]);
 
-        // Handle actual redirection when auth is loaded and user exists
-        if (!authLoading && user) {
-            logger.info('User already authenticated, redirecting...');
+    // Effect to handle user authentication state
+    useEffect(() => {
+        // Skip if still loading
+        if (authLoading) {
+            return;
+        }
+        
+        // If we have a user, redirect
+        if (user) {
+            logger.info('User already authenticated, redirecting...', { 
+                attempt: redirectAttempts + 1,
+                roles: user.roles 
+            });
+            
             setIsRedirecting(true);
             
-            if (user.roles.includes('admin')) {
-                router.push('/admin/dashboard');
-            } else if (user.roles.includes('consultant')) {
-                router.push('/sparks/manage');
-            } else if (user.roles.includes('client')) {
-                router.push('/client/dashboard');
+            // Add a small delay before redirection to ensure all auth state is properly updated
+            const redirectTimer = setTimeout(performRedirect, 500);
+            return () => clearTimeout(redirectTimer);
+        } else {
+            // If no user and not loading, try refreshing user data once
+            const now = Date.now();
+            if (now - lastRefreshTime > 2000) { // Only refresh if it's been more than 2 seconds
+                logger.info('No user found, attempting to refresh user data');
+                setLastRefreshTime(now);
+                refreshUser().catch(err => {
+                    logger.error('Error refreshing user data:', err);
+                });
             }
+            
+            setIsRedirecting(false);
         }
-    }, [user, authLoading, router]);
+    }, [user, authLoading, redirectAttempts, performRedirect, refreshUser, lastRefreshTime]);
+
+    // Effect to handle redirect attempts
+    useEffect(() => {
+        if (redirectAttempts >= 3) {
+            logger.info('Too many redirect attempts, forcing page reload');
+            window.location.reload();
+        }
+    }, [redirectAttempts]);
+
+    // Add a timeout to prevent getting stuck in redirection state
+    useEffect(() => {
+        if (isRedirecting) {
+            const stuckTimer = setTimeout(() => {
+                logger.info('Redirection taking too long, forcing page reload');
+                window.location.reload();
+            }, 15000); // 15 seconds timeout (increased from 10)
+            
+            return () => clearTimeout(stuckTimer);
+        }
+    }, [isRedirecting]);
 
     // Only show the message if we're actually redirecting
     if (isRedirecting) {

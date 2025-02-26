@@ -31,9 +31,9 @@ export function SignUpFormManager() {
         }
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            const { data: { user } } = await createBrowserClient().auth.getUser();
-            if (!user) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            const { data: { session } } = await createBrowserClient().auth.getSession();
+            if (!session?.user) {
                 logger.error('Session lost after sign in');
                 throw new Error('Session perdue après la connexion');
             }
@@ -45,7 +45,7 @@ export function SignUpFormManager() {
                 return;
             }
 
-            const requests = await getClientRequestsByClientId(user.id);
+            const requests = await getClientRequestsByClientId(session.user.id);
             const existingRequest = requests.find(r => 
                 r.sparkId === spark.id && 
                 (r.status === 'pending' || r.status === 'accepted')
@@ -58,7 +58,7 @@ export function SignUpFormManager() {
                 logger.info('Creating new request after sign in', { sparkId: spark.id });
                 const request = await createClientRequest({
                     sparkId: spark.id,
-                    clientId: user.id,
+                    clientId: session.user.id,
                     status: 'pending',
                     message: ''
                 });

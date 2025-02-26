@@ -25,15 +25,27 @@ export default function AuthCallback() {
             try {
                 // First check if we already have a valid session
                 const supabase = createBrowserClient();
-                const { data: { user }, error: userError } = await supabase.auth.getUser();
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
                 
-                if (userError) {
-                    logger.error('Error getting user:', userError);
+                if (sessionError) {
+                    logger.error('Error checking session:', sessionError);
                 }
-                
-                if (user) {
-                    logger.info('Valid user found, skipping confirmation flow');
-                    router.push('/');
+
+                if (session?.user) {
+                    logger.info('User already authenticated, redirecting to dashboard');
+                    
+                    // Check user roles to determine where to redirect
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('roles')
+                        .eq('id', session.user.id)
+                        .single();
+
+                    if (profile.roles.includes('admin')) {
+                        router.push('/admin');
+                    } else {
+                        router.push('/');
+                    }
                     return;
                 }
 

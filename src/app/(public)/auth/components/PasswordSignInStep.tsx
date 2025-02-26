@@ -44,7 +44,12 @@ export function PasswordSignInStep({
     };
 
     return (
-        <form onSubmit={handleSubmit} className={`space-y-6 ${className}`}>
+        <form 
+            onSubmit={handleSubmit} 
+            className={`space-y-6 ${className}`}
+            method="POST"
+            action="#"
+        >
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                     Mot de passe

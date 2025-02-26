@@ -31,7 +31,7 @@ export function ProtectedRoute({
         if (!user) {
             logger.info('User not authenticated, redirecting to signin');
             const returnUrl = encodeURIComponent(window.location.pathname);
-            router.push(`/signin?returnUrl=${returnUrl}`);
+            router.push(`/auth/signin?returnUrl=${returnUrl}`);
             return;
         }
 

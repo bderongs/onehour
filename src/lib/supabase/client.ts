@@ -25,17 +25,56 @@ const getEnvVars = (): { supabaseUrl: string, supabaseKey: string } => {
   return { supabaseUrl: url, supabaseKey: key }
 }
 
+// Create an in-memory storage provider to help with auth session issues
+const createInMemoryStorageProvider = () => {
+  const items = new Map<string, string>();
+  return {
+    getItem: (key: string) => items.get(key) || null,
+    setItem: (key: string, value: string) => {
+      items.set(key, value);
+    },
+    removeItem: (key: string) => {
+      items.delete(key);
+    },
+  };
+};
+
+// Cache the client to avoid creating multiple instances
+let browserClientInstance: any = null;
+
 // Export a wrapped version of createBrowserClient that includes the required arguments
 export const createBrowserClient = () => {
   try {
-    const { supabaseUrl, supabaseKey } = getEnvVars()
-    return createSupabaseBrowserClient<Database>(
+    // Return cached instance if available
+    if (browserClientInstance) {
+      logger.info('Using cached Supabase browser client');
+      return browserClientInstance;
+    }
+
+    logger.info('Creating new Supabase browser client');
+    const { supabaseUrl, supabaseKey } = getEnvVars();
+    
+    // Create a new client instance with in-memory storage
+    browserClientInstance = createSupabaseBrowserClient<Database>(
       supabaseUrl,
-      supabaseKey
-    )
+      supabaseKey,
+      {
+        auth: {
+          // Use in-memory storage to help mitigate "Auth Session Missing" issues
+          // This is a workaround for a known bug in Supabase auth-js
+          // See: https://github.com/supabase/auth-js/issues/948
+          storage: createInMemoryStorageProvider(),
+          persistSession: true,
+          autoRefreshToken: true,
+        }
+      }
+    );
+    
+    logger.info('Supabase browser client created successfully');
+    return browserClientInstance;
   } catch (error) {
-    logger.error('Error creating browser client:', error)
-    throw new Error('Failed to initialize Supabase browser client')
+    logger.error('Error creating browser client:', error);
+    throw new Error('Failed to initialize Supabase browser client');
   }
 }
 
@@ -47,7 +86,15 @@ export const createClient = () => {
     
     return createSupabaseBrowserClient<Database>(
       supabaseUrl,
-      supabaseKey
+      supabaseKey,
+      {
+        auth: {
+          // Use in-memory storage to help mitigate "Auth Session Missing" issues
+          storage: createInMemoryStorageProvider(),
+          persistSession: true,
+          autoRefreshToken: true,
+        }
+      }
     )
   } catch (error) {
     logger.error('Error creating browser client:', error)

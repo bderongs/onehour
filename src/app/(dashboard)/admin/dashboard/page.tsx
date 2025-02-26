@@ -22,9 +22,9 @@ export default function AdminDashboard() {
 
                 // Check if we have a session
                 const supabase = createClient();
-                const { data: { user } } = await supabase.auth.getUser();
+                const { data: { session } } = await supabase.auth.getSession();
                 
-                if (!user) {
+                if (!session?.user) {
                     logger.info('No session found, redirecting to signin');
                     router.push('/auth/signin');
                     return;
@@ -34,7 +34,7 @@ export default function AdminDashboard() {
                 const { data: profile } = await supabase
                     .from('profiles')
                     .select('roles')
-                    .eq('id', user.id)
+                    .eq('id', session.user.id)
                     .single();
 
                 // Check if user has admin role

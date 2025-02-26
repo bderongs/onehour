@@ -324,16 +324,19 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
 export const getCurrentUser = async (): Promise<UserProfile | null> => {
     try {
         const client = await createClient();
-        const { data: { user }, error: sessionError } = await client.auth.getUser();
+        const { data: { session }, error: sessionError } = await client.auth.getSession();
 
         if (sessionError) {
             logger.error('Error getting session:', sessionError);
             return null;
         }
 
-        if (!user) {
+        if (!session?.user) {
+            logger.info('No active session found');
             return null;
         }
+
+        const user = session.user;
 
         const { data: profile, error: profileError } = await client
             .from('profiles')

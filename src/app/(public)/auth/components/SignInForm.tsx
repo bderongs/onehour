@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock } from 'lucide-react';
@@ -8,7 +8,7 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import logger from '@/utils/logger';
-import { getCurrentUser } from '@/services/auth/client';
+import { getCurrentUser, signOut } from '@/services/auth/client';
 
 export default function SignInForm() {
     const [email, setEmail] = useState('');
@@ -19,8 +19,47 @@ export default function SignInForm() {
     const { refreshUser } = useAuth();
     const { showNotification } = useNotification();
 
+    // Add a timeout to prevent the sign-in process from getting stuck
+    useEffect(() => {
+        let timeoutId: NodeJS.Timeout | null = null;
+        
+        if (loading) {
+            timeoutId = setTimeout(() => {
+                logger.error('Sign-in process timed out after 15 seconds');
+                setLoading(false);
+                showNotification('error', 'La connexion a pris trop de temps. Veuillez réessayer.');
+            }, 15000); // 15 seconds timeout
+        }
+        
+        return () => {
+            if (timeoutId) clearTimeout(timeoutId);
+        };
+    }, [loading, showNotification]);
+
+    // Check if user is already signed in and sign them out on component mount
+    useEffect(() => {
+        const checkAndSignOut = async () => {
+            try {
+                const supabase = createBrowserClient();
+                const { data: { session } } = await supabase.auth.getSession();
+                
+                if (session?.user) {
+                    logger.info('User already signed in, signing out first...');
+                    await signOut();
+                    logger.info('Successfully signed out');
+                }
+            } catch (error) {
+                logger.error('Error checking auth state:', error);
+            }
+        };
+        
+        checkAndSignOut();
+    }, []);
+
     const handleSubmit = async (e: React.FormEvent) => {
+        // Prevent default form submission which would expose credentials in URL
         e.preventDefault();
+        
         if (loading) return;
         
         setLoading(true);
@@ -29,6 +68,22 @@ export default function SignInForm() {
         try {
             logger.info('Attempting to sign in with email...');
             const supabase = createBrowserClient();
+            
+            // First, ensure we're starting with a clean state
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    logger.info('Existing session found, signing out first for clean login');
+                    await supabase.auth.signOut();
+                    // Reduced delay to ensure signout is processed
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+            } catch (sessionError) {
+                logger.warn('Error checking session before login:', sessionError);
+                // Continue with sign-in attempt even if this fails
+            }
+            
+            // Now attempt to sign in
             const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
                 email,
                 password,
@@ -42,52 +97,65 @@ export default function SignInForm() {
                 throw signInError;
             }
 
-            logger.info('Sign-in successful, waiting for session...');
-            
-            let session = signInData.session;
-            if (!session) {
-                logger.error('No session established after sign in');
-                throw new Error('Session non établie après la connexion');
+            if (!signInData?.user) {
+                logger.error('Sign-in successful but no user returned');
+                throw new Error('Authentification réussie mais aucun utilisateur trouvé.');
             }
 
-            logger.info('Session established, refreshing user data...');
-            await refreshUser();
+            logger.info('Sign-in successful, user ID:', signInData.user.id);
             
-            logger.info('User data refreshed, preparing for redirect...');
+            // Use window.location.href for redirection to ensure a full page reload
             const returnUrl = searchParams?.get('returnUrl');
             
-            if (returnUrl) {
-                logger.info(`Redirecting to return URL: ${returnUrl}`);
-                router.push(returnUrl);
-            } else {
+            // Reduced delay before redirection to improve perceived performance
+            // while still giving time for the auth state to propagate
+            setTimeout(() => {
                 try {
-                    const currentUser = await getCurrentUser();
-                    logger.info('Current user retrieved for role-based redirect:', currentUser);
-                    
-                    if (!currentUser) {
-                        logger.error('User data not available after refresh');
-                        throw new Error('Données utilisateur non disponibles');
-                    }
-                    
-                    if (currentUser.roles.includes('admin')) {
-                        logger.info('Redirecting admin user to dashboard');
-                        router.push('/admin/dashboard');
-                    } else if (currentUser.roles.includes('consultant')) {
-                        logger.info('Redirecting consultant user to sparks management');
-                        router.push('/sparks/manage');
-                    } else if (currentUser.roles.includes('client')) {
-                        logger.info('Redirecting client user to dashboard');
-                        router.push('/client/dashboard');
+                    if (returnUrl) {
+                        logger.info(`Redirecting to return URL: ${returnUrl}`);
+                        window.location.href = returnUrl;
                     } else {
-                        logger.warn('User has no recognized role, redirecting to default page');
-                        router.push('/');
+                        // Check user roles to determine where to redirect
+                        logger.info('Checking user roles for redirection');
+                        
+                        // We'll use the session user ID to fetch the profile directly
+                        // This avoids relying on the AuthContext which might not be updated yet
+                        supabase
+                            .from('profiles')
+                            .select('roles')
+                            .eq('id', signInData.user.id)
+                            .single()
+                            .then(({ data: profile, error: profileError }: { data: { roles: string[] } | null, error: Error | null }) => {
+                                if (profileError || !profile) {
+                                    logger.error('Error fetching user profile for redirection:', profileError);
+                                    window.location.href = '/';
+                                    return;
+                                }
+                                
+                                logger.info('User roles for redirection:', profile.roles);
+                                
+                                if (profile.roles.includes('admin')) {
+                                    window.location.href = '/admin/dashboard';
+                                } else if (profile.roles.includes('consultant')) {
+                                    window.location.href = '/sparks/manage';
+                                } else if (profile.roles.includes('client')) {
+                                    window.location.href = '/client/dashboard';
+                                } else {
+                                    window.location.href = '/';
+                                }
+                            })
+                            .catch((error: Error) => {
+                                logger.error('Error in profile fetch for redirection:', error);
+                                window.location.href = '/';
+                            });
                     }
-                } catch (redirectError) {
-                    logger.error('Error during role-based redirect:', redirectError);
-                    // Fallback to home page if role-based redirect fails
-                    router.push('/');
+                } catch (error) {
+                    logger.error('Error during redirection:', error);
+                    showNotification('error', 'Erreur lors de la redirection. Veuillez réessayer.');
+                    // If redirection fails, reload the page as a fallback
+                    window.location.reload();
                 }
-            }
+            }, 500); // Reduced from 1000ms to 500ms
         } catch (error: any) {
             logger.error('Error during sign-in:', error);
             showNotification('error', error.message || 'Une erreur est survenue lors de la connexion');
@@ -97,7 +165,12 @@ export default function SignInForm() {
     };
 
     return (
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form 
+            className="space-y-6" 
+            onSubmit={handleSubmit} 
+            method="POST"
+            action="#" // Add action attribute to prevent form from submitting to the current URL
+        >
             <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                     Email
