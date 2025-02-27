@@ -7,7 +7,7 @@ export interface ClientProfile {
     firstName: string;
     lastName: string;
     company: string;
-    roles: string[];
+    roles: ("consultant" | "admin" | "client")[];
     createdAt: string;
     updatedAt: string;
 }

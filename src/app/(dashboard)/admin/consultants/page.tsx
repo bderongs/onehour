@@ -179,7 +179,7 @@ const ConsultantRow = ({
                                 <Edit className="h-5 w-5" />
                             </button>
                             <a
-                                href={`/consultant/${consultant.slug}`}
+                                href={`/consultants/${consultant.slug}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-gray-400 hover:text-gray-600 transition-colors"

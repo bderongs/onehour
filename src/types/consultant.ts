@@ -3,7 +3,7 @@ export type ConsultantProfile = {
     email: string;
     first_name: string;
     last_name: string;
-    roles: string[];
+    roles: ("consultant" | "admin" | "client")[];
     slug: string;
     
     // Basic profile info

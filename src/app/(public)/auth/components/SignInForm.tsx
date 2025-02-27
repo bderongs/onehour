@@ -139,7 +139,7 @@ export default function SignInForm() {
                             .select('roles')
                             .eq('id', signInData.user.id)
                             .single()
-                            .then(({ data: profile, error: profileError }: { data: { roles: string[] } | null, error: Error | null }) => {
+                            .then(({ data: profile, error: profileError }: { data: { roles: ("consultant" | "admin" | "client")[] } | null, error: Error | null }) => {
                                 if (profileError || !profile) {
                                     logger.error('Error fetching user profile for redirection:', profileError);
                                     window.location.href = '/';

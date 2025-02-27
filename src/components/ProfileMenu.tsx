@@ -106,7 +106,7 @@ export function ProfileMenu() {
                                 <button
                                     onClick={() => {
                                         setIsOpen(false);
-                                        router.push(`/consultants/${user.id}/edit`);
+                                        router.push(`/consultants/${user.slug}/edit`);
                                     }}
                                     className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                                 >

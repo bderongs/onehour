@@ -17,7 +17,7 @@ interface WebhookPayload {
     first_name: string
     last_name: string
     company?: string
-    roles: string[]
+    roles: ("consultant" | "admin" | "client")[]
     created_at: string
   }
   schema: string
