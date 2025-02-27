@@ -152,33 +152,109 @@ export function useFormHandlers(
         e.preventDefault();
         if (!consultant || !consultant.id) return;
 
-        // Filter out empty reviews before submitting
-        const filteredReviews = formData.reviews?.filter(review => {
-            const hasContent = review.client_name.trim() !== '' || 
-                              (review.client_role?.trim() || '') !== '' || 
-                              (review.client_company?.trim() || '') !== '' || 
-                              review.review_text.trim() !== '';
-            
-            // If any field has content, all required fields must be filled
-            if (hasContent) {
-                return review.client_name.trim() !== '' && review.review_text.trim() !== '';
-            }
-            return false;
-        }) || [];
+        logger.info('Form submission started', { 
+            reviewsCount: formData.reviews?.length || 0,
+            missionsCount: formData.missions?.length || 0
+        });
 
-        // Filter out empty missions before submitting
-        const filteredMissions = formData.missions?.filter(mission => {
-            const hasContent = mission.title.trim() !== '' || 
-                              (mission.company?.trim() || '') !== '' || 
-                              (mission.duration?.trim() || '') !== '' || 
-                              mission.description.trim() !== '';
+        // Validate and filter reviews
+        const validatedReviews = formData.reviews?.map(review => {
+            // Check if any field has content
+            const hasAnyContent = 
+                review.client_name.trim() !== '' || 
+                (review.client_role?.trim() || '') !== '' || 
+                (review.client_company?.trim() || '') !== '' || 
+                review.review_text.trim() !== '';
             
-            // If any field has content, all required fields must be filled
-            if (hasContent) {
-                return mission.title.trim() !== '' && mission.description.trim() !== '';
+            // If no content at all, mark for removal
+            if (!hasAnyContent) {
+                return { review, isValid: false, reason: 'empty' };
             }
-            return false;
+            
+            // If any content exists, check required fields
+            const hasRequiredFields = 
+                review.client_name.trim() !== '' && 
+                review.review_text.trim() !== '';
+            
+            return { 
+                review, 
+                isValid: hasRequiredFields, 
+                reason: hasRequiredFields ? 'valid' : 'missing_required_fields',
+                fields: {
+                    client_name: review.client_name.trim() !== '',
+                    client_role: (review.client_role?.trim() || '') !== '',
+                    client_company: (review.client_company?.trim() || '') !== '',
+                    review_text: review.review_text.trim() !== ''
+                }
+            };
         }) || [];
+        
+        // Log validation results
+        validatedReviews.forEach(item => {
+            logger.info('Review validation', { 
+                id: item.review.id,
+                isValid: item.isValid,
+                reason: item.reason,
+                fields: item.fields
+            });
+        });
+        
+        // Filter to only valid reviews
+        const filteredReviews = validatedReviews
+            .filter(item => item.isValid)
+            .map(item => item.review);
+
+        // Validate and filter missions
+        const validatedMissions = formData.missions?.map(mission => {
+            // Check if any field has content
+            const hasAnyContent = 
+                mission.title.trim() !== '' || 
+                (mission.company?.trim() || '') !== '' || 
+                (mission.duration?.trim() || '') !== '' || 
+                mission.description.trim() !== '';
+            
+            // If no content at all, mark for removal
+            if (!hasAnyContent) {
+                return { mission, isValid: false, reason: 'empty' };
+            }
+            
+            // If any content exists, check required fields
+            const hasRequiredFields = 
+                mission.title.trim() !== '' && 
+                mission.description.trim() !== '';
+            
+            return { 
+                mission, 
+                isValid: hasRequiredFields, 
+                reason: hasRequiredFields ? 'valid' : 'missing_required_fields',
+                fields: {
+                    title: mission.title.trim() !== '',
+                    company: (mission.company?.trim() || '') !== '',
+                    duration: (mission.duration?.trim() || '') !== '',
+                    description: mission.description.trim() !== ''
+                }
+            };
+        }) || [];
+        
+        // Log validation results
+        validatedMissions.forEach(item => {
+            logger.info('Mission validation', { 
+                title: item.mission.title,
+                isValid: item.isValid,
+                reason: item.reason,
+                fields: item.fields
+            });
+        });
+        
+        // Filter to only valid missions
+        const filteredMissions = validatedMissions
+            .filter(item => item.isValid)
+            .map(item => item.mission);
+
+        logger.info('After filtering', { 
+            filteredReviewsCount: filteredReviews.length,
+            filteredMissionsCount: filteredMissions.length
+        });
 
         // Convert string inputs to arrays before submitting
         const submissionData = {
@@ -202,6 +278,12 @@ export function useFormHandlers(
                 updateConsultantReviewsAction(consultant.id, filteredReviews),
                 updateConsultantMissionsAction(consultant.id, filteredMissions)
             ]);
+
+            logger.info('Update results', { 
+                profileUpdated: !!updatedProfile,
+                reviewsUpdated,
+                missionsUpdated
+            });
 
             if (updatedProfile && reviewsUpdated && missionsUpdated) {
                 showNotification('success', 'Profil mis à jour avec succès');

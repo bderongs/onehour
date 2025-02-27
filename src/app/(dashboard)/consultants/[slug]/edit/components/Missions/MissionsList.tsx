@@ -78,7 +78,7 @@ export function MissionsList({
                     Ajouter une mission
                 </button>
                 <p className="mt-2 text-xs text-gray-500 italic text-center">
-                    Note: Les missions sans titre ou description seront ignorées lors de l'enregistrement.
+                    Note: Si vous remplissez un champ, le titre et la description deviennent obligatoires pour l'enregistrement. Les missions complètement vides seront ignorées.
                 </p>
             </div>
         </div>
