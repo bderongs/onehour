@@ -30,11 +30,23 @@ module.exports = {
             maxHeight: '2000px',
             transform: 'translateY(0)'
           }
+        },
+        'highlight-error': {
+          '0%': { 
+            boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.7)'
+          },
+          '70%': { 
+            boxShadow: '0 0 0 10px rgba(239, 68, 68, 0)'
+          },
+          '100%': { 
+            boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)'
+          }
         }
       },
       animation: {
         'fade-in-up': 'fade-in-up 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-        'slide-down': 'slide-down 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+        'slide-down': 'slide-down 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+        'highlight-error': 'highlight-error 2s ease-in-out'
       }
     },
   },
@@ -53,7 +65,9 @@ module.exports = {
     'text-white',
     'text-black',
     'animate-fade-in-up',
-    'animate-slide-down'
+    'animate-slide-down',
+    'animate-highlight-error',
+    'border-red-500'
   ],
   plugins: [],
 };

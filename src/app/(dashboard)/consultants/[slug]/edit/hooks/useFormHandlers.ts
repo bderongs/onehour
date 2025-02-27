@@ -1,7 +1,7 @@
 // Purpose: Custom hook to handle form interactions for the consultant profile edit page
 // This hook manages form state changes, image uploads, and form submission
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '@/types/consultant';
 import { uploadProfileImage, deleteProfileImage } from '@/services/storage';
@@ -12,6 +12,7 @@ import {
     updateConsultantMissionsAction
 } from '../actions';
 import logger from '@/utils/logger';
+import { useValidationStyles, scrollAndHighlightElement, validateAndScrollToFirstError } from '@/components/ui/FormValidation';
 
 type ConsultantFormData = Partial<ConsultantProfile> & {
     languagesInput?: string,
@@ -19,23 +20,6 @@ type ConsultantFormData = Partial<ConsultantProfile> & {
     reviews?: ConsultantReview[],
     missions?: ConsultantMission[],
     profile_image_path?: string
-};
-
-// Helper function to scroll to an element and highlight it
-const scrollAndHighlightElement = (elementId: string) => {
-    const element = document.getElementById(elementId);
-    if (element) {
-        // Scroll to the element with a small offset
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        
-        // Add highlight effect
-        element.classList.add('validation-error-highlight');
-        
-        // Remove highlight after animation completes
-        setTimeout(() => {
-            element.classList.remove('validation-error-highlight');
-        }, 2000);
-    }
 };
 
 export function useFormHandlers(
@@ -51,26 +35,8 @@ export function useFormHandlers(
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { showNotification } = useNotification();
 
-    // Add CSS for the highlight effect when component mounts
-    useEffect(() => {
-        // Create a style element if it doesn't exist
-        if (!document.getElementById('validation-highlight-style')) {
-            const style = document.createElement('style');
-            style.id = 'validation-highlight-style';
-            style.innerHTML = `
-                @keyframes highlightError {
-                    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-                    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-                    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-                }
-                .validation-error-highlight {
-                    animation: highlightError 2s ease-in-out;
-                    border-color: rgb(239, 68, 68) !important;
-                }
-            `;
-            document.head.appendChild(style);
-        }
-    }, []);
+    // Use the shared validation styles hook
+    useValidationStyles();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -211,57 +177,48 @@ export function useFormHandlers(
                 fields.client_company && 
                 fields.review_text;
             
+            // Determine which field is invalid for highlighting
+            let fieldId = '';
+            if (!fields.client_name) {
+                fieldId = `client-name-${reviewIndex}`;
+            } else if (!fields.client_role) {
+                fieldId = `client-role-${reviewIndex}`;
+            } else if (!fields.client_company) {
+                fieldId = `client-company-${reviewIndex}`;
+            } else if (!fields.review_text) {
+                fieldId = `review-text-${reviewIndex}`;
+            }
+            
             return { 
-                review, 
-                reviewIndex,
-                isValid: hasAllRequiredFields, 
-                reason: hasAllRequiredFields ? 'valid' : 'missing_required_fields',
-                fields
+                isValid: hasAllRequiredFields,
+                fieldId: hasAllRequiredFields ? '' : fieldId,
+                data: review
             };
         }) || [];
         
         // Log validation results
         validatedReviews.forEach(item => {
             logger.info('Review validation', { 
-                id: item.review.id,
+                id: item.data.id,
                 isValid: item.isValid,
-                reason: item.reason,
-                fields: item.fields
+                fieldId: item.fieldId
             });
         });
         
-        // Check if any reviews are invalid
-        const invalidReviews = validatedReviews.filter(item => !item.isValid);
-        if (invalidReviews.length > 0) {
-            showNotification('error', 'Tous les champs des avis clients sont obligatoires');
-            
-            // Find the first invalid field in the first invalid review
-            const firstInvalidReview = invalidReviews[0];
-            const reviewIndex = firstInvalidReview.reviewIndex;
-            
-            // Determine which field is invalid
-            let fieldId = '';
-            if (!firstInvalidReview.fields.client_name) {
-                fieldId = `client-name-${reviewIndex}`;
-            } else if (!firstInvalidReview.fields.client_role) {
-                fieldId = `client-role-${reviewIndex}`;
-            } else if (!firstInvalidReview.fields.client_company) {
-                fieldId = `client-company-${reviewIndex}`;
-            } else if (!firstInvalidReview.fields.review_text) {
-                fieldId = `review-text-${reviewIndex}`;
-            }
-            
-            // Scroll to and highlight the invalid field
-            if (fieldId) {
-                setTimeout(() => scrollAndHighlightElement(fieldId), 100);
-            }
-            
+        // Validate reviews using the shared validation utility
+        const reviewsValid = validateAndScrollToFirstError(
+            validatedReviews,
+            (message) => showNotification('error', message),
+            'Tous les champs des avis clients sont obligatoires'
+        );
+        
+        if (!reviewsValid) {
             setSaving(false);
             return;
         }
         
         // Filter to only valid reviews
-        const filteredReviews = validatedReviews.map(item => item.review);
+        const filteredReviews = validatedReviews.map(item => item.data);
 
         // Validate missions - all fields are required
         const validatedMissions = formData.missions?.map((mission, missionIndex) => {
@@ -279,57 +236,48 @@ export function useFormHandlers(
                 fields.duration && 
                 fields.description;
             
+            // Determine which field is invalid for highlighting
+            let fieldId = '';
+            if (!fields.title) {
+                fieldId = `mission-title-${missionIndex}`;
+            } else if (!fields.company) {
+                fieldId = `mission-company-${missionIndex}`;
+            } else if (!fields.duration) {
+                fieldId = `mission-duration-${missionIndex}`;
+            } else if (!fields.description) {
+                fieldId = `mission-description-${missionIndex}`;
+            }
+            
             return { 
-                mission, 
-                missionIndex,
-                isValid: hasAllRequiredFields, 
-                reason: hasAllRequiredFields ? 'valid' : 'missing_required_fields',
-                fields
+                isValid: hasAllRequiredFields,
+                fieldId: hasAllRequiredFields ? '' : fieldId,
+                data: mission
             };
         }) || [];
         
         // Log validation results
         validatedMissions.forEach(item => {
             logger.info('Mission validation', { 
-                title: item.mission.title,
+                title: item.data.title,
                 isValid: item.isValid,
-                reason: item.reason,
-                fields: item.fields
+                fieldId: item.fieldId
             });
         });
         
-        // Check if any missions are invalid
-        const invalidMissions = validatedMissions.filter(item => !item.isValid);
-        if (invalidMissions.length > 0) {
-            showNotification('error', 'Tous les champs des missions sont obligatoires');
-            
-            // Find the first invalid field in the first invalid mission
-            const firstInvalidMission = invalidMissions[0];
-            const missionIndex = firstInvalidMission.missionIndex;
-            
-            // Determine which field is invalid
-            let fieldId = '';
-            if (!firstInvalidMission.fields.title) {
-                fieldId = `mission-title-${missionIndex}`;
-            } else if (!firstInvalidMission.fields.company) {
-                fieldId = `mission-company-${missionIndex}`;
-            } else if (!firstInvalidMission.fields.duration) {
-                fieldId = `mission-duration-${missionIndex}`;
-            } else if (!firstInvalidMission.fields.description) {
-                fieldId = `mission-description-${missionIndex}`;
-            }
-            
-            // Scroll to and highlight the invalid field
-            if (fieldId) {
-                setTimeout(() => scrollAndHighlightElement(fieldId), 100);
-            }
-            
+        // Validate missions using the shared validation utility
+        const missionsValid = validateAndScrollToFirstError(
+            validatedMissions,
+            (message) => showNotification('error', message),
+            'Tous les champs des missions sont obligatoires'
+        );
+        
+        if (!missionsValid) {
             setSaving(false);
             return;
         }
         
         // Filter to only valid missions
-        const filteredMissions = validatedMissions.map(item => item.mission);
+        const filteredMissions = validatedMissions.map(item => item.data);
 
         logger.info('After validation', { 
             filteredReviewsCount: filteredReviews.length,
