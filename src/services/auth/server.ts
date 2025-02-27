@@ -77,7 +77,7 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
             }
             
             // Ensure roles is an array of user_role type
-            const roles = ['consultant'] as const;
+            const roles: ("client" | "consultant" | "admin")[] = ['consultant'];
             
             // Validate required fields based on the database schema
             if (!data.firstName || !data.lastName) {
@@ -226,7 +226,7 @@ export const signUpClientWithEmail = async (data: ClientSignUpData) => {
             }
 
             // Ensure roles is an array of user_role type
-            const roles = ['client'] as const;
+            const roles: ("client" | "consultant" | "admin")[] = ['client'];
 
             // Create the profile
             logger.info('Creating profile for client user');
