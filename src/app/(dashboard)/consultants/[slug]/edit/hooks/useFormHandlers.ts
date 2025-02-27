@@ -375,11 +375,7 @@ export function useFormHandlers(
 
             if (updatedProfile && reviewsUpdated && missionsUpdated) {
                 showNotification('success', 'Profil mis à jour avec succès');
-                // Add a small delay before redirecting to allow the notification to display
-                // and prevent layout flashing during navigation
-                setTimeout(() => {
-                    router.push(`/${consultant.slug}`);
-                }, 1000);
+                router.push(`/${consultant.slug}`);
             } else {
                 showNotification('error', 'Échec de la mise à jour du profil');
             }
