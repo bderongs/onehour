@@ -81,7 +81,7 @@ export function ReviewsList({
                     Ajouter un avis
                 </button>
                 <p className="mt-2 text-xs text-gray-500 italic text-center">
-                    Note: Si vous remplissez un champ, le nom du client et le texte de l'avis deviennent obligatoires pour l'enregistrement. Les avis complètement vides seront ignorés.
+                    Note: Tous les champs sont obligatoires pour chaque avis client.
                 </p>
             </div>
         </div>

@@ -136,80 +136,58 @@ export async function updateConsultantProfileAction(id: string, profile: Partial
 }
 
 export async function updateConsultantReviewsAction(consultantId: string, reviews: ConsultantReview[]): Promise<boolean> {
+    // Add prominent logging at the beginning of the function
+    logger.info('🔍 updateConsultantReviewsAction CALLED', {
+        consultantId,
+        reviewsReceived: reviews.length,
+        reviewIds: reviews.map(r => r.id)
+    });
+    
     try {
-        // Get current reviews to identify ones that need to be deleted
         const client = await createClient()
-        const { data: currentReviews } = await client
+        
+        // Delete all existing reviews for this consultant
+        logger.info('Deleting all existing reviews for consultant', { consultantId })
+        const { error: deleteError } = await client
             .from('consultant_reviews')
-            .select('id')
+            .delete()
             .eq('consultant_id', consultantId)
-
-        if (currentReviews) {
-            const currentIds = new Set(currentReviews.map((r: { id: string }) => r.id))
-            const existingReviews = reviews.filter(review => !review.id.startsWith('temp-'))
-            const newReviews = reviews.filter(review => review.id.startsWith('temp-'))
-            const keepIds = new Set(existingReviews.map(r => r.id))
-            const idsToDelete = Array.from(currentIds).filter((id: unknown): id is string => 
-                typeof id === 'string' && !keepIds.has(id)
-            )
-
-            // Delete reviews that are no longer present
-            if (idsToDelete.length > 0) {
-                const { error: deleteError } = await client
-                    .from('consultant_reviews')
-                    .delete()
-                    .in('id', idsToDelete)
-                    .eq('consultant_id', consultantId)
-
-                if (deleteError) {
-                    logger.error('Error deleting removed reviews:', deleteError)
-                    return false
-                }
-            }
-
-            // Update existing reviews one by one to respect RLS
-            for (const review of existingReviews) {
-                const { error: updateError } = await client
-                    .from('consultant_reviews')
-                    .update({
-                        reviewer_name: review.client_name,
-                        reviewer_role: review.client_role,
-                        reviewer_company: review.client_company,
-                        review_text: review.review_text,
-                        rating: review.rating,
-                        reviewer_image_url: review.client_image_url
-                    })
-                    .eq('id', review.id)
-                    .eq('consultant_id', consultantId)
-
-                if (updateError) {
-                    logger.error('Error updating review:', updateError)
-                    return false
-                }
-            }
-
-            // Insert new reviews
-            if (newReviews.length > 0) {
-                const { error: insertError } = await client
-                    .from('consultant_reviews')
-                    .insert(newReviews.map(review => ({
-                        consultant_id: consultantId,
-                        reviewer_name: review.client_name,
-                        reviewer_role: review.client_role,
-                        reviewer_company: review.client_company,
-                        review_text: review.review_text,
-                        rating: review.rating,
-                        reviewer_image_url: review.client_image_url,
-                        created_at: review.created_at
-                    })))
-
-                if (insertError) {
-                    logger.error('Error inserting new reviews:', insertError)
-                    return false
-                }
-            }
+            
+        if (deleteError) {
+            logger.error('Error deleting existing reviews:', deleteError)
+            return false
         }
-
+        
+        // Only insert reviews if there are any
+        if (reviews.length > 0) {
+            // Prepare reviews for insertion
+            const reviewsToInsert = reviews.map(review => ({
+                consultant_id: consultantId,
+                reviewer_name: review.client_name,
+                reviewer_role: review.client_role,
+                reviewer_company: review.client_company,
+                review_text: review.review_text,
+                rating: review.rating,
+                reviewer_image_url: review.client_image_url,
+                // Use existing created_at for existing reviews, or current time for new ones
+                created_at: review.created_at || new Date().toISOString()
+            }))
+            
+            logger.info('Inserting reviews', { count: reviewsToInsert.length })
+            const { error: insertError } = await client
+                .from('consultant_reviews')
+                .insert(reviewsToInsert)
+                
+            if (insertError) {
+                logger.error('Error inserting reviews:', insertError)
+                return false
+            }
+            
+            logger.info('Successfully inserted reviews', { count: reviewsToInsert.length })
+        } else {
+            logger.info('No reviews to insert')
+        }
+        
         return true
     } catch (error) {
         logger.error('Error in updateConsultantReviews:', error)

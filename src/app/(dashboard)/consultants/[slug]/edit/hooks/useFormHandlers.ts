@@ -1,7 +1,7 @@
 // Purpose: Custom hook to handle form interactions for the consultant profile edit page
 // This hook manages form state changes, image uploads, and form submission
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '@/types/consultant';
 import { uploadProfileImage, deleteProfileImage } from '@/services/storage';
@@ -21,6 +21,23 @@ type ConsultantFormData = Partial<ConsultantProfile> & {
     profile_image_path?: string
 };
 
+// Helper function to scroll to an element and highlight it
+const scrollAndHighlightElement = (elementId: string) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+        // Scroll to the element with a small offset
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Add highlight effect
+        element.classList.add('validation-error-highlight');
+        
+        // Remove highlight after animation completes
+        setTimeout(() => {
+            element.classList.remove('validation-error-highlight');
+        }, 2000);
+    }
+};
+
 export function useFormHandlers(
     consultant: ConsultantProfile | null,
     formData: ConsultantFormData,
@@ -33,6 +50,27 @@ export function useFormHandlers(
     const [newLanguage, setNewLanguage] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { showNotification } = useNotification();
+
+    // Add CSS for the highlight effect when component mounts
+    useEffect(() => {
+        // Create a style element if it doesn't exist
+        if (!document.getElementById('validation-highlight-style')) {
+            const style = document.createElement('style');
+            style.id = 'validation-highlight-style';
+            style.innerHTML = `
+                @keyframes highlightError {
+                    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+                    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+                    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+                }
+                .validation-error-highlight {
+                    animation: highlightError 2s ease-in-out;
+                    border-color: rgb(239, 68, 68) !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -157,35 +195,28 @@ export function useFormHandlers(
             missionsCount: formData.missions?.length || 0
         });
 
-        // Validate and filter reviews
-        const validatedReviews = formData.reviews?.map(review => {
-            // Check if any field has content
-            const hasAnyContent = 
-                review.client_name.trim() !== '' || 
-                (review.client_role?.trim() || '') !== '' || 
-                (review.client_company?.trim() || '') !== '' || 
-                review.review_text.trim() !== '';
+        // Validate reviews - all fields are required
+        const validatedReviews = formData.reviews?.map((review, reviewIndex) => {
+            // Check each field individually
+            const fields = {
+                client_name: review.client_name.trim() !== '',
+                client_role: (review.client_role?.trim() || '') !== '',
+                client_company: (review.client_company?.trim() || '') !== '',
+                review_text: review.review_text.trim() !== ''
+            };
             
-            // If no content at all, mark for removal
-            if (!hasAnyContent) {
-                return { review, isValid: false, reason: 'empty' };
-            }
-            
-            // If any content exists, check required fields
-            const hasRequiredFields = 
-                review.client_name.trim() !== '' && 
-                review.review_text.trim() !== '';
+            const hasAllRequiredFields = 
+                fields.client_name && 
+                fields.client_role && 
+                fields.client_company && 
+                fields.review_text;
             
             return { 
                 review, 
-                isValid: hasRequiredFields, 
-                reason: hasRequiredFields ? 'valid' : 'missing_required_fields',
-                fields: {
-                    client_name: review.client_name.trim() !== '',
-                    client_role: (review.client_role?.trim() || '') !== '',
-                    client_company: (review.client_company?.trim() || '') !== '',
-                    review_text: review.review_text.trim() !== ''
-                }
+                reviewIndex,
+                isValid: hasAllRequiredFields, 
+                reason: hasAllRequiredFields ? 'valid' : 'missing_required_fields',
+                fields
             };
         }) || [];
         
@@ -199,40 +230,61 @@ export function useFormHandlers(
             });
         });
         
-        // Filter to only valid reviews
-        const filteredReviews = validatedReviews
-            .filter(item => item.isValid)
-            .map(item => item.review);
-
-        // Validate and filter missions
-        const validatedMissions = formData.missions?.map(mission => {
-            // Check if any field has content
-            const hasAnyContent = 
-                mission.title.trim() !== '' || 
-                (mission.company?.trim() || '') !== '' || 
-                (mission.duration?.trim() || '') !== '' || 
-                mission.description.trim() !== '';
+        // Check if any reviews are invalid
+        const invalidReviews = validatedReviews.filter(item => !item.isValid);
+        if (invalidReviews.length > 0) {
+            showNotification('error', 'Tous les champs des avis clients sont obligatoires');
             
-            // If no content at all, mark for removal
-            if (!hasAnyContent) {
-                return { mission, isValid: false, reason: 'empty' };
+            // Find the first invalid field in the first invalid review
+            const firstInvalidReview = invalidReviews[0];
+            const reviewIndex = firstInvalidReview.reviewIndex;
+            
+            // Determine which field is invalid
+            let fieldId = '';
+            if (!firstInvalidReview.fields.client_name) {
+                fieldId = `client-name-${reviewIndex}`;
+            } else if (!firstInvalidReview.fields.client_role) {
+                fieldId = `client-role-${reviewIndex}`;
+            } else if (!firstInvalidReview.fields.client_company) {
+                fieldId = `client-company-${reviewIndex}`;
+            } else if (!firstInvalidReview.fields.review_text) {
+                fieldId = `review-text-${reviewIndex}`;
             }
             
-            // If any content exists, check required fields
-            const hasRequiredFields = 
-                mission.title.trim() !== '' && 
-                mission.description.trim() !== '';
+            // Scroll to and highlight the invalid field
+            if (fieldId) {
+                setTimeout(() => scrollAndHighlightElement(fieldId), 100);
+            }
+            
+            setSaving(false);
+            return;
+        }
+        
+        // Filter to only valid reviews
+        const filteredReviews = validatedReviews.map(item => item.review);
+
+        // Validate missions - all fields are required
+        const validatedMissions = formData.missions?.map((mission, missionIndex) => {
+            // Check each field individually
+            const fields = {
+                title: mission.title.trim() !== '',
+                company: mission.company.trim() !== '',
+                duration: mission.duration.trim() !== '',
+                description: mission.description.trim() !== ''
+            };
+            
+            const hasAllRequiredFields = 
+                fields.title && 
+                fields.company && 
+                fields.duration && 
+                fields.description;
             
             return { 
                 mission, 
-                isValid: hasRequiredFields, 
-                reason: hasRequiredFields ? 'valid' : 'missing_required_fields',
-                fields: {
-                    title: mission.title.trim() !== '',
-                    company: (mission.company?.trim() || '') !== '',
-                    duration: (mission.duration?.trim() || '') !== '',
-                    description: mission.description.trim() !== ''
-                }
+                missionIndex,
+                isValid: hasAllRequiredFields, 
+                reason: hasAllRequiredFields ? 'valid' : 'missing_required_fields',
+                fields
             };
         }) || [];
         
@@ -246,12 +298,40 @@ export function useFormHandlers(
             });
         });
         
+        // Check if any missions are invalid
+        const invalidMissions = validatedMissions.filter(item => !item.isValid);
+        if (invalidMissions.length > 0) {
+            showNotification('error', 'Tous les champs des missions sont obligatoires');
+            
+            // Find the first invalid field in the first invalid mission
+            const firstInvalidMission = invalidMissions[0];
+            const missionIndex = firstInvalidMission.missionIndex;
+            
+            // Determine which field is invalid
+            let fieldId = '';
+            if (!firstInvalidMission.fields.title) {
+                fieldId = `mission-title-${missionIndex}`;
+            } else if (!firstInvalidMission.fields.company) {
+                fieldId = `mission-company-${missionIndex}`;
+            } else if (!firstInvalidMission.fields.duration) {
+                fieldId = `mission-duration-${missionIndex}`;
+            } else if (!firstInvalidMission.fields.description) {
+                fieldId = `mission-description-${missionIndex}`;
+            }
+            
+            // Scroll to and highlight the invalid field
+            if (fieldId) {
+                setTimeout(() => scrollAndHighlightElement(fieldId), 100);
+            }
+            
+            setSaving(false);
+            return;
+        }
+        
         // Filter to only valid missions
-        const filteredMissions = validatedMissions
-            .filter(item => item.isValid)
-            .map(item => item.mission);
+        const filteredMissions = validatedMissions.map(item => item.mission);
 
-        logger.info('After filtering', { 
+        logger.info('After validation', { 
             filteredReviewsCount: filteredReviews.length,
             filteredMissionsCount: filteredMissions.length
         });
@@ -272,6 +352,14 @@ export function useFormHandlers(
 
         setSaving(true);
         try {
+            // Log the data being sent to the server
+            logger.info('Submitting form data', {
+                consultantId: consultant.id,
+                reviewsCount: filteredReviews.length,
+                reviewIds: filteredReviews.map(r => r.id),
+                missionsCount: filteredMissions.length
+            });
+            
             // Update profile, reviews, and missions in parallel
             const [updatedProfile, reviewsUpdated, missionsUpdated] = await Promise.all([
                 updateConsultantProfileAction(consultant.id, submissionData),
@@ -287,8 +375,11 @@ export function useFormHandlers(
 
             if (updatedProfile && reviewsUpdated && missionsUpdated) {
                 showNotification('success', 'Profil mis à jour avec succès');
-                // Redirect immediately without delay
-                router.push(`/${consultant.slug}`);
+                // Add a small delay before redirecting to allow the notification to display
+                // and prevent layout flashing during navigation
+                setTimeout(() => {
+                    router.push(`/${consultant.slug}`);
+                }, 1000);
             } else {
                 showNotification('error', 'Échec de la mise à jour du profil');
             }

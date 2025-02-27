@@ -32,7 +32,6 @@ export function SocialLinks({
                             onChange={handleInputChange}
                             className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
                             placeholder="https://www.linkedin.com/in/votre-profil"
-                            aria-describedby="linkedin-description"
                         />
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-400">
@@ -40,9 +39,6 @@ export function SocialLinks({
                             </svg>
                         </div>
                     </div>
-                    <p id="linkedin-description" className="mt-1 text-xs text-gray-500">
-                        Votre profil LinkedIn professionnel
-                    </p>
                 </div>
                 <div>
                     <label htmlFor="twitter" className="block text-sm font-medium text-gray-700 mb-1">
@@ -57,7 +53,6 @@ export function SocialLinks({
                             onChange={handleInputChange}
                             className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
                             placeholder="https://twitter.com/votre-compte"
-                            aria-describedby="twitter-description"
                         />
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-400">
@@ -65,9 +60,6 @@ export function SocialLinks({
                             </svg>
                         </div>
                     </div>
-                    <p id="twitter-description" className="mt-1 text-xs text-gray-500">
-                        Votre compte Twitter/X
-                    </p>
                 </div>
                 <div>
                     <label htmlFor="instagram" className="block text-sm font-medium text-gray-700 mb-1">
@@ -82,7 +74,6 @@ export function SocialLinks({
                             onChange={handleInputChange}
                             className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
                             placeholder="https://www.instagram.com/votre-compte"
-                            aria-describedby="instagram-description"
                         />
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-400">
@@ -90,9 +81,6 @@ export function SocialLinks({
                             </svg>
                         </div>
                     </div>
-                    <p id="instagram-description" className="mt-1 text-xs text-gray-500">
-                        Votre compte Instagram
-                    </p>
                 </div>
                 <div>
                     <label htmlFor="facebook" className="block text-sm font-medium text-gray-700 mb-1">
@@ -107,7 +95,6 @@ export function SocialLinks({
                             onChange={handleInputChange}
                             className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
                             placeholder="https://www.facebook.com/votre-page"
-                            aria-describedby="facebook-description"
                         />
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-400">
@@ -115,9 +102,6 @@ export function SocialLinks({
                             </svg>
                         </div>
                     </div>
-                    <p id="facebook-description" className="mt-1 text-xs text-gray-500">
-                        Votre page Facebook professionnelle
-                    </p>
                 </div>
                 <div>
                     <label htmlFor="youtube" className="block text-sm font-medium text-gray-700 mb-1">
@@ -132,7 +116,6 @@ export function SocialLinks({
                             onChange={handleInputChange}
                             className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
                             placeholder="https://www.youtube.com/c/votre-chaine"
-                            aria-describedby="youtube-description"
                         />
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-400">
@@ -140,9 +123,6 @@ export function SocialLinks({
                             </svg>
                         </div>
                     </div>
-                    <p id="youtube-description" className="mt-1 text-xs text-gray-500">
-                        Votre chaîne YouTube
-                    </p>
                 </div>
                 <div>
                     <label htmlFor="medium" className="block text-sm font-medium text-gray-700 mb-1">
@@ -157,7 +137,6 @@ export function SocialLinks({
                             onChange={handleInputChange}
                             className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
                             placeholder="https://medium.com/@votre-compte"
-                            aria-describedby="medium-description"
                         />
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-400">
@@ -165,9 +144,6 @@ export function SocialLinks({
                             </svg>
                         </div>
                     </div>
-                    <p id="medium-description" className="mt-1 text-xs text-gray-500">
-                        Votre profil Medium pour vos articles
-                    </p>
                 </div>
                 <div>
                     <label htmlFor="substack" className="block text-sm font-medium text-gray-700 mb-1">
@@ -182,7 +158,6 @@ export function SocialLinks({
                             onChange={handleInputChange}
                             className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
                             placeholder="https://votre-newsletter.substack.com"
-                            aria-describedby="substack-description"
                         />
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-400">
@@ -190,9 +165,6 @@ export function SocialLinks({
                             </svg>
                         </div>
                     </div>
-                    <p id="substack-description" className="mt-1 text-xs text-gray-500">
-                        Votre newsletter Substack
-                    </p>
                 </div>
                 <div>
                     <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
@@ -207,7 +179,6 @@ export function SocialLinks({
                             onChange={handleInputChange}
                             className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
                             placeholder="https://www.votresite.com"
-                            aria-describedby="website-description"
                         />
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-gray-400">
@@ -217,9 +188,6 @@ export function SocialLinks({
                             </svg>
                         </div>
                     </div>
-                    <p id="website-description" className="mt-1 text-xs text-gray-500">
-                        Votre site web personnel ou professionnel
-                    </p>
                 </div>
             </div>
         </div>

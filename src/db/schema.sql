@@ -421,6 +421,29 @@ begin
             on consultant_reviews for insert
             with check ( auth.role() = 'authenticated' );
     end if;
+    
+    if not exists (
+        select 1 from pg_policies 
+        where tablename = 'consultant_reviews' 
+        and policyname = 'Consultants can manage their own reviews and admins can manage any review'
+    ) then
+        create policy "Consultants can manage their own reviews and admins can manage any review"
+            on consultant_reviews for all
+            using (
+                (exists (
+                    select 1 from profiles
+                    where id = auth.uid()
+                    and roles @> array['consultant']::user_role[]
+                )
+                and consultant_id = auth.uid())
+                or
+                (exists (
+                    select 1 from profiles
+                    where id = auth.uid()
+                    and roles @> array['admin']::user_role[]
+                ))
+            );
+    end if;
 end $$;
 
 -- Create policies for consultant_missions
