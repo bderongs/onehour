@@ -1,9 +1,0 @@
----
-description: Follow the official NextJs Doc and Supabase doc for the versions installed
-globs: 
-alwaysApply: false
----
-
-# Your rule content
-
-Check docs for NextJs and Supabase

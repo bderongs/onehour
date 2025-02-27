@@ -88,6 +88,13 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
                 throw new Error('Profile error: First name and last name are required');
             }
             
+            // Generate a slug from the consultant's name
+            logger.info('Generating slug for consultant profile');
+            const baseSlug = generateSlug(`${data.firstName}-${data.lastName}`);
+            // Ensure the slug is unique
+            const slug = await ensureUniqueSlugServer(baseSlug, 'profile');
+            logger.info('Generated unique slug for consultant:', slug);
+            
             // Prepare the profile data with proper types
             const now = new Date().toISOString();
             const profileData = {
@@ -97,6 +104,7 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
                 last_name: data.lastName || '',
                 roles: roles,
                 linkedin: data.linkedin || null,
+                slug: slug, // Add slug to profile data
                 created_at: now,
                 updated_at: now
             };
@@ -107,7 +115,8 @@ export const signUpConsultantWithEmail = async (data: ConsultantSignUpData) => {
                 hasFirstName: !!profileData.first_name,
                 hasLastName: !!profileData.last_name,
                 roles: profileData.roles,
-                hasLinkedin: !!profileData.linkedin
+                hasLinkedin: !!profileData.linkedin,
+                slug: profileData.slug  // Add slug to logging
             });
             
             const { error: profileError } = await client.from('profiles').insert(profileData);
