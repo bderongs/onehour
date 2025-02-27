@@ -64,6 +64,7 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
     });
 
     const [highlightError, setHighlightError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const DURATION_OPTIONS = [
         { value: '15', label: '15 minutes' },
@@ -126,14 +127,19 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Generate URL from title if not provided
-        const data = {
-            ...formData,
-            url: formData.url || formData.title?.toLowerCase().replace(/\s+/g, '-') || ''
-        } as Spark;
-        onSubmit(data);
+        setIsSubmitting(true);
+        try {
+            // Generate URL from title if not provided
+            const data = {
+                ...formData,
+                url: formData.url || formData.title?.toLowerCase().replace(/\s+/g, '-') || ''
+            } as Spark;
+            await onSubmit(data);
+        } catch (error) {
+            setIsSubmitting(false);
+        }
     };
 
     const parsePrice = (value: string): number | null => {
@@ -703,14 +709,23 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
                     type="button"
                     onClick={onCancel}
                     className="px-4 py-2 text-gray-600 hover:text-gray-900"
+                    disabled={isSubmitting}
                 >
                     Annuler
                 </button>
                 <button
                     type="submit"
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    disabled={isSubmitting}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center min-w-[120px]"
                 >
-                    {initialData ? 'Mettre à jour' : 'Créer'}
+                    {isSubmitting ? (
+                        <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            {initialData ? 'Mise à jour...' : 'Création...'}
+                        </>
+                    ) : (
+                        initialData ? 'Mettre à jour' : 'Créer'
+                    )}
                 </button>
             </div>
         </form>

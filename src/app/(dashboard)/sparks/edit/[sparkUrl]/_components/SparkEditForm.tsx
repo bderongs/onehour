@@ -1,10 +1,14 @@
+/**
+ * SparkEditForm.tsx - Component for editing existing Sparks
+ * Handles form submission and loading states
+ */
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
-import { SparkForm } from '@/components/SparkForm'
+import { SparkForm } from '@/app/(dashboard)/sparks/components/SparkForm'
 import { updateSparkAction } from '../actions'
 import type { Spark } from '@/types/spark'
 import { useNotification } from '@/contexts/NotificationContext'
@@ -32,6 +36,7 @@ export function SparkEditForm({ spark }: SparkEditFormProps) {
             logger.error('Error updating spark:', error)
             setError('Impossible de mettre à jour le spark. Veuillez réessayer plus tard.')
             showNotification('error', 'Erreur lors de la mise à jour du spark')
+            throw error // Re-throw to let the form component know there was an error
         }
     }
 

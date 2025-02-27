@@ -1,214 +1,61 @@
-//Incomplete edit page
-// 
+// Purpose: Edit page for consultant profiles, allowing users to update their information
+// This page handles editing consultant profiles with Next.js
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Loader2, Plus, Trash2, Edit2, Star, X, Upload, Link } from 'lucide-react';
 import { motion } from 'framer-motion';
-import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '@/types/consultant';
-import { uploadProfileImage, deleteProfileImage } from '@/services/storage';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { useNotification } from '@/contexts/NotificationContext';
-import { 
-    getConsultantProfileAction, 
-    getConsultantBySlugAction,
-    getConsultantReviewsAction, 
-    getConsultantMissionsAction,
-    updateConsultantProfileAction,
-    updateConsultantReviewsAction,
-    updateConsultantMissionsAction
-} from './actions';
+import { useConsultantData } from './hooks/useConsultantData';
+import { useFormHandlers } from './hooks/useFormHandlers';
+import { BasicInformation } from './components/BasicInformation';
+import { CompanyInformation } from './components/CompanyInformation';
+import { Competencies } from './components/Competencies';
+import { Languages } from './components/Languages';
+import { SocialLinks } from './components/SocialLinks';
+import { ReviewsList } from './components/Reviews/ReviewsList';
+import { MissionsList } from './components/Missions/MissionsList';
 import logger from '@/utils/logger';
 
 export default function ConsultantProfileEditPage() {
+    const params = useParams<{ slug: string }>();
     const router = useRouter();
-    const params = useParams();
-    const slug = Array.isArray(params?.slug) ? params.slug[0] : params?.slug ?? '';
-    const [consultant, setConsultant] = useState<ConsultantProfile | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const { showNotification } = useNotification();
-    const [formData, setFormData] = useState<Partial<ConsultantProfile> & {
-        languagesInput?: string,
-        keyCompetenciesInput?: string,
-        reviews?: ConsultantReview[],
-        missions?: ConsultantMission[],
-        profile_image_path?: string
-    }>({});
-    const [editingReviewIndex, setEditingReviewIndex] = useState<number | null>(null);
-    const [editingMissionIndex, setEditingMissionIndex] = useState<number | null>(null);
+    const { consultant, formData, setFormData, loading, error } = useConsultantData(params.slug as string);
+    const { 
+        saving, 
+        uploadingImage, 
+        handleInputChange, 
+        handleAddCompetency, 
+        handleRemoveCompetency, 
+        handleAddLanguage,
+        handleRemoveLanguage,
+        handleImageUpload, 
+        handleImageDelete, 
+        handleSubmit,
+        addCompetency,
+        addLanguage
+    } = useFormHandlers(consultant, formData, setFormData);
+    
     const [deleteConfirm, setDeleteConfirm] = useState<{
         type: 'review' | 'mission';
         index: number;
         isOpen: boolean;
     } | null>(null);
-    const [newCompetency, setNewCompetency] = useState('');
-    const [uploadingImage, setUploadingImage] = useState(false);
-    const [showUrlInput, setShowUrlInput] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Fetch consultant data when component mounts
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!slug) {
-                setError('Consultant slug is required');
-                setLoading(false);
-                return;
-            }
-
-            logger.info(`Fetching consultant data for slug: ${slug}`);
-            
-            try {
-                // Get the consultant data by slug first
-                const consultantData = await getConsultantBySlugAction(slug);
-                
-                logger.info(`Consultant data fetch result:`, consultantData ? 'Found' : 'Not found');
-                
-                if (!consultantData) {
-                    setError('Consultant not found');
-                    setLoading(false);
-                    return;
-                }
-                
-                // Then get reviews and missions using the ID
-                logger.info(`Fetching reviews and missions for consultant ID: ${consultantData.id}`);
-                const [reviews, missions] = await Promise.all([
-                    getConsultantReviewsAction(consultantData.id),
-                    getConsultantMissionsAction(consultantData.id)
-                ]);
-                logger.info(`Fetched ${reviews.length} reviews and ${missions.length} missions`);
-
-                setConsultant(consultantData);
-                setFormData({
-                    ...consultantData,
-                    languagesInput: consultantData.languages?.join(', ') || '',
-                    keyCompetenciesInput: consultantData.key_competencies?.join(', ') || '',
-                    reviews: reviews,
-                    missions: missions
-                });
-                setLoading(false);
-            } catch (err) {
-                logger.error('Error fetching consultant data:', err);
-                setError('Impossible de charger les données du consultant');
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [slug]);
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+    const handleRequestDelete = (type: 'review' | 'mission', index: number) => {
+        setDeleteConfirm({
+            type,
+            index,
+            isOpen: true
+        });
     };
 
-    const handleAddCompetency = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter' && newCompetency.trim()) {
+    // Prevent form submission when Enter key is pressed
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
             e.preventDefault();
-            const competencies = formData.keyCompetenciesInput?.split(',').map(c => c.trim()).filter(Boolean) || [];
-            if (!competencies.includes(newCompetency.trim())) {
-                setFormData(prev => ({
-                    ...prev,
-                    keyCompetenciesInput: [...competencies, newCompetency.trim()].join(',')
-                }));
-            }
-            setNewCompetency('');
-        }
-    };
-
-    const handleRemoveCompetency = (competencyToRemove: string) => {
-        const competencies = formData.keyCompetenciesInput?.split(',').map(c => c.trim()).filter(Boolean) || [];
-        setFormData(prev => ({
-            ...prev,
-            keyCompetenciesInput: competencies.filter(c => c !== competencyToRemove).join(',')
-        }));
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!slug || !consultant?.id) return;
-
-        const submissionData = {
-            ...formData,
-            languages: formData.languagesInput?.split(',').map(item => item.trim()).filter(Boolean) || [],
-            key_competencies: formData.keyCompetenciesInput?.split(',').map(item => item.trim()).filter(Boolean) || []
-        };
-
-        delete submissionData.languagesInput;
-        delete submissionData.keyCompetenciesInput;
-        delete submissionData.reviews;
-        delete submissionData.missions;
-        delete submissionData.profile_image_path;
-
-        setSaving(true);
-        try {
-            const [updatedProfile, reviewsUpdated, missionsUpdated] = await Promise.all([
-                updateConsultantProfileAction(consultant.id, submissionData),
-                updateConsultantReviewsAction(consultant.id, formData.reviews || []),
-                updateConsultantMissionsAction(consultant.id, formData.missions || [])
-            ]);
-
-            if (updatedProfile && reviewsUpdated && missionsUpdated) {
-                showNotification('success', 'Profil mis à jour avec succès');
-                setTimeout(() => {
-                    router.push(`/consultants/${updatedProfile.slug}`);
-                }, 1500);
-            } else {
-                setError('Impossible de mettre à jour le profil');
-                showNotification('error', 'Échec de la mise à jour du profil');
-            }
-        } catch (err) {
-            logger.error('Error updating profile:', err);
-            setError('Impossible de mettre à jour le profil');
-            showNotification('error', 'Échec de la mise à jour du profil');
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file || !slug) return;
-
-        try {
-            setUploadingImage(true);
-            const { publicUrl } = await uploadProfileImage(file, slug, formData.profile_image_url);
-            setFormData(prev => ({
-                ...prev,
-                profile_image_url: publicUrl
-            }));
-        } catch (error) {
-            logger.error('Error uploading image:', error);
-            showNotification('error', error instanceof Error ? error.message : 'Erreur lors de l\'upload de l\'image');
-        } finally {
-            setUploadingImage(false);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
-        }
-    };
-
-    const handleImageDelete = async () => {
-        if (formData.profile_image_url) {
-            try {
-                await deleteProfileImage(formData.profile_image_url);
-                setFormData(prev => ({ 
-                    ...prev, 
-                    profile_image_url: ''
-                }));
-            } catch (error) {
-                logger.error('Error deleting image:', error);
-                showNotification('error', 'Erreur lors de la suppression de l\'image');
-            }
-        }
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
+            logger.info('Form submission prevented on Enter key press');
         }
     };
 
@@ -242,43 +89,118 @@ export default function ConsultantProfileEditPage() {
                 >
                     <div className="flex items-center gap-4 mb-8">
                         <button
-                            onClick={() => router.push(`/consultants/${consultant.slug}`)}
+                            onClick={() => router.push(`/${consultant.slug}`)}
                             className="text-gray-500 hover:text-gray-700 transition-colors"
                         >
-                            <X className="h-6 w-6" />
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
                         </button>
                         <h1 className="text-3xl font-bold text-gray-900">Mon profil</h1>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-8">
-                        {/* Basic Information Card */}
-                        <div className="bg-white rounded-xl shadow-md p-6">
-                            <h2 className="text-xl font-semibold mb-4">Informations de base</h2>
-                            <p className="text-sm text-gray-500 mb-4">
-                                Ces informations constituent l'en-tête de votre profil et sont essentielles pour vous présenter aux clients potentiels.
-                            </p>
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Photo de profil
-                                    </label>
-                                    <div className="space-y-4">
-                                        {formData.profile_image_url && (
-                                            <div className="relative w-40 h-40 md:w-72 md:h-96 bg-gray-400 rounded-2xl border-4 border-white overflow-hidden">
-                                                <img
-                                                    src={formData.profile_image_url}
-                                                    alt="Profile"
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-                                        )}
+                    <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-8">
+                        {/* Basic Information */}
+                        <BasicInformation 
+                            formData={formData}
+                            handleInputChange={handleInputChange}
+                            handleImageUpload={handleImageUpload}
+                            handleImageDelete={handleImageDelete}
+                            uploadingImage={uploadingImage}
+                        />
+
+                        {/* Company Information */}
+                        <CompanyInformation 
+                            formData={formData}
+                            handleInputChange={handleInputChange}
+                        />
+
+                        {/* Competencies */}
+                        <Competencies 
+                            formData={formData}
+                            handleAddCompetency={handleAddCompetency}
+                            handleRemoveCompetency={handleRemoveCompetency}
+                            setFormData={setFormData}
+                            addCompetency={addCompetency}
+                        />
+
+                        {/* Languages */}
+                        <Languages 
+                            formData={formData}
+                            handleAddLanguage={handleAddLanguage}
+                            handleRemoveLanguage={handleRemoveLanguage}
+                            setFormData={setFormData}
+                            addLanguage={addLanguage}
+                        />
+
+                        {/* Social Links */}
+                        <SocialLinks 
+                            formData={formData}
+                            handleInputChange={handleInputChange}
+                        />
+
+                        {/* Reviews */}
+                        <ReviewsList 
+                            consultant={consultant}
+                            formData={formData}
+                            setFormData={setFormData}
+                            onRequestDelete={(type, index) => handleRequestDelete(type, index)}
+                        />
+
+                        {/* Missions */}
+                        <MissionsList 
+                            consultant={consultant}
+                            formData={formData}
+                            setFormData={setFormData}
+                            onRequestDelete={(type, index) => handleRequestDelete(type, index)}
+                        />
+
+                        {/* Form Actions */}
+                        <div className="flex justify-end gap-4">
+                            <button
+                                type="button"
+                                onClick={() => router.push(`/${consultant.slug}`)}
+                                className="px-4 py-2 text-gray-600 hover:text-gray-900"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={saving}
+                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                {saving ? (
+                                    <div className="flex items-center gap-2">
+                                        <LoadingSpinner message="Enregistrement..." />
                                     </div>
-                                </div>
-                            </div>
+                                ) : (
+                                    'Mettre à jour'
+                                )}
+                            </button>
                         </div>
                     </form>
                 </motion.div>
             </div>
+
+            <ConfirmDialog
+                isOpen={!!deleteConfirm}
+                title={`Supprimer ${deleteConfirm?.type === 'review' ? 'l\'avis' : 'la mission'}`}
+                message={`Êtes-vous sûr de vouloir supprimer ${deleteConfirm?.type === 'review' ? 'cet avis' : 'cette mission'} ? Cette action est irréversible.`}
+                confirmLabel="Supprimer"
+                cancelLabel="Annuler"
+                onConfirm={() => {
+                    if (deleteConfirm) {
+                        const { type, index } = deleteConfirm;
+                        setFormData(prev => ({
+                            ...prev,
+                            [type === 'review' ? 'reviews' : 'missions']: prev[type === 'review' ? 'reviews' : 'missions']?.filter((_, i) => i !== index)
+                        }));
+                        setDeleteConfirm(null);
+                    }
+                }}
+                onCancel={() => setDeleteConfirm(null)}
+                variant="danger"
+            />
         </div>
     );
-} 
+}

@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { SparkForm } from '@/components/SparkForm';
+import { ArrowLeft } from 'lucide-react';
+import { SparkForm } from '@/app/(dashboard)/sparks/components/SparkForm';
 import { createSparkAction } from '../actions';
 import type { Spark } from '@/types/spark';
 import { useAuth } from '@/contexts/AuthContext';

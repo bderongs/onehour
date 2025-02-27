@@ -1,3 +1,5 @@
+// Purpose: Server actions for consultant profile editing
+// This file contains all the server-side functions needed for the consultant profile edit page
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
