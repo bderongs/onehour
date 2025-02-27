@@ -1,8 +1,9 @@
-'use client';
+// Duplicate of the public profile page
+'use client'
 
-import { useEffect, useState, useMemo, use } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { CheckCircle, Star, Linkedin, Twitter, Globe, X, BadgeCheck, Sparkles, PenSquare, Instagram, Facebook, Youtube, FileText, BookOpen } from 'lucide-react';
-import { useRouter, useParams } from 'next/navigation';
 import { AIChatInterface, Message } from '@/components/AIChatInterface';
 import { ConsultantConnect } from '@/components/ConsultantConnect';
 import { DOCUMENT_TEMPLATES } from '@/data/documentTemplates';
@@ -10,7 +11,7 @@ import { createChatConfigs } from '@/data/chatConfigs';
 import type { DocumentSummary } from '@/types/chat';
 import type { Spark } from '@/types/spark';
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '@/types/consultant';
-import { getConsultantBySlugAction, getConsultantReviewsAction, getConsultantSparksAction, getConsultantMissionsAction } from './actions';
+import { getConsultantProfileAction, getConsultantBySlugAction, getConsultantReviewsAction, getConsultantSparksAction, getConsultantMissionsAction } from './actions';
 import { formatDuration, formatPrice } from '@/utils/format';
 import { getCurrentUser } from '@/services/auth';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
@@ -18,8 +19,9 @@ import { useNotification } from '@/contexts/NotificationContext';
 import { getDefaultAvatarUrl } from '@/utils/avatar';
 import logger from '@/utils/logger';
 
-export default function ConsultantProfilePage({ params }: { params: Promise<{ slug: string }> }) {
-    const resolvedParams = use(params);
+export default function ConsultantProfilePage() {
+    const params = useParams<{ slug: string }>();
+    const urlSlug = params?.slug;
     const router = useRouter();
     const { showNotification } = useNotification();
     const [showChat, setShowChat] = useState(false);
@@ -43,8 +45,8 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
     });
     const [missions, setMissions] = useState<ConsultantMission[]>([]);
 
-    // Use resolvedParams.slug instead of params.slug
-    const consultantIdentifier = resolvedParams.slug;
+    // Use propId if provided, otherwise use urlSlug
+    const consultantIdentifier = urlSlug;
 
     // Fetch current user when component mounts
     useEffect(() => {
@@ -59,11 +61,12 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Always use getConsultantBySlug since we're on the [slug] route
-                const consultantData = await getConsultantBySlugAction(consultantIdentifier || '');
+                const consultantData = urlSlug 
+                    ? await getConsultantProfileAction(urlSlug)
+                    : await getConsultantBySlugAction(consultantIdentifier || '');
 
                 if (!consultantData) {
-                    logger.error('No consultant found for slug:', consultantIdentifier || 'unknown');
+                    logger.error('No consultant found for identifier:', consultantIdentifier || 'unknown');
                     setError('Consultant not found');
                     setLoading(false);
                     router.push('/');
@@ -102,7 +105,7 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
             setSparks([]);
             setMissions([]);
         };
-    }, [consultantIdentifier, router, showNotification]);
+    }, [consultantIdentifier, urlSlug, router, showNotification]);
 
     // Memoize chat configs based on consultant's firstname
     const chatConfigs = useMemo(
@@ -117,17 +120,8 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
         }
     }, [consultant, chatConfigs]);
 
-    // Log state changes using logger
+    // Log state changes
     useEffect(() => {
-        if (error) {
-            logger.error('Error in ConsultantProfilePage:', error);
-        }
-        if (loading) {
-            logger.info('Loading consultant profile...');
-        }
-        if (consultant) {
-            logger.info('Consultant profile loaded:', { id: consultant.id });
-        }
     }, [loading, error, consultant, reviews, sparks]);
 
     // Reset shouldReset after it's been consumed
@@ -188,6 +182,15 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
         }
     };
 
+    const handleEditProfile = () => {
+        router.push(`/consultants/${consultantIdentifier}/edit`);
+    };
+
+    // Update the navigation handlers
+    const handleSeeSparkDetails = (sparkUrl: string) => {
+        router.push(`/sparks/${sparkUrl}`);
+    };
+
     // Handle loading state
     if (loading) {
         return <LoadingSpinner message="Chargement du profil..." />;
@@ -204,7 +207,7 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
             {currentUser?.id === consultant.id && (
                 <div className="fixed right-4 top-4 z-50">
                     <button
-                        onClick={() => router.push(`/consultants/${resolvedParams.slug}/edit`)}
+                        onClick={handleEditProfile}
                         className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-lg hover:shadow-xl border border-gray-200 text-gray-700 hover:text-blue-600 transition-all duration-200"
                         title="Modifier mon profil"
                     >
@@ -422,7 +425,7 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
                             }).map((pkg) => (
                                 <div 
                                     key={pkg.id}
-                                    onClick={() => router.push(`/sparks/${pkg.url}`)}
+                                    onClick={() => handleSeeSparkDetails(pkg.url)}
                                     className="flex flex-col bg-white rounded-xl shadow-md w-80 flex-shrink-0 
                                     hover:shadow-lg transition-all duration-200 ease-out hover:scale-[1.02]
                                     transform-gpu cursor-pointer"
@@ -446,7 +449,7 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
                                         <div className="mt-auto">
                                             <div className="text-sm font-medium text-gray-900 mb-2">Ce qui est inclus :</div>
                                             <ul className="space-y-2">
-                                                {pkg.deliverables?.map((item: string, i: number) => (
+                                                {pkg.deliverables?.map((item, i) => (
                                                     <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
                                                         <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
                                                         <span>{item}</span>
@@ -459,7 +462,7 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
                                         <button 
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                router.push(`/sparks/${pkg.url}`);
+                                                handleSeeSparkDetails(pkg.url);
                                             }}
                                             className={`w-full font-medium px-4 py-2 rounded-lg transition-colors ${
                                                 (!pkg.price || parseFloat(pkg.price) === 0)
@@ -530,7 +533,7 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
                         <div className="bg-white p-6 rounded-lg shadow-md mb-8 animate-fade-in-up">
                             <h3 className="text-xl font-semibold mb-4">Compétences clés</h3>
                             <ul className="grid md:grid-cols-2 gap-2">
-                                {consultant.key_competencies.map((competency: string, index: number) => (
+                                {consultant.key_competencies.map((competency, index) => (
                                     <li key={index} className="flex items-center gap-2">
                                         <CheckCircle className="h-5 w-5 text-blue-600" />
                                         <span>{competency}</span>

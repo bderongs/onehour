@@ -29,3 +29,6 @@ yarn-error.log*
 # Supabase
 supabase/.branches/
 supabase/.temp/ 
+
+# Legacy code files used as references
+./legacy/**/*
