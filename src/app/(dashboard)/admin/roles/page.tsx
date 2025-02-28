@@ -144,7 +144,7 @@ export default function Page() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-            <div className="max-w-7xl mx-auto px-4 py-12">
+            <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">Gestion des rôles</h1>
