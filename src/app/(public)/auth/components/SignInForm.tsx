@@ -11,7 +11,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, Loader2 } from 'lucide-react';
+import { Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotification } from '@/contexts/NotificationContext';
@@ -21,7 +21,11 @@ import { getCurrentUser, signOut } from '@/services/auth/client';
 // Define authentication stages for better UI state management
 type AuthStage = 'idle' | 'authenticating' | 'redirecting';
 
-export default function SignInForm() {
+interface SignInFormProps {
+    className?: string;
+}
+
+export default function SignInForm({ className = "" }: SignInFormProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [authStage, setAuthStage] = useState<AuthStage>('idle');
@@ -177,68 +181,47 @@ export default function SignInForm() {
         }
     };
 
-    // Get button text based on current auth stage
-    const getButtonText = () => {
-        switch (authStage) {
-            case 'authenticating':
-                return 'Connexion en cours...';
-            case 'redirecting':
-                return 'Redirection...';
-            default:
-                return 'Se connecter';
-        }
-    };
-
     return (
         <form 
-            className="space-y-6" 
+            className={`space-y-6 ${className}`}
             onSubmit={handleSubmit} 
             method="POST"
-            action="#" // Add action attribute to prevent form from submitting to the current URL
+            action="#" 
         >
             <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 text-left">
                     Email
                 </label>
-                <div className="mt-1 relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Mail className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="block w-full pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="vous@example.com"
-                        disabled={authStage !== 'idle'}
-                    />
-                </div>
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="vous@example.com"
+                    disabled={authStage !== 'idle'}
+                />
             </div>
 
             <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1 text-left">
                     Mot de passe
                 </label>
-                <div className="mt-1 relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Lock className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        autoComplete="current-password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="block w-full pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        disabled={authStage !== 'idle'}
-                    />
-                </div>
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Votre mot de passe"
+                    disabled={authStage !== 'idle'}
+                />
             </div>
 
             <div className="flex items-center justify-between">
@@ -256,14 +239,19 @@ export default function SignInForm() {
                 <button
                     type="submit"
                     disabled={authStage !== 'idle'}
-                    className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                        authStage !== 'idle' ? 'opacity-80 cursor-not-allowed' : ''
-                    }`}
+                    className="w-full bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {authStage !== 'idle' && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {authStage !== 'idle' ? (
+                        <>
+                            <div className="h-5 w-5 border-t-2 border-white border-solid rounded-full animate-spin"></div>
+                            <span>{authStage === 'authenticating' ? 'Connexion en cours...' : 'Redirection...'}</span>
+                        </>
+                    ) : (
+                        <>
+                            Se connecter
+                            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                        </>
                     )}
-                    {getButtonText()}
                 </button>
             </div>
         </form>

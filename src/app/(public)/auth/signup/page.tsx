@@ -1,3 +1,7 @@
+/**
+ * Signup page component that allows users to create a new account.
+ * Uses the same styling as the signin page for consistency.
+ */
 import { Suspense } from 'react';
 import { type Metadata } from 'next';
 import { SignUpPageClient } from '../components/SignUpPageClient';
@@ -14,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function SignUpPage() {
     return (
-        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center px-4">
             <div className="max-w-md w-full">
                 <Suspense fallback={<SignUpPageSkeleton />}>
                     <SignUpPageClient />
