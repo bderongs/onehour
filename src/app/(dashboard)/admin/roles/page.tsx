@@ -12,6 +12,17 @@ import { useAuth } from '../../../../contexts/AuthContext'
 import { updateRoles } from './actions'
 import logger from '@/utils/logger'
 
+// Define a type for the profile data from Supabase
+interface ProfileData {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    roles: UserRole[];
+    created_at: string;
+    updated_at: string;
+}
+
 const EmptyState = () => (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
         <motion.div
@@ -50,9 +61,9 @@ export default function Page() {
 
             const filteredData = includeSparkierEmails 
                 ? data 
-                : data.filter(profile => !profile.email.endsWith('@sparkier.io'))
+                : data.filter((profile: ProfileData) => !profile.email.endsWith('@sparkier.io'))
 
-            setUsers(filteredData.map(profile => ({
+            setUsers(filteredData.map((profile: ProfileData) => ({
                 id: profile.id,
                 email: profile.email,
                 firstName: profile.first_name,

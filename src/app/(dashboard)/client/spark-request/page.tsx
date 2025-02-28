@@ -17,11 +17,11 @@ export default function SparkRequestPage({
 }: {
     searchParams: { [key: string]: string | string[] | undefined };
 }) {
-    const sparkUrl = searchParams.spark_url as string | null;
+    const sparkSlug = searchParams.spark_url as string | null;
 
     return (
         <Suspense fallback={<SparkRequestSkeleton />}>
-            <SparkRequestHandler sparkUrl={sparkUrl} />
+            <SparkRequestHandler sparkSlug={sparkSlug} />
         </Suspense>
     );
 } 

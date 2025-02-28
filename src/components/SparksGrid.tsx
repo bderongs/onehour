@@ -12,10 +12,10 @@ const fadeInUp = {
 interface SparksGridProps {
     sparks: Spark[];
     onCreateSpark: () => void;
-    onPreviewSpark: (sparkUrl: string) => void;
-    onEditSpark: (sparkUrl: string) => void;
-    onAIEditSpark: (sparkUrl: string) => void;
-    onDeleteSpark: (sparkUrl: string) => void;
+    onPreviewSpark: (sparkSlug: string) => void;
+    onEditSpark: (sparkSlug: string) => void;
+    onAIEditSpark: (sparkSlug: string) => void;
+    onDeleteSpark: (sparkSlug: string) => void;
 }
 
 export function SparksGrid({
@@ -42,7 +42,7 @@ export function SparksGrid({
 
             {sparks.map((spark) => (
                 <SparkCard
-                    key={spark.url}
+                    key={spark.slug}
                     spark={spark}
                     onPreview={onPreviewSpark}
                     onEdit={onEditSpark}

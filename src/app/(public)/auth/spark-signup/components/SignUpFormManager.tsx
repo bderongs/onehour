@@ -6,7 +6,7 @@ import { EmailCheckForm } from '../../components/EmailCheckForm';
 import { PasswordSignInStep } from '../../components/PasswordSignInStep';
 import { ClientSignUpForm } from '../../components/ClientSignUpForm';
 import { useClientSignUp } from '@/contexts/ClientSignUpContext';
-import { getSparkByUrl } from '@/services/sparks';
+import { getSparkBySlug } from '@/services/sparks';
 import { createClientRequest, getClientRequestsByClientId } from '@/services/clientRequests';
 import { createBrowserClient } from '@/lib/supabase/client';
 import logger from '@/utils/logger';
@@ -38,7 +38,7 @@ export function SignUpFormManager() {
                 throw new Error('Session perdue après la connexion');
             }
 
-            const spark = await getSparkByUrl(sparkUrlSlug);
+            const spark = await getSparkBySlug(sparkUrlSlug);
             if (!spark) {
                 logger.error('Spark not found after sign in', { sparkUrlSlug });
                 router.push('/client/dashboard');

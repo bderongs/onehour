@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { ConsultantProfile, ConsultantReview, ConsultantMission } from '@/types/consultant'
 import type { Spark } from '@/types/spark'
 import logger from '@/utils/logger'
+import { transformSparkFromDB } from '@/services/serverSparks'
 
 export async function getConsultantBySlugAction(slug: string): Promise<ConsultantProfile | null> {
     const client = await createClient()
@@ -61,7 +62,7 @@ export async function getConsultantSparksAction(consultantId: string): Promise<S
         return []
     }
 
-    return data as Spark[]
+    return data ? data.map(spark => transformSparkFromDB(spark)) : []
 }
 
 export async function getConsultantMissionsAction(consultantId: string): Promise<ConsultantMission[]> {

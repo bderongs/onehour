@@ -270,7 +270,7 @@ export type Database = {
           testimonials: Json[] | null
           title: string
           updated_at: string
-          url: string
+          slug: string
         }
         Insert: {
           benefits?: string[] | null
@@ -294,7 +294,7 @@ export type Database = {
           testimonials?: Json[] | null
           title: string
           updated_at?: string
-          url: string
+          slug: string
         }
         Update: {
           benefits?: string[] | null
@@ -318,7 +318,7 @@ export type Database = {
           testimonials?: Json[] | null
           title?: string
           updated_at?: string
-          url?: string
+          slug?: string
         }
         Relationships: [
           {

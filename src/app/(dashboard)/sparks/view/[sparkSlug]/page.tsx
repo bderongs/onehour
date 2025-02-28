@@ -4,7 +4,7 @@
  */
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { getSparkByUrl } from '@/services/sparks';
+import { getSparkBySlug } from '@/services/sparks';
 import { SparkProductSkeleton } from './_components/SparkProductSkeleton';
 import { MainContent } from './_components/MainContent';
 
@@ -13,16 +13,16 @@ type PageContext = 'consultant_marketing' | 'client_purchase' | 'consultant_prev
 
 interface PageProps {
     params: {
-        sparkUrl: string;
+        sparkSlug: string;
     };
 }
 
 export async function generateMetadata({ params }: PageProps) {
     // Await the entire params object
     params = await params;
-    const sparkUrl = params.sparkUrl;
+    const sparkSlug = params.sparkSlug;
     
-    const spark = await getSparkByUrl(sparkUrl);
+    const spark = await getSparkBySlug(sparkSlug);
     
     if (!spark) {
         return {
@@ -46,11 +46,11 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function SparkProductPage({ params }: PageProps) {
     // Await the entire params object
     params = await params;
-    const sparkUrl = params.sparkUrl;
+    const sparkSlug = params.sparkSlug;
     
     const DEMO_CONSULTANT_ID = process.env.NEXT_PUBLIC_DEMO_CONSULTANT_ID;
 
-    const spark = await getSparkByUrl(sparkUrl);
+    const spark = await getSparkBySlug(sparkSlug);
 
     if (!spark) {
         notFound();
@@ -68,7 +68,7 @@ export default async function SparkProductPage({ params }: PageProps) {
             <MainContent 
                 spark={spark} 
                 pageContext={pageContext} 
-                sparkUrl={sparkUrl} 
+                sparkSlug={sparkSlug} 
             />
         </Suspense>
     );

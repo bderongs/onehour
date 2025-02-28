@@ -9,7 +9,7 @@ import { ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClientSignUp } from '@/contexts/ClientSignUpContext';
 import { createClientRequest, getClientRequestsByClientId } from '@/services/clientRequests';
-import { getSparkByUrl } from '@/services/sparks';
+import { getSparkBySlug } from '@/services/sparks';
 import type { Spark } from '@/types/spark';
 import logger from '@/utils/logger';
 
@@ -17,12 +17,12 @@ type PageContext = 'consultant_marketing' | 'client_purchase' | 'consultant_prev
 
 interface SparkActionButtonProps {
     pageContext: PageContext;
-    sparkUrl: string;
+    sparkSlug: string;
     className?: string;
     isMobile?: boolean;
 }
 
-export function SparkActionButton({ pageContext, sparkUrl, className = '', isMobile = false }: SparkActionButtonProps) {
+export function SparkActionButton({ pageContext, sparkSlug, className = '', isMobile = false }: SparkActionButtonProps) {
     const router = useRouter();
     const { user } = useAuth();
     const { setSparkUrlSlug } = useClientSignUp();
@@ -35,17 +35,17 @@ export function SparkActionButton({ pageContext, sparkUrl, className = '', isMob
                 break;
             case 'client_purchase':
                 if (!isAuthenticated) {
-                    logger.info('User not authenticated, redirecting to signup', { sparkUrl });
-                    setSparkUrlSlug(sparkUrl || null);
+                    logger.info('User not authenticated, redirecting to signup', { sparkSlug });
+                    setSparkUrlSlug(sparkSlug || null);
                     router.push('/auth/spark-signup');
                 } else {
-                    if (!sparkUrl || !user) return;
-                    logger.info('Creating client request for authenticated user', { sparkUrl });
+                    if (!sparkSlug || !user) return;
+                    logger.info('Creating client request for authenticated user', { sparkSlug });
                     
-                    getSparkByUrl(sparkUrl)
+                    getSparkBySlug(sparkSlug)
                         .then((spark: Spark | null) => {
                             if (!spark) {
-                                logger.error('Spark not found when creating request', { sparkUrl });
+                                logger.error('Spark not found when creating request', { sparkSlug });
                                 throw new Error('Spark not found');
                             }
                             logger.info('Found spark, checking existing requests', { sparkId: spark.id });

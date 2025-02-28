@@ -73,7 +73,7 @@ export function SparksGridServer({
     // Generate dates on the server side
     const availableDates = sparks.map((spark, index) => {
         // Make sure we have a valid identifier to use as seed
-        const identifier = spark.id || spark.url || `spark-${index}`;
+        const identifier = spark.id || spark.slug || `spark-${index}`;
         return getBusinessDate(identifier);
     });
 

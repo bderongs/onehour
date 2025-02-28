@@ -3,17 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientRequest, getClientRequestsByClientId } from '@/services/clientRequests';
-import { getSparkByUrl } from '@/services/sparks';
+import { getSparkBySlug } from '@/services/sparks';
 import { createBrowserClient } from '@/lib/supabase/client';
 import logger from '@/utils/logger';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useNotification } from '@/contexts/NotificationContext';
 
 interface SparkRequestHandlerProps {
-    sparkUrl: string | null;
+    sparkSlug: string | null;
 }
 
-export function SparkRequestHandler({ sparkUrl }: SparkRequestHandlerProps) {
+export function SparkRequestHandler({ sparkSlug }: SparkRequestHandlerProps) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
@@ -22,17 +22,17 @@ export function SparkRequestHandler({ sparkUrl }: SparkRequestHandlerProps) {
     useEffect(() => {
         const handleSparkRequest = async () => {
             try {
-                logger.info('Processing spark request', { sparkUrl });
+                logger.info('Processing spark request', { sparkSlug });
 
-                if (!sparkUrl) {
+                if (!sparkSlug) {
                     logger.error('Missing spark_url parameter');
                     throw new Error('Paramètre spark_url manquant');
                 }
 
                 // Get the spark
-                const spark = await getSparkByUrl(sparkUrl);
+                const spark = await getSparkBySlug(sparkSlug);
                 if (!spark) {
-                    logger.error('Spark not found', { sparkUrl });
+                    logger.error('Spark not found', { sparkSlug });
                     throw new Error('Spark non trouvé');
                 }
 
@@ -77,7 +77,7 @@ export function SparkRequestHandler({ sparkUrl }: SparkRequestHandlerProps) {
         };
 
         handleSparkRequest();
-    }, [router, sparkUrl, showNotification]);
+    }, [router, sparkSlug, showNotification]);
 
     if (loading) {
         return <LoadingSpinner message="Traitement de votre demande..." />;

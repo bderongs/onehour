@@ -19,10 +19,10 @@ type PageContext = 'consultant_marketing' | 'client_purchase' | 'consultant_prev
 interface MainContentProps {
     spark: Spark;
     pageContext: PageContext;
-    sparkUrl: string;
+    sparkSlug: string;
 }
 
-export function MainContent({ spark, pageContext, sparkUrl }: MainContentProps) {
+export function MainContent({ spark, pageContext, sparkSlug }: MainContentProps) {
     return (
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
             {/* Demo Warning Banner */}
@@ -34,7 +34,7 @@ export function MainContent({ spark, pageContext, sparkUrl }: MainContentProps) 
                         </div>
                         <SparkActionButton 
                             pageContext={pageContext}
-                            sparkUrl={sparkUrl}
+                            sparkSlug={sparkSlug}
                             className="text-xs sm:text-sm font-medium text-amber-800 hover:text-amber-900"
                         />
                     </div>
@@ -73,7 +73,7 @@ export function MainContent({ spark, pageContext, sparkUrl }: MainContentProps) 
                         <div className="hidden lg:flex justify-end">
                             <SparkActionButton 
                                 pageContext={pageContext}
-                                sparkUrl={sparkUrl}
+                                sparkSlug={sparkSlug}
                             />
                         </div>
                         
@@ -81,7 +81,7 @@ export function MainContent({ spark, pageContext, sparkUrl }: MainContentProps) 
                         <div className="lg:hidden w-full">
                             <SparkActionButton 
                                 pageContext={pageContext}
-                                sparkUrl={sparkUrl}
+                                sparkSlug={sparkSlug}
                                 isMobile
                             />
                         </div>

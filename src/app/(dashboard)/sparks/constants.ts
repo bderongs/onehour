@@ -1,3 +1,7 @@
+/**
+ * constants.ts
+ * Contains default values and constants for the sparks module.
+ */
 import type { Spark } from '@/types/spark'
 
 // Default spark state
@@ -12,7 +16,7 @@ export const DEFAULT_SPARK: Omit<Spark, 'id'> = {
     prerequisites: [],
     deliverables: [],
     nextSteps: [],
-    url: '',
+    slug: `spark-${Date.now()}`, // Generate a default slug based on timestamp
     consultant: null,
     highlight: '',
     prefillText: '',
@@ -25,5 +29,6 @@ export const DEFAULT_SPARK: Omit<Spark, 'id'> = {
     },
     faq: [],
     imageUrl: '',
+    image_url: '', // Database column name
     socialImageUrl: ''
 } 

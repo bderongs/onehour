@@ -419,10 +419,10 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
                                 const priceA = !a.price || a.price === '' ? 0 : parseFloat(a.price);
                                 const priceB = !b.price || b.price === '' ? 0 : parseFloat(b.price);
                                 return priceA - priceB;
-                            }).map((pkg) => (
+                            }).map((spark) => (
                                 <div 
-                                    key={pkg.id}
-                                    onClick={() => router.push(`/sparks/${pkg.url}`)}
+                                    key={spark.id}
+                                    onClick={() => router.push(`/sparks/${spark.slug}`)}
                                     className="flex flex-col bg-white rounded-xl shadow-md w-80 flex-shrink-0 
                                     hover:shadow-lg transition-all duration-200 ease-out hover:scale-[1.02]
                                     transform-gpu cursor-pointer"
@@ -430,23 +430,23 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
                                     <div className="p-6 flex flex-col h-full">
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
-                                                <h4 className="text-lg font-semibold text-gray-900">{pkg.title}</h4>
+                                                <h4 className="text-lg font-semibold text-gray-900">{spark.title}</h4>
                                                 <div className="flex items-center gap-4 text-gray-500">
-                                                    <span>{formatDuration(pkg.duration)}</span>
-                                                    <div className="text-sm font-bold text-gray-900">{formatPrice(pkg.price)}</div>
+                                                    <span>{formatDuration(spark.duration)}</span>
+                                                    <div className="text-sm font-bold text-gray-900">{formatPrice(spark.price)}</div>
                                                 </div>
                                             </div>
-                                            {pkg.highlight && (
+                                            {spark.highlight && (
                                                 <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                                    {pkg.highlight}
+                                                    {spark.highlight}
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
+                                        <p className="text-gray-600 text-sm mb-4">{spark.description}</p>
                                         <div className="mt-auto">
                                             <div className="text-sm font-medium text-gray-900 mb-2">Ce qui est inclus :</div>
                                             <ul className="space-y-2">
-                                                {pkg.deliverables?.map((item: string, i: number) => (
+                                                {spark.deliverables?.map((item: string, i: number) => (
                                                     <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
                                                         <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
                                                         <span>{item}</span>
@@ -459,15 +459,15 @@ export default function ConsultantProfilePage({ params }: { params: Promise<{ sl
                                         <button 
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                router.push(`/sparks/${pkg.url}`);
+                                                router.push(`/sparks/${spark.slug}`);
                                             }}
                                             className={`w-full font-medium px-4 py-2 rounded-lg transition-colors ${
-                                                (!pkg.price || parseFloat(pkg.price) === 0)
+                                                (!spark.price || parseFloat(spark.price) === 0)
                                                 ? "bg-blue-600 hover:bg-blue-700 text-white" 
                                                 : "bg-gray-50 hover:bg-gray-100 text-gray-900"
                                             }`}
                                         >
-                                            {(!pkg.price || parseFloat(pkg.price) === 0) ? "Prendre RDV" : "En savoir plus"}
+                                            {(!spark.price || parseFloat(spark.price) === 0) ? "Prendre RDV" : "En savoir plus"}
                                         </button>
                                     </div>
                                 </div>

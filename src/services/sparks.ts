@@ -14,7 +14,7 @@ const transformSparkFromDB = (dbSpark: any): Spark => ({
     prefillText: dbSpark.prefill_text,
     highlight: dbSpark.highlight,
     consultant: dbSpark.consultant,
-    url: dbSpark.url,
+    slug: dbSpark.slug,
     detailedDescription: dbSpark.detailed_description,
     methodology: dbSpark.methodology,
     targetAudience: dbSpark.target_audience,
@@ -118,20 +118,25 @@ export const getSparks = async (): Promise<Spark[]> => {
     }
 };
 
-export const getSparkByUrl = async (url: string): Promise<Spark | null> => {
-    const client = createClient();
-    const { data, error } = await client
-        .from('sparks')
-        .select('*')
-        .eq('url', url)
-        .single();
+export const getSparkBySlug = async (slug: string): Promise<Spark | null> => {
+    try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+            .from('sparks')
+            .select('*')
+            .eq('slug', slug)
+            .single();
 
-    if (error) {
-        logger.error('Error fetching spark by URL:', error);
+        if (error) {
+            logger.error('Error fetching spark by slug', { error, slug });
+            return null;
+        }
+
+        return data ? transformSparkFromDB(data) : null;
+    } catch (error) {
+        logger.error('Exception fetching spark by slug', { error, slug });
         return null;
     }
-
-    return data ? transformSparkFromDB(data) : null;
 };
 
 export const getSparksByConsultant = async (consultantId: string): Promise<Spark[]> => {

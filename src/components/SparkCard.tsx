@@ -11,10 +11,10 @@ const fadeInUp = {
 
 interface SparkCardProps {
     spark: Spark;
-    onPreview: (sparkUrl: string) => void;
-    onEdit: (sparkUrl: string) => void;
-    onAIEdit: (sparkUrl: string) => void;
-    onDelete: (sparkUrl: string) => void;
+    onPreview: (sparkSlug: string) => void;
+    onEdit: (sparkSlug: string) => void;
+    onAIEdit: (sparkSlug: string) => void;
+    onDelete: (sparkSlug: string) => void;
 }
 
 export function SparkCard({
@@ -50,28 +50,28 @@ export function SparkCard({
 
             <div className="flex items-center gap-3">
                 <button
-                    onClick={() => onPreview(spark.url)}
+                    onClick={() => onPreview(spark.slug)}
                     className="text-gray-600 hover:text-gray-900 transition-colors"
                     title="Preview"
                 >
                     <Eye className="h-5 w-5" />
                 </button>
                 <button
-                    onClick={() => onEdit(spark.url)}
+                    onClick={() => onEdit(spark.slug)}
                     className="text-gray-600 hover:text-gray-900 transition-colors"
                     title="Edit"
                 >
                     <Edit2 className="h-5 w-5" />
                 </button>
                 <button
-                    onClick={() => onAIEdit(spark.url)}
+                    onClick={() => onAIEdit(spark.slug)}
                     className="text-blue-600 hover:text-blue-700 transition-colors"
                     title="AI Edit"
                 >
                     <Sparkles className="h-5 w-5" />
                 </button>
                 <button
-                    onClick={() => onDelete(spark.url)}
+                    onClick={() => onDelete(spark.slug)}
                     className="text-red-600 hover:text-red-700 transition-colors"
                     title="Delete"
                 >

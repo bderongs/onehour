@@ -144,8 +144,8 @@ export const SparksGrid = React.memo(function SparksGrid({
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        logger.info('Navigating to spark details', { url: `/sparks/${spark.url}` });
-                                                        router.push(`/sparks/${spark.url}`);
+                                                        logger.info('Navigating to spark details', { url: `/sparks/${spark.slug}` });
+                                                        router.push(`/sparks/${spark.slug}`);
                                                         setExpandedCallIndex(null);
                                                     }}
                                                     className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg 

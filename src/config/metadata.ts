@@ -36,7 +36,7 @@ export const routeMetadata: RouteMetadata = {
         type: 'website'
     },
 
-    '/sparks/:sparkUrl': ({ spark }: DynamicMetadataProps = {}) => ({
+    '/sparks/:sparkSlug': ({ spark }: DynamicMetadataProps = {}) => ({
         title: spark?.title ? `${spark.title} | Sparkier` : 'Sparkier',
         description: spark?.description || defaultMetadata.description,
         image: spark?.socialImageUrl || 'https://sparkier.io/images/og-spark.png',

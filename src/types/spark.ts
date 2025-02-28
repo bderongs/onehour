@@ -1,3 +1,7 @@
+/**
+ * spark.ts
+ * Type definitions for Spark objects, ensuring compatibility between frontend and database representations.
+ */
 export interface Spark {
     id: string;
     title: string;
@@ -23,8 +27,9 @@ export interface Spark {
         answer: string;
     }>;
     nextSteps?: string[];
-    url: string;
-    imageUrl?: string; // URL for the main image
+    slug: string; // Unique identifier used in URLs (previously named 'url')
+    imageUrl?: string; // URL for the main image (frontend property)
+    image_url?: string; // URL for the main image (database column name)
     socialImageUrl?: string; // URL for the social sharing image
     createdAt: string;
     updatedAt: string;

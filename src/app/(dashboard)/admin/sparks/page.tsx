@@ -52,9 +52,9 @@ export default function Page() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [filterType, setFilterType] = useState<FilterType>('orphan')
-    const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; sparkUrl: string | null }>({
+    const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; sparkSlug: string | null }>({
         isOpen: false,
-        sparkUrl: null
+        sparkSlug: null
     })
 
     const filteredSparks = sparks.filter(spark => {
@@ -105,35 +105,35 @@ export default function Page() {
         router.push('/sparks/ai-create')
     }
 
-    const handleEditSpark = (sparkUrl: string) => {
-        router.push(`/sparks/edit/${sparkUrl}`)
+    const handleEditSpark = (sparkSlug: string) => {
+        router.push(`/sparks/edit/${sparkSlug}`)
     }
 
-    const handleAIEditSpark = (sparkUrl: string) => {
-        router.push(`/sparks/ai-edit/${sparkUrl}`)
+    const handleAIEditSpark = (sparkSlug: string) => {
+        router.push(`/sparks/ai-edit/${sparkSlug}`)
     }
 
-    const handlePreviewSpark = (sparkUrl: string) => {
-        router.push(`/sparks/view/${sparkUrl}`)
+    const handlePreviewSpark = (sparkSlug: string) => {
+        router.push(`/sparks/view/${sparkSlug}`)
     }
 
-    const handleDeleteSpark = async (sparkUrl: string) => {
-        setDeleteConfirm({ isOpen: true, sparkUrl })
+    const handleDeleteSpark = async (sparkSlug: string) => {
+        setDeleteConfirm({ isOpen: true, sparkSlug: sparkSlug })
     }
 
     const handleConfirmDelete = async () => {
-        if (!deleteConfirm.sparkUrl) return
+        if (!deleteConfirm.sparkSlug) return
         
         try {
             // Use server action to delete spark
-            await deleteSparkAction(deleteConfirm.sparkUrl)
-            setSparks(sparks.filter(spark => spark.url !== deleteConfirm.sparkUrl))
+            await deleteSparkAction(deleteConfirm.sparkSlug)
+            setSparks(sparks.filter(spark => spark.slug !== deleteConfirm.sparkSlug))
             showNotification('success', 'Le Spark a été supprimé avec succès')
         } catch (error) {
             console.error('Error deleting spark:', error)
             showNotification('error', 'Échec de la suppression du Spark')
         } finally {
-            setDeleteConfirm({ isOpen: false, sparkUrl: null })
+            setDeleteConfirm({ isOpen: false, sparkSlug: null })
         }
     }
 
@@ -204,7 +204,7 @@ export default function Page() {
                 confirmLabel="Supprimer"
                 cancelLabel="Annuler"
                 onConfirm={handleConfirmDelete}
-                onCancel={() => setDeleteConfirm({ isOpen: false, sparkUrl: null })}
+                onCancel={() => setDeleteConfirm({ isOpen: false, sparkSlug: null })}
                 variant="danger"
             />
         </div>

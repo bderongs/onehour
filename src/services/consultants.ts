@@ -6,6 +6,7 @@ import { generateSlug } from '@/utils/url/shared';
 import { ensureUniqueSlug as ensureUniqueSlugServer } from '@/utils/url/server';
 import { deleteUserAction } from '@/app/(public)/auth/actions';
 import logger from '@/utils/logger';
+import { transformSparkFromDB } from '@/services/serverSparks';
 
 // Transform database response to ConsultantProfile
 const transformConsultantFromDB = (data: any): ConsultantProfile => ({
@@ -76,7 +77,7 @@ export async function getConsultantSparks(consultantId: string): Promise<Spark[]
         return [];
     }
 
-    return data as Spark[];
+    return data ? data.map(spark => transformSparkFromDB(spark)) : [];
 }
 
 export async function getConsultantBySlug(slug: string): Promise<ConsultantProfile | null> {
@@ -290,7 +291,7 @@ export async function updateConsultantMissions(consultantId: string, missions: C
                         duration: mission.duration,
                         start_date: mission.date
                     })
-                    .eq('id', missionId)
+                    .eq('id', missionId || '')
                     .eq('consultant_id', consultantId);
 
                 if (updateError) {

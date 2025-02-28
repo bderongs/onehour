@@ -1,12 +1,15 @@
+/**
+ * SparkForm.tsx
+ * Client component for creating and editing Spark products with form validation and image upload
+ */
 'use client';
 
 import { useState, useRef } from 'react';
-import type { Spark } from '../types/spark';
-import { Plus, X, Trash2, Upload, Link } from 'lucide-react';
-import { formatDuration, formatPrice } from '../utils/format';
-import { Loader2 } from 'lucide-react';
-import { uploadSparkImage, deleteSparkImage } from '../services/storage';
-import { useNotification } from '../contexts/NotificationContext';
+import type { Spark } from '@/types/spark';
+import { Plus, X, Trash2, Upload, Link, Loader2 } from 'lucide-react';
+import { formatDuration, formatPrice } from '@/utils/format';
+import { uploadSparkImage, deleteSparkImage } from '@/services/storage';
+import { useNotification } from '@/contexts/NotificationContext';
 
 interface SparkFormProps {
     initialData?: Spark;
@@ -131,10 +134,10 @@ export function SparkForm({ initialData, onSubmit, onCancel }: SparkFormProps) {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            // Generate URL from title if not provided
+            // Generate slug from title if not provided
             const data = {
                 ...formData,
-                url: formData.url || formData.title?.toLowerCase().replace(/\s+/g, '-') || ''
+                slug: formData.slug || formData.title?.toLowerCase().replace(/\s+/g, '-') || ''
             } as Spark;
             await onSubmit(data);
         } catch (error) {

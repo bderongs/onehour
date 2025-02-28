@@ -29,7 +29,7 @@ export function SparkEditForm({ spark }: SparkEditFormProps) {
                 ...data,
                 price: data.price || '0'
             }
-            await updateSparkAction(spark.url, updatedData)
+            await updateSparkAction(spark.slug, updatedData)
             showNotification('success', 'Spark mis à jour avec succès')
             router.back()
         } catch (error) {

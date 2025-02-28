@@ -215,7 +215,7 @@ create table if not exists sparks (
     benefits text[],
     prefill_text text not null,
     highlight text,
-    url text not null unique,
+    slug text not null unique,
     detailed_description text,
     methodology text[],
     target_audience text[],
@@ -226,9 +226,22 @@ create table if not exists sparks (
     testimonials jsonb[],
     next_steps text[],
     social_image_url text,
+    image_url text,
     created_at timestamp with time zone default timezone('utc'::text, now()) not null,
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
+
+-- Add migration to rename url column to slug if it exists
+do $$
+begin
+    if exists (
+        select 1 from information_schema.columns 
+        where table_name = 'sparks' 
+        and column_name = 'url'
+    ) then
+        alter table sparks rename column url to slug;
+    end if;
+end $$;
 
 -- Add social_image_url column if it doesn't exist
 do $$
@@ -239,6 +252,15 @@ begin
         and column_name = 'social_image_url'
     ) then
         alter table sparks add column social_image_url text;
+    end if;
+    
+    -- Add image_url column if it doesn't exist
+    if not exists (
+        select 1 from information_schema.columns 
+        where table_name = 'sparks' 
+        and column_name = 'image_url'
+    ) then
+        alter table sparks add column image_url text;
     end if;
 end $$;
 
@@ -335,7 +357,7 @@ end $$;
 
 -- Create indexes
 create index if not exists sparks_consultant_idx on sparks (consultant);
-create index if not exists sparks_url_idx on sparks (url);
+create index if not exists sparks_slug_idx on sparks (slug);
 
 -- Create a table for consultant reviews if it doesn't exist
 create table if not exists consultant_reviews (

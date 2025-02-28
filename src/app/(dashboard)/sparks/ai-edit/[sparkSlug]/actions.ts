@@ -6,37 +6,37 @@ import type { Spark } from '@/types/spark';
 import { generateSlug } from '@/utils/url/shared';
 import { ensureUniqueSlug } from '@/utils/url/server';
 
-// Get a spark by its URL
-export async function getSparkByUrl(url: string): Promise<Spark | null> {
+// Get a spark by its slug
+export async function getSparkBySlug(slug: string): Promise<Spark | null> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from('sparks')
       .select('*')
-      .eq('url', url)
+      .eq('slug', slug)
       .single();
 
     if (error) {
-      logger.error('Error fetching spark by URL:', error);
+      logger.error('Error fetching spark by slug:', error);
       return null;
     }
 
     return data ? transformSparkFromDB(data) : null;
   } catch (error) {
-    logger.error('Error in getSparkByUrl server action:', error);
+    logger.error('Error in getSparkBySlug server action:', error);
     return null;
   }
 }
 
 // Update a spark
-export async function updateSpark(url: string, spark: Partial<Spark>): Promise<Spark> {
+export async function updateSpark(slug: string, spark: Partial<Spark>): Promise<Spark> {
   try {
     const supabase = await createClient();
     // First, verify the spark exists
     const { data: existingSpark, error: fetchError } = await supabase
       .from('sparks')
       .select('*')
-      .eq('url', url)
+      .eq('slug', slug)
       .single();
 
     if (fetchError) {
@@ -45,64 +45,49 @@ export async function updateSpark(url: string, spark: Partial<Spark>): Promise<S
     }
 
     if (!existingSpark) {
-      throw new Error(`Spark with URL ${url} not found`);
+      throw new Error(`Spark with slug ${slug} not found`);
     }
 
-    // If title is being updated, generate new URL
+    // If title is being updated, generate new slug
     let updatedSpark = { ...spark };
     if (spark.title) {
       const baseSlug = generateSlug(spark.title);
-      // Only generate a new URL if the title has changed
-      if (baseSlug !== url) {
+      // Only generate a new slug if the title has changed
+      if (baseSlug !== slug) {
         const { data } = await supabase
           .from('sparks')
-          .select('url')
-          .eq('url', baseSlug)
+          .select('slug')
+          .eq('slug', baseSlug)
           .single();
 
-        // If the URL is already taken, generate a unique one
+        // If the slug is already taken, generate a unique one
         if (data) {
-          updatedSpark.url = await ensureUniqueSlug(baseSlug, 'spark');
+          updatedSpark.slug = await ensureUniqueSlug(baseSlug, 'spark');
         } else {
-          updatedSpark.url = baseSlug;
+          updatedSpark.slug = baseSlug;
         }
       }
     }
 
-    // Remove id and transform using the same function as create
-    const { id, ...updateFields } = updatedSpark;
-    const transformedUpdate = transformSparkToDB(updateFields);
+    // Convert to DB format
+    const dbSpark = transformSparkToDB(updatedSpark);
 
-    // First update the spark - try without select first
-    const { error: updateError } = await supabase
+    // Update the spark
+    const { data, error } = await supabase
       .from('sparks')
-      .update(transformedUpdate)
-      .eq('url', url);
-
-    if (updateError) {
-      logger.error('Error updating spark:', updateError);
-      throw updateError;
-    }
-
-    // Then fetch the updated record
-    const { data: updatedData, error: fetchUpdatedError } = await supabase
-      .from('sparks')
+      .update(dbSpark)
+      .eq('slug', slug)
       .select('*')
-      .eq('url', updatedSpark.url || url)
       .single();
 
-    if (fetchUpdatedError) {
-      logger.error('Error fetching updated spark:', fetchUpdatedError);
-      throw fetchUpdatedError;
+    if (error) {
+      logger.error('Error updating spark:', error);
+      throw new Error(`Failed to update spark: ${error.message}`);
     }
 
-    if (!updatedData) {
-      throw new Error(`Impossible de récupérer le spark mis à jour avec l'URL ${url}`);
-    }
-
-    return transformSparkFromDB(updatedData);
+    return transformSparkFromDB(data);
   } catch (error) {
-    logger.error('Error in updateSpark server action:', error);
+    logger.error('Error in updateSpark:', error);
     throw error;
   }
 }
@@ -119,7 +104,7 @@ const transformSparkFromDB = (dbSpark: any): Spark => ({
   prefillText: dbSpark.prefill_text,
   highlight: dbSpark.highlight,
   consultant: dbSpark.consultant,
-  url: dbSpark.url,
+  slug: dbSpark.slug,
   detailedDescription: dbSpark.detailed_description,
   methodology: dbSpark.methodology,
   targetAudience: dbSpark.target_audience,

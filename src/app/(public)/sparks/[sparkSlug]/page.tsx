@@ -1,3 +1,7 @@
+/**
+ * page.tsx
+ * Client component for displaying a Spark product page with details and action buttons
+ */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -11,7 +15,7 @@ import { createClientRequest, getClientRequestsByClientId } from '@/services/cli
 import { useClientSignUp } from '@/contexts/ClientSignUpContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { getSparkByUrlAction } from './actions';
+import { getSparkBySlugAction } from './actions';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -25,7 +29,7 @@ type PageContext = 'consultant_marketing' | 'client_purchase' | 'consultant_prev
 export default function SparkProductPage() {
     const router = useRouter();
     const params = useParams();
-    const sparkUrl = params.sparkUrl as string;
+    const sparkSlug = params.sparkSlug as string;
     const { user } = useAuth();
     const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
     const [spark, setSpark] = useState<Spark | null>(null);
@@ -39,7 +43,7 @@ export default function SparkProductPage() {
 
     useEffect(() => {
         const checkAuthAndFetchSpark = async () => {
-            if (!sparkUrl) {
+            if (!sparkSlug) {
                 router.push('/');
                 return;
             }
@@ -48,7 +52,7 @@ export default function SparkProductPage() {
                 setIsAuthenticated(!!user);
 
                 // Fetch spark using the server action
-                const fetchedSpark = await getSparkByUrlAction(sparkUrl);
+                const fetchedSpark = await getSparkBySlugAction(sparkSlug);
                 if (!fetchedSpark) {
                     router.push('/');
                     return;
@@ -77,7 +81,7 @@ export default function SparkProductPage() {
         };
 
         checkAuthAndFetchSpark();
-    }, [sparkUrl, router, DEMO_CONSULTANT_ID, user]);
+    }, [sparkSlug, router, DEMO_CONSULTANT_ID, user]);
 
     const handleAction = () => {
         if (!spark) return;
@@ -88,20 +92,20 @@ export default function SparkProductPage() {
                 break;
             case 'client_purchase':
                 if (!isAuthenticated) {
-                    logger.info('User not authenticated, redirecting to signup', { sparkUrl });
+                    logger.info('User not authenticated, redirecting to signup', { sparkSlug });
                     // Store sparkUrlSlug in context and redirect to dedicated signup page
-                    setSparkUrlSlug(sparkUrl || null);
+                    setSparkUrlSlug(sparkSlug || null);
                     router.push('/auth/spark-signup');
                 } else {
                     // If authenticated, create a client request directly
-                    if (!sparkUrl || !user) return;
-                    logger.info('Creating client request for authenticated user', { sparkUrl });
+                    if (!sparkSlug || !user) return;
+                    logger.info('Creating client request for authenticated user', { sparkSlug });
                     
                     // Get the spark by URL first to ensure we have the correct data
-                    getSparkByUrlAction(sparkUrl)
+                    getSparkBySlugAction(sparkSlug)
                         .then(spark => {
                             if (!spark) {
-                                logger.error('Spark not found when creating request', { sparkUrl });
+                                logger.error('Spark not found when creating request', { sparkSlug });
                                 throw new Error('Spark not found');
                             }
                             logger.info('Found spark, checking existing requests', { sparkId: spark.id });

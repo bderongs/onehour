@@ -5,6 +5,7 @@ import type { ConsultantProfile } from '@/types/consultant'
 import type { Spark } from '@/types/spark'
 import logger from '@/utils/logger'
 import { deleteUser } from '@/services/auth/server'
+import { transformSparkFromDB } from '@/services/serverSparks'
 
 export async function getAllConsultantsAction(includeSparkierEmails: boolean = false): Promise<ConsultantProfile[]> {
     const client = await createClient()
@@ -42,7 +43,8 @@ export async function getConsultantSparksAction(consultantId: string): Promise<S
         return []
     }
 
-    return data as Spark[]
+    // Transform the database response to the Spark type
+    return data ? data.map(spark => transformSparkFromDB(spark)) : []
 }
 
 export async function deleteConsultantAction(consultantId: string): Promise<boolean> {
@@ -74,13 +76,13 @@ export async function deleteConsultantAction(consultantId: string): Promise<bool
     }
 }
 
-export async function deleteSparkAction(sparkUrl: string): Promise<boolean> {
+export async function deleteSparkAction(sparkSlug: string): Promise<boolean> {
     try {
         const client = await createClient()
         const { error } = await client
             .from('sparks')
             .delete()
-            .eq('url', sparkUrl)
+            .eq('slug', sparkSlug)
 
         if (error) {
             logger.error('Error deleting spark:', error)

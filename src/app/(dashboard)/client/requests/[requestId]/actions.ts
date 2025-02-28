@@ -101,7 +101,7 @@ const transformSparkFromDB = (dbSpark: any): Spark => ({
   prefillText: dbSpark.prefill_text,
   highlight: dbSpark.highlight,
   consultant: dbSpark.consultant,
-  url: dbSpark.url,
+  slug: dbSpark.slug,
   detailedDescription: dbSpark.detailed_description,
   methodology: dbSpark.methodology,
   targetAudience: dbSpark.target_audience,

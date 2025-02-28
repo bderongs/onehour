@@ -1,20 +1,24 @@
+/**
+ * page.tsx
+ * Server component for AI-assisted spark editing
+ */
 import { Suspense } from 'react'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { DEFAULT_SPARK } from '../../constants'
 import SparkAIEditor from '../../components/SparkAIEditor'
 import SparkAIEditorSkeleton from '../../components/SparkAIEditorSkeleton'
-import { getSparkByUrl } from './actions'
+import { getSparkBySlug } from './actions'
 
 interface EditSparkPageProps {
-  params: Promise<{ sparkUrl: string }> | { sparkUrl: string }
+  params: Promise<{ sparkSlug: string }> | { sparkSlug: string }
   searchParams?: Record<string, string | string[] | undefined>
 }
 
 export async function generateMetadata({ params }: EditSparkPageProps): Promise<Metadata> {
   const resolvedParams = params instanceof Promise ? await params : params
-  const sparkUrl = resolvedParams.sparkUrl
-  const spark = await getSparkByUrl(sparkUrl)
+  const sparkSlug = resolvedParams.sparkSlug
+  const spark = await getSparkBySlug(sparkSlug)
   
   if (!spark) {
     return {
@@ -36,21 +40,23 @@ export async function generateMetadata({ params }: EditSparkPageProps): Promise<
 
 export default async function EditSparkPage({ params }: EditSparkPageProps) {
   const resolvedParams = params instanceof Promise ? await params : params
-  const sparkUrl = resolvedParams.sparkUrl
-  const spark = await getSparkByUrl(sparkUrl)
+  const sparkSlug = resolvedParams.sparkSlug
+  const spark = await getSparkBySlug(sparkSlug)
   
   if (!spark) {
     notFound()
   }
   
   return (
-    <Suspense fallback={<SparkAIEditorSkeleton />}>
-      <SparkAIEditor 
-        mode="edit"
-        initialSpark={spark}
-        sparkUrl={sparkUrl}
-        pageTitle="Modifier le Spark avec l'IA"
-      />
-    </Suspense>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+      <Suspense fallback={<SparkAIEditorSkeleton />}>
+        <SparkAIEditor 
+          mode="edit"
+          initialSpark={spark}
+          sparkSlug={sparkSlug}
+          pageTitle="Modifier avec l'IA"
+        />
+      </Suspense>
+    </div>
   )
 } 

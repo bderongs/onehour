@@ -1,18 +1,22 @@
+/**
+ * page.tsx
+ * Server component for editing an existing Spark, fetches the Spark data and renders the edit form
+ */
 import { Suspense } from 'react'
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { SparkEditForm } from './_components/SparkEditForm'
-import { getSparkByUrl } from './actions'
+import { getSparkBySlug } from './actions'
 
 interface PageProps {
-    params: Promise<{ sparkUrl: string }> | { sparkUrl: string }
+    params: Promise<{ sparkSlug: string }> | { sparkSlug: string }
     searchParams?: Record<string, string | string[] | undefined>
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const resolvedParams = params instanceof Promise ? await params : params
-    const sparkUrl = resolvedParams.sparkUrl
-    const spark = await getSparkByUrl(sparkUrl)
+    const sparkSlug = resolvedParams.sparkSlug
+    const spark = await getSparkBySlug(sparkSlug)
     
     if (!spark) {
         return {
@@ -23,7 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     
     return {
         title: `Modifier ${spark.title} | Sparkier`,
-        description: `Modifier le spark ${spark.title}.`,
+        description: `Modifier les détails du spark ${spark.title}`,
         openGraph: {
             title: `Modifier ${spark.title} | Sparkier`,
             description: `Modifier le spark ${spark.title}.`,
@@ -34,8 +38,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function Page({ params }: PageProps) {
     const resolvedParams = params instanceof Promise ? await params : params
-    const sparkUrl = resolvedParams.sparkUrl
-    const spark = await getSparkByUrl(sparkUrl)
+    const sparkSlug = resolvedParams.sparkSlug
+    const spark = await getSparkBySlug(sparkSlug)
     
     if (!spark) {
         notFound()

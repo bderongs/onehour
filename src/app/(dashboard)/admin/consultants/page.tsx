@@ -47,9 +47,9 @@ const ConsultantRow = ({
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [sparks, setSparks] = useState<Spark[]>([])
     const [loadingSparks, setLoadingSparks] = useState(false)
-    const [showSparkDeleteConfirm, setShowSparkDeleteConfirm] = useState<{ isOpen: boolean; sparkUrl: string | null; sparkTitle: string | null }>({
+    const [showSparkDeleteConfirm, setShowSparkDeleteConfirm] = useState<{ isOpen: boolean; sparkSlug: string | null; sparkTitle: string | null }>({
         isOpen: false,
-        sparkUrl: null,
+        sparkSlug: null,
         sparkTitle: null
     })
     const [showDeleteError, setShowDeleteError] = useState(false)
@@ -96,22 +96,22 @@ const ConsultantRow = ({
         setShowDeleteConfirm(false)
     }
 
-    const handleSparkDelete = async (sparkUrl: string, sparkTitle: string) => {
-        setShowSparkDeleteConfirm({ isOpen: true, sparkUrl, sparkTitle })
+    const handleSparkDelete = async (sparkSlug: string, sparkTitle: string) => {
+        setShowSparkDeleteConfirm({ isOpen: true, sparkSlug: sparkSlug, sparkTitle })
     }
 
     const handleConfirmSparkDelete = async () => {
-        if (!showSparkDeleteConfirm.sparkUrl) return
+        if (!showSparkDeleteConfirm.sparkSlug) return
         
         try {
-            await deleteSparkAction(showSparkDeleteConfirm.sparkUrl)
-            setSparks(sparks.filter(spark => spark.url !== showSparkDeleteConfirm.sparkUrl))
+            await deleteSparkAction(showSparkDeleteConfirm.sparkSlug)
+            setSparks(sparks.filter(spark => spark.slug !== showSparkDeleteConfirm.sparkSlug))
             showNotification('success', 'Le Spark a été supprimé avec succès')
         } catch (error) {
             console.error('Error deleting spark:', error)
             showNotification('error', 'Échec de la suppression du Spark')
         } finally {
-            setShowSparkDeleteConfirm({ isOpen: false, sparkUrl: null, sparkTitle: null })
+            setShowSparkDeleteConfirm({ isOpen: false, sparkSlug: null, sparkTitle: null })
         }
     }
 
@@ -276,7 +276,7 @@ const ConsultantRow = ({
                                         <div className="space-y-3">
                                             {sparks.map((spark) => (
                                                 <div
-                                                    key={spark.url}
+                                                    key={spark.slug}
                                                     className="bg-white p-4 rounded-lg border border-gray-200 flex items-center justify-between"
                                                 >
                                                     <div className="flex-1">
@@ -291,14 +291,14 @@ const ConsultantRow = ({
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <button
-                                                            onClick={() => router.push(`/sparks/edit/${spark.url}`)}
+                                                            onClick={() => router.push(`/sparks/edit/${spark.slug}`)}
                                                             className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors"
                                                             title="Modifier"
                                                         >
                                                             <Edit className="h-5 w-5" />
                                                         </button>
                                                         <a
-                                                            href={`/sparks/view/${spark.url}`}
+                                                            href={`/sparks/view/${spark.slug}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors"
@@ -307,7 +307,7 @@ const ConsultantRow = ({
                                                             <Eye className="h-5 w-5" />
                                                         </a>
                                                         <button
-                                                            onClick={() => handleSparkDelete(spark.url, spark.title)}
+                                                            onClick={() => handleSparkDelete(spark.slug, spark.title)}
                                                             className="p-1.5 text-gray-400 hover:text-red-600 transition-colors"
                                                             title="Supprimer"
                                                         >
@@ -358,7 +358,7 @@ const ConsultantRow = ({
                 confirmLabel="Supprimer"
                 cancelLabel="Annuler"
                 onConfirm={handleConfirmSparkDelete}
-                onCancel={() => setShowSparkDeleteConfirm({ isOpen: false, sparkUrl: null, sparkTitle: null })}
+                onCancel={() => setShowSparkDeleteConfirm({ isOpen: false, sparkSlug: null, sparkTitle: null })}
                 variant="danger"
             />
         </>

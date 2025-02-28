@@ -41,7 +41,7 @@ export const SparksGridSection: React.FC<SparksGridSectionProps> = React.memo(({
     ].includes(spark.id)), [initialSparks]);
 
     const handleDetailsClick = useCallback((spark: Spark) => {
-        router.push(`/sparks/${spark.url}`);
+        router.push(`/sparks/${spark.slug}`);
     }, [router]);
 
     if (loading) {
