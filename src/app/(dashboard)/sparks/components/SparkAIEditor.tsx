@@ -39,6 +39,7 @@ const SparkPreviewSection = ({ title, children }: { title: string; children: Rea
 // Custom hook for AI interaction
 const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>, onSparkChange: (spark: Omit<Spark, 'id'>) => void) => {
     const [spark, setSpark] = useState<Omit<Spark, 'id'>>(initialSpark)
+    const [previousSparkRef] = useState<{ current: Omit<Spark, 'id'> }>({ current: initialSpark })
     
     // Memoize chat configs to prevent unnecessary recreations
     const chatConfigs = useMemo(() => createChatConfigs(), [])
@@ -52,12 +53,56 @@ const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>, on
     // Update spark when initialSpark changes
     useEffect(() => {
         setSpark(initialSpark)
-    }, [initialSpark])
+        previousSparkRef.current = initialSpark
+    }, [initialSpark, previousSparkRef])
 
-    // Notify parent component when spark changes
+    // Helper function to check if spark has actually changed
+    const hasSparkChanged = useCallback((newSpark: Omit<Spark, 'id'>, oldSpark: Omit<Spark, 'id'>) => {
+        // Check key fields that would require saving
+        const fieldsToCheck = [
+            'title',
+            'description',
+            'detailedDescription',
+            'duration',
+            'price',
+            'methodology',
+            'targetAudience',
+            'prerequisites',
+            'deliverables',
+            'nextSteps',
+            'benefits',
+            'expertProfile',
+            'faq'
+        ]
+        
+        return fieldsToCheck.some(field => {
+            const oldValue = oldSpark[field as keyof Omit<Spark, 'id'>]
+            const newValue = newSpark[field as keyof Omit<Spark, 'id'>]
+            
+            // Handle arrays
+            if (Array.isArray(oldValue) && Array.isArray(newValue)) {
+                if (oldValue.length !== newValue.length) return true
+                return JSON.stringify(oldValue) !== JSON.stringify(newValue)
+            }
+            
+            // Handle objects
+            if (typeof oldValue === 'object' && oldValue !== null && 
+                typeof newValue === 'object' && newValue !== null) {
+                return JSON.stringify(oldValue) !== JSON.stringify(newValue)
+            }
+            
+            // Handle primitives
+            return oldValue !== newValue
+        })
+    }, [])
+
+    // Notify parent component when spark changes, but only if content actually changed
     useEffect(() => {
-        onSparkChange(spark)
-    }, [spark, onSparkChange])
+        if (hasSparkChanged(spark, previousSparkRef.current)) {
+            previousSparkRef.current = { ...spark }
+            onSparkChange(spark)
+        }
+    }, [spark, onSparkChange, hasSparkChanged, previousSparkRef])
 
     const handleMessagesUpdate = async (newMessages: Message[]) => {
         const lastUserMessage = [...newMessages].reverse().find(m => m.role === 'user')
@@ -86,19 +131,25 @@ const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>, on
 
             // Process the document updates
             const documentUpdates = response.document as Partial<Spark>
-
-            // Create the updated spark state by only applying defined fields
-            const updatedSpark = {
-                ...spark,
-                ...Object.fromEntries(
-                    Object.entries(documentUpdates)
-                        .filter(([_, value]) => value !== undefined)
-                )
+            
+            // Only update if there are actual changes
+            if (Object.keys(documentUpdates).length > 0) {
+                // Create the updated spark state by only applying defined fields
+                const updatedSpark = {
+                    ...spark,
+                    ...Object.fromEntries(
+                        Object.entries(documentUpdates)
+                            .filter(([_, value]) => value !== undefined)
+                    )
+                }
+                
+                // Update state
+                setMessages(updatedMessages)
+                setSpark(updatedSpark)
+            } else {
+                // Just update messages if no spark changes
+                setMessages(updatedMessages)
             }
-
-            // Update state
-            setMessages(updatedMessages)
-            setSpark(updatedSpark)
         } catch (error) {
             logger.error('Error getting AI response:', error)
             setMessages([
@@ -160,7 +211,8 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
                 mode,
                 sparkSlug,
                 savedSparkId,
-                hasConsultant: !!sparkData.consultant
+                hasConsultant: !!sparkData.consultant,
+                title: sparkData.title?.substring(0, 30) + (sparkData.title?.length > 30 ? '...' : '')
             })
             
             let result: Spark
@@ -179,7 +231,10 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
                 logger.info('Spark data for save', { 
                     mode, 
                     hasSlug: !!sparkSlug,
-                    hasSavedId: !!savedSparkId
+                    hasSavedId: !!savedSparkId,
+                    hasTitle: !!sparkData.title?.trim(),
+                    hasDescription: !!sparkData.description?.trim(),
+                    hasDetailedDescription: !!sparkData.detailedDescription?.trim()
                 })
                 
                 if (savedSparkId) {
@@ -244,16 +299,32 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
     const handleSparkChange = useCallback((updatedSpark: Omit<Spark, 'id'>) => {
         // Only trigger auto-save if there's meaningful content
         const hasContent = updatedSpark.description || updatedSpark.detailedDescription
+        const hasTitle = updatedSpark.title?.trim()
+        
+        // Log what triggered the change
+        logger.info('Spark change detected', {
+            mode,
+            hasTitle: !!hasTitle,
+            hasContent: !!hasContent,
+            hasSavedId: !!savedSparkId,
+            title: updatedSpark.title?.substring(0, 30) + (updatedSpark.title?.length > 30 ? '...' : '')
+        })
         
         // For new sparks in create mode, require a title
         if (mode === 'create' && !savedSparkId) {
             // Only auto-save if there's a title
-            if (updatedSpark.title?.trim()) {
+            if (hasTitle) {
+                logger.info('Auto-saving new spark with title:', hasTitle)
                 debouncedAutoSave(updatedSpark)
+            } else {
+                logger.info('Skipping auto-save: No title for new spark')
             }
-        } else if (hasContent || updatedSpark.title) {
+        } else if (hasContent || hasTitle) {
             // For existing sparks, auto-save if there's any content
+            logger.info('Auto-saving existing spark with content')
             debouncedAutoSave(updatedSpark)
+        } else {
+            logger.info('Skipping auto-save: No meaningful content changes')
         }
     }, [debouncedAutoSave, mode, savedSparkId])
 
