@@ -29,7 +29,6 @@ export interface Spark {
     nextSteps?: string[];
     slug: string; // Unique identifier used in URLs (previously named 'url')
     imageUrl?: string; // URL for the main image (frontend property)
-    image_url?: string; // URL for the main image (database column name)
     socialImageUrl?: string; // URL for the social sharing image
     createdAt: string;
     updatedAt: string;

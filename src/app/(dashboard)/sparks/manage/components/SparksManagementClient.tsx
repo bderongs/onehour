@@ -1,9 +1,14 @@
+/**
+ * SparksManagementClient.tsx
+ * Client component for managing sparks with automatic data refresh when the page is focused
+ * to ensure newly created sparks are visible after navigation.
+ */
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Spark } from '@/types/spark';
-import { deleteSparkAction } from '../actions';
+import { deleteSparkAction, refreshSparksAction } from '../actions';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { SparksGrid } from '@/components/SparksGrid';
 import { EmptyState } from '@/app/(dashboard)/sparks/manage/components/EmptyState';
@@ -22,6 +27,38 @@ export const SparksManagementClient = ({ initialSparks }: SparksManagementClient
         isOpen: false,
         sparkSlug: null
     });
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    // Refresh sparks data when the page is focused or loaded
+    useEffect(() => {
+        const refreshData = async () => {
+            try {
+                setIsRefreshing(true);
+                const refreshedSparks = await refreshSparksAction();
+                setSparks(refreshedSparks);
+            } catch (error) {
+                logger.error('Error refreshing sparks:', error);
+            } finally {
+                setIsRefreshing(false);
+            }
+        };
+
+        // Refresh on initial load
+        refreshData();
+
+        // Refresh when the page regains focus (user navigates back)
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                refreshData();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
 
     const handleCreateSpark = () => {
         router.push('/sparks/ai-create');
@@ -71,7 +108,11 @@ export const SparksManagementClient = ({ initialSparks }: SparksManagementClient
                 variant="danger"
             />
 
-            {sparks.length === 0 ? (
+            {isRefreshing && sparks.length === 0 ? (
+                <div className="flex justify-center items-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+            ) : sparks.length === 0 ? (
                 <EmptyState onCreateSpark={handleCreateSpark} />
             ) : (
                 <SparksGrid

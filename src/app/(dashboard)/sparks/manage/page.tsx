@@ -1,3 +1,8 @@
+/**
+ * page.tsx
+ * Server component for managing sparks with dynamic parameters to ensure
+ * the page is refreshed when navigating back from creating or editing a spark.
+ */
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { getSparksByConsultant } from '@/services/sparks';
@@ -5,6 +10,9 @@ import { SparksManagementClient } from './components/SparksManagementClient';
 import { SparksManagementSkeleton } from './components/SparksManagementSkeleton';
 import { getCurrentUser } from '@/services/auth/server';
 import logger from '@/utils/logger';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata = {
     title: 'Gérer mes Sparks | Sparkier',

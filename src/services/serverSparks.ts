@@ -91,6 +91,10 @@ const transformSparkToDB = (spark: Partial<Spark>): Record<string, any> => {
             transformed['detailed_description'] = value;
         } else if (key === 'nextSteps') {
             transformed['next_steps'] = value;
+        } else if (key === 'imageUrl') {
+            transformed['image_url'] = value;
+        } else if (key === 'socialImageUrl') {
+            transformed['social_image_url'] = value;
         } else {
             transformed[snakeKey] = value;
         }
@@ -164,6 +168,12 @@ export const getSparksByConsultant = async (consultantId: string): Promise<Spark
 };
 
 export const createSpark = async (spark: Omit<Spark, 'id'>): Promise<Spark> => {
+    // Validate that the spark has a title
+    if (!spark.title?.trim()) {
+        logger.error('Cannot create spark: Missing title');
+        throw new Error('A title is required to create a spark');
+    }
+
     // Generate URL from title
     const baseSlug = generateSlug(spark.title);
     const slug = await ensureUniqueSlug(baseSlug, 'spark');
@@ -199,6 +209,33 @@ export const updateSpark = async (slug: string, spark: Partial<Spark>): Promise<
     try {
         const supabase = await createClient();
         
+        // Get the current session for debugging
+        const { data: sessionData } = await supabase.auth.getSession();
+        const currentUserId = sessionData?.session?.user?.id;
+        
+        // Log the update attempt for debugging
+        logger.info('Attempting to update spark', { 
+            slug,
+            hasConsultant: !!spark.consultant,
+            consultant: spark.consultant,
+            hasSession: !!sessionData?.session,
+            userId: currentUserId || 'No user ID'
+        });
+        
+        // First, get the existing spark to preserve the consultant if not provided
+        if (!spark.consultant && slug) {
+            const { data: existingSpark } = await supabase
+                .from('sparks')
+                .select('consultant')
+                .eq('slug', slug)
+                .single();
+                
+            if (existingSpark?.consultant) {
+                spark.consultant = existingSpark.consultant;
+                logger.info('Preserved existing consultant', { consultant: existingSpark.consultant });
+            }
+        }
+        
         // Transform the spark object for database
         const dbSpark = transformSparkToDB(spark);
         
@@ -214,11 +251,18 @@ export const updateSpark = async (slug: string, spark: Partial<Spark>): Promise<
             }
         }
         
+        // Log the transformed data for debugging
+        logger.info('Transformed spark data for update', {
+            slug,
+            dbSlug: dbSpark.slug,
+            consultant: dbSpark.consultant
+        });
+        
         // Update the spark in the database
         const { data, error } = await supabase
             .from('sparks')
             .update(dbSpark)
-            .eq('slug', dbSpark.slug || slug)
+            .eq('slug', slug)  // Always use the original slug to find the spark
             .select('*')
             .single();
             

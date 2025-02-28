@@ -24,9 +24,9 @@ export const ensureUniqueSlug = async (
         if (context === 'spark') {
             const result = await client
                 .from('sparks')
-                .select('url')
-                .eq('url', slug)
-                .neq('url', currentSlug || '');
+                .select('slug')
+                .eq('slug', slug)
+                .neq('slug', currentSlug || '');
             data = result.data;
             error = result.error;
         } else {

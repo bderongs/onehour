@@ -1,14 +1,17 @@
 /**
  * page.tsx
  * Server component for AI-assisted spark editing
+ * Ensures the consultant ID is preserved when editing a spark
  */
 import { Suspense } from 'react'
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { DEFAULT_SPARK } from '../../constants'
 import SparkAIEditor from '../../components/SparkAIEditor'
 import SparkAIEditorSkeleton from '../../components/SparkAIEditorSkeleton'
 import { getSparkBySlug } from './actions'
+import { getCurrentUser } from '@/services/auth/server'
+import logger from '@/utils/logger'
 
 interface EditSparkPageProps {
   params: Promise<{ sparkSlug: string }> | { sparkSlug: string }
@@ -46,6 +49,28 @@ export default async function EditSparkPage({ params }: EditSparkPageProps) {
   if (!spark) {
     notFound()
   }
+  
+  // Get the current user
+  const user = await getCurrentUser()
+  
+  // Redirect if not authenticated
+  if (!user) {
+    redirect('/auth/signin')
+  }
+  
+  // Only allow consultants and admins to access this page
+  if (!user.roles?.includes('consultant') && !user.roles?.includes('admin')) {
+    redirect('/')
+  }
+  
+  // Only allow the consultant who created the spark or admins to edit it
+  if (!user.roles?.includes('admin') && spark.consultant !== user.id) {
+    logger.warn(`User ${user.id} attempted to edit spark ${sparkSlug} which belongs to consultant ${spark.consultant}`)
+    redirect('/sparks/manage')
+  }
+  
+  // Log the consultant ID for debugging
+  logger.info(`Editing spark with consultant ID: ${spark.consultant}`)
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">

@@ -122,6 +122,14 @@ export async function editSparkWithAI(
                                         type: 'array',
                                         items: { type: 'string' },
                                         description: 'Liste des prochaines étapes'
+                                    },
+                                    imageUrl: { 
+                                        type: 'string', 
+                                        description: 'URL de l\'image principale du Spark' 
+                                    },
+                                    socialImageUrl: { 
+                                        type: 'string', 
+                                        description: 'URL de l\'image pour les réseaux sociaux' 
                                     }
                                 }
                             }

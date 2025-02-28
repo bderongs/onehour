@@ -29,6 +29,5 @@ export const DEFAULT_SPARK: Omit<Spark, 'id'> = {
     },
     faq: [],
     imageUrl: '',
-    image_url: '', // Database column name
     socialImageUrl: ''
 } 

@@ -21,7 +21,6 @@ function generateSparkFields(): DocumentField[] {
         faq: { label: 'FAQ', description: 'Questions fréquemment posées' },
         nextSteps: { label: 'Prochaines étapes', description: 'Liste des prochaines étapes après le Spark' },
         imageUrl: { label: 'Image', description: 'URL de l\'image principale' },
-        image_url: { label: 'Image (DB)', description: 'URL de l\'image principale (nom de colonne dans la base de données)' },
         slug: { label: 'Slug', description: 'URL slug unique du Spark' },
         prefillText: { label: 'Texte prérempli', description: 'Texte de préparation pour le client' },
         socialImageUrl: { label: 'Image sociale', description: 'URL de l\'image pour les réseaux sociaux' },

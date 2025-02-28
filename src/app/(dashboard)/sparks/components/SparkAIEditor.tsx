@@ -54,13 +54,6 @@ const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>, on
         setSpark(initialSpark)
     }, [initialSpark])
 
-    // Update spark when userId changes
-    useEffect(() => {
-        if (initialSpark.consultant) {
-            setSpark(prev => ({ ...prev, consultant: initialSpark.consultant }))
-        }
-    }, [initialSpark.consultant])
-
     // Notify parent component when spark changes
     useEffect(() => {
         onSparkChange(spark)
@@ -125,17 +118,16 @@ interface SparkAIEditorProps {
     pageTitle: string
 }
 
-export default function SparkAIEditor({ mode, initialSpark, sparkSlug, pageTitle }: SparkAIEditorProps) {
+export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSparkSlug, pageTitle }: SparkAIEditorProps) {
     const router = useRouter()
     const { user } = useAuth()
-    const userId = user?.id ?? null
-    const isAdmin = user?.roles?.includes('admin') ?? false
     
     const [error, setError] = useState<string | null>(null)
     const [isSaving, setIsSaving] = useState(false)
     const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
     const [savedSparkId, setSavedSparkId] = useState<string | null>(null)
     const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+    const [sparkSlug, setSparkSlug] = useState<string | undefined>(initialSparkSlug)
 
     // Debounce function for auto-save
     const debounce = <T extends (...args: any[]) => any>(func: T, delay: number) => {
@@ -148,51 +140,81 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug, pageTitle
 
     // Auto-save function
     const autoSave = useCallback(async (sparkData: Omit<Spark, 'id'>) => {
-        if (!userId) {
+        if (!user) {
             logger.warn('Cannot auto-save: User not logged in')
+            return
+        }
+
+        // Skip saving if there's no title and we're creating a new spark
+        if (mode === 'create' && !savedSparkId && !sparkData.title?.trim()) {
+            logger.info('Skipping auto-save: No title provided for new spark')
             return
         }
 
         try {
             setAutoSaveStatus('saving')
             
+            // Log user information for debugging
+            logger.info('Auto-save attempt', { 
+                userId: user.id, 
+                mode,
+                sparkSlug,
+                savedSparkId,
+                hasConsultant: !!sparkData.consultant
+            })
+            
             let result: Spark
             
             if (mode === 'create') {
-                // Ensure the spark has a slug property before saving
+                // For create mode, we don't generate a temporary slug
+                // We'll let the server generate it based on the title
                 const sparkToSave = {
                     ...sparkData,
-                    // Generate a slug if one doesn't exist
-                    slug: sparkData.slug || `spark-${Date.now()}`,
-                    // Ensure imageUrl is properly set for database compatibility
-                    image_url: sparkData.imageUrl || ''
+                    // Remove any client-side generated slug to allow server to generate one from title
+                    // Use empty string instead of undefined to satisfy type requirements
+                    slug: sparkSlug || ''
                 }
                 
+                // Log the data being sent for debugging
+                logger.info('Spark data for save', { 
+                    mode, 
+                    hasSlug: !!sparkSlug,
+                    hasSavedId: !!savedSparkId
+                })
+                
                 if (savedSparkId) {
-                    // If we already have a saved spark ID, update it
-                    result = await updateSparkAction(sparkToSave.slug || savedSparkId, sparkToSave)
+                    // If we already have a saved spark ID, update it using the original slug
+                    const originalSlug = sparkSlug
+                    if (!originalSlug) {
+                        throw new Error('Missing slug for update operation')
+                    }
+                    result = await updateSparkAction(originalSlug, sparkToSave)
                 } else {
                     // First time saving
-                    result = await createSparkAction({
-                        ...sparkToSave,
-                        consultant: isAdmin ? null : userId
-                    })
+                    result = await createSparkAction(sparkToSave)
                     setSavedSparkId(result.id)
                     
-                    // If we're in create mode and just created the spark, update the slug
-                    if (mode === 'create' && result.slug) {
-                        // We don't redirect, just update the internal state
+                    // Store the server-generated slug for future updates
+                    if (result.slug) {
                         logger.info(`Spark created with ID: ${result.id} and slug: ${result.slug}`)
+                        setSparkSlug(result.slug)
                     }
                 }
             } else if (mode === 'edit' && sparkSlug) {
-                // Ensure the spark has a slug property before saving
+                // For edit mode, use the existing slug
                 const sparkToSave = {
                     ...sparkData,
-                    slug: sparkData.slug || sparkSlug,
-                    // Ensure imageUrl is properly set for database compatibility
-                    image_url: sparkData.imageUrl || ''
+                    // Don't override the slug if it's already set by the server
+                    // Use empty string instead of undefined to satisfy type requirements
+                    slug: sparkData.slug || ''
                 }
+                
+                // Log the data being sent for debugging
+                logger.info('Spark data for edit', { 
+                    mode, 
+                    sparkSlug
+                })
+                
                 result = await updateSparkAction(sparkSlug, sparkToSave)
             } else {
                 throw new Error('Invalid mode or missing sparkSlug for edit mode')
@@ -210,7 +232,7 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug, pageTitle
             logger.error(`Error auto-saving spark:`, error)
             setAutoSaveStatus('error')
         }
-    }, [userId, mode, savedSparkId, sparkSlug, isAdmin])
+    }, [user, mode, savedSparkId, sparkSlug])
     
     // Create debounced version of autoSave
     const debouncedAutoSave = useMemo(
@@ -221,44 +243,64 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug, pageTitle
     // Handle spark changes from the AI editor
     const handleSparkChange = useCallback((updatedSpark: Omit<Spark, 'id'>) => {
         // Only trigger auto-save if there's meaningful content
-        if (updatedSpark.title || updatedSpark.description || updatedSpark.detailedDescription) {
+        const hasContent = updatedSpark.description || updatedSpark.detailedDescription
+        
+        // For new sparks in create mode, require a title
+        if (mode === 'create' && !savedSparkId) {
+            // Only auto-save if there's a title
+            if (updatedSpark.title?.trim()) {
+                debouncedAutoSave(updatedSpark)
+            }
+        } else if (hasContent || updatedSpark.title) {
+            // For existing sparks, auto-save if there's any content
             debouncedAutoSave(updatedSpark)
         }
-    }, [debouncedAutoSave])
+    }, [debouncedAutoSave, mode, savedSparkId])
 
     const { spark, messages, handleMessagesUpdate, chatConfig } = useSparkAI(mode, initialSpark, handleSparkChange)
 
     const handleSave = async () => {
-        if (!userId) {
+        if (!user) {
             setError('You must be logged in to save a spark')
+            return
+        }
+        
+        // Validate title before saving
+        if (mode === 'create' && !savedSparkId && !spark.title?.trim()) {
+            setError('Veuillez ajouter un titre avant de sauvegarder')
             return
         }
         
         setIsSaving(true)
         try {
-            // Ensure the spark has a slug property before saving
+            // Don't generate a temporary slug, let the server handle it
             const sparkToSave = {
                 ...spark,
-                slug: spark.slug || `spark-${Date.now()}`,
-                // Ensure imageUrl is properly set for database compatibility
-                image_url: spark.imageUrl || ''
+                // Use existing slug if available, otherwise empty string
+                slug: sparkSlug || ''
             }
             
             if (mode === 'create') {
                 if (savedSparkId) {
                     // If we already have a saved spark, update it
-                    await updateSparkAction(sparkToSave.slug || savedSparkId, sparkToSave)
+                    if (!sparkSlug) {
+                        throw new Error('Missing slug for update operation')
+                    }
+                    await updateSparkAction(sparkSlug, sparkToSave)
                 } else {
                     // First time manual save
-                    const result = await createSparkAction({
-                        ...sparkToSave,
-                        consultant: isAdmin ? null : userId
-                    })
+                    const result = await createSparkAction(sparkToSave)
                     setSavedSparkId(result.id)
+                    if (result.slug) {
+                        setSparkSlug(result.slug)
+                    }
                 }
             } else if (mode === 'edit' && sparkSlug) {
                 await updateSparkAction(sparkSlug, sparkToSave)
             }
+            
+            // Refresh the router to ensure data is updated when navigating back
+            router.refresh()
             router.back()
         } catch (error) {
             logger.error(`Error ${mode === 'create' ? 'creating' : 'updating'} spark:`, error)
@@ -268,6 +310,10 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug, pageTitle
     }
 
     const handleBack = () => {
+        // Refresh the router to ensure data is updated when navigating back
+        if (savedSparkId) {
+            router.refresh()
+        }
         router.back()
     }
 

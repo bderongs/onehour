@@ -13,18 +13,18 @@ export async function createSparkAction(spark: Omit<Spark, 'id'>): Promise<Spark
   }
 }
 
-export async function updateSparkAction(url: string, spark: Partial<Spark>): Promise<Spark> {
+export async function updateSparkAction(slug: string, spark: Partial<Spark>): Promise<Spark> {
   try {
-    return await updateSparkServer(url, spark)
+    return await updateSparkServer(slug, spark)
   } catch (error) {
     logger.error('Error in updateSparkAction:', error)
     throw error
   }
 }
 
-export async function deleteSparkAction(url: string): Promise<void> {
+export async function deleteSparkAction(slug: string): Promise<void> {
   try {
-    return await deleteSparkServer(url)
+    return await deleteSparkServer(slug)
   } catch (error) {
     logger.error('Error in deleteSparkAction:', error)
     throw error

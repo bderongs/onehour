@@ -93,16 +93,16 @@ export function ProfileMenu() {
 
                         {user.roles.includes('consultant') && (
                             <>
-                                <button
-                                    onClick={() => {
-                                        setIsOpen(false);
-                                        router.push(`/${user.slug || ''}`);
-                                    }}
+                                <a
+                                    href={`/${user.slug || ''}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={() => setIsOpen(false)}
                                     className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                                 >
                                     <ExternalLink className="w-4 h-4 mr-2" />
                                     Voir mon profil
-                                </button>
+                                </a>
                                 <button
                                     onClick={() => {
                                         setIsOpen(false);
