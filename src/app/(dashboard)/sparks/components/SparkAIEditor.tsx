@@ -221,9 +221,20 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
             // Redirect to ai-edit/[sparkSlug] after first save in create mode
             if (isFirstSave && result.slug) {
                 logger.info(`Redirecting to ai-edit/${result.slug} after first auto-save`)
+                
+                // Use browser's History API to change URL without any navigation
                 setTimeout(() => {
-                    router.refresh()
-                    router.push(`/sparks/ai-edit/${result.slug}`)
+                    // Construct the new URL path
+                    const newPath = `/sparks/ai-edit/${result.slug}`
+                    
+                    // Update browser history without triggering navigation
+                    window.history.pushState({}, '', newPath)
+                    
+                    // Update page title
+                    document.title = `Modifier ${result.title || 'Spark'} - Sparkier`
+                    
+                    // Log the URL change
+                    logger.info(`URL changed to ${newPath} without page reload`)
                 }, 500) // Small delay to ensure state is updated
             }
             
