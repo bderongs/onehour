@@ -1,14 +1,14 @@
 /**
  * SparkAIEditor.tsx
  * This component provides an AI-assisted interface for creating and editing sparks,
- * with automatic saving functionality to preserve changes as they are made.
+ * with automatic saving functionality that triggers only when receiving updates from the AI service.
  */
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ArrowLeft, Sparkles, Save } from 'lucide-react'
+import { Clock, ArrowRight, CheckCircle, Users, FileText, Target, ArrowLeft, Sparkles, Save, Edit2, Trash2, Loader2 } from 'lucide-react'
 import type { Spark } from '@/types/spark'
 import { AIChatInterface, Message } from '@/components/AIChatInterface'
 import { DOCUMENT_TEMPLATES } from '@/data/documentTemplates'
@@ -16,9 +16,10 @@ import { createChatConfigs } from '@/data/chatConfigs'
 import { formatDuration, formatPrice } from '@/utils/format'
 import { generateSparkCreatePrompt, generateSparkEditPrompt } from '@/services/promptGenerators'
 import { editSparkWithAI } from '@/services/openai'
-import { createSparkAction, updateSparkAction } from '../actions'
+import { createSparkAction, updateSparkAction, deleteSparkAction } from '../actions'
 import { useAuth } from '@/contexts/AuthContext'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import logger from '@/utils/logger'
 
 // Animation variants
@@ -39,7 +40,6 @@ const SparkPreviewSection = ({ title, children }: { title: string; children: Rea
 // Custom hook for AI interaction
 const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>, onSparkChange: (spark: Omit<Spark, 'id'>) => void) => {
     const [spark, setSpark] = useState<Omit<Spark, 'id'>>(initialSpark)
-    const [previousSparkRef] = useState<{ current: Omit<Spark, 'id'> }>({ current: initialSpark })
     
     // Memoize chat configs to prevent unnecessary recreations
     const chatConfigs = useMemo(() => createChatConfigs(), [])
@@ -53,63 +53,14 @@ const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>, on
     // Update spark when initialSpark changes
     useEffect(() => {
         setSpark(initialSpark)
-        previousSparkRef.current = initialSpark
-    }, [initialSpark, previousSparkRef])
-
-    // Helper function to check if spark has actually changed
-    const hasSparkChanged = useCallback((newSpark: Omit<Spark, 'id'>, oldSpark: Omit<Spark, 'id'>) => {
-        // Check key fields that would require saving
-        const fieldsToCheck = [
-            'title',
-            'description',
-            'detailedDescription',
-            'duration',
-            'price',
-            'methodology',
-            'targetAudience',
-            'prerequisites',
-            'deliverables',
-            'nextSteps',
-            'benefits',
-            'expertProfile',
-            'faq'
-        ]
-        
-        return fieldsToCheck.some(field => {
-            const oldValue = oldSpark[field as keyof Omit<Spark, 'id'>]
-            const newValue = newSpark[field as keyof Omit<Spark, 'id'>]
-            
-            // Handle arrays
-            if (Array.isArray(oldValue) && Array.isArray(newValue)) {
-                if (oldValue.length !== newValue.length) return true
-                return JSON.stringify(oldValue) !== JSON.stringify(newValue)
-            }
-            
-            // Handle objects
-            if (typeof oldValue === 'object' && oldValue !== null && 
-                typeof newValue === 'object' && newValue !== null) {
-                return JSON.stringify(oldValue) !== JSON.stringify(newValue)
-            }
-            
-            // Handle primitives
-            return oldValue !== newValue
-        })
-    }, [])
-
-    // Notify parent component when spark changes, but only if content actually changed
-    useEffect(() => {
-        if (hasSparkChanged(spark, previousSparkRef.current)) {
-            previousSparkRef.current = { ...spark }
-            onSparkChange(spark)
-        }
-    }, [spark, onSparkChange, hasSparkChanged, previousSparkRef])
+    }, [initialSpark])
 
     const handleMessagesUpdate = async (newMessages: Message[]) => {
         const lastUserMessage = [...newMessages].reverse().find(m => m.role === 'user')
         if (!lastUserMessage) return
 
-        setMessages(newMessages)
-        setMessages(prev => [...prev, { role: 'assistant', content: '⋯', isLoading: true }])
+        // Show loading state
+        setMessages(prev => [...newMessages, { role: 'assistant', content: '⋯', isLoading: true }])
 
         try {
             const systemPrompt = mode === 'create' 
@@ -123,16 +74,19 @@ const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>, on
 
             const response = await editSparkWithAI(aiMessages)
 
-            // Create updated messages before updating the spark state
+            // Create updated messages
             const updatedMessages: Message[] = [
                 ...newMessages,
                 { role: 'assistant', content: response.reply, summary: response.document }
             ]
 
-            // Process the document updates
+            // Update messages state FIRST to ensure the reply appears immediately
+            setMessages(updatedMessages)
+            
+            // Process the document updates AFTER updating messages
             const documentUpdates = response.document as Partial<Spark>
             
-            // Only update if there are actual changes
+            // Only update spark and trigger auto-save if there are document updates
             if (Object.keys(documentUpdates).length > 0) {
                 // Create the updated spark state by only applying defined fields
                 const updatedSpark = {
@@ -143,12 +97,15 @@ const useSparkAI = (mode: 'create' | 'edit', initialSpark: Omit<Spark, 'id'>, on
                     )
                 }
                 
-                // Update state
-                setMessages(updatedMessages)
-                setSpark(updatedSpark)
-            } else {
-                // Just update messages if no spark changes
-                setMessages(updatedMessages)
+                // Update spark state and trigger auto-save in the next tick
+                // This ensures the UI updates with the message first
+                setTimeout(() => {
+                    setSpark(updatedSpark)
+                    
+                    // Trigger auto-save only when we receive updates from AI
+                    logger.info('AI provided document updates, triggering auto-save')
+                    onSparkChange(updatedSpark)
+                }, 0)
             }
         } catch (error) {
             logger.error('Error getting AI response:', error)
@@ -174,20 +131,12 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
     const { user } = useAuth()
     
     const [error, setError] = useState<string | null>(null)
-    const [isSaving, setIsSaving] = useState(false)
     const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
     const [savedSparkId, setSavedSparkId] = useState<string | null>(null)
     const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
     const [sparkSlug, setSparkSlug] = useState<string | undefined>(initialSparkSlug)
-
-    // Debounce function for auto-save
-    const debounce = <T extends (...args: any[]) => any>(func: T, delay: number) => {
-        let timeoutId: NodeJS.Timeout
-        return (...args: Parameters<T>) => {
-            clearTimeout(timeoutId)
-            timeoutId = setTimeout(() => func(...args), delay)
-        }
-    }
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
 
     // Auto-save function
     const autoSave = useCallback(async (sparkData: Omit<Spark, 'id'>) => {
@@ -205,40 +154,27 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
         try {
             setAutoSaveStatus('saving')
             
-            // Log user information for debugging
-            logger.info('Auto-save attempt', { 
-                userId: user.id, 
+            // Show saving state for at least 1 second
+            const minSavingTimer = setTimeout(() => {}, 1000)
+            
+            // Log auto-save attempt
+            logger.info('Auto-saving after AI update', { 
                 mode,
                 sparkSlug,
-                savedSparkId,
-                hasConsultant: !!sparkData.consultant,
-                title: sparkData.title?.substring(0, 30) + (sparkData.title?.length > 30 ? '...' : '')
+                savedSparkId
             })
             
             let result: Spark
+            let isFirstSave = false
             
             if (mode === 'create') {
-                // For create mode, we don't generate a temporary slug
-                // We'll let the server generate it based on the title
                 const sparkToSave = {
                     ...sparkData,
-                    // Remove any client-side generated slug to allow server to generate one from title
-                    // Use empty string instead of undefined to satisfy type requirements
                     slug: sparkSlug || ''
                 }
                 
-                // Log the data being sent for debugging
-                logger.info('Spark data for save', { 
-                    mode, 
-                    hasSlug: !!sparkSlug,
-                    hasSavedId: !!savedSparkId,
-                    hasTitle: !!sparkData.title?.trim(),
-                    hasDescription: !!sparkData.description?.trim(),
-                    hasDetailedDescription: !!sparkData.detailedDescription?.trim()
-                })
-                
                 if (savedSparkId) {
-                    // If we already have a saved spark ID, update it using the original slug
+                    // Update existing spark
                     const originalSlug = sparkSlug
                     if (!originalSlug) {
                         throw new Error('Missing slug for update operation')
@@ -246,10 +182,10 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
                     result = await updateSparkAction(originalSlug, sparkToSave)
                 } else {
                     // First time saving
+                    isFirstSave = true
                     result = await createSparkAction(sparkToSave)
                     setSavedSparkId(result.id)
                     
-                    // Store the server-generated slug for future updates
                     if (result.slug) {
                         logger.info(`Spark created with ID: ${result.id} and slug: ${result.slug}`)
                         setSparkSlug(result.slug)
@@ -259,16 +195,8 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
                 // For edit mode, use the existing slug
                 const sparkToSave = {
                     ...sparkData,
-                    // Don't override the slug if it's already set by the server
-                    // Use empty string instead of undefined to satisfy type requirements
                     slug: sparkData.slug || ''
                 }
-                
-                // Log the data being sent for debugging
-                logger.info('Spark data for edit', { 
-                    mode, 
-                    sparkSlug
-                })
                 
                 result = await updateSparkAction(sparkSlug, sparkToSave)
             } else {
@@ -276,116 +204,93 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
             }
             
             setLastSavedAt(new Date())
+            
+            // Wait for the minimum saving timer to complete
+            await new Promise(resolve => {
+                clearTimeout(minSavingTimer)
+                resolve(null)
+            })
+            
             setAutoSaveStatus('saved')
             
-            // Reset status after a delay
+            // Reset status after a delay but keep lastSavedAt
             setTimeout(() => {
                 setAutoSaveStatus('idle')
             }, 3000)
+            
+            // Redirect to ai-edit/[sparkSlug] after first save in create mode
+            if (isFirstSave && result.slug) {
+                logger.info(`Redirecting to ai-edit/${result.slug} after first auto-save`)
+                setTimeout(() => {
+                    router.refresh()
+                    router.push(`/sparks/ai-edit/${result.slug}`)
+                }, 500) // Small delay to ensure state is updated
+            }
             
         } catch (error) {
             logger.error(`Error auto-saving spark:`, error)
             setAutoSaveStatus('error')
         }
-    }, [user, mode, savedSparkId, sparkSlug])
-    
-    // Create debounced version of autoSave
-    const debouncedAutoSave = useMemo(
-        () => debounce(autoSave, 2000), // 2 second delay
-        [autoSave]
-    )
+    }, [user, mode, savedSparkId, sparkSlug, router])
 
-    // Handle spark changes from the AI editor
+    // Handle spark changes from the AI editor - simplified to just call autoSave directly
     const handleSparkChange = useCallback((updatedSpark: Omit<Spark, 'id'>) => {
-        // Only trigger auto-save if there's meaningful content
-        const hasContent = updatedSpark.description || updatedSpark.detailedDescription
-        const hasTitle = updatedSpark.title?.trim()
-        
-        // Log what triggered the change
-        logger.info('Spark change detected', {
-            mode,
-            hasTitle: !!hasTitle,
-            hasContent: !!hasContent,
-            hasSavedId: !!savedSparkId,
-            title: updatedSpark.title?.substring(0, 30) + (updatedSpark.title?.length > 30 ? '...' : '')
-        })
-        
-        // For new sparks in create mode, require a title
-        if (mode === 'create' && !savedSparkId) {
-            // Only auto-save if there's a title
-            if (hasTitle) {
-                logger.info('Auto-saving new spark with title:', hasTitle)
-                debouncedAutoSave(updatedSpark)
-            } else {
-                logger.info('Skipping auto-save: No title for new spark')
-            }
-        } else if (hasContent || hasTitle) {
-            // For existing sparks, auto-save if there's any content
-            logger.info('Auto-saving existing spark with content')
-            debouncedAutoSave(updatedSpark)
-        } else {
-            logger.info('Skipping auto-save: No meaningful content changes')
-        }
-    }, [debouncedAutoSave, mode, savedSparkId])
+        // Auto-save immediately when we get updates from AI
+        autoSave(updatedSpark)
+    }, [autoSave])
 
     const { spark, messages, handleMessagesUpdate, chatConfig } = useSparkAI(mode, initialSpark, handleSparkChange)
 
-    const handleSave = async () => {
-        if (!user) {
-            setError('You must be logged in to save a spark')
-            return
-        }
-        
-        // Validate title before saving
-        if (mode === 'create' && !savedSparkId && !spark.title?.trim()) {
-            setError('Veuillez ajouter un titre avant de sauvegarder')
-            return
-        }
-        
-        setIsSaving(true)
-        try {
-            // Don't generate a temporary slug, let the server handle it
-            const sparkToSave = {
-                ...spark,
-                // Use existing slug if available, otherwise empty string
-                slug: sparkSlug || ''
-            }
-            
-            if (mode === 'create') {
-                if (savedSparkId) {
-                    // If we already have a saved spark, update it
-                    if (!sparkSlug) {
-                        throw new Error('Missing slug for update operation')
-                    }
-                    await updateSparkAction(sparkSlug, sparkToSave)
-                } else {
-                    // First time manual save
-                    const result = await createSparkAction(sparkToSave)
-                    setSavedSparkId(result.id)
-                    if (result.slug) {
-                        setSparkSlug(result.slug)
-                    }
-                }
-            } else if (mode === 'edit' && sparkSlug) {
-                await updateSparkAction(sparkSlug, sparkToSave)
-            }
-            
-            // Refresh the router to ensure data is updated when navigating back
-            router.refresh()
-            router.back()
-        } catch (error) {
-            logger.error(`Error ${mode === 'create' ? 'creating' : 'updating'} spark:`, error)
-            setError(`Impossible de ${mode === 'create' ? 'créer' : 'mettre à jour'} le spark. Veuillez réessayer plus tard.`)
-            setIsSaving(false)
-        }
-    }
-
     const handleBack = () => {
-        // Refresh the router to ensure data is updated when navigating back
         if (savedSparkId) {
             router.refresh()
         }
         router.back()
+    }
+
+    // Handle edit button click - navigate to manual edit page
+    const handleEditClick = () => {
+        logger.info('Edit button clicked, navigating to manual edit page')
+        if (sparkSlug) {
+            router.push(`/sparks/edit/${sparkSlug}`)
+        } else {
+            logger.error('Cannot navigate to edit page: Missing spark slug')
+        }
+    }
+
+    // Handle delete button click - show confirmation modal
+    const handleDeleteClick = () => {
+        logger.info('Delete button clicked, showing confirmation modal')
+        setIsDeleteModalOpen(true)
+    }
+
+    // Handle confirm delete
+    const handleConfirmDelete = async () => {
+        if (!sparkSlug) {
+            logger.error('Cannot delete spark: Missing spark slug')
+            setIsDeleteModalOpen(false)
+            return
+        }
+
+        setIsDeleting(true)
+        try {
+            logger.info(`Deleting spark with slug: ${sparkSlug}`)
+            await deleteSparkAction(sparkSlug)
+            
+            // Close modal and redirect to sparks management page
+            setIsDeleteModalOpen(false)
+            router.refresh()
+            router.push('/sparks/manage')
+        } catch (error) {
+            logger.error('Error deleting spark:', error)
+            setError('Impossible de supprimer le spark. Veuillez réessayer plus tard.')
+            setIsDeleting(false)
+        }
+    }
+
+    // Handle cancel delete
+    const handleCancelDelete = () => {
+        setIsDeleteModalOpen(false)
     }
 
     if (error) {
@@ -421,29 +326,6 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
                                 <h1 className="text-3xl font-bold text-gray-900">
                                     {pageTitle}
                                 </h1>
-                                
-                                {/* Auto-save status indicator */}
-                                <div className="ml-auto flex items-center gap-2">
-                                    {autoSaveStatus === 'saving' && (
-                                        <div className="flex items-center text-amber-600">
-                                            <div className="w-4 h-4">
-                                                <LoadingSpinner fullScreen={false} message="" />
-                                            </div>
-                                            <span className="ml-2 text-sm">Enregistrement...</span>
-                                        </div>
-                                    )}
-                                    {autoSaveStatus === 'saved' && (
-                                        <div className="flex items-center text-green-600">
-                                            <Save className="h-4 w-4" />
-                                            <span className="ml-2 text-sm">Enregistré {lastSavedAt ? `à ${lastSavedAt.toLocaleTimeString()}` : ''}</span>
-                                        </div>
-                                    )}
-                                    {autoSaveStatus === 'error' && (
-                                        <div className="flex items-center text-red-600">
-                                            <span className="ml-2 text-sm">Erreur d'enregistrement</span>
-                                        </div>
-                                    )}
-                                </div>
                             </div>
                             <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
                                 <div className="p-4 border-b border-gray-200">
@@ -457,9 +339,8 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
                                     template={mode === 'create' ? DOCUMENT_TEMPLATES.spark_content_creator : DOCUMENT_TEMPLATES.spark_content_editor}
                                     messages={messages}
                                     onMessagesUpdate={handleMessagesUpdate}
-                                    shouldReset={isSaving}
-                                    onConnect={handleSave}
                                     hideSummary={true}
+                                    isSparkConfig={true}
                                 />
                             </div>
                         </div>
@@ -467,6 +348,51 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
 
                     {/* Right Column - Preview */}
                     <div className="lg:w-1/2">
+                        {/* Section header with autosave status */}
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg lg:text-xl font-semibold text-gray-900">Aperçu du Spark</h2>
+                            {/* Improved autosave status indicator with persistent message and action buttons */}
+                            <div className="flex items-center gap-3">
+                                {/* Status messages with consistent width for alignment */}
+                                <div className="w-44 flex justify-start items-center">
+                                    {/* Always render icons but conditionally show them */}
+                                    <Loader2 className={`h-5 w-5 mr-1.5 ${autoSaveStatus === 'saved' ? 'text-green-600' : 'text-gray-500'} ${autoSaveStatus === 'saving' ? 'animate-spin visible' : 'invisible'} absolute`} />
+                                    <Save className={`h-5 w-5 mr-1.5 ${autoSaveStatus === 'saved' ? 'text-green-600' : 'text-gray-500'} ${autoSaveStatus === 'saved' || (autoSaveStatus === 'idle' && lastSavedAt) ? 'visible' : 'invisible'} absolute`} />
+                                    <div className="w-5 h-5 mr-1.5 flex-shrink-0"></div> {/* Placeholder to maintain spacing */}
+                                    
+                                    {autoSaveStatus === 'saving' && (
+                                        <span className="text-green-600 text-sm">Enregistrement...</span>
+                                    )}
+                                    {(autoSaveStatus === 'saved' || (autoSaveStatus === 'idle' && lastSavedAt)) && (
+                                        <span className={`text-sm ${autoSaveStatus === 'saved' ? 'text-green-600' : 'text-gray-500'}`}>
+                                            Enregistré {lastSavedAt ? `à ${lastSavedAt.toLocaleTimeString()}` : ''}
+                                        </span>
+                                    )}
+                                    {autoSaveStatus === 'error' && (
+                                        <span className="text-red-600 text-sm">Erreur d'enregistrement</span>
+                                    )}
+                                </div>
+                                
+                                {/* Action buttons (only show if we have a saved spark) */}
+                                <div className="flex items-center">
+                                    <button
+                                        onClick={handleEditClick}
+                                        className={`text-gray-600 hover:text-gray-900 transition-colors ${lastSavedAt ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                                        title="Modifier manuellement"
+                                    >
+                                        <Edit2 className="h-5 w-5" />
+                                    </button>
+                                    <button
+                                        onClick={handleDeleteClick}
+                                        className={`text-red-600 hover:text-red-700 transition-colors ml-3 ${lastSavedAt ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                                        title="Supprimer"
+                                    >
+                                        <Trash2 className="h-5 w-5" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <motion.div
                             initial="initial"
                             animate="animate"
@@ -572,6 +498,18 @@ export default function SparkAIEditor({ mode, initialSpark, sparkSlug: initialSp
                     </div>
                 </div>
             </div>
+
+            {/* Delete Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={isDeleteModalOpen}
+                title="Confirmer la suppression"
+                message="Êtes-vous sûr de vouloir supprimer ce spark ? Cette action est irréversible."
+                confirmLabel={isDeleting ? "Suppression..." : "Supprimer"}
+                cancelLabel="Annuler"
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+                variant="danger"
+            />
         </div>
     )
 } 
